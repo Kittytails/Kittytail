@@ -9,8 +9,7 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
   body{background:var(--bg-color);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;display:flex;flex-direction:column;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
-
-  .dynamic-edit-pill{
+.dynamic-edit-pill{
     position:fixed;top:max(16px,env(safe-area-inset-top));left:50%;
     transform:translateX(-50%) scale(.9) translateY(-90px);
     display:flex;align-items:center;
@@ -78,29 +77,119 @@
   .home-indicator.search-mode{min-width:76px;padding-left:12px;padding-right:14px}
   .search-label{display:inline-block;font-size:13px;line-height:1;color:#666;letter-spacing:.2px;white-space:nowrap;font-weight:500}
   .search-symbol{display:block;flex-shrink:0}
-  .page-dots{display:none;align-items:center;justify-content:center;gap:5px;max-width:120px}
+  .page-dots{display:none;align-items:center;justify-content:center;gap:5px;max-width:80px}
   .home-indicator.pages-mode .search-symbol,.home-indicator.pages-mode .search-label{display:none}
   .home-indicator.pages-mode .page-dots{display:inline-flex}
   .page-dot{width:6px;height:6px;border-radius:50%;background:rgba(90,90,90,.42);flex:0 0 6px;border:0;padding:0;cursor:pointer;transition:background .2s ease}
   .page-dot.active{width:7.5px;height:7.5px;flex-basis:7.5px;background:rgba(40,40,40,.78)}
   body.edit-mode .home-indicator{transform:translateY(-10px)}
 
-  .dock-wrapper{padding:10px 15px 35px;z-index:10;flex:0 0 auto}
-  .dock{height:88px;position:relative;background:rgba(255,255,255,.65);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);border-radius:32px;display:flex;justify-content:space-around;align-items:center;padding:0 15px;box-shadow:0 8px 30px rgba(0,0,0,.05);border:1px solid rgba(255,255,255,.8);min-width:100%;touch-action:none}
+  .dock-wrapper{padding:10px 15px 35px;z-index:10;flex:0 0 auto;display:flex;justify-content:center}
+  .dock{height:88px;position:relative;background:rgba(255,255,255,.65);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);border-radius:32px;display:flex;justify-content:space-around;align-items:center;padding:0 15px;box-shadow:0 8px 30px rgba(0,0,0,.05);border:1px solid rgba(255,255,255,.8);width:100%;touch-action:none;transition:width .22s cubic-bezier(.2,.8,.2,1)}
   .dock.drag-target{box-shadow:0 8px 30px rgba(0,0,0,.05),0 0 0 2px rgba(0,0,0,.045)}
   .dock .app{flex:1 1 0;min-width:0;max-width:72px;width:auto;height:auto;gap:0;transform:none;animation:none!important;transition:transform .16s ease}
   .dock .app .label{display:none}
   body.dragging-app .dock .app:not(.dragging){transition:transform .16s cubic-bezier(.2,.8,.2,1)}
   .app::before,.app::after{content:none!important;display:none!important}
 
-  .app-launch-overlay{position:fixed;inset:0;z-index:200000;background:#fff;transform:translateY(100%);opacity:0;pointer-events:none;transition:transform .38s cubic-bezier(.2,.8,.2,1),opacity .28s ease;display:flex;flex-direction:column}
-  .app-launch-overlay.show{transform:translateY(0);opacity:1;pointer-events:auto}
-  .app-launch-bar{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:max(10px,env(safe-area-inset-top)) 10px 8px;background:rgba(247,247,247,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.05)}
-  .app-launch-back{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.05);cursor:pointer;flex-shrink:0}
-  .app-launch-back:active{background:rgba(0,0,0,.1)}
-  .app-launch-title{font-size:15px;font-weight:600;color:#111}
-  .app-launch-body{flex:1 1 auto;min-height:0}
-  .app-launch-body iframe{width:100%;height:100%;border:0;display:block;background:#fff}
+  /* ===== 轻量精修：扁平、轻玻璃，不改变原有比例 ===== */
+  body{
+    background:var(--bg-color);
+  }
+  body::before{display:none}
+
+  .desktop.home-page{
+    padding-left:16px;padding-right:16px;
+    column-gap:12px;row-gap:12px;
+  }
+  .desktop-grid{
+    inset:24px 16px;
+    gap:12px;
+  }
+  .grid-slot{
+    border-radius:22px;
+    background:rgba(255,255,255,.035);
+  }
+  .icon{
+    box-shadow:0 4px 14px rgba(0,0,0,.035);
+    border-color:rgba(0,0,0,.022);
+  }
+  .label{
+    text-shadow:none;
+  }
+
+  /* 拖动目标：左上角定位点更大、更清楚 */
+  .drag-target-block{
+    background:rgba(0,0,0,.035);
+    border:1.5px dashed rgba(0,0,0,.16);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.025);
+  }
+  .drag-target-block::before{
+    content:"";
+    position:absolute;
+    width:9px;height:9px;
+    left:-5px;top:-5px;
+    border-radius:50%;
+    background:#555;
+    border:2px solid rgba(255,255,255,.96);
+    box-shadow:0 2px 7px rgba(0,0,0,.16);
+    z-index:3;
+  }
+
+  /* Dock：降低玻璃厚重感 */
+  .dock{
+    background:rgba(255,255,255,.58);
+    backdrop-filter:blur(16px) saturate(1.08);
+    -webkit-backdrop-filter:blur(16px) saturate(1.08);
+    box-shadow:0 7px 24px rgba(0,0,0,.045);
+    border:1px solid rgba(255,255,255,.72);
+  }
+  /* Dock：图标数量少于4个时，整条胶囊栏本身收缩变窄并居中，而不是拉伸/放大图标 */
+  .dock.dock-compact{
+    width:auto;
+    min-width:0;
+    flex:0 0 auto;
+    justify-content:center;
+    gap:24px;
+    padding:0 28px;
+  }
+  .dock.dock-compact .app{
+    flex:0 0 72px;
+  }
+
+  /* 翻页边缘：更窄、更柔 */
+  .edge-hint{
+    width:56px;
+    transition:opacity .14s ease,background .14s ease;
+  }
+  .edge-hint.active{
+    background:linear-gradient(to right,rgba(0,0,0,.045),transparent 72%);
+  }
+  .edge-hint.right.active{
+    background:linear-gradient(to left,rgba(0,0,0,.045),transparent 72%);
+  }
+  .edge-hint.armed{
+    background:linear-gradient(to right,rgba(0,0,0,.085),transparent 76%);
+  }
+  .edge-hint.right.armed{
+    background:linear-gradient(to left,rgba(0,0,0,.085),transparent 76%);
+  }
+
+  @media (max-height:720px){
+    .desktop.home-page{padding-top:18px;padding-bottom:18px;row-gap:8px}
+    .desktop-grid{inset:18px 16px;row-gap:8px}
+    .dock-wrapper{padding-top:7px;padding-bottom:27px}
+    .dock{height:80px;border-radius:29px}
+    .home-indicator-area{height:30px;flex-basis:30px}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{
+      scroll-behavior:auto!important;
+      transition-duration:.01ms!important;
+      animation-duration:.01ms!important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -117,18 +206,18 @@
   <div class="dep-divider"></div>
   <div class="dep-btn primary" id="doneBtn">完成</div>
 </div>
-
 <div class="pages-viewport" id="pagesViewport">
   <div class="edge-hint left" id="edgeHintLeft"></div>
   <div class="edge-hint right" id="edgeHintRight"></div>
   <div class="desktop home-page active-page" id="desktop" data-page="0">
+    <!-- 只有“直链”这个图标配了 data-link，指向同目录下的 直链.html -->
     <div class="app"><div class="icon">微信</div><span class="label">微信</span></div>
     <div class="app"><div class="icon">世界书</div><span class="label">世界书</span></div>
     <div class="app"><div class="icon">档案</div><span class="label">档案</span></div>
     <div class="app"><div class="icon">设置</div><span class="label">设置</span></div>
     <div class="app"><div class="icon">倒数日</div><span class="label">倒数日</span></div>
-    <div class="app"><div class="icon">资源库</div><span class="label">资源库</span></div>
     <div class="app"><div class="icon">美化</div><span class="label">美化</span></div>
+    <div class="app" data-link="直链.html"><div class="icon">直链</div><span class="label">直链</span></div>
   </div>
 </div>
 
@@ -152,24 +241,13 @@
   </div>
 </div>
 
-<div class="app-launch-overlay" id="appLaunchOverlay">
-  <div class="app-launch-bar">
-    <div class="app-launch-back" id="appLaunchBack">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-    </div>
-    <div class="app-launch-title" id="appLaunchTitle">资源库</div>
-  </div>
-  <div class="app-launch-body"><iframe id="appLaunchFrame" src="about:blank"></iframe></div>
-</div>
-
-
 <script>
 (() => {
   'use strict';
   const COLS=4,ROWS=6,SLOT_COUNT=COLS*ROWS;
-  const LONG_PRESS_MS=700,CANCEL_PRESS_PX=10,SWIPE_START_PX=3,SWIPE_AXIS_RATIO=1.02,VERTICAL_BAIL_PX=9;
-  const FLIP_RATIO=.07,FLIP_VELOCITY=.35,EDGE_DAMP=.28;
-  const EDGE_ZONE=72,EDGE_HOLD_MS=160,EDGE_REPEAT_DELAY=1200,EDGE_FLIP_DURATION=360;
+  const LONG_PRESS_MS=700,CANCEL_PRESS_PX=10,SWIPE_START_PX=5,SWIPE_AXIS_RATIO=1.12,VERTICAL_BAIL_PX=10;
+  const FLIP_RATIO=.10,FLIP_VELOCITY=.58,EDGE_DAMP=.22;
+  const EDGE_ZONE=72,EDGE_HOLD_MS=160,EDGE_REPEAT_DELAY=1200,EDGE_FLIP_DURATION=440;
 
   const body=document.body;
   const viewport=document.getElementById('pagesViewport');
@@ -184,24 +262,13 @@
   const edgeHintLeft=document.getElementById('edgeHintLeft');
   const edgeHintRight=document.getElementById('edgeHintRight');
 
-  const APP_URLS={'资源库':'资源库 2.html'};
-  const appLaunchOverlay=document.getElementById('appLaunchOverlay');
-  const appLaunchBack=document.getElementById('appLaunchBack');
-  const appLaunchTitle=document.getElementById('appLaunchTitle');
-  const appLaunchFrame=document.getElementById('appLaunchFrame');
-
-  function openLaunchApp(name){const url=APP_URLS[name];if(!url)return;appLaunchTitle.textContent=name;appLaunchFrame.src=url;appLaunchOverlay.classList.add('show')}
-  function closeLaunchApp(){appLaunchOverlay.classList.remove('show');setTimeout(()=>{appLaunchFrame.src='about:blank'},400)}
-  if(appLaunchBack)appLaunchBack.addEventListener('click',closeLaunchApp);
-  if(appLaunchOverlay)appLaunchOverlay.addEventListener('pointerdown',e=>e.stopPropagation());
-
   let pages=[],currentPageIndex=0,desktop=null;
   let pagePos=0,rafHandle=0,anim=null;
   let editMode=false,appDrag=null,swipe=null,pressTimer=null,pressOrigin=null,pressStartTime=0,suppressNextClick=false;
   let edgeTimer=null,edgeDir=0,edgeHasFlipped=false;
 
   const clamp=(v,a,b)=>v<a?a:(v>b?b:v);
-  const easeOutSmooth=t=>1-Math.pow(1-t,2.8);
+  const easeOutSmooth=t=>1-Math.pow(1-t,3.05);
   const damp=x=>Math.min(x*EDGE_DAMP,EDGE_DAMP);
   const isWidgetEl=el=>el.classList.contains('widget-2x2')||el.classList.contains('widget-4x2')||el.classList.contains('widget-4x3');
 
@@ -233,7 +300,7 @@
     }
     const from=pagePos,dist=target-from;
     if(Math.abs(dist)<.0005){pagePos=target;renderPages(pagePos);return}
-    const dur=duration!=null?duration:clamp(380+Math.abs(dist)*90,380,500);
+    const dur=duration!=null?duration:clamp(400+Math.abs(dist)*95,400,540);
     anim={from,to:target,start:performance.now(),duration:dur};
     const tick=now=>{
       if(!anim)return;
@@ -256,10 +323,10 @@
 
   function clearEdgeTimer(){if(edgeTimer){clearTimeout(edgeTimer);edgeTimer=null}edgeDir=0;edgeHasFlipped=false;edgeHintLeft.classList.remove('active','armed');edgeHintRight.classList.remove('active','armed')}
   function setEdgeHint(dir,armed){edgeHintLeft.classList.remove('active','armed');edgeHintRight.classList.remove('active','armed');if(dir===-1){edgeHintLeft.classList.add('active');if(armed)edgeHintLeft.classList.add('armed')}else if(dir===1){edgeHintRight.classList.add('active');if(armed)edgeHintRight.classList.add('armed')}}
-  function checkEdgeTrigger(x){
+  function checkEdgeTrigger(x,rect){
     if(!appDrag){clearEdgeTimer();return}
-    const rect=viewport.getBoundingClientRect();
-    const distLeft=x-rect.left,distRight=rect.right-x;
+    const r=rect||viewport.getBoundingClientRect();
+    const distLeft=x-r.left,distRight=r.right-x;
     let dir=0;
     if(distLeft<EDGE_ZONE&&currentPageIndex>0)dir=-1;
     else if(distRight<EDGE_ZONE&&currentPageIndex<pages.length-1)dir=1;
@@ -325,6 +392,9 @@
     }
     if(inViewport)startSwipe(e);
     clearPressTimer();
+    const pressAppEl=e.target.closest('.app');
+    const isAppPress=!!(pressAppEl&&(pressAppEl.parentElement===desktop||pressAppEl.parentElement===dock));
+    if(!isAppPress)return;
     pressOrigin={x:e.clientX,y:e.clientY};
     pressStartTime=performance.now();
     pressTimer=setTimeout(()=>{
@@ -335,9 +405,22 @@
   }
   function clearPressTimer(){if(pressTimer){clearTimeout(pressTimer);pressTimer=null}pressOrigin=null}
 
+  let pendingMoveEvent=null,moveRafScheduled=false;
+  function scheduleMoveFrame(){
+    if(moveRafScheduled)return;
+    moveRafScheduled=true;
+    requestAnimationFrame(flushMoveFrame);
+  }
+  function flushMoveFrame(){
+    moveRafScheduled=false;
+    const e=pendingMoveEvent;pendingMoveEvent=null;
+    if(!e)return;
+    if(appDrag&&e.pointerId===appDrag.pointerId)moveAppDrag(e);
+    else if(swipe&&e.pointerId===swipe.pointerId)moveSwipe(e);
+  }
   function onPointerMove(e){
-    if(appDrag){if(e.pointerId!==appDrag.pointerId)return;e.preventDefault();moveAppDrag(e);return}
-    if(swipe&&e.pointerId===swipe.pointerId){moveSwipe(e);return}
+    if(appDrag){if(e.pointerId!==appDrag.pointerId)return;e.preventDefault();pendingMoveEvent=e;scheduleMoveFrame();return}
+    if(swipe&&e.pointerId===swipe.pointerId){pendingMoveEvent=e;scheduleMoveFrame();return}
     if(pressOrigin){const dx=e.clientX-pressOrigin.x,dy=e.clientY-pressOrigin.y;if(dx*dx+dy*dy>CANCEL_PRESS_PX*CANCEL_PRESS_PX)clearPressTimer()}
   }
 
@@ -355,7 +438,7 @@
   }
   function endSwipe(e){
     const s=swipe;swipe=null;if(!s)return;
-    if(!s.active){clearPressTimer();animateTo(Math.round(pagePos),320);return}
+    if(!s.active){clearPressTimer();animateTo(Math.round(pagePos),400);return}
     suppressNextClick=true;setTimeout(()=>{suppressNextClick=false},350);
     const maxIdx=pages.length-1;
     const sinceLast=performance.now()-s.lastTime;
@@ -370,22 +453,24 @@
     else if(dir!==0&&ratio>.012)target=Math.round(base+dir*.28);
     else target=Math.round(base);
     target=clamp(target,0,maxIdx);
-    const dist=Math.abs(target-pagePos);const duration=clamp(360+dist*100,360,460);
+    const dist=Math.abs(target-pagePos);const duration=clamp(400+dist*95,400,540);
     animateTo(target,duration);
   }
   function onPointerUp(e){
+    pendingMoveEvent=null;
     if(appDrag){endAppDrag(e);return}
     if(swipe&&e.pointerId===swipe.pointerId){endSwipe(e);return}
     clearPressTimer();
   }
   function onPointerCancel(e){
+    pendingMoveEvent=null;
     if(appDrag){cancelAppDrag();clearPressTimer();return}
     if(swipe){
       const s=swipe;swipe=null;
       if(s.active){
         suppressNextClick=true;setTimeout(()=>{suppressNextClick=false},350);
-        animateTo(Math.round(pagePos),360);
-      }else animateTo(Math.round(pagePos),320);
+        animateTo(Math.round(pagePos),440);
+      }else animateTo(Math.round(pagePos),400);
     }
     clearPressTimer();
   }
@@ -412,6 +497,12 @@
   function initializeSlots(){pages.forEach(page=>{page.querySelectorAll(':scope > .app').forEach((app,i)=>setDesktopSlot(app,i,false))});normalizeDockSlots()}
   function desktopApps(){return Array.from(desktop.querySelectorAll(':scope > .app'))}
   function dockApps(){return Array.from(dock.querySelectorAll(':scope > .app'))}
+  const MAX_DOCK_APPS=4;
+  function dockHasRoom(exceptApp){return dockApps().filter(a=>a!==exceptApp).length<MAX_DOCK_APPS}
+  function updateDockFit(){
+    const n=dockApps().length;
+    dock.classList.toggle('dock-compact',n>0&&n<MAX_DOCK_APPS);
+  }
 
   function occupiedDesktop(index,except,w,h){
     const aw=w||1,ah=h||1;
@@ -532,7 +623,9 @@
       originPageIndex:currentPageIndex,currentArea:originArea,
       currentSlot:originSlot,startX:e.clientX,startY:e.clientY,
       moved:false,offsetX:e.clientX-rect.left,offsetY:e.clientY-rect.top,
-      ghost:null,rect,justAdded:false
+      ghost:null,rect,justAdded:false,
+      dockRect:document.querySelector('.dock-wrapper').getBoundingClientRect(),
+      desktopRect:viewport.getBoundingClientRect()
     };
     try{app.setPointerCapture(e.pointerId)}catch(_){}
   }
@@ -556,16 +649,18 @@
       d.ghost.style.left=(e.clientX-d.offsetX)+'px';
       d.ghost.style.top=(e.clientY-d.offsetY-2)+'px';
     }
-    const dockRect=document.querySelector('.dock-wrapper').getBoundingClientRect();
-    const desktopRect=viewport.getBoundingClientRect();
+    const dockRect=d.dockRect;
+    const desktopRect=d.desktopRect;
     const isWidget=isWidgetEl(d.app);
     const aw=Number(d.app.dataset.w||1),ah=Number(d.app.dataset.h||1);
-    if(pointInRect(e.clientX,e.clientY,dockRect)&&!isWidget){
+    if(pointInRect(e.clientX,e.clientY,dockRect)&&!isWidget&&dockHasRoom(d.app)){
       d.currentArea='dock';d.currentSlot=nearestDockInsertIndex(e.clientX);
       showTarget('dock',d.currentSlot);clearEdgeTimer();
     }else if(pointInRect(e.clientX,e.clientY,desktopRect)){
       d.currentArea='desktop';d.currentSlot=nearestDesktopSlot(e.clientX,e.clientY,aw,ah);
-      showTarget('desktop',d.currentSlot,aw,ah);checkEdgeTrigger(e.clientX);
+      showTarget('desktop',d.currentSlot,aw,ah);checkEdgeTrigger(e.clientX,desktopRect);
+    }else if(pointInRect(e.clientX,e.clientY,dockRect)){
+      clearTarget();clearEdgeTimer();
     }else clearEdgeTimer();
   }
 
@@ -587,10 +682,10 @@
       return;
     }
 
-    const dockRect=document.querySelector('.dock-wrapper').getBoundingClientRect();
-    const desktopRect=viewport.getBoundingClientRect();
+    const dockRect=d.dockRect;
+    const desktopRect=d.desktopRect;
     let area=d.currentArea,slot=d.currentSlot;
-    if(pointInRect(e.clientX,e.clientY,dockRect)&&!isWidget){
+    if(pointInRect(e.clientX,e.clientY,dockRect)&&!isWidget&&dockHasRoom(app)){
       area='dock';slot=nearestDockInsertIndex(e.clientX);
     }else if(pointInRect(e.clientX,e.clientY,desktopRect)||isWidget){
       area='desktop';slot=nearestDesktopSlot(e.clientX,e.clientY,aw,ah);
@@ -603,10 +698,12 @@
       const at=clamp(slot,0,others.length);
       dock.insertBefore(app,others[at]||null);
       normalizeDockSlots();
+      updateDockFit();
     }else{
       if(app.parentElement!==desktop)desktop.appendChild(app);
       setDesktopSlot(app,slot,true);
       relocateOverlaps(app);
+      updateDockFit();
     }
     try{app.releasePointerCapture(d.pointerId)}catch(_){}
     appDrag=null;
@@ -632,19 +729,38 @@
       if(app.parentElement!==originPage)originPage.appendChild(app);
       setDesktopSlot(app,d.originSlot,false);
     }
+    updateDockFit();
     try{app.releasePointerCapture(d.pointerId)}catch(_){}
     clearTarget();appDrag=null;
     body.classList.remove('is-dragging-app','dragging-app');
     requestAnimationFrame(fitDesktopWidgets);
   }
 
+
+  // 轻量增强：点击桌面空白处时给页面一个极短的触感反馈；不改变原有逻辑。
+  function softHaptic(){
+    if(navigator.vibrate) navigator.vibrate(4);
+  }
+
   function enterEditMode(){if(editMode)return;editMode=true;body.classList.add('edit-mode');if(navigator.vibrate)navigator.vibrate(45)}
   function exitEditMode(){if(!editMode)return;if(appDrag)cancelAppDrag();editMode=false;body.classList.remove('edit-mode');clearTarget();clearEdgeTimer();edgeHasFlipped=false}
 
 
+  function openAppLink(link){
+    if(!link)return;
+    link=link.trim();
+    if(!link)return;
+    if(/^(tel:|mailto:|sms:)/i.test(link)){location.href=link;return}
+    if(/^https?:\/\//i.test(link)){window.open(link,'_blank','noopener');return}
+    location.href=link;
+  }
+
   body.addEventListener('click',e=>{
     if(suppressNextClick)return;
-    if(!editMode){const appEl=e.target.closest('.app');if(appEl){const labelEl=appEl.querySelector('.label');const name=labelEl?labelEl.textContent.trim():'';if(APP_URLS[name]){openLaunchApp(name);return}}}
+    if(!editMode){
+      const appEl=e.target.closest('.app');
+      if(appEl)openAppLink(appEl.dataset.link);
+    }
     if(editMode&&!e.target.closest('.app')&&!e.target.closest('.dynamic-edit-pill')&&!e.target.closest('.widget-modal'))exitEditMode();
   });
 
@@ -678,8 +794,10 @@
     searchLabel.style.display=isHome?'inline-block':'none';
     pageDots.innerHTML='';
     if(!isHome&&count>1){
-      let start=Math.max(0,currentPageIndex-1),end=start+2;
-      if(end>=count){end=count-1;start=Math.max(0,end-2)}
+      const windowSize=Math.min(3,count);
+      let start=Math.max(0,currentPageIndex-Math.floor(windowSize/2));
+      let end=start+windowSize-1;
+      if(end>=count){end=count-1;start=Math.max(0,end-windowSize+1)}
       const frag=document.createDocumentFragment();
       for(let i=start;i<=end;i++){const dot=document.createElement('button');dot.type='button';dot.className='page-dot'+(i===currentPageIndex?' active':'');dot.setAttribute('aria-label','第 '+(i+1)+' 页');dot.addEventListener('click',ev=>{ev.stopPropagation();goToPage(i)});frag.appendChild(dot)}
       pageDots.appendChild(frag);
@@ -698,9 +816,10 @@
   pages=getPages();
   pages.forEach(pg=>buildGrid(pg));
   initializeSlots();
+  updateDockFit();
   desktop=pages[0];pagePos=0;renderPages(0);commitPage(0);
 
-  window.addEventListener('resize',()=>{cancelAnim();const rounded=Math.round(pagePos);pagePos=rounded;renderPages(rounded);commitPage(rounded);resizeWidgetPreviews();fitDesktopWidgets()},{passive:true});
+  window.addEventListener('resize',()=>{cancelAnim();const rounded=Math.round(pagePos);pagePos=rounded;renderPages(rounded);commitPage(rounded);resizeWidgetPreviews();fitDesktopWidgets();if(appDrag){appDrag.dockRect=document.querySelector('.dock-wrapper').getBoundingClientRect();appDrag.desktopRect=viewport.getBoundingClientRect()}},{passive:true});
 })();
 </script>
 </body>

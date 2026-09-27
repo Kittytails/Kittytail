@@ -125,6 +125,24 @@
     .repo-live-item.long-pressing .repo-live-preview { transform:scale(.96); }
     .repo-live-loading, .repo-live-empty { text-align:center; color:var(--text-secondary); font-size:12px; padding:28px 0; }
     .repo-live-error { color:#555; }
+    .repo-breadcrumb { display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin:-4px 0 14px; font-size:12px; color:var(--text-secondary); }
+    .repo-breadcrumb .crumb { cursor:pointer; padding:2px 4px; border-radius:6px; font-weight:600; }
+    .repo-breadcrumb .crumb:last-child { color:var(--primary); cursor:default; }
+    .repo-breadcrumb .crumb-sep { opacity:.5; }
+    .repo-folder-item .repo-live-preview { background:#F0F0F0; }
+    .repo-folder-icon { font-size:26px; line-height:1; }
+    .repo-folder-del { position:absolute; top:-5px; right:-5px; width:12px; height:12px; border-radius:50%; background:var(--primary); border:4px solid #FFFFFF; box-sizing:content-box; cursor:pointer; z-index:5; padding:0; outline:none; }
+    .move-folder-list { max-height:38vh; overflow:auto; display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+    .move-folder-item { padding:11px 13px; border-radius:12px; background:#F6F6F6; border:1px solid #E8E8E8; font-size:13px; font-weight:600; color:#222; cursor:pointer; }
+    .move-folder-item.active { background:#111111; color:#FFFFFF; border-color:#111111; }
+    .move-new-folder-row { display:flex; gap:8px; margin-bottom:14px; }
+    .move-new-folder-row input { flex:1; border:1px solid var(--border); border-radius:10px; padding:10px 12px; font-size:13px; background:#FAFAFA; font-family:inherit; }
+    html[data-theme="dark"] .move-folder-item { background:#2C2C2E; border-color:#48484A; color:#F5F5F7; }
+    html[data-theme="dark"] .move-folder-item.active { background:#F5F5F7; color:#111113; border-color:#F5F5F7; }
+    html[data-theme="dark"] .move-new-folder-row input { background:#2C2C2E; color:#F5F5F7; border-color:#48484A; }
+    html[data-theme="dark"] .repo-breadcrumb { color:#98989F; }
+    html[data-theme="dark"] .repo-breadcrumb .crumb:last-child { color:#F5F5F7; }
+    html[data-theme="dark"] .repo-folder-item .repo-live-preview { background:#2C2C2E; }
     .gallery-date-header { font-size: 14px; font-weight: 700; color: var(--primary); margin: 18px 0 10px; padding-left: 2px; letter-spacing: -0.2px; }
     .gallery-date-header:first-child { margin-top: 0; }
     .gallery-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px 16px; }
@@ -826,14 +844,19 @@
         <div class="card repo-live-card">
             <div class="card-head-row" style="align-items: center; margin-bottom: 12px;">
                 <div class="title" style="margin-bottom: 0;">Repository Files</div>
-                <button class="small-btn" id="repo-refresh-btn" onclick="loadRepoLiveFiles(true)">刷新</button>
+                <div class="card-head-actions">
+                    <button class="small-btn" onclick="createRepoFolder()">新建文件夹</button>
+                    <button class="small-btn" id="repo-refresh-btn" onclick="loadRepoLiveFiles(true)">刷新</button>
+                </div>
             </div>
             <div class="sub repo-live-sub" id="repo-live-status">kittytailcat/kittytail-assets · 12 个文件</div>
+            <div class="repo-breadcrumb" id="repo-breadcrumb"></div>
             <div class="repo-select-bar" id="repo-select-bar">
                 <div class="repo-select-info" id="repo-select-info">已选择 0 项</div>
                 <div class="repo-select-actions">
                     <button class="small-btn" id="repo-select-all-btn" onclick="toggleRepoSelectAll()">全选</button>
                     <button class="small-btn" onclick="exitRepoMultiMode()">取消</button>
+                    <button class="small-btn" onclick="openMoveSheet()">移动到</button>
                     <button class="small-btn black" onclick="deleteSelectedRepoFiles()">删除选中</button>
                 </div>
             </div>
@@ -887,6 +910,22 @@
         <div class="delete-sheet-actions">
             <button class="delete-cancel" onclick="closeDeleteSheet()">取消</button>
             <button class="delete-confirm" onclick="confirmDeleteSelected()">确认删除</button>
+        </div>
+    </div>
+</div>
+
+<!-- 移动文件到文件夹 -->
+<div class="delete-sheet-backdrop" id="move-sheet-backdrop" onclick="if(event.target===this) closeMoveSheet()">
+    <div class="delete-sheet">
+        <div class="delete-sheet-title">移动到文件夹</div>
+        <div class="delete-sheet-sub">选择目标文件夹，或在下方输入新文件夹名称。</div>
+        <div class="move-folder-list" id="move-folder-list"></div>
+        <div class="move-new-folder-row">
+            <input type="text" id="move-new-folder-input" placeholder="在所选位置下新建文件夹（可选）">
+        </div>
+        <div class="delete-sheet-actions">
+            <button class="delete-cancel" onclick="closeMoveSheet()">取消</button>
+            <button class="delete-confirm" onclick="confirmMoveSheet()">确认移动</button>
         </div>
     </div>
 </div>
@@ -1333,6 +1372,235 @@ let repoLiveLoading = false;
 let repoLiveLoadedAt = 0;
 let repoMultiMode = false;
 const repoSelected = new Set();
+let repoCurrentPath = ''; // 当前浏览的文件夹（空字符串 = 根目录）
+let moveTargetFolder = '';
+
+// 非法文件夹名字符：不允许出现路径分隔符等特殊符号
+const INVALID_FOLDER_NAME_RE = /[\/\\:*?"<>|]/;
+
+// 当前文件夹下的直接子文件夹名（不含更深层级）
+function getRepoSubfolders() {
+    const prefix = repoCurrentPath ? repoCurrentPath + '/' : '';
+    const set = new Set();
+    repoLiveFiles.forEach(f => {
+        if (!f.path.startsWith(prefix)) return;
+        const rest = f.path.slice(prefix.length);
+        const slash = rest.indexOf('/');
+        if (slash > 0) set.add(rest.slice(0, slash));
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'zh'));
+}
+
+// 仓库中出现过的所有文件夹路径（含各层级），供"移动到"选择器使用
+function getAllRepoFolders() {
+    const set = new Set();
+    repoLiveFiles.forEach(f => {
+        const parts = f.path.split('/');
+        parts.pop();
+        let acc = '';
+        parts.forEach(p => {
+            acc = acc ? acc + '/' + p : p;
+            set.add(acc);
+        });
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'zh'));
+}
+
+function enterRepoFolder(name) {
+    repoCurrentPath = repoCurrentPath ? repoCurrentPath + '/' + name : name;
+    repoMultiMode = false;
+    repoSelected.clear();
+    updateRepoSelectionUI();
+    renderRepoLiveFiles();
+}
+
+function goToRepoPath(path) {
+    repoCurrentPath = path || '';
+    repoMultiMode = false;
+    repoSelected.clear();
+    updateRepoSelectionUI();
+    renderRepoLiveFiles();
+}
+
+function renderRepoBreadcrumb() {
+    const el = $('repo-breadcrumb');
+    if (!el) return;
+    el.innerHTML = '';
+    const segs = repoCurrentPath ? repoCurrentPath.split('/') : [];
+    const makeCrumb = (label, path, isLast) => {
+        const span = document.createElement('span');
+        span.className = 'crumb';
+        span.textContent = label;
+        if (!isLast) span.onclick = () => goToRepoPath(path);
+        return span;
+    };
+    el.appendChild(makeCrumb('根目录', '', segs.length === 0));
+    let acc = '';
+    segs.forEach((seg, i) => {
+        acc = acc ? acc + '/' + seg : seg;
+        const sep = document.createElement('span');
+        sep.className = 'crumb-sep';
+        sep.textContent = '/';
+        el.appendChild(sep);
+        el.appendChild(makeCrumb(seg, acc, i === segs.length - 1));
+    });
+}
+
+// 新建文件夹：GitHub 不支持空目录，用一个隐藏的 .gitkeep 占位文件来"创建"文件夹
+async function createRepoFolder() {
+    if (!getSettings().token) return toast('请先配置 Token');
+    const name = (prompt('新建文件夹名称') || '').trim();
+    if (!name) return;
+    if (INVALID_FOLDER_NAME_RE.test(name)) return toast('文件夹名称不能包含 / \\ : * ? " < > |');
+    if (getRepoSubfolders().includes(name)) return toast('文件夹已存在');
+    const s = getSettings();
+    const prefix = repoCurrentPath ? repoCurrentPath + '/' : '';
+    const path = prefix + name + '/.gitkeep';
+    try {
+        const ctx = await resolveGithubContext({ createIfMissing: true });
+        const contentsPath = '/repos/' + ctx.owner + '/' + s.repo + '/contents/' + path.split('/').map(encodeURIComponent).join('/');
+        await githubRequest(contentsPath, { method: 'PUT', body: JSON.stringify({ message: '创建文件夹 ' + prefix + name, content: '', branch: ctx.branch }) }, s.token, s.proxy);
+        repoLiveFiles.push({
+            path, name: '.gitkeep', sha: '', size: 0, type: 'file',
+            url: '', rawUrl: '', owner: ctx.owner, repo: s.repo, branch: ctx.branch
+        });
+        renderRepoLiveFiles();
+        toast('已创建文件夹「' + name + '」');
+    } catch (e) {
+        toast('创建失败：' + (e.message || '未知错误'));
+    }
+}
+
+// 删除整个文件夹（连同其中所有文件）
+async function deleteRepoFolder(folderPath) {
+    if (!getSettings().token) return toast('请先配置 Token');
+    const prefix = folderPath + '/';
+    const filesInFolder = repoLiveFiles.filter(f => f.path.startsWith(prefix));
+    const folderShortName = folderPath.split('/').pop();
+    const realFiles = filesInFolder.filter(f => f.name !== '.gitkeep');
+    const ok = confirm('确定删除文件夹「' + folderShortName + '」' + (realFiles.length ? '及其中 ' + realFiles.length + ' 个文件？' : '？'));
+    if (!ok) return;
+    const failures = [];
+    for (let i = 0; i < filesInFolder.length; i++) {
+        const file = filesInFolder[i];
+        try {
+            await deleteGithubAsset({ githubOwner: file.owner, githubRepo: file.repo, githubBranch: file.branch, githubPath: file.path, name: file.name });
+        } catch (e) {
+            failures.push({ path: file.path, name: file.name, message: e.message || '未知错误' });
+        }
+    }
+    const failedPaths = new Set(failures.map(x => x.path));
+    repoLiveFiles = repoLiveFiles.filter(f => !(f.path.startsWith(prefix) && !failedPaths.has(f.path)));
+    renderRepoLiveFiles();
+    if (failures.length) {
+        toast('部分删除失败');
+        showUploadErrorModal(failures);
+    } else {
+        toast('文件夹已删除');
+    }
+}
+
+// --- 移动文件到文件夹 ---
+function openMoveSheet() {
+    if (!repoSelected.size) return toast('请先选择要移动的文件');
+    moveTargetFolder = '';
+    const list = $('move-folder-list');
+    list.innerHTML = '';
+    const rootItem = document.createElement('div');
+    rootItem.className = 'move-folder-item active';
+    rootItem.textContent = '根目录';
+    rootItem.onclick = () => selectMoveTarget('', rootItem);
+    list.appendChild(rootItem);
+    getAllRepoFolders().forEach(folder => {
+        const item = document.createElement('div');
+        item.className = 'move-folder-item';
+        item.textContent = folder;
+        item.onclick = () => selectMoveTarget(folder, item);
+        list.appendChild(item);
+    });
+    const input = $('move-new-folder-input');
+    if (input) input.value = '';
+    $('move-sheet-backdrop').classList.add('show');
+}
+
+function selectMoveTarget(folder, el) {
+    moveTargetFolder = folder;
+    document.querySelectorAll('#move-folder-list .move-folder-item').forEach(x => x.classList.remove('active'));
+    if (el) el.classList.add('active');
+}
+
+function closeMoveSheet() {
+    const el = $('move-sheet-backdrop');
+    if (el) el.classList.remove('show');
+}
+
+async function confirmMoveSheet() {
+    const input = $('move-new-folder-input');
+    const newName = ((input && input.value) || '').trim();
+    let target = moveTargetFolder;
+    if (newName) {
+        if (INVALID_FOLDER_NAME_RE.test(newName)) return toast('文件夹名称不能包含 / \\ : * ? " < > |');
+        target = target ? target + '/' + newName : newName;
+    }
+    closeMoveSheet();
+    await moveSelectedRepoFiles(target);
+}
+
+// 用一次 Git 提交（blob 复用原 sha，无需重新读取文件内容）批量把选中文件挪到目标文件夹
+async function moveSelectedRepoFiles(targetFolder) {
+    const paths = Array.from(repoSelected);
+    if (!paths.length) return;
+    if (!getSettings().token) return toast('请先配置 Token');
+    const selected = repoLiveFiles.filter(f => paths.includes(f.path));
+    if (!selected.length) return exitRepoMultiMode();
+    const s = getSettings();
+    try {
+        const ctx = await resolveGithubContext();
+        const refData = await githubRequest('/repos/' + ctx.owner + '/' + s.repo + '/git/ref/heads/' + ctx.branch, { method: 'GET' }, s.token, s.proxy);
+        const latestCommitSha = refData.object.sha;
+        const latestCommit = await githubRequest('/repos/' + ctx.owner + '/' + s.repo + '/git/commits/' + latestCommitSha, { method: 'GET' }, s.token, s.proxy);
+        const baseTreeSha = latestCommit.tree.sha;
+
+        const prefix = targetFolder ? targetFolder + '/' : '';
+        const treeChanges = [];
+        const moves = [];
+        selected.forEach(f => {
+            const newPath = prefix + f.name;
+            if (newPath === f.path) return;
+            treeChanges.push({ path: f.path, mode: '100644', type: 'blob', sha: null });
+            treeChanges.push({ path: newPath, mode: '100644', type: 'blob', sha: f.sha });
+            moves.push({ from: f.path, to: newPath });
+        });
+        if (!treeChanges.length) { toast('所选文件已在目标位置'); exitRepoMultiMode(); return; }
+
+        const newTree = await githubRequest('/repos/' + ctx.owner + '/' + s.repo + '/git/trees', {
+            method: 'POST', body: JSON.stringify({ base_tree: baseTreeSha, tree: treeChanges })
+        }, s.token, s.proxy);
+
+        const newCommit = await githubRequest('/repos/' + ctx.owner + '/' + s.repo + '/git/commits', {
+            method: 'POST', body: JSON.stringify({ message: '移动 ' + moves.length + ' 个文件到 ' + (targetFolder || '根目录'), tree: newTree.sha, parents: [latestCommitSha] })
+        }, s.token, s.proxy);
+
+        await githubRequest('/repos/' + ctx.owner + '/' + s.repo + '/git/refs/heads/' + ctx.branch, {
+            method: 'PATCH', body: JSON.stringify({ sha: newCommit.sha })
+        }, s.token, s.proxy);
+
+        moves.forEach(m => {
+            const f = repoLiveFiles.find(x => x.path === m.from);
+            if (f) {
+                f.path = m.to;
+                f.name = m.to.split('/').pop();
+                f.url = repoCdnUrl(f.owner, f.repo, f.branch, f.path);
+                f.rawUrl = repoRawUrl(f.owner, f.repo, f.branch, f.path);
+            }
+        });
+        exitRepoMultiMode();
+        renderRepoLiveFiles();
+        toast('已移动 ' + moves.length + ' 个文件');
+    } catch (e) {
+        toast('移动失败：' + (e.message || '未知错误'));
+    }
+}
 
 function setRepoFilter(f) {
     repoFilter = f;
@@ -1343,7 +1611,14 @@ function setRepoFilter(f) {
 }
 
 function getRepoVisibleList() {
-    return repoLiveFiles.filter(f => repoFilter === 'all' || f.type === repoFilter);
+    const prefix = repoCurrentPath ? repoCurrentPath + '/' : '';
+    return repoLiveFiles.filter(f => {
+        if (f.name === '.gitkeep') return false;
+        if (repoFilter !== 'all' && f.type !== repoFilter) return false;
+        if (!f.path.startsWith(prefix)) return false;
+        const rest = f.path.slice(prefix.length);
+        return rest.length > 0 && rest.indexOf('/') === -1;
+    });
 }
 
 function updateRepoSelectionUI() {
@@ -1501,6 +1776,9 @@ async function loadRepoLiveFiles(force = false) {
                 rawUrl: repoRawUrl(ctx.owner, s.repo, ctx.branch, x.path),
                 owner: ctx.owner, repo: s.repo, branch: ctx.branch
             }));
+        if (repoCurrentPath && !repoLiveFiles.some(f => f.path.startsWith(repoCurrentPath + '/'))) {
+            repoCurrentPath = ''; // 当前文件夹已不存在（被删除/改名等），回到根目录
+        }
         repoSelected.clear();
         repoMultiMode = false;
         repoLiveLoaded = true;
@@ -1525,15 +1803,48 @@ async function loadRepoLiveFiles(force = false) {
 function renderRepoLiveFiles() {
     const container = $('repo-live-container');
     if (!container) return;
+    renderRepoBreadcrumb();
+    const folders = getRepoSubfolders();
     const visible = getRepoVisibleList();
     container.innerHTML = '';
     updateRepoSelectionUI();
-    if (!visible.length) {
-        container.innerHTML = '<div class="repo-live-empty">暂无文件</div>';
+    if (!folders.length && !visible.length) {
+        container.innerHTML = '<div class="repo-live-empty">暂无内容</div>';
         return;
     }
     const list = document.createElement('div');
     list.className = 'repo-live-list';
+
+    folders.forEach(name => {
+        const folderPath = (repoCurrentPath ? repoCurrentPath + '/' : '') + name;
+        const item = document.createElement('div');
+        item.className = 'gallery-tile repo-live-item repo-folder-item';
+        item.title = '点击进入 · ' + folderPath;
+
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'repo-folder-del';
+        del.onclick = (ev) => { ev.stopPropagation(); deleteRepoFolder(folderPath); };
+        item.appendChild(del);
+
+        item.onclick = () => enterRepoFolder(name);
+
+        const preview = document.createElement('div');
+        preview.className = 'repo-live-preview icon-tile';
+        const icon = document.createElement('div');
+        icon.className = 'repo-folder-icon';
+        icon.textContent = '📁';
+        preview.appendChild(icon);
+        item.appendChild(preview);
+
+        const label = document.createElement('div');
+        label.className = 'repo-live-name tile-name';
+        label.textContent = name;
+        item.appendChild(label);
+
+        list.appendChild(item);
+    });
+
     visible.forEach(file => {
         const item = document.createElement('div');
         item.className = 'gallery-tile repo-live-item' + (repoMultiMode ? ' selectable' : '') + (repoSelected.has(file.path) ? ' selected' : '');

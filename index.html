@@ -1185,6 +1185,29 @@
   desktop=pages[0];pagePos=0;renderPages(0);commitPage(0);
 
   window.addEventListener('resize',()=>{cancelAnim();const rounded=Math.round(pagePos);pagePos=rounded;renderPages(rounded);commitPage(rounded);resizeWidgetPreviews();fitDesktopWidgets();if(appDrag){appDrag.dockRect=document.querySelector('.dock-wrapper').getBoundingClientRect();appDrag.desktopRect=viewport.getBoundingClientRect()}},{passive:true});
+
+  /* ===== 底栏跟随真实可视视口修正 =====
+     原因：iOS/微信等内置浏览器的地址栏、工具栏在滚动时会收起/展开，
+     但 position:fixed 的元素是相对"布局视口"定位的，不会跟着工具栏
+     收起而自动下移，于是就会出现"底栏悬在半空、下面多出一截空白"，
+     也就是视觉上的"底栏上移"。这里用 visualViewport 实时测出工具栏
+     占用的高度差，用 transform 把底栏重新贴回真实可视区域的底部。 */
+  (function fixBottomBarToVisualViewport(){
+    const bar=document.querySelector('.bottom-fixed-bar');
+    const vv=window.visualViewport;
+    if(!bar||!vv)return;
+    let raf=0;
+    function apply(){
+      raf=0;
+      const gap=window.innerHeight-(vv.height+vv.offsetTop);
+      bar.style.transform=gap>1?'translateY('+(-gap)+'px)':'';
+    }
+    function schedule(){if(!raf)raf=requestAnimationFrame(apply)}
+    vv.addEventListener('resize',schedule);
+    vv.addEventListener('scroll',schedule);
+    window.addEventListener('orientationchange',()=>setTimeout(apply,300));
+    apply();
+  })();
   window.addEventListener('pageshow',()=>{
     try{
       const t=JSON.parse(localStorage.getItem('phoneTheme')||'{}');

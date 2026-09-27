@@ -587,6 +587,24 @@ function goBack(){
 })();
 
 renderSwatches();renderSavedBgs();renderFonts();renderApps();renderPlans();
+
+/* ===== 底栏跟随真实可视视口修正（同小手机主界面的修复，原理一致） ===== */
+(function fixBottomBarToVisualViewport(){
+  const bar=document.querySelector('.bottom');
+  const vv=window.visualViewport;
+  if(!bar||!vv)return;
+  let raf=0;
+  function apply(){
+    raf=0;
+    const gap=window.innerHeight-(vv.height+vv.offsetTop);
+    bar.style.transform=gap>1?'translateY('+(-gap)+'px)':'';
+  }
+  function schedule(){if(!raf)raf=requestAnimationFrame(apply)}
+  vv.addEventListener('resize',schedule);
+  vv.addEventListener('scroll',schedule);
+  window.addEventListener('orientationchange',()=>setTimeout(apply,300));
+  apply();
+})();
 })();
 </script>
 </body></html>

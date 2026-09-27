@@ -185,6 +185,10 @@ button,input{font:inherit}
       <div class="row-main"><div class="row-title">保存当前配置</div><div class="row-desc">把当前背景、字体、图标存成一个方案，方便以后切换</div></div>
       <button class="small-btn dark" id="savePlanBtn">保存方案</button>
     </div>
+    <div class="row">
+      <div class="row-main"><div class="row-title">恢复默认</div><div class="row-desc">背景、字体、App图标、排序都会还原成初始状态（已导入的字体文件不会被删除）</div></div>
+      <button class="small-btn" id="resetThemeBtn">恢复默认</button>
+    </div>
     <div id="planList"></div>
   </div>
 </section>
@@ -546,6 +550,22 @@ function renderPlans(){let box=$('planList');box.innerHTML='';if(!plans.length){
 
 function savePlan(){let name=prompt('给当前方案取个名字');if(!name)return;plans.unshift({name:name.trim().slice(0,24),time:Date.now(),data:currentSnapshot()});plans=plans.slice(0,20);let ok=write(PLANS,plans);renderPlans();if(ok)toast('方案已保存')}
 if($('savePlanBtn'))$('savePlanBtn').onclick=savePlan;
+
+function resetTheme(){
+  if(!confirm('确定要恢复默认吗？背景、字体选择、App图标和排序都会还原'))return;
+  theme.bgColor='#ffffff';
+  theme.wallpaperCSS='none';
+  theme.backgroundName='';
+  theme.fontId='system';
+  theme.font=baseFonts[0].stack;
+  theme.appIcons={};
+  currentApps=[...apps];
+  let ok=sync();
+  injectFonts();renderFonts();renderApps();renderSavedBgs();renderSwatches();
+  $('colorInput').value=theme.bgColor;$('hexInput').value=theme.bgColor;
+  if(ok)toast('已恢复默认');
+}
+if($('resetThemeBtn'))$('resetThemeBtn').onclick=resetTheme;
 $('doneBtn').onclick=()=>{if(sync()){toast('配置已保存');setTimeout(goBack,450)}};
 function goBack(){
   // 如果是被"小手机"外壳用 iframe 嵌进来打开的（同源），优先通知外壳把自己关掉，

@@ -91,7 +91,7 @@
   .page-dot.active{width:7.5px;height:7.5px;flex-basis:7.5px;background:rgba(30,30,30,.85)}
   body.edit-mode .home-indicator{transform:translateY(-10px)}
 
-  .dock-wrapper{padding:10px 15px 35px;z-index:10;flex:0 0 auto;display:flex;justify-content:center}
+  .dock-wrapper{padding:10px 15px calc(35px + env(safe-area-inset-bottom));z-index:10;flex:0 0 auto;display:flex;justify-content:center}
   .dock{height:88px;position:relative;background:rgba(255,255,255,.65);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);border-radius:32px;display:flex;justify-content:space-around;align-items:center;padding:0 15px;box-shadow:0 8px 30px rgba(0,0,0,.05);border:1px solid rgba(255,255,255,.8);width:100%;touch-action:none;transition:width .22s cubic-bezier(.2,.8,.2,1)}
   .dock.drag-target{box-shadow:0 8px 30px rgba(0,0,0,.05),0 0 0 2px rgba(0,0,0,.045)}
   .dock .app{flex:1 1 0;min-width:0;max-width:72px;width:auto;height:auto;gap:0;transform:none;animation:none!important;transition:transform .16s ease}
@@ -184,7 +184,7 @@
   @media (max-height:720px){
     .desktop.home-page{padding-top:calc(18px + env(safe-area-inset-top));padding-bottom:18px;row-gap:8px}
     .desktop-grid{top:calc(18px + env(safe-area-inset-top));right:16px;bottom:18px;left:16px;row-gap:8px}
-    .dock-wrapper{padding-top:7px;padding-bottom:27px}
+    .dock-wrapper{padding-top:7px;padding-bottom:calc(27px + env(safe-area-inset-bottom))}
     .dock{height:80px;border-radius:29px}
     .home-indicator-area{height:30px;flex-basis:30px}
   }

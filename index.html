@@ -97,6 +97,7 @@
   .app-launch-overlay{position:fixed;inset:0;z-index:200000;background:#fff;transform:translateY(100%);opacity:0;pointer-events:none;transition:transform .38s cubic-bezier(.2,.8,.2,1),opacity .28s ease;display:flex;flex-direction:column}
   .app-launch-overlay.show{transform:translateY(0);opacity:1;pointer-events:auto}
   .app-launch-bar{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:max(10px,env(safe-area-inset-top)) 10px 8px;background:rgba(247,247,247,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.05)}
+  .app-launch-overlay.no-bar .app-launch-bar{display:none}
   .app-launch-back{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.05);cursor:pointer;flex-shrink:0}
   .app-launch-back:active{background:rgba(0,0,0,.1)}
   .app-launch-title{font-size:15px;font-weight:600;color:#111}
@@ -187,12 +188,13 @@
   const edgeHintRight=document.getElementById('edgeHintRight');
 
   const APP_URLS={'美化':'美化.html','直链':'直链.html'};
+  const NO_BAR_APPS=new Set(['美化']);
   const appLaunchOverlay=document.getElementById('appLaunchOverlay');
   const appLaunchBack=document.getElementById('appLaunchBack');
   const appLaunchTitle=document.getElementById('appLaunchTitle');
   const appLaunchFrame=document.getElementById('appLaunchFrame');
 
-  function openLaunchApp(name){const url=APP_URLS[name];if(!url)return;appLaunchTitle.textContent=name;appLaunchFrame.src=url;appLaunchOverlay.classList.add('show')}
+  function openLaunchApp(name){const url=APP_URLS[name];if(!url)return;appLaunchTitle.textContent=name;appLaunchFrame.src=url;appLaunchOverlay.classList.toggle('no-bar',NO_BAR_APPS.has(name));appLaunchOverlay.classList.add('show')}
   function closeLaunchApp(){appLaunchOverlay.classList.remove('show');setTimeout(()=>{appLaunchFrame.src='about:blank'},400)}
   if(appLaunchBack)appLaunchBack.addEventListener('click',closeLaunchApp);
   if(appLaunchOverlay)appLaunchOverlay.addEventListener('pointerdown',e=>e.stopPropagation());

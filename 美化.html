@@ -25,7 +25,7 @@ button,input{font:inherit}
 .back{width:32px;height:32px;border:0;background:none;display:grid;place-items:center;color:var(--ink)}
 .title{position:absolute;left:50%;transform:translateX(-50%);font-size:15px;font-weight:700;letter-spacing:.5px}
 .save-top{margin-left:auto;height:32px;padding:0 16px;border:1px solid var(--ink);border-radius:var(--radius-btn);background:var(--ink);color:var(--card);font-size:12px;font-weight:600}
-.scroll{height:100%;overflow:auto;padding:18px 20px calc(90px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}.scroll::-webkit-scrollbar{display:none}
+.scroll{height:100%;overflow:auto;padding:calc(18px + env(safe-area-inset-top)) 20px calc(90px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}.scroll::-webkit-scrollbar{display:none}
 
 .section{margin-bottom:28px}
 .card{background:var(--card);border:1px solid #e0e0e0;border-radius:var(--radius-card);overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.03)}

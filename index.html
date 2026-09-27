@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>手机界面 - 韩系ins风</title>
 <style>
   :root{--bg-color:#f7f7f7;--text-color:#222;--gray-color:#888;--white:#fff;
@@ -85,7 +88,7 @@
   .home-indicator.pages-mode .search-symbol,.home-indicator.pages-mode .search-label{display:none}
   .home-indicator.pages-mode .page-dots{display:inline-flex}
   .page-dot{width:6px;height:6px;border-radius:50%;background:rgba(90,90,90,.42);flex:0 0 6px;border:0;padding:0;cursor:pointer;transition:background .2s ease}
-  .page-dot.active{width:7.5px;height:7.5px;flex-basis:7.5px;background:var(--accent-color,rgba(40,40,40,.78))}
+  .page-dot.active{width:7.5px;height:7.5px;flex-basis:7.5px;background:rgba(30,30,30,.85)}
   body.edit-mode .home-indicator{transform:translateY(-10px)}
 
   .dock-wrapper{padding:10px 15px 35px;z-index:10;flex:0 0 auto;display:flex;justify-content:center}
@@ -734,6 +737,7 @@
     updatePageIndicator();
     requestAnimationFrame(fitDesktopWidgets);
     suppressNextClick=true;setTimeout(()=>{suppressNextClick=false},350);
+    saveLayout();
   }
   function findFolderMergeTarget(d,x,y){
     if(isFolderEl(d.app))return null;
@@ -877,6 +881,7 @@
       body.classList.remove('is-dragging-app','dragging-app');
       updatePageIndicator();
       requestAnimationFrame(fitDesktopWidgets);
+      saveLayout();
       return;
     }
 
@@ -914,6 +919,7 @@
     body.classList.remove('is-dragging-app','dragging-app');
     updatePageIndicator();
     requestAnimationFrame(fitDesktopWidgets);
+    saveLayout();
   }
 
   function cancelAppDrag(){
@@ -947,6 +953,7 @@
     const folder=document.createElement('div');
     folder.className='app folder';
     folder.dataset.folderName=name;
+    folder.dataset.folderId='folder-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);
     folder.innerHTML='<div class="icon folder-icon"><div class="folder-mini"></div></div><span class="label"></span><div class="folder-items" style="display:none"></div>';
     folder.querySelector('.label').textContent=name;
     return folder;
@@ -1011,6 +1018,7 @@
     folder.querySelector('.label').textContent=folder.dataset.folderName;
     renderFolderPreview(folder);
     closeFolderModalRaw();
+    saveLayout();
   }
   function removeFromOpenFolder(app){
     const folder=openFolderEl;if(!folder||!app)return;
@@ -1032,6 +1040,7 @@
       compactAllSlots(desktop);
       closeFolderModalRaw();
     }
+    saveLayout();
   }
   function openFolder(folder){
     if(appDrag||openFolderEl)return;
@@ -1118,7 +1127,7 @@
     }
   });
 
-  function addPage(){if(!editMode)return;const page=document.createElement('div');page.className='desktop home-page';page.dataset.page=String(pages.length);viewport.appendChild(page);buildGrid(page);pages=getPages();if(navigator.vibrate)navigator.vibrate(30);animateTo(pages.length-1,420)}
+  function addPage(){if(!editMode)return;const page=document.createElement('div');page.className='desktop home-page';page.dataset.page=String(pages.length);viewport.appendChild(page);buildGrid(page);pages=getPages();if(navigator.vibrate)navigator.vibrate(30);animateTo(pages.length-1,420);saveLayout()}
   function deletePage(){
     if(!editMode)return;
     if(currentPageIndex===0||pages.length<=1){if(navigator.vibrate)navigator.vibrate([18,35,18]);return}
@@ -1138,6 +1147,7 @@
     let newIdx=Math.min(delIdx,pages.length-1);if(newIdx<0)newIdx=0;
     commitPage(newIdx);renderPages(newIdx);
     if(navigator.vibrate)navigator.vibrate(30);
+    saveLayout();
   }
 
   function updatePageIndicator(){
@@ -1158,6 +1168,84 @@
     }
   }
 
+  const LAYOUT_KEY='phoneLayout';
+  function appKey(app){
+    if(!app)return '';
+    if(isFolderEl(app))return app.dataset.folderId||(app.dataset.folderId='folder-'+Date.now()+'-'+Math.random().toString(36).slice(2,8));
+    const l=app.querySelector(':scope > .label');
+    return l?l.textContent.trim():'';
+  }
+  function serializeLayout(){
+    try{
+      const data={pages:[],dock:[]};
+      pages.forEach(pg=>{
+        const arr=[];
+        Array.from(pg.querySelectorAll(':scope > .app')).forEach(app=>{
+          const key=appKey(app);if(!key)return;
+          const entry={key,slot:Number(app.dataset.slot||0)};
+          if(isWidgetEl(app)){entry.widget=true;entry.w=app.dataset.w;entry.h=app.dataset.h}
+          if(isFolderEl(app)){
+            entry.folder=true;
+            entry.folderName=app.dataset.folderName||'';
+            const itemsWrap=app.querySelector(':scope > .folder-items');
+            entry.items=itemsWrap?Array.from(itemsWrap.children).map(appKey).filter(Boolean):[];
+          }
+          arr.push(entry);
+        });
+        data.pages.push(arr);
+      });
+      data.dock=dockApps().map(appKey).filter(Boolean);
+      localStorage.setItem(LAYOUT_KEY,JSON.stringify(data));
+    }catch(e){}
+  }
+  function saveLayout(){serializeLayout()}
+  function applyLayout(){
+    let data=null;
+    try{data=JSON.parse(localStorage.getItem(LAYOUT_KEY)||'null')}catch(e){data=null}
+    if(!data||!Array.isArray(data.pages)||!data.pages.length)return false;
+    // 先把当前所有.app(含文件夹内部的)按key收集起来，后面照保存的记录把它们挪回原位
+    const allApps={};
+    document.querySelectorAll('.app').forEach(a=>{const k=appKey(a);if(k&&!(k in allApps))allApps[k]=a});
+    while(pages.length<data.pages.length){
+      const page=document.createElement('div');
+      page.className='desktop home-page';
+      page.dataset.page=String(pages.length);
+      viewport.appendChild(page);
+      buildGrid(page);
+      pages=getPages();
+    }
+    data.pages.forEach((arr,pi)=>{
+      const pg=pages[pi];if(!pg)return;
+      arr.forEach(entry=>{
+        const app=allApps[entry.key];
+        if(!app)return;
+        if(entry.folder&&isFolderEl(app)){
+          app.dataset.folderName=entry.folderName||app.dataset.folderName;
+          const label=app.querySelector(':scope > .label');
+          if(label)label.textContent=app.dataset.folderName;
+          const itemsWrap=app.querySelector(':scope > .folder-items');
+          if(itemsWrap&&Array.isArray(entry.items)){
+            entry.items.forEach(ik=>{
+              const child=allApps[ik];
+              if(child&&child.parentElement!==itemsWrap){child.remove();child.removeAttribute('style');itemsWrap.appendChild(child)}
+            });
+          }
+          renderFolderPreview(app);
+        }
+        if(app.parentElement!==pg)pg.appendChild(app);
+        setDesktopSlot(app,entry.slot,false);
+      });
+    });
+    if(Array.isArray(data.dock)){
+      data.dock.forEach(k=>{
+        const a=allApps[k];
+        if(a&&a.parentElement!==dock){a.remove();a.removeAttribute('style');dock.appendChild(a)}
+      });
+      normalizeDockSlots();
+    }
+    return true;
+  }
+
   document.addEventListener('pointerdown',onPointerDown,{passive:false});
   window.addEventListener('pointermove',onPointerMove,{passive:false});
   window.addEventListener('pointerup',onPointerUp,{passive:false});
@@ -1169,7 +1257,9 @@
 
   pages=getPages();
   pages.forEach(pg=>buildGrid(pg));
-  initializeSlots();
+  if(!applyLayout()){initializeSlots()}
+  pages=getPages();
+  normalizeDockSlots();
   updateDockFit();
   desktop=pages[0];pagePos=0;renderPages(0);commitPage(0);
 

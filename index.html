@@ -1193,5 +1193,40 @@
   });
 })();
 </script>
+
+<script>
+(()=>{
+  function applyBeauty(){
+    try{
+      const t=JSON.parse(localStorage.getItem('phoneTheme')||'{}');
+      if(t.customFonts&&t.customFonts.length){
+        let css='';
+        t.customFonts.forEach(f=>{if(f&&f.data&&f.family)css+='@font-face{font-family:"'+f.family+'";src:url("'+f.data+'")}';});
+        if(css){const old=document.getElementById('beautyUserFonts');if(old)old.remove();const s=document.createElement('style');s.id='beautyUserFonts';s.textContent=css;document.head.appendChild(s)}
+      }
+      if(t.appIcons){
+        document.querySelectorAll('.app').forEach(app=>{
+          const label=app.querySelector(':scope > .label');
+          const icon=app.querySelector(':scope > .icon');
+          if(!label||!icon)return;
+          const name=label.textContent.trim(),src=t.appIcons[name];
+          if(!src)return;
+          if(icon.classList.contains('folder-icon'))return;
+          icon.textContent='';
+          let img=icon.querySelector('img.beauty-app-icon');
+          if(!img){img=document.createElement('img');img.className='beauty-app-icon';icon.appendChild(img)}
+          img.src=src;
+        });
+      }
+    }catch(e){}
+  }
+  const s=document.createElement('style');s.textContent='.icon .beauty-app-icon{width:100%;height:100%;display:block;object-fit:cover;border-radius:inherit;pointer-events:none}.icon:has(.beauty-app-icon){overflow:hidden;padding:0!important}';document.head.appendChild(s);
+  applyBeauty();
+  window.addEventListener('pageshow',applyBeauty);
+  window.addEventListener('storage',applyBeauty);
+  window.addEventListener('phoneThemeSync',applyBeauty);
+  window.addEventListener('message',e=>{if(e&&e.data&&e.data.type==='phoneThemeSync'){applyBeauty()}});
+})();
+</script>
 </body>
 </html>

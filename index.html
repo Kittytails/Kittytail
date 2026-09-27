@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>手机界面 - 韩系ins风</title>
 <style>
   :root{--bg-color:#f7f7f7;--text-color:#222;--gray-color:#888;--white:#fff;
@@ -101,10 +103,15 @@
   .desktop.home-page{
     padding-left:16px;padding-right:16px;
     column-gap:12px;row-gap:12px;
+    padding-top:calc(24px + env(safe-area-inset-top,0px));
+  }
+  body.edit-mode .desktop.home-page{
+    padding-top:calc(78px + env(safe-area-inset-top,0px));
   }
   .desktop-grid{
     inset:24px 16px;
     gap:12px;
+    top:calc(24px + env(safe-area-inset-top,0px));
   }
   .grid-slot{
     border-radius:22px;
@@ -176,8 +183,8 @@
   }
 
   @media (max-height:720px){
-    .desktop.home-page{padding-top:18px;padding-bottom:18px;row-gap:8px}
-    .desktop-grid{inset:18px 16px;row-gap:8px}
+    .desktop.home-page{padding-top:calc(18px + env(safe-area-inset-top,0px));padding-bottom:18px;row-gap:8px}
+    .desktop-grid{inset:18px 16px;top:calc(18px + env(safe-area-inset-top,0px));row-gap:8px}
     .dock-wrapper{padding-top:7px;padding-bottom:27px}
     .dock{height:80px;border-radius:29px}
     .home-indicator-area{height:30px;flex-basis:30px}

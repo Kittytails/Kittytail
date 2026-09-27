@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>手机界面 - 韩系ins风</title>
 <style>
   :root{--bg-color:#f7f7f7;--text-color:#222;--gray-color:#888;--white:#fff;
@@ -14,8 +11,7 @@
     --label-color:var(--gray-color);--label-text-shadow:none}
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
-  html{background-color:var(--bg-color);background-image:var(--wallpaper-image);background-size:cover;background-position:center}
-  body{background-color:var(--bg-color);background-image:var(--wallpaper-image);background-size:cover;background-position:center;font-family:var(--font-family);display:flex;flex-direction:column;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+  body{background-color:var(--bg-color);background-image:var(--wallpaper-image);background-size:cover;background-position:center;background-attachment:fixed;font-family:var(--font-family);display:flex;flex-direction:column;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 .dynamic-edit-pill{
     position:fixed;top:max(16px,env(safe-area-inset-top));left:50%;
     transform:translateX(-50%) scale(.9) translateY(-90px);
@@ -37,7 +33,7 @@
   .dep-btn:active{background:rgba(255,255,255,.15);transform:scale(.95)}
   .dep-btn.danger{color:#ff453a}
   .dep-btn.danger:active{background:rgba(255,69,58,.15)}
-  .dep-btn.primary{background:#fff;color:#000;padding:0 18px;margin-left:2px}
+  .dep-btn.primary{background:var(--accent-color,#fff);color:var(--accent-text,#000);padding:0 18px;margin-left:2px}
   .dep-btn.primary:active{background:#e5e5e5}
   .dep-divider{width:1px;height:20px;background:rgba(255,255,255,.2);margin:0 2px;border-radius:1px}
 
@@ -45,7 +41,7 @@
   .desktop.home-page{position:absolute;inset:0;padding:24px 14px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(6,minmax(80px,1fr));align-content:start;gap:10px;overflow:hidden;visibility:hidden;pointer-events:none;transform:translate3d(0,0,0);will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden;contain:layout style paint}
   .desktop.home-page.is-shown{visibility:visible}
   .desktop.home-page.active-page{pointer-events:auto;z-index:2}
-  body.edit-mode .desktop.home-page{padding-top:calc(78px + env(safe-area-inset-top))}
+  body.edit-mode .desktop.home-page{padding-top:78px}
 
   .desktop-grid{position:absolute;inset:24px 14px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(6,minmax(80px,1fr));gap:10px;pointer-events:none;opacity:0;z-index:0;transition:opacity .18s ease}
   body.edit-mode .desktop-grid{opacity:1}
@@ -88,10 +84,10 @@
   .home-indicator.pages-mode .search-symbol,.home-indicator.pages-mode .search-label{display:none}
   .home-indicator.pages-mode .page-dots{display:inline-flex}
   .page-dot{width:6px;height:6px;border-radius:50%;background:rgba(90,90,90,.42);flex:0 0 6px;border:0;padding:0;cursor:pointer;transition:background .2s ease}
-  .page-dot.active{width:7.5px;height:7.5px;flex-basis:7.5px;background:rgba(30,30,30,.85)}
+  .page-dot.active{width:7.5px;height:7.5px;flex-basis:7.5px;background:var(--accent-color,rgba(40,40,40,.78))}
   body.edit-mode .home-indicator{transform:translateY(-10px)}
 
-  .dock-wrapper{padding:10px 15px calc(35px + env(safe-area-inset-bottom));z-index:10;flex:0 0 auto;display:flex;justify-content:center}
+  .dock-wrapper{padding:10px 15px 35px;z-index:10;flex:0 0 auto;display:flex;justify-content:center}
   .dock{height:88px;position:relative;background:rgba(255,255,255,.65);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);border-radius:32px;display:flex;justify-content:space-around;align-items:center;padding:0 15px;box-shadow:0 8px 30px rgba(0,0,0,.05);border:1px solid rgba(255,255,255,.8);width:100%;touch-action:none;transition:width .22s cubic-bezier(.2,.8,.2,1)}
   .dock.drag-target{box-shadow:0 8px 30px rgba(0,0,0,.05),0 0 0 2px rgba(0,0,0,.045)}
   .dock .app{flex:1 1 0;min-width:0;max-width:72px;width:auto;height:auto;gap:0;transform:none;animation:none!important;transition:transform .16s ease}
@@ -103,13 +99,11 @@
   body::before{display:none}
 
   .desktop.home-page{
-    padding-top:calc(24px + env(safe-area-inset-top));
     padding-left:16px;padding-right:16px;
     column-gap:12px;row-gap:12px;
   }
   .desktop-grid{
-    top:calc(24px + env(safe-area-inset-top));
-    right:16px;bottom:24px;left:16px;
+    inset:24px 16px;
     gap:12px;
   }
   .grid-slot{
@@ -182,9 +176,9 @@
   }
 
   @media (max-height:720px){
-    .desktop.home-page{padding-top:calc(18px + env(safe-area-inset-top));padding-bottom:18px;row-gap:8px}
-    .desktop-grid{top:calc(18px + env(safe-area-inset-top));right:16px;bottom:18px;left:16px;row-gap:8px}
-    .dock-wrapper{padding-top:7px;padding-bottom:calc(27px + env(safe-area-inset-bottom))}
+    .desktop.home-page{padding-top:18px;padding-bottom:18px;row-gap:8px}
+    .desktop-grid{inset:18px 16px;row-gap:8px}
+    .dock-wrapper{padding-top:7px;padding-bottom:27px}
     .dock{height:80px;border-radius:29px}
     .home-indicator-area{height:30px;flex-basis:30px}
   }
@@ -221,15 +215,6 @@
   .folder-modal-grid .app.jiggle{animation:jiggle .55s infinite alternate ease-in-out}
   .folder-remove-badge{position:absolute;top:-4px;left:-4px;width:20px;height:20px;border-radius:50%;background:#444;color:#fff;font-size:13px;line-height:20px;text-align:center;display:none;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.3)}
   .folder-modal-grid .app.jiggle .folder-remove-badge{display:block}
-
-  /* ===== 强制更新弹窗 ===== */
-  .force-update-mask{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(20,20,22,.55);backdrop-filter:blur(20px) saturate(1.2);-webkit-backdrop-filter:blur(20px) saturate(1.2);padding:24px}
-  .force-update-mask.show{display:flex}
-  .force-update-card{width:min(300px,86vw);background:rgba(255,255,255,.98);border-radius:26px;padding:26px 22px 20px;text-align:center;box-shadow:0 30px 70px rgba(0,0,0,.35)}
-  .force-update-card h3{font-size:17px;font-weight:700;margin-bottom:8px;color:#111}
-  .force-update-card p{font-size:13px;color:#777;line-height:1.6;margin-bottom:20px}
-  .force-update-btn{width:100%;height:46px;border-radius:16px;background:#111;color:#fff;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;border:none}
-  .force-update-btn:active{background:#333}
 </style>
 <script>
 (function(){
@@ -252,39 +237,6 @@
 </script>
 </head>
 <body>
-
-<div class="force-update-mask" id="forceUpdateMask">
-  <div class="force-update-card">
-    <h3>发现新版本</h3>
-    <p>点击更新即可应用最新修复，你的壁纸、图标、桌面布局等数据都会保留，不会丢失。</p>
-    <button class="force-update-btn" id="forceUpdateBtn">立即更新</button>
-  </div>
-</div>
-<script>
-(function(){
-  // 每次我改完文件都会把这里的版本号往上加一位，用来触发强制更新弹窗
-  var CURRENT_BUILD='20260927-2';
-  try{
-    var last=localStorage.getItem('appBuildVersion');
-    if(last!==CURRENT_BUILD){
-      document.addEventListener('DOMContentLoaded',function(){
-        var mask=document.getElementById('forceUpdateMask');
-        if(mask)mask.classList.add('show');
-      });
-    }
-  }catch(e){}
-  document.addEventListener('DOMContentLoaded',function(){
-    var btn=document.getElementById('forceUpdateBtn');
-    if(!btn)return;
-    btn.addEventListener('click',function(){
-      try{localStorage.setItem('appBuildVersion',CURRENT_BUILD)}catch(e){}
-      var url=location.pathname+'?_u='+Date.now()+location.hash;
-      location.href=url;
-      setTimeout(function(){location.reload(true)},50);
-    });
-  });
-})();
-</script>
 
 <div class="dynamic-edit-pill">
   <div class="dep-btn" id="addPageBtn">
@@ -781,7 +733,6 @@
     updatePageIndicator();
     requestAnimationFrame(fitDesktopWidgets);
     suppressNextClick=true;setTimeout(()=>{suppressNextClick=false},350);
-    saveLayout();
   }
   function findFolderMergeTarget(d,x,y){
     if(isFolderEl(d.app))return null;
@@ -925,7 +876,6 @@
       body.classList.remove('is-dragging-app','dragging-app');
       updatePageIndicator();
       requestAnimationFrame(fitDesktopWidgets);
-      saveLayout();
       return;
     }
 
@@ -963,7 +913,6 @@
     body.classList.remove('is-dragging-app','dragging-app');
     updatePageIndicator();
     requestAnimationFrame(fitDesktopWidgets);
-    saveLayout();
   }
 
   function cancelAppDrag(){
@@ -997,7 +946,6 @@
     const folder=document.createElement('div');
     folder.className='app folder';
     folder.dataset.folderName=name;
-    folder.dataset.folderId='folder-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);
     folder.innerHTML='<div class="icon folder-icon"><div class="folder-mini"></div></div><span class="label"></span><div class="folder-items" style="display:none"></div>';
     folder.querySelector('.label').textContent=name;
     return folder;
@@ -1062,7 +1010,6 @@
     folder.querySelector('.label').textContent=folder.dataset.folderName;
     renderFolderPreview(folder);
     closeFolderModalRaw();
-    saveLayout();
   }
   function removeFromOpenFolder(app){
     const folder=openFolderEl;if(!folder||!app)return;
@@ -1084,7 +1031,6 @@
       compactAllSlots(desktop);
       closeFolderModalRaw();
     }
-    saveLayout();
   }
   function openFolder(folder){
     if(appDrag||openFolderEl)return;
@@ -1171,7 +1117,7 @@
     }
   });
 
-  function addPage(){if(!editMode)return;const page=document.createElement('div');page.className='desktop home-page';page.dataset.page=String(pages.length);viewport.appendChild(page);buildGrid(page);pages=getPages();if(navigator.vibrate)navigator.vibrate(30);animateTo(pages.length-1,420);saveLayout()}
+  function addPage(){if(!editMode)return;const page=document.createElement('div');page.className='desktop home-page';page.dataset.page=String(pages.length);viewport.appendChild(page);buildGrid(page);pages=getPages();if(navigator.vibrate)navigator.vibrate(30);animateTo(pages.length-1,420)}
   function deletePage(){
     if(!editMode)return;
     if(currentPageIndex===0||pages.length<=1){if(navigator.vibrate)navigator.vibrate([18,35,18]);return}
@@ -1191,7 +1137,6 @@
     let newIdx=Math.min(delIdx,pages.length-1);if(newIdx<0)newIdx=0;
     commitPage(newIdx);renderPages(newIdx);
     if(navigator.vibrate)navigator.vibrate(30);
-    saveLayout();
   }
 
   function updatePageIndicator(){
@@ -1212,84 +1157,6 @@
     }
   }
 
-  const LAYOUT_KEY='phoneLayout';
-  function appKey(app){
-    if(!app)return '';
-    if(isFolderEl(app))return app.dataset.folderId||(app.dataset.folderId='folder-'+Date.now()+'-'+Math.random().toString(36).slice(2,8));
-    const l=app.querySelector(':scope > .label');
-    return l?l.textContent.trim():'';
-  }
-  function serializeLayout(){
-    try{
-      const data={pages:[],dock:[]};
-      pages.forEach(pg=>{
-        const arr=[];
-        Array.from(pg.querySelectorAll(':scope > .app')).forEach(app=>{
-          const key=appKey(app);if(!key)return;
-          const entry={key,slot:Number(app.dataset.slot||0)};
-          if(isWidgetEl(app)){entry.widget=true;entry.w=app.dataset.w;entry.h=app.dataset.h}
-          if(isFolderEl(app)){
-            entry.folder=true;
-            entry.folderName=app.dataset.folderName||'';
-            const itemsWrap=app.querySelector(':scope > .folder-items');
-            entry.items=itemsWrap?Array.from(itemsWrap.children).map(appKey).filter(Boolean):[];
-          }
-          arr.push(entry);
-        });
-        data.pages.push(arr);
-      });
-      data.dock=dockApps().map(appKey).filter(Boolean);
-      localStorage.setItem(LAYOUT_KEY,JSON.stringify(data));
-    }catch(e){}
-  }
-  function saveLayout(){serializeLayout()}
-  function applyLayout(){
-    let data=null;
-    try{data=JSON.parse(localStorage.getItem(LAYOUT_KEY)||'null')}catch(e){data=null}
-    if(!data||!Array.isArray(data.pages)||!data.pages.length)return false;
-    // 先把当前所有.app(含文件夹内部的)按key收集起来，后面照保存的记录把它们挪回原位
-    const allApps={};
-    document.querySelectorAll('.app').forEach(a=>{const k=appKey(a);if(k&&!(k in allApps))allApps[k]=a});
-    while(pages.length<data.pages.length){
-      const page=document.createElement('div');
-      page.className='desktop home-page';
-      page.dataset.page=String(pages.length);
-      viewport.appendChild(page);
-      buildGrid(page);
-      pages=getPages();
-    }
-    data.pages.forEach((arr,pi)=>{
-      const pg=pages[pi];if(!pg)return;
-      arr.forEach(entry=>{
-        const app=allApps[entry.key];
-        if(!app)return;
-        if(entry.folder&&isFolderEl(app)){
-          app.dataset.folderName=entry.folderName||app.dataset.folderName;
-          const label=app.querySelector(':scope > .label');
-          if(label)label.textContent=app.dataset.folderName;
-          const itemsWrap=app.querySelector(':scope > .folder-items');
-          if(itemsWrap&&Array.isArray(entry.items)){
-            entry.items.forEach(ik=>{
-              const child=allApps[ik];
-              if(child&&child.parentElement!==itemsWrap){child.remove();child.removeAttribute('style');itemsWrap.appendChild(child)}
-            });
-          }
-          renderFolderPreview(app);
-        }
-        if(app.parentElement!==pg)pg.appendChild(app);
-        setDesktopSlot(app,entry.slot,false);
-      });
-    });
-    if(Array.isArray(data.dock)){
-      data.dock.forEach(k=>{
-        const a=allApps[k];
-        if(a&&a.parentElement!==dock){a.remove();a.removeAttribute('style');dock.appendChild(a)}
-      });
-      normalizeDockSlots();
-    }
-    return true;
-  }
-
   document.addEventListener('pointerdown',onPointerDown,{passive:false});
   window.addEventListener('pointermove',onPointerMove,{passive:false});
   window.addEventListener('pointerup',onPointerUp,{passive:false});
@@ -1301,9 +1168,7 @@
 
   pages=getPages();
   pages.forEach(pg=>buildGrid(pg));
-  if(!applyLayout()){initializeSlots()}
-  pages=getPages();
-  normalizeDockSlots();
+  initializeSlots();
   updateDockFit();
   desktop=pages[0];pagePos=0;renderPages(0);commitPage(0);
 
@@ -1326,41 +1191,6 @@
       else{s.setProperty('--label-color','');s.setProperty('--label-text-shadow','')}
     }catch(e){}
   });
-})();
-</script>
-
-<script>
-(()=>{
-  function applyBeauty(){
-    try{
-      const t=JSON.parse(localStorage.getItem('phoneTheme')||'{}');
-      if(t.customFonts&&t.customFonts.length){
-        let css='';
-        t.customFonts.forEach(f=>{if(f&&f.data&&f.family)css+='@font-face{font-family:"'+f.family+'";src:url("'+f.data+'")}';});
-        if(css){const old=document.getElementById('beautyUserFonts');if(old)old.remove();const s=document.createElement('style');s.id='beautyUserFonts';s.textContent=css;document.head.appendChild(s)}
-      }
-      if(t.appIcons){
-        document.querySelectorAll('.app').forEach(app=>{
-          const label=app.querySelector(':scope > .label');
-          const icon=app.querySelector(':scope > .icon');
-          if(!label||!icon)return;
-          const name=label.textContent.trim(),src=t.appIcons[name];
-          if(!src)return;
-          if(icon.classList.contains('folder-icon'))return;
-          icon.textContent='';
-          let img=icon.querySelector('img.beauty-app-icon');
-          if(!img){img=document.createElement('img');img.className='beauty-app-icon';icon.appendChild(img)}
-          img.src=src;
-        });
-      }
-    }catch(e){}
-  }
-  const s=document.createElement('style');s.textContent='.icon .beauty-app-icon{width:100%;height:100%;display:block;object-fit:cover;border-radius:inherit;pointer-events:none}.icon:has(.beauty-app-icon){overflow:hidden;padding:0!important}';document.head.appendChild(s);
-  applyBeauty();
-  window.addEventListener('pageshow',applyBeauty);
-  window.addEventListener('storage',applyBeauty);
-  window.addEventListener('phoneThemeSync',applyBeauty);
-  window.addEventListener('message',e=>{if(e&&e.data&&e.data.type==='phoneThemeSync'){applyBeauty()}});
 })();
 </script>
 </body>

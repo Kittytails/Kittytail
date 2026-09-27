@@ -2,6 +2,37 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<script>
+/* ===== 强制拉取最新版本 =====
+   原理：GitHub Pages 返回的响应头里带 ETag/Last-Modified，文件内容一变这个值就会变。
+   这里定期用 cache:'no-store' 去请求页面自身，把这个标记存进 localStorage 做比对；
+   一旦发现和上次不一样，就清掉浏览器缓存并强制刷新，尽量让打开着的页面自动换成最新版本。
+   注意：这段逻辑要先被这次更新"种"进当前页面，以后你再更新文件，检测才会跟着生效。 */
+(function(){
+  try{
+    var KEY='ktv:'+location.pathname;
+    function check(){
+      var url=location.pathname+(location.pathname.indexOf('?')>-1?'&':'?')+'_cb='+Date.now();
+      fetch(url,{cache:'no-store'}).then(function(r){
+        var tag=r.headers.get('etag')||r.headers.get('last-modified');
+        if(!tag)return;
+        var prev=localStorage.getItem(KEY);
+        if(prev&&prev!==tag){
+          localStorage.setItem(KEY,tag);
+          if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
+          if('serviceWorker' in navigator)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(reg){reg.unregister()})});
+          location.replace(location.pathname+'?_v='+encodeURIComponent(tag));
+        }else if(!prev){
+          localStorage.setItem(KEY,tag);
+        }
+      }).catch(function(){});
+    }
+    check();
+    setInterval(check,20000);
+    document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')check()});
+  }catch(e){}
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">

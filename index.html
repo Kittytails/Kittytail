@@ -102,7 +102,11 @@
 
   .desktop.home-page{
     padding-left:16px;padding-right:16px;
+    padding-top:calc(24px + env(safe-area-inset-top));
     column-gap:12px;row-gap:12px;
+  }
+  body.edit-mode .desktop.home-page{
+    padding-top:calc(78px + env(safe-area-inset-top));
   }
   .desktop-grid{
     inset:24px 16px;
@@ -178,7 +182,7 @@
   }
 
   @media (max-height:720px){
-    .desktop.home-page{padding-top:18px;padding-bottom:18px;row-gap:8px}
+    .desktop.home-page{padding-top:calc(18px + env(safe-area-inset-top));padding-bottom:18px;row-gap:8px}
     .desktop-grid{inset:18px 16px;row-gap:8px}
     .dock-wrapper{padding-top:7px;padding-bottom:27px}
     .dock{height:80px;border-radius:29px}

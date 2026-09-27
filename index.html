@@ -6,13 +6,23 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>手机界面 - 韩系ins风</title>
+<script>
+(function(){
+  function setAppHeight(){
+    document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+  }
+  setAppHeight();
+  window.addEventListener('resize', setAppHeight);
+  window.addEventListener('orientationchange', setAppHeight);
+})();
+</script>
 <style>
   :root{--bg-color:#f7f7f7;--text-color:#222;--gray-color:#888;--white:#fff;
     --wallpaper-image:none;--font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
     --accent-color:#111827;--accent-text:#fff;--icon-radius:18px;
     --label-color:var(--gray-color);--label-text-shadow:none}
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
+  html,body{width:100%;height:var(--app-height, 100%);overflow:hidden;overscroll-behavior:none}
   body{background-color:var(--bg-color);background-image:var(--wallpaper-image);background-size:cover;background-position:center;background-attachment:fixed;font-family:var(--font-family);display:flex;flex-direction:column;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 .dynamic-edit-pill{
     position:fixed;top:max(16px,env(safe-area-inset-top));left:50%;
@@ -89,7 +99,7 @@
   .page-dot.active{width:7.5px;height:7.5px;flex-basis:7.5px;background:var(--accent-color,rgba(40,40,40,.78))}
   body.edit-mode .home-indicator{transform:translateY(-10px)}
 
-  .dock-wrapper{padding:10px 15px 35px;z-index:10;flex:0 0 auto;display:flex;justify-content:center}
+  .dock-wrapper{padding:10px 15px calc(35px + env(safe-area-inset-bottom));z-index:10;flex:0 0 auto;display:flex;justify-content:center}
   .dock{height:88px;position:relative;background:rgba(255,255,255,.65);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);border-radius:32px;display:flex;justify-content:space-around;align-items:center;padding:0 15px;box-shadow:0 8px 30px rgba(0,0,0,.05);border:1px solid rgba(255,255,255,.8);width:100%;touch-action:none;transition:width .22s cubic-bezier(.2,.8,.2,1)}
   .dock.drag-target{box-shadow:0 8px 30px rgba(0,0,0,.05),0 0 0 2px rgba(0,0,0,.045)}
   .dock .app{flex:1 1 0;min-width:0;max-width:72px;width:auto;height:auto;gap:0;transform:none;animation:none!important;transition:transform .16s ease}

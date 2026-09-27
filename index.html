@@ -221,6 +221,15 @@
   .folder-modal-grid .app.jiggle{animation:jiggle .55s infinite alternate ease-in-out}
   .folder-remove-badge{position:absolute;top:-4px;left:-4px;width:20px;height:20px;border-radius:50%;background:#444;color:#fff;font-size:13px;line-height:20px;text-align:center;display:none;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.3)}
   .folder-modal-grid .app.jiggle .folder-remove-badge{display:block}
+
+  /* ===== 强制更新弹窗 ===== */
+  .force-update-mask{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(20,20,22,.55);backdrop-filter:blur(20px) saturate(1.2);-webkit-backdrop-filter:blur(20px) saturate(1.2);padding:24px}
+  .force-update-mask.show{display:flex}
+  .force-update-card{width:min(300px,86vw);background:rgba(255,255,255,.98);border-radius:26px;padding:26px 22px 20px;text-align:center;box-shadow:0 30px 70px rgba(0,0,0,.35)}
+  .force-update-card h3{font-size:17px;font-weight:700;margin-bottom:8px;color:#111}
+  .force-update-card p{font-size:13px;color:#777;line-height:1.6;margin-bottom:20px}
+  .force-update-btn{width:100%;height:46px;border-radius:16px;background:#111;color:#fff;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;border:none}
+  .force-update-btn:active{background:#333}
 </style>
 <script>
 (function(){
@@ -243,6 +252,39 @@
 </script>
 </head>
 <body>
+
+<div class="force-update-mask" id="forceUpdateMask">
+  <div class="force-update-card">
+    <h3>发现新版本</h3>
+    <p>点击更新即可应用最新修复，你的壁纸、图标、桌面布局等数据都会保留，不会丢失。</p>
+    <button class="force-update-btn" id="forceUpdateBtn">立即更新</button>
+  </div>
+</div>
+<script>
+(function(){
+  // 每次我改完文件都会把这里的版本号往上加一位，用来触发强制更新弹窗
+  var CURRENT_BUILD='20260927-2';
+  try{
+    var last=localStorage.getItem('appBuildVersion');
+    if(last!==CURRENT_BUILD){
+      document.addEventListener('DOMContentLoaded',function(){
+        var mask=document.getElementById('forceUpdateMask');
+        if(mask)mask.classList.add('show');
+      });
+    }
+  }catch(e){}
+  document.addEventListener('DOMContentLoaded',function(){
+    var btn=document.getElementById('forceUpdateBtn');
+    if(!btn)return;
+    btn.addEventListener('click',function(){
+      try{localStorage.setItem('appBuildVersion',CURRENT_BUILD)}catch(e){}
+      var url=location.pathname+'?_u='+Date.now()+location.hash;
+      location.href=url;
+      setTimeout(function(){location.reload(true)},50);
+    });
+  });
+})();
+</script>
 
 <div class="dynamic-edit-pill">
   <div class="dep-btn" id="addPageBtn">

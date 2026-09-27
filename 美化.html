@@ -95,7 +95,7 @@ button,input{font:inherit}
 .bottom{position:fixed;left:0;right:0;bottom:0;padding:12px 20px calc(12px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line)}
 .done{width:100%;height:52px;border:0;border-radius:16px;background:var(--ink);color:var(--card);font-size:15px;font-weight:700;letter-spacing:1px;transition:0.2s;cursor:pointer}
 .done:active{transform:scale(0.98);background:#333}
-.toast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,15px);background:rgba(17,17,17,0.9);color:#fff;padding:12px 24px;border-radius:100px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(0.34, 1.56, 0.64, 1);z-index:30;box-shadow: 0 10px 30px rgba(0,0,0,0.15)}
+.toast{position:fixed;left:50%;top:calc(64px + env(safe-area-inset-top) + 12px);transform:translate(-50%,-14px);background:rgba(20,20,20,0.96);color:#fff;padding:16px 20px;border-radius:20px;font-size:13.5px;font-weight:600;line-height:1.6;text-align:left;max-width:min(94vw,420px);width:max-content;white-space:normal;word-break:break-word;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(0.34, 1.56, 0.64, 1);z-index:200;box-shadow: 0 10px 30px rgba(0,0,0,0.22)}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 </style>
 </head>
@@ -153,6 +153,10 @@ button,input{font:inherit}
       <label class="small-btn dark" style="flex:1; margin:0;">批量上传本地 <input id="bulkUpload" type="file" multiple accept="image/*" style="display:none"></label>
       <button class="small-btn" id="toggleAppEdit" style="flex:1">调整位置</button>
     </div>
+    <label style="display:flex;align-items:center;gap:8px;margin:10px 2px 4px;font-size:12.5px;color:#666;line-height:1.5">
+      <input type="checkbox" id="useDirectLink" style="width:16px;height:16px;flex-shrink:0">
+      上传图标时自动转直链（上传到「直链」里配置的 GitHub 仓库，不占用本地存储空间）
+    </label>
     <div id="appList" class="app-list"></div>
   </div>
 </section>
@@ -189,8 +193,63 @@ let appEditMode = false;
 
 function read(k,d){try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}}
 function write(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){if(e.name==='QuotaExceededError') toast('存储空间不足，这次改动没保存成功，删掉几张旧图片/背景再试试~');return false}}
-function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1500)}
+function toast(s){$('toast').textContent=s;$('toast').classList.add('show');clearTimeout(toast._t);var dur=Math.max(1500,Math.min(4200,s.length*70));toast._t=setTimeout(()=>$('toast').classList.remove('show'),dur)}
 function sync(){theme.appsOrder = currentApps; let ok=write(KEY,theme); ok=write(COLORS,colors)&&ok; ok=write(BGS,savedBgs)&&ok; try{window.dispatchEvent(new Event('phoneThemeSync')); if(window.opener)window.opener.postMessage({type:'phoneThemeSync'},'*');}catch(e){} return ok;}
+
+// ===== 直链集成：把图标改上传到「直链」里配置好的 GitHub 仓库，换成一个网址，
+// 而不是把图片编码成又大又占地方的 base64 塞进 localStorage（这才是"存储空间不足"的根源）。
+// 直接复用"直链"App自己保存Token/仓库名用的那几个localStorage键，两边配置是通的，不用重新填一遍。
+const DL_TOKEN_PREF='useDirectLinkForIcons';
+$('useDirectLink').checked = localStorage.getItem(DL_TOKEN_PREF)==='1';
+$('useDirectLink').onchange=()=>{localStorage.setItem(DL_TOKEN_PREF, $('useDirectLink').checked?'1':'0')};
+
+function dlSettings(){
+  return {
+    token:(localStorage.getItem('kb_standalone_token')||'').trim(),
+    repo:(localStorage.getItem('kb_standalone_repo')||'').trim()||'kittytail-assets',
+    proxy:(localStorage.getItem('kb_standalone_proxy')||'').trim().replace(/\/+$/,'')
+  };
+}
+async function ghRequest(path,options,token,proxy){
+  const base=proxy||'https://api.github.com';
+  const res=await fetch(base+path,{...options,headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json',...((options&&options.headers)||{})},cache:'no-store'});
+  const text=await res.text();let data={};try{data=text?JSON.parse(text):{}}catch(e){data={message:text}}
+  if(!res.ok) throw new Error(data.message||('HTTP '+res.status));
+  return data;
+}
+function dlSafeName(name){
+  name=String(name||'icon');
+  const dot=name.lastIndexOf('.');
+  let stem=dot>=0?name.slice(0,dot):name, ext=dot>=0?name.slice(dot):'.jpg';
+  stem=stem.replace(/[^\w.\-\u4e00-\u9fff]+/g,'-').replace(/^[-.]+|[-.]+$/g,'')||('icon-'+Date.now());
+  ext=ext.replace(/[^\w.]/g,'')||'.jpg';
+  return stem+ext;
+}
+function dlCdnUrl(owner,repo,branch,path){
+  return 'https://cdn.jsdelivr.net/gh/'+encodeURIComponent(owner)+'/'+encodeURIComponent(repo)+'@'+encodeURIComponent(branch)+'/'+path.split('/').map(encodeURIComponent).join('/');
+}
+// dataUrl: compressImage()压缩后的 data:image/jpeg;base64,... 字符串
+async function uploadIconToDirectLink(dataUrl, filename){
+  const s=dlSettings();
+  if(!s.token) throw new Error('还没在「直链」里配置 GitHub Token');
+  const user=await ghRequest('/user',{method:'GET'},s.token,s.proxy);
+  const owner=user.login;
+  let branch='main';
+  try{
+    const repoData=await ghRequest('/repos/'+owner+'/'+s.repo,{method:'GET'},s.token,s.proxy);
+    branch=repoData.default_branch||'main';
+  }catch(e){
+    if(/404|Not Found/i.test(e.message||'')){
+      const created=await ghRequest('/user/repos',{method:'POST',body:JSON.stringify({name:s.repo,auto_init:true})},s.token,s.proxy);
+      branch=created.default_branch||'main';
+    } else throw e;
+  }
+  const path='images/icon-'+Date.now()+'-'+dlSafeName(filename);
+  const content=String(dataUrl).split(',')[1]||'';
+  const encodedPath=path.split('/').map(encodeURIComponent).join('/');
+  await ghRequest('/repos/'+owner+'/'+s.repo+'/contents/'+encodedPath,{method:'PUT',body:JSON.stringify({message:'上传图标 '+path,content,branch})},s.token,s.proxy);
+  return dlCdnUrl(owner,s.repo,branch,path);
+}
 
 // 色块处理
 function applyColor(c){theme.bgColor=c;theme.wallpaperCSS='none';sync();$('colorInput').value=c;$('hexInput').value=c;renderSwatches();renderSavedBgs();}
@@ -321,18 +380,60 @@ const readFile = (file) => new Promise(resolve => {
     let r = new FileReader(); r.onload = x => resolve(x.target.result); r.readAsDataURL(file);
 });
 
+// 压缩图片:限制最长边尺寸+转成JPEG压缩质量,能把手机原图(动辄几MB)
+// 压到几十到一两百KB,同样的localStorage配额能多存好几倍的图标/背景。
+function compressImage(file, maxDim, quality){
+  return new Promise(resolve=>{
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let w = img.naturalWidth, h = img.naturalHeight;
+        if(w > maxDim || h > maxDim){
+          if(w >= h){ h = Math.round(h * maxDim / w); w = maxDim; }
+          else { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        // 先铺白底,避免带透明通道的图压成JPEG后透明区域变黑
+        ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,h);
+        ctx.drawImage(img,0,0,w,h);
+        try{ resolve(canvas.toDataURL('image/jpeg', quality)); }
+        catch(err){ resolve(e.target.result); }
+      };
+      img.onerror = ()=> resolve(e.target.result);
+      img.src = e.target.result;
+    };
+    reader.onerror = ()=> resolve(null);
+    reader.readAsDataURL(file);
+  });
+}
+
 $('bulkUpload').onchange = async (ev) => {
     let files = Array.from(ev.target.files);
     if (!files.length) return;
-    toast('正在批量处理...');
+    const useDL = $('useDirectLink').checked;
+    toast(useDL ? '正在批量处理并转直链...' : '正在批量处理...');
     theme.appIcons = theme.appIcons || {};
     let fileIdx = 0;
+    let dlFailCount = 0, dlFailReason = '';
     for (let name of currentApps) {
         if (fileIdx >= files.length) break;
         let fileToUse = files.find(f => f.name.replace(/\.[^/.]+$/, "") === name) || files[fileIdx++];
-        if (fileToUse) theme.appIcons[name] = await readFile(fileToUse);
+        if (!fileToUse) continue;
+        const compressed = await compressImage(fileToUse, 240, 0.85);
+        if (useDL) {
+            try { theme.appIcons[name] = await uploadIconToDirectLink(compressed, name + '.jpg'); }
+            catch (err) { dlFailCount++; dlFailReason = err.message || '未知错误'; theme.appIcons[name] = compressed; }
+        } else {
+            theme.appIcons[name] = compressed;
+        }
     }
-    renderApps(); if(sync())toast('批量上传完成');
+    renderApps();
+    const ok = sync();
+    if (dlFailCount) toast(dlFailCount + ' 张转直链失败（' + dlFailReason + '），已改存本地');
+    else if (ok) toast(useDL ? '批量上传完成，已转为直链' : '批量上传完成');
     ev.target.value = '';
 };
 
@@ -347,7 +448,25 @@ function renderApps(){
     if(theme.appIcons&&theme.appIcons[name]){let im=document.createElement('img');im.src=theme.appIcons[name];thumb.appendChild(im)}else thumb.textContent=name.slice(0,2);
     let main=document.createElement('div'); main.className='app-name'; main.textContent=name;
     let input=document.createElement('input');input.type='file';input.accept='image/*';input.style.display='none';
-    input.onchange=ev=>{let f=ev.target.files[0];if(!f)return;let r=new FileReader();r.onload=x=>{theme.appIcons=theme.appIcons||{};theme.appIcons[name]=x.target.result;let ok=sync();renderApps();if(ok)toast(name+' 图标已保存并同步')};r.readAsDataURL(f)};
+    input.onchange=async ev=>{
+      let f=ev.target.files[0];if(!f)return;
+      const compressed = await compressImage(f, 240, 0.85);
+      theme.appIcons=theme.appIcons||{};
+      const useDL = $('useDirectLink').checked;
+      if(useDL){
+        try{
+          theme.appIcons[name]=await uploadIconToDirectLink(compressed, name+'.jpg');
+        }catch(err){
+          theme.appIcons[name]=compressed;
+          renderApps(); sync();
+          toast('转直链失败（'+(err.message||'未知错误')+'），已改存本地');
+          return;
+        }
+      } else {
+        theme.appIcons[name]=compressed;
+      }
+      let ok=sync();renderApps();if(ok)toast(name+(useDL?' 直链已保存并同步':' 图标已保存并同步'));
+    };
     lab.append(thumb, main, input);
     lab.addEventListener('click',e=>{if(e.target===lab||e.target===thumb||e.target===main)input.click()});
 
@@ -379,7 +498,23 @@ function renderPlans(){let box=$('planList');box.innerHTML='';if(!plans.length){
 function savePlan(){let name=prompt('给当前方案取个名字');if(!name)return;plans.unshift({name:name.trim().slice(0,24),time:Date.now(),data:currentSnapshot()});plans=plans.slice(0,20);let ok=write(PLANS,plans);renderPlans();if(ok)toast('方案已保存')}
 if($('savePlanBtn'))$('savePlanBtn').onclick=savePlan;
 $('doneBtn').onclick=()=>{if(sync()){toast('配置已保存');setTimeout(goBack,450)}};
-function goBack(){if(document.referrer&&document.referrer.indexOf('小手机毛胚.html')!==-1&&history.length>1)history.back();else location.href='小手机毛胚.html'}
+function goBack(){
+  // 只要浏览器历史里有上一页,直接用 history.back() 原路返回即可——
+  // 不需要再核对 document.referrer 里是不是"小手机毛胚.html"这几个字。
+  // 之前的问题就出在这:很多浏览器/GitHub Pages 会把 referrer 里的中文
+  // 编码成 %E5%B0%8F%E6%89%8B... 这样的形式,indexOf('小手机毛胚.html')
+  // 永远匹配不上,于是每次都被迫走"location.href='小手机毛胚.html'"这条
+  // 硬编码兜底路径,一旦当前页面所在目录/域名和预期的不完全一致就会 404。
+  if(history.length>1){
+    history.back();
+    return;
+  }
+  // 只有在没有可回退的历史记录时(比如美化页是被直接打开/刷新进来的),
+  // 才退回到拼接跳转,并且基于当前页面所在目录来拼路径,而不是写死根路径,
+  // 这样部署在子目录下也不会 404。
+  var base=location.pathname.slice(0,location.pathname.lastIndexOf('/')+1);
+  location.href=base+'小手机毛胚.html';
+}
 
 // 左滑退出（避开色块/背景缩略图的横向滚动区和弹窗）
 (function(){

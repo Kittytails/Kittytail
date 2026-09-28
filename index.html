@@ -901,6 +901,14 @@
                 <span class="label">API 代理（可选）</span>
                 <input type="text" id="gh-proxy" class="url-input" placeholder="例如 https://your-worker.workers.dev" autocomplete="off">
             </div>
+            <div class="input-group">
+                <span class="label">图片代理（可选，转换外链被跨域拦截时兜底）</span>
+                <input type="text" id="gh-imgproxy" class="url-input" placeholder="例如 https://img.your-worker.workers.dev/?url=" autocomplete="off">
+            </div>
+            <label class="cloud-delete-option">
+                <input type="checkbox" id="gh-pin">
+                <span>直链固定到提交版本（不受 CDN 分支缓存影响）</span>
+            </label>
             <button class="ghost-btn primary" onclick="saveSettings()">保存并测试连接</button>
         </div>
     </div>
@@ -1020,7 +1028,7 @@ async function writeClipboard(text) {
 }
 function toast(msg) {
     let el = $('kb-toast');
-    const isError = /失败|错误|无法|请先|请填写|没有|暂无|还有.*正在/.test(msg);
+    const isError = /失败|错误|无法|请先|请填写|没有|暂无|还有.*正在|不对|已存在|未识别|未找到|请稍候|仅支持|不支持|不能|超时|未配置/.test(msg);
     const iconSvg = isError
         ? '<svg viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke-width="2.6" stroke-linecap="round"/></svg>'
         : '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -1095,7 +1103,9 @@ function getSettings() {
     return {
         token: ($('gh-token').value || '').trim(),
         repo: ($('gh-repo').value || '').trim() || 'kittytail-assets',
-        proxy: ($('gh-proxy').value || '').trim().replace(/\/+$/, '')
+        proxy: ($('gh-proxy').value || '').trim().replace(/\/+$/, ''),
+        imgProxy: (($('gh-imgproxy') && $('gh-imgproxy').value) || '').trim(),
+        pin: !!($('gh-pin') && $('gh-pin').checked)
     };
 }
 
@@ -1109,6 +1119,8 @@ async function saveSettings() {
         localStorage.setItem('kb_standalone_token', s.token);
         localStorage.setItem('kb_standalone_repo', s.repo);
         localStorage.setItem('kb_standalone_proxy', s.proxy);
+        localStorage.setItem('kb_standalone_imgproxy', s.imgProxy);
+        localStorage.setItem('kb_standalone_pin', s.pin ? '1' : '0');
         repoLiveLoaded = false;
         repoLiveLoadedAt = 0;
         toast('连接成功');
@@ -1145,6 +1157,74 @@ function removeHistoryItem(id) {
     const list = loadHistory().filter(e => e.id !== id);
     saveHistory(list);
     renderGallery();
+}
+
+// --- 上传顺序（实时仓库按此排序）---
+// GitHub 的文件树只按路径字母序返回、不带上传时间，所以上传成功时在本地记一笔时间。
+// 单独存一份（不随图库记录被删而丢失）；没有记录的文件（别的设备/手动上传）视为最早。
+const UPLOAD_ORDER_KEY = 'kb_standalone_upload_order';
+const REPO_SORT_NEWEST_FIRST = false; // false = 先上传的在前；改成 true = 最新上传的在最前
+function uploadKey(owner, repo, path) {
+    return [String(owner || '').toLowerCase(), String(repo || '').toLowerCase(), path].join('\u0000');
+}
+function loadUploadOrder() {
+    try {
+        const o = JSON.parse(localStorage.getItem(UPLOAD_ORDER_KEY) || '{}');
+        return (o && typeof o === 'object') ? o : {};
+    } catch (_) { return {}; }
+}
+function saveUploadOrder(o) {
+    try { localStorage.setItem(UPLOAD_ORDER_KEY, JSON.stringify(o)); } catch (_) {}
+}
+function recordUploadOrder(owner, repo, path, time) {
+    if (!path) return;
+    const o = loadUploadOrder();
+    o[uploadKey(owner, repo, path)] = time;
+    saveUploadOrder(o);
+}
+function historyAssetRef(e) {
+    if (!e) return null;
+    if (e.githubPath) return { owner: e.githubOwner || '', repo: e.githubRepo || '', path: e.githubPath };
+    return parseGithubAssetFromUrl(e.url);
+}
+function buildUploadRank() {
+    const rank = new Map();
+    loadHistory().forEach(e => { // 旧版本留下的图库记录也能用来排序
+        const p = historyAssetRef(e);
+        if (!p) return;
+        const k = uploadKey(p.owner, p.repo, p.path);
+        rank.set(k, Math.max(rank.get(k) || 0, e.time || 0));
+    });
+    const order = loadUploadOrder();
+    Object.keys(order).forEach(k => rank.set(k, order[k]));
+    return rank;
+}
+function sortByUploadOrder(list) {
+    const rank = buildUploadRank();
+    const t = f => rank.get(uploadKey(f.owner, f.repo, f.path)) || 0;
+    const dir = REPO_SORT_NEWEST_FIRST ? -1 : 1;
+    return list.slice().sort((a, b) => (t(a) - t(b)) * dir || a.path.localeCompare(b.path, 'zh', { numeric: true }));
+}
+function pruneOrderOnly(files) {
+    const order = loadUploadOrder();
+    let changed = false;
+    files.forEach(f => { const k = uploadKey(f.owner, f.repo, f.path); if (k in order) { delete order[k]; changed = true; } });
+    if (changed) saveUploadOrder(order);
+}
+// 仓库文件被删除后，同步清掉本地图库记录和顺序记录
+function pruneHistoryForFiles(files) {
+    if (!files.length) return;
+    const keys = new Set(files.map(f => uploadKey(f.owner, f.repo, f.path)));
+    const history = loadHistory();
+    const next = history.filter(e => {
+        const p = historyAssetRef(e);
+        return !(p && keys.has(uploadKey(p.owner, p.repo, p.path)));
+    });
+    if (next.length !== history.length) { saveHistory(next); renderGallery(); }
+    const order = loadUploadOrder();
+    let changed = false;
+    keys.forEach(k => { if (k in order) { delete order[k]; changed = true; } });
+    if (changed) saveUploadOrder(order);
 }
 
 let galleryMultiMode = false;
@@ -1383,7 +1463,7 @@ let repoCurrentPath = ''; // 当前浏览的文件夹（空字符串 = 根目录
 let moveTargetFolder = '';
 
 // 非法文件夹名字符：不允许出现路径分隔符等特殊符号
-const INVALID_FOLDER_NAME_RE = /[\/\\:*?"<>|]/;
+const INVALID_FOLDER_NAME_RE = /[\/\\:*?"<>|]|^\.{1,2}$/;
 
 // 当前文件夹下的直接子文件夹名（不含更深层级）
 function getRepoSubfolders() {
@@ -1497,8 +1577,11 @@ async function deleteRepoFolder(folderPath) {
         }
     }
     const failedPaths = new Set(failures.map(x => x.path));
+    pruneHistoryForFiles(filesInFolder.filter(f => !failedPaths.has(f.path)));
     repoLiveFiles = repoLiveFiles.filter(f => !(f.path.startsWith(prefix) && !failedPaths.has(f.path)));
     renderRepoLiveFiles();
+    const statusEl = $('repo-live-status');
+    if (statusEl) statusEl.textContent = '实时仓库 · ' + repoLiveFiles.length + ' 个文件';
     if (failures.length) {
         toast('部分删除失败');
         showUploadErrorModal(failures);
@@ -1571,9 +1654,22 @@ async function moveSelectedRepoFiles(targetFolder) {
         const prefix = targetFolder ? targetFolder + '/' : '';
         const treeChanges = [];
         const moves = [];
+        const occupied = new Set(repoLiveFiles.map(x => x.path));
+        let renamedCount = 0;
         selected.forEach(f => {
-            const newPath = prefix + f.name;
+            let newPath = prefix + f.name;
             if (newPath === f.path) return;
+            // 目标位置已有同名文件（或本批里有重名）：自动加 -2、-3，绝不覆盖
+            if (occupied.has(newPath)) {
+                const dot = f.name.lastIndexOf('.');
+                const stem = dot > 0 ? f.name.slice(0, dot) : f.name;
+                const ext = dot > 0 ? f.name.slice(dot) : '';
+                let n = 2;
+                while (occupied.has(prefix + stem + '-' + n + ext)) n++;
+                newPath = prefix + stem + '-' + n + ext;
+                renamedCount++;
+            }
+            occupied.add(newPath);
             treeChanges.push({ path: f.path, mode: '100644', type: 'blob', sha: null });
             treeChanges.push({ path: newPath, mode: '100644', type: 'blob', sha: f.sha });
             moves.push({ from: f.path, to: newPath });
@@ -1592,6 +1688,9 @@ async function moveSelectedRepoFiles(targetFolder) {
             method: 'PATCH', body: JSON.stringify({ sha: newCommit.sha })
         }, s.token, s.proxy);
 
+        const history = loadHistory();
+        const order = loadUploadOrder();
+        let historyChanged = false;
         moves.forEach(m => {
             const f = repoLiveFiles.find(x => x.path === m.from);
             if (f) {
@@ -1600,10 +1699,28 @@ async function moveSelectedRepoFiles(targetFolder) {
                 f.url = repoCdnUrl(f.owner, f.repo, f.branch, f.path);
                 f.rawUrl = repoRawUrl(f.owner, f.repo, f.branch, f.path);
             }
+            // 上传顺序跟着文件走
+            const oldK = uploadKey(ctx.owner, s.repo, m.from);
+            if (order[oldK] !== undefined) { order[uploadKey(ctx.owner, s.repo, m.to)] = order[oldK]; delete order[oldK]; }
+            // 图库记录里的直链也要同步，否则旧链接 404、之后「同时删除仓库文件」也找不到文件
+            history.forEach(e => {
+                const p = historyAssetRef(e);
+                if (!p || p.path !== m.from) return;
+                if (p.owner && p.owner.toLowerCase() !== String(ctx.owner).toLowerCase()) return;
+                if (p.repo && p.repo.toLowerCase() !== String(s.repo).toLowerCase()) return;
+                const viaRaw = /raw\.githubusercontent\.com/.test(e.url || '');
+                e.githubOwner = ctx.owner; e.githubRepo = s.repo; e.githubBranch = e.githubBranch || ctx.branch; e.githubPath = m.to;
+                // 固定到提交的直链：旧提交里的旧路径依然有效，保持不变
+                const pinned = /[@/][0-9a-f]{40}\//i.test(e.url || '');
+                if (!pinned) e.url = viaRaw ? repoRawUrl(ctx.owner, s.repo, ctx.branch, m.to) : repoCdnUrl(ctx.owner, s.repo, ctx.branch, m.to);
+                historyChanged = true;
+            });
         });
+        saveUploadOrder(order);
+        if (historyChanged) { saveHistory(history); renderGallery(); }
         exitRepoMultiMode();
         renderRepoLiveFiles();
-        toast('已移动 ' + moves.length + ' 个文件');
+        toast('已移动 ' + moves.length + ' 个文件' + (renamedCount ? '（' + renamedCount + ' 个重名已自动改名）' : ''));
     } catch (e) {
         toast('移动失败：' + (e.message || '未知错误'));
     }
@@ -1619,13 +1736,14 @@ function setRepoFilter(f) {
 
 function getRepoVisibleList() {
     const prefix = repoCurrentPath ? repoCurrentPath + '/' : '';
-    return repoLiveFiles.filter(f => {
+    const list = repoLiveFiles.filter(f => {
         if (f.name === '.gitkeep') return false;
         if (repoFilter !== 'all' && f.type !== repoFilter) return false;
         if (!f.path.startsWith(prefix)) return false;
         const rest = f.path.slice(prefix.length);
         return rest.length > 0 && rest.indexOf('/') === -1;
     });
+    return sortByUploadOrder(list);
 }
 
 function updateRepoSelectionUI() {
@@ -1704,6 +1822,7 @@ async function deleteSelectedRepoFiles() {
                 .filter(f => !failedPaths.has(f.path))
                 .map(f => keyOf(f.owner, f.repo, f.branch, f.path))
         );
+        pruneOrderOnly(selected.filter(f => !failedPaths.has(f.path)));
         repoLiveFiles = repoLiveFiles.filter(f => !deletedKeys.has(keyOf(f.owner, f.repo, f.branch, f.path)));
         const history = loadHistory();
         const next = history.filter(e => !(e.githubOwner && e.githubRepo && e.githubPath &&
@@ -2056,6 +2175,7 @@ function renderGallery() {
 
 // 初始化读取
 function clearCurrentUploadAtNewDay() {
+    if (isBatchUploading) return; // 上传进行中不清空结果列表
     const key = 'kb_current_upload_date';
     const today = formatDate(Date.now());
     const last = localStorage.getItem(key);
@@ -2088,6 +2208,8 @@ window.onload = () => {
     $('gh-token').value = savedToken;
     $('gh-repo').value = localStorage.getItem('kb_standalone_repo') || 'kittytail-assets';
     $('gh-proxy').value = localStorage.getItem('kb_standalone_proxy') || '';
+    $('gh-imgproxy').value = localStorage.getItem('kb_standalone_imgproxy') || '';
+    $('gh-pin').checked = localStorage.getItem('kb_standalone_pin') === '1';
 
     renderGallery();
     switchTab(savedToken ? 'upload' : 'settings');
@@ -2272,6 +2394,132 @@ async function findAvailableGithubPath(initialPath, ctx, owner, branch, s) {
     }
 }
 
+// 大文件上传 blob：
+// 1) 内存：不再把整个文件转成一个巨大的 base64 字符串再 JSON.stringify（那样会同时存在好几份拷贝），
+//    而是每 3MB 转一段，直接塞进 Blob 里（浏览器可把 Blob 放在磁盘/外部内存），JS 堆里同一时刻只有一小段。
+//    分块必须是 3 字节的整数倍，各段 base64 拼起来才是合法的 base64。
+// 2) 超时：改用 XHR，只要还在持续上传就不会超时；只有连续 45 秒完全没有进展才判定卡死。
+//    blob 按内容寻址，重复提交是安全的，所以卡住/断线后可以自动重试。
+async function uploadBlobChunked(file, owner, s, onProgress) {
+    const CHUNK = 3 * 1024 * 1024;
+    const STALL_MS = 45000;
+    const MAX_ATTEMPTS = 3;
+    const parts = ['{"encoding":"base64","content":"'];
+    for (let off = 0; off < file.size; off += CHUNK) {
+        const dataUrl = await new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = () => resolve(String(r.result));
+            r.onerror = () => reject(new Error('读取文件失败'));
+            r.readAsDataURL(file.slice(off, off + CHUNK));
+        });
+        parts.push(dataUrl.slice(dataUrl.indexOf(',') + 1));
+        if (onProgress) onProgress('准备中 ' + Math.min(99, Math.round(off / file.size * 100)) + '%');
+    }
+    parts.push('"}');
+    const body = new Blob(parts, { type: 'application/json' });
+    parts.length = 0;
+
+    const base = s.proxy || 'https://api.github.com';
+    const url = base + '/repos/' + owner + '/' + s.repo + '/git/blobs';
+    let lastErr = null;
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        try {
+            return await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                let stallTimer = null;
+                const arm = () => {
+                    clearTimeout(stallTimer);
+                    stallTimer = setTimeout(() => {
+                        reject(Object.assign(new Error('stalled'), { retryable: true, stalled: true }));
+                        xhr.abort();
+                    }, STALL_MS);
+                };
+                xhr.open('POST', url);
+                xhr.setRequestHeader('Accept', 'application/vnd.github+json');
+                xhr.setRequestHeader('Authorization', 'Bearer ' + s.token);
+                xhr.setRequestHeader('X-GitHub-Api-Version', '2022-11-28');
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.upload.onprogress = ev => {
+                    arm();
+                    if (onProgress && ev.lengthComputable) onProgress('上传中 ' + Math.min(99, Math.round(ev.loaded / ev.total * 100)) + '%');
+                };
+                xhr.onerror = () => {
+                    clearTimeout(stallTimer);
+                    reject(Object.assign(new Error('network'), { retryable: true, network: true }));
+                };
+                xhr.onload = () => {
+                    clearTimeout(stallTimer);
+                    let data = {};
+                    try { data = xhr.responseText ? JSON.parse(xhr.responseText) : {}; } catch (_) { data = { message: xhr.responseText }; }
+                    if (xhr.status >= 200 && xhr.status < 300) return resolve(data);
+                    const msg = data.message || ('HTTP ' + xhr.status);
+                    const limited = xhr.status === 429 || (xhr.status === 403 && /rate limit|abuse|secondary/i.test(msg));
+                    const retryable = limited || [502, 503, 504].includes(xhr.status);
+                    let text;
+                    if (xhr.status === 401) text = 'Token 无效或已过期（401）';
+                    else if (limited) text = 'GitHub API 触发限流，已重试多次仍失败，请稍后再试';
+                    else if (xhr.status === 403) text = 'GitHub 拒绝请求（403）：可能是 Token 权限不足';
+                    else if (xhr.status === 404) text = '仓库或资源不存在（404）';
+                    else if (xhr.status === 413) text = '文件太大，GitHub 拒绝接收（413）';
+                    else if (xhr.status === 422) text = 'GitHub 参数错误（422）：' + msg;
+                    else text = 'GitHub API ' + xhr.status + '：' + msg;
+                    reject(Object.assign(new Error(text), { retryable, limited }));
+                };
+                arm();
+                xhr.send(body);
+            });
+        } catch (e) {
+            lastErr = e;
+            if (!e.retryable || attempt === MAX_ATTEMPTS) break;
+            if (onProgress) onProgress('重试中 ' + attempt + '/' + (MAX_ATTEMPTS - 1));
+            await sleep((e.limited ? 4000 : 1500) * attempt);
+        }
+    }
+    if (lastErr && lastErr.stalled) throw new Error('上传长时间没有进展（' + STALL_MS / 1000 + ' 秒），可能是网络太慢或中断，请换个网络后重试');
+    if (lastErr && lastErr.network) throw new Error('无法连接 GitHub API（' + base.replace(/^https?:\/\//, '') + '）。这通常是当前网络拦截、代理/VPN 或对方服务器暂时不可达导致的，不是文件损坏');
+    throw lastErr || new Error('上传失败');
+}
+
+// --- 上传前按内容查重：Git 的 blob sha = SHA-1("blob <字节数>\0" + 内容) ---
+// 仓库里已有内容完全相同（且扩展名相同）的文件时，直接复用它的直链，不再重复上传。
+const DEDUP_MAX_SIZE = 8 * 1024 * 1024; // 更大的文件整份读进内存算哈希太吃力，跳过查重
+async function gitBlobSha(file) {
+    if (typeof crypto === 'undefined' || !crypto.subtle) return ''; // 非 https 环境没有 SubtleCrypto
+    const data = new Uint8Array(await file.arrayBuffer());
+    const head = new TextEncoder().encode('blob ' + data.length + '\0');
+    const all = new Uint8Array(head.length + data.length);
+    all.set(head, 0);
+    all.set(data, head.length);
+    const digest = new Uint8Array(await crypto.subtle.digest('SHA-1', all));
+    return Array.from(digest, b => b.toString(16).padStart(2, '0')).join('');
+}
+function pathExt(p) { const m = String(p || '').match(/\.[^./]+$/); return m ? m[0].toLowerCase() : ''; }
+// 整批只取一次仓库文件树（每批 1 次请求），本批新传的文件也会加进来
+async function getRepoShaIndex(ctx, owner, branch, s) {
+    if (ctx._shaIndex) return ctx._shaIndex;
+    const idx = new Map();
+    ctx._shaIndex = idx;
+    try {
+        const tree = await githubRequest('/repos/' + owner + '/' + s.repo + '/git/trees/' + encodeURIComponent(branch) + '?recursive=1', { method: 'GET' }, s.token, s.proxy);
+        (tree.tree || []).forEach(x => {
+            if (x.type !== 'blob' || !x.sha || x.path.split('/').pop() === '.gitkeep') return;
+            if (!idx.has(x.sha)) idx.set(x.sha, x.path);
+        });
+    } catch (_) { /* 取不到就当没有，正常上传 */ }
+    return idx;
+}
+
+// --- 固定到提交版本：拿到本次提交的 sha，直链用 @sha 而不是 @分支 ---
+async function resolvePinRef(commitSha, owner, branch, s) {
+    if (!s.pin) return branch;
+    if (commitSha) return commitSha;
+    try {
+        const ref = await githubRequest('/repos/' + owner + '/' + s.repo + '/git/ref/heads/' + encodeURIComponent(branch), { method: 'GET' }, s.token, s.proxy);
+        return (ref && ref.object && ref.object.sha) || branch;
+    } catch (_) { return branch; }
+}
+
 async function uploadToGithub(file, ctx) {
     const s = getSettings();
     if (!s.token) throw new Error('未配置 Token');
@@ -2286,19 +2534,33 @@ async function uploadToGithub(file, ctx) {
     const folder = isImage ? 'images' : 'fonts';
     let path = folder + '/' + getSafeFilename(file.name);
 
+    // 内容查重：已有完全相同的文件就直接复用
+    let contentSha = '';
+    if (file.size > 0 && file.size <= DEDUP_MAX_SIZE) {
+        try { contentSha = await gitBlobSha(file); } catch (_) { contentSha = ''; }
+        if (contentSha) {
+            const idx = await getRepoShaIndex(ctx, owner, branch, s);
+            const hit = idx.get(contentSha);
+            if (hit && pathExt(hit) === pathExt(path)) {
+                const ref = await resolvePinRef('', owner, branch, s);
+                return Object.assign(assetResult(file, owner, s.repo, branch, hit, ref), { deduped: true });
+            }
+        }
+    }
+
     // 无论是本批次重名，还是仓库里已经存在同名文件，都自动换名，避免覆盖历史资源。
     path = await findAvailableGithubPath(path, ctx, owner, branch, s);
 
-    const content = await fileToBase64(file);
-
     // 小文件（<800KB）走原来的 Contents API，一次请求搞定
     if (file.size < 800 * 1024) {
+        const content = await fileToBase64(file);
         const body = { message: '上传素材 ' + path, content, branch };
 
         // 不传 sha：这里只允许“创建新文件”，不允许静默覆盖旧资源。
         const contentsPath = '/repos/' + owner + '/' + s.repo + '/contents/' + path.split('/').map(encodeURIComponent).join('/');
+        let putRes = null;
         try {
-            await githubRequest(contentsPath, { method: 'PUT', body: JSON.stringify(body) }, s.token, s.proxy);
+            putRes = await githubRequest(contentsPath, { method: 'PUT', body: JSON.stringify(body) }, s.token, s.proxy);
         } catch (e) {
             // 之前的重试其实已写入成功、只是响应丢了：再次 PUT 会得到 422。
             // 路径在上面已确认“原本不存在”，此时若已存在，说明就是我们写进去的，视为成功。
@@ -2309,12 +2571,13 @@ async function uploadToGithub(file, ctx) {
         }
 
         ctx.usedPaths.add(path);
-        return assetResult(file, owner, s.repo, branch, path);
+        if (contentSha && ctx._shaIndex) ctx._shaIndex.set(contentSha, path);
+        const ref = await resolvePinRef(putRes && putRes.commit && putRes.commit.sha, owner, branch, s);
+        return assetResult(file, owner, s.repo, branch, path, ref);
     }
 
     // 大文件（常见于字体）：改用 Git Data API（blob→tree→commit→ref），避免 Contents API 的小文件限制。
-    const blob = await githubRequest('/repos/' + owner + '/' + s.repo + '/git/blobs',
-        { method: 'POST', body: JSON.stringify({ content, encoding: 'base64' }) }, s.token, s.proxy);
+    const blob = await uploadBlobChunked(file, owner, s, file._onProgress);
 
     const refData = await githubRequest('/repos/' + owner + '/' + s.repo + '/git/ref/heads/' + branch, { method: 'GET' }, s.token, s.proxy);
     const latestCommitSha = refData.object.sha;
@@ -2338,7 +2601,9 @@ async function uploadToGithub(file, ctx) {
         { method: 'PATCH', body: JSON.stringify({ sha: newCommit.sha }) }, s.token, s.proxy);
 
     ctx.usedPaths.add(path);
-    return assetResult(file, owner, s.repo, branch, path);
+    if (contentSha && ctx._shaIndex) ctx._shaIndex.set(contentSha, path);
+    const ref = await resolvePinRef(newCommit.sha, owner, branch, s);
+    return assetResult(file, owner, s.repo, branch, path, ref);
 }
 
 // --- 结果条目构建（本次上传列表用） ---
@@ -2466,17 +2731,26 @@ async function runUpload(file, refs, ctx) {
     const oldRetry = refs.action.querySelector('.retry-btn');
     if (oldRetry) oldRetry.remove();
 
+    file._onProgress = t => { statusEl.textContent = t; };
     try {
         const url = await uploadToGithub(file, ctx);
+        file._onProgress = null;
         statusEl.className = 'result-status ok';
-        statusEl.textContent = url.viaRaw ? '✓ 成功 · raw' : '✓ 成功';
-        if (url.viaRaw) statusEl.title = '超过 20MB，jsDelivr 不支持，已改用 GitHub raw 直链';
+        statusEl.textContent = url.deduped ? '✓ 已存在 · 复用' : (url.viaRaw ? '✓ 成功 · raw' : '✓ 成功');
+        if (url.deduped) statusEl.title = '仓库里已有内容完全相同的文件，直接复用了它的直链，没有重复上传';
+        else if (url.viaRaw) statusEl.title = '超过 20MB，jsDelivr 不支持，已改用 GitHub raw 直链';
         refs.input.value = url.url || url;
         refs.btn.disabled = false;
         refs.btn.onclick = () => copyText(url.url || url);
         if (file._collector && file._srcUrl) file._collector.set(file._srcUrl, url.url || url);
+        if (refs.retried && file._afterFn) file._afterFn(); // 「替换文件」流程里手动重试成功：重新生成可下载的替换结果
 
-        addToHistory({
+        // 复用已有文件时，图库里若已有同一文件的记录就不再重复添加（否则删一条会连带删掉另一条依赖的仓库文件）
+        const alreadyInHistory = !!url.deduped && loadHistory().some(e => {
+            const pr = historyAssetRef(e);
+            return pr && uploadKey(pr.owner, pr.repo, pr.path) === uploadKey(url.owner, url.repo, url.path);
+        });
+        if (!alreadyInHistory) addToHistory({
             id: Date.now() + '-' + Math.random().toString(36).slice(2),
             name: file.name,
             url: url.url || url,
@@ -2488,6 +2762,7 @@ async function runUpload(file, refs, ctx) {
             githubBranch: url.branch || '',
             githubPath: url.path || ''
         });
+        if (!url.deduped) recordUploadOrder(url.owner, url.repo, url.path, Date.now());
         repoLiveLoaded = false; // 仓库内容已变化，下次进入资源库时重新读取
         return { ok: true };
     } catch (err) {
@@ -2507,6 +2782,7 @@ async function runUpload(file, refs, ctx) {
         retryBtn.textContent = '重试';
         retryBtn.onclick = () => {
             closeUploadErrorModal();
+            refs.retried = true;
             runUpload(file, refs, ctx);
         };
         refs.action.appendChild(retryBtn);
@@ -2516,17 +2792,32 @@ async function runUpload(file, refs, ctx) {
 }
 
 // --- 外部图床链接转换 ---
+// 代理地址里含 {url} 就替换；否则把编码后的原链接直接接在末尾（如 https://x.workers.dev/?url=）
+function buildImgProxyUrl(tpl, target) {
+    const enc = encodeURIComponent(target);
+    return tpl.indexOf('{url}') !== -1 ? tpl.replace('{url}', enc) : tpl + enc;
+}
 async function urlToFile(rawUrl) {
     let u;
     try { u = new URL(rawUrl); } catch (e) { throw new Error('链接格式不正确'); }
     if (!/^https?:$/.test(u.protocol)) throw new Error('仅支持 http/https 链接');
 
-    let res;
+    // no-referrer：很多图床按 Referer 做防盗链，不带来源就能直接拿到
+    let res = null;
     try {
-        res = await fetch(u.href, { mode: 'cors', credentials: 'omit' });
-    } catch (e) {
-        throw new Error('无法获取该链接，可能是对方服务器拒绝跨域访问（CORS）');
+        res = await fetch(u.href, { mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer' });
+    } catch (_) { res = null; }
+    // 直连失败（多为 CORS）或被防盗链拒绝（401/403）：有图片代理就走代理再试一次
+    const imgProxy = getSettings().imgProxy;
+    if ((!res || res.status === 401 || res.status === 403) && imgProxy) {
+        let proxyErr = '';
+        try {
+            const r2 = await fetch(buildImgProxyUrl(imgProxy, u.href), { credentials: 'omit', referrerPolicy: 'no-referrer' });
+            if (r2.ok) res = r2; else proxyErr = 'HTTP ' + r2.status;
+        } catch (_) { proxyErr = '网络错误'; }
+        if (!res) throw new Error('无法获取该链接：直连被跨域拦截，图片代理也失败（' + proxyErr + '）');
     }
+    if (!res) throw new Error('无法获取该链接，可能是对方服务器拒绝跨域访问（CORS）。可在设置里填一个「图片代理」作为兜底');
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const declaredSize = Number(res.headers.get('content-length'));
     if (declaredSize && declaredSize > MAX_UPLOAD_SIZE) throw new Error('文件超过 ' + Math.round(MAX_UPLOAD_SIZE / 1048576) + 'MB，已跳过');
@@ -2554,13 +2845,18 @@ async function urlToFile(rawUrl) {
 }
 
 // --- 图床识别：只提取“图片上下文”里的 URL，避免把代码本身的普通网址也当成图床 ---
-function normalizeExtractedUrl(raw) {
+function cleanRawUrl(raw) {
     if (!raw) return '';
     let value = String(raw).trim();
     // HTML 实体与常见包裹符号
     value = value.replace(/^['"`(<\[]+|['"`)>\],;]+$/g, '');
     value = value.replace(/&amp;/gi, '&').replace(/&quot;/gi, '"').replace(/&#39;/gi, "'");
     value = value.replace(/[.,;:，。；、！!？?\)\]}>"'`]+$/, '');
+    return value;
+}
+function normalizeExtractedUrl(raw) {
+    let value = cleanRawUrl(raw);
+    if (!value) return '';
     if (value.startsWith('//')) value = 'https:' + value; // 协议相对地址
     try {
         const u = new URL(value);
@@ -2597,6 +2893,14 @@ function extractUrlsFromText(text, opts) {
         if (!explicitImageContext && !looksLikeImageUrl(url)) return;
         // 记录原文里写成 //host/path（协议相对）的链接，替换文件时需要一并处理
         if (opts.rawForms && /^\/\//.test(String(value).trim())) opts.rawForms.add(url);
+        // new URL().href 会把中文等字符转成 %XX；记下原文写法，替换文件时才对得上
+        if (opts.aliases) {
+            const cleaned = cleanRawUrl(value);
+            if (/^https?:\/\//i.test(cleaned) && cleaned !== url) {
+                if (!opts.aliases.has(url)) opts.aliases.set(url, new Set());
+                opts.aliases.get(url).add(cleaned);
+            }
+        }
         if (!found.includes(url)) found.push(url);
     };
 
@@ -2678,7 +2982,7 @@ async function convertUrls(urls, collector, afterFn) {
     results.forEach((result, index) => {
         if (result.status === 'fulfilled') {
             const f = result.value;
-            if (collector) { f._srcUrl = urls[index]; f._collector = collector; }
+            if (collector) { f._srcUrl = urls[index]; f._collector = collector; f._afterFn = afterFn; }
             files.push(f);
         } else {
             failures.push({ name: urls[index], message: (result.reason && result.reason.message) || '获取失败' });
@@ -2731,7 +3035,7 @@ async function handleImportFile(file) {
         return;
     }
 
-    const urls = extractUrlsFromText(text);
+    const urls = extractUrlsFromText(text, { scanAll: true });
     $('import-file-input').value = '';
 
     if (!urls.length) { toast('文件里没有链接'); return; }
@@ -2746,17 +3050,22 @@ let replaceOutput = null; // { url, name, replaced, total }
 function escapeRegExp(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
 // 一次性替换：最长的链接优先，且链接后面不能紧跟链接字符，避免把 a.png?x=1 只替换掉一半
-function applyLinkMap(text, map, protoRelative) {
+function applyLinkMap(text, map, protoRelative, aliases) {
     const keys = Array.from(map.keys()).sort((a, b) => b.length - a.length);
     if (!keys.length) return { text, count: 0 };
     let count = 0;
     const forms = new Map(); // 文件里可能出现的写法 → 新直链
     keys.forEach(k => {
-        forms.set(k, map.get(k));
-        if (k.indexOf('&') !== -1) forms.set(k.replace(/&/g, '&amp;'), map.get(k)); // HTML 里的 &amp; 写法
+        const addForm = form => {
+            forms.set(form, map.get(k));
+            if (form.indexOf('&') !== -1) forms.set(form.replace(/&/g, '&amp;'), map.get(k)); // HTML 里的 &amp; 写法
+        };
+        addForm(k);
+        const al = aliases && aliases.get(k);
+        if (al) al.forEach(addForm);
     });
     const fullKeys = Array.from(forms.keys()).sort((a, b) => b.length - a.length);
-    const tail = '(?![\\w%~/?&=#-])';
+    const tail = '(?![\\w%~/?&=#-]|\\.\\w)';
     const fullRe = new RegExp('(' + fullKeys.map(escapeRegExp).join('|') + ')' + tail, 'g');
     let out = text.replace(fullRe, (m) => { count++; return forms.get(m); });
 
@@ -2792,9 +3101,9 @@ function downloadReplaceOutput() {
     a.remove();
 }
 
-function buildReplaceOutput(fileName, mime, bom, originalText, map, protoRelative, total) {
+function buildReplaceOutput(fileName, mime, bom, originalText, map, protoRelative, total, aliases) {
     if (!map.size) { hideReplaceResult(); return; }
-    const r = applyLinkMap(originalText, map, protoRelative);
+    const r = applyLinkMap(originalText, map, protoRelative, aliases);
     if (replaceOutput && replaceOutput.url) URL.revokeObjectURL(replaceOutput.url);
     const dot = fileName.lastIndexOf('.');
     const outName = dot > 0 ? fileName.slice(0, dot) + '-replaced' + fileName.slice(dot) : fileName + '-replaced';
@@ -2835,12 +3144,13 @@ async function handleReplaceFile(file) {
     }
 
     const protoRelative = new Set();
-    const urls = extractUrlsFromText(text, { scanAll: true, rawForms: protoRelative });
+    const aliases = new Map();
+    const urls = extractUrlsFromText(text, { scanAll: true, rawForms: protoRelative, aliases });
     if (!urls.length) { toast('文件里没有图床链接'); return; }
 
     const map = new Map(); // 原链接 → 新直链
     const total = urls.filter(u => !isOwnHostUrl(u)).length;
-    const rebuild = () => buildReplaceOutput(file.name, file.type, bom, text, map, protoRelative, total);
+    const rebuild = () => buildReplaceOutput(file.name, file.type, bom, text, map, protoRelative, total, aliases);
 
     moveResultCardAfter('card-replace-file');
     await convertUrls(urls, map, rebuild);
@@ -2851,11 +3161,12 @@ async function handleReplaceFile(file) {
 const MAX_UPLOAD_SIZE = 99 * 1024 * 1024;
 // jsDelivr 对 GitHub 单文件有 20MB 上限：更大的文件不走 jsDelivr，改用 raw.githubusercontent.com 直链。
 const CDN_SIZE_LIMIT = 20 * 1024 * 1024;
-function assetResult(file, owner, repo, branch, path) {
+function assetResult(file, owner, repo, branch, path, ref) {
     const viaRaw = file.size > CDN_SIZE_LIMIT;
+    const r = ref || branch; // 开启「固定到提交版本」时 ref 是提交 sha，直链里用它；branch 仍保留真实分支名（删除文件要用）
     const url = viaRaw
-        ? repoRawUrl(owner, repo, branch, path)
-        : repoCdnUrl(owner, repo, branch, path);
+        ? repoRawUrl(owner, repo, r, path)
+        : repoCdnUrl(owner, repo, r, path);
     return { url, owner, repo, branch, path, viaRaw };
 }
 let isBatchUploading = false;

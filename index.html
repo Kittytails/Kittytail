@@ -38,10 +38,10 @@
     .card { background: var(--card-bg); border-radius: 26px; padding: 28px 26px; box-shadow: 0 8px 30px rgba(0,0,0,0.03); border: 1px solid var(--border); }
     .title { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--primary); letter-spacing: -0.4px; }
     .sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.7; font-weight: 400; }
-    #card-convert-link .sub, #card-import-file .sub { margin-bottom: 18px; }
+    #card-convert-link .sub, #card-import-file .sub, #card-replace-file > .sub { margin-bottom: 18px; }
     #card-convert-link .input-group { margin-bottom: 12px; }
     #card-convert-link .url-input { min-height: 92px; line-height: 1.55; }
-    #card-convert-link, #card-import-file, #result-card { scroll-margin-top: 90px; }
+    #card-convert-link, #card-import-file, #card-replace-file, #result-card { scroll-margin-top: 90px; }
     #result-card { margin-top: 0; }
 
     .card-head-row { display: flex; justify-content: space-between; align-items: flex-start; }
@@ -747,7 +747,8 @@
         margin-bottom: 15px !important;
     }
     #card-convert-link > .sub,
-    #card-import-file > .sub {
+    #card-import-file > .sub,
+    #card-replace-file > .sub {
         margin-bottom: 15px !important;
     }
     .card > .filter-group {
@@ -794,6 +795,17 @@
             <div class="sub">支持导入任意文件，文本格式识别更准确。</div>
             <input type="file" id="import-file-input" style="display:none" onchange="handleImportFile(this.files[0])">
             <button class="ghost-btn primary" id="import-file-btn" onclick="document.getElementById('import-file-input').click()">选择文件</button>
+        </div>
+
+        <div class="card" id="card-replace-file">
+            <div class="title">Replace File Links</div>
+            <div class="sub">导入 UTF-8 文本文件（HTML / MD / CSS / JSON 等），转换里面的图床链接，并直接在文件里替换后下载新文件。</div>
+            <input type="file" id="replace-file-input" style="display:none" onchange="handleReplaceFile(this.files[0])">
+            <button class="ghost-btn primary" id="replace-file-btn" onclick="document.getElementById('replace-file-input').click()">选择文件并替换</button>
+            <div id="replace-result" style="display:none; margin-top:14px;">
+                <div class="sub" id="replace-result-text" style="margin-bottom:10px;"></div>
+                <button class="ghost-btn primary" id="replace-download-btn" onclick="downloadReplaceOutput()">下载替换后的文件</button>
+            </div>
         </div>
 
         <div class="card" id="result-card" style="display:none;">
@@ -2462,6 +2474,7 @@ async function runUpload(file, refs, ctx) {
         refs.input.value = url.url || url;
         refs.btn.disabled = false;
         refs.btn.onclick = () => copyText(url.url || url);
+        if (file._collector && file._srcUrl) file._collector.set(file._srcUrl, url.url || url);
 
         addToHistory({
             id: Date.now() + '-' + Math.random().toString(36).slice(2),
@@ -2573,7 +2586,8 @@ function looksLikeImageUrl(url) {
     } catch (_) { return false; }
 }
 
-function extractUrlsFromText(text) {
+function extractUrlsFromText(text, opts) {
+    opts = opts || {};
     const source = String(text || '');
     const found = [];
     const add = (value, explicitImageContext = false) => {
@@ -2581,6 +2595,8 @@ function extractUrlsFromText(text) {
         if (!url) return;
         if (/\.(?:woff2?|ttf|otf|eot)$/i.test(new URL(url).pathname)) return; // 字体不属于图床转换范围
         if (!explicitImageContext && !looksLikeImageUrl(url)) return;
+        // 记录原文里写成 //host/path（协议相对）的链接，替换文件时需要一并处理
+        if (opts.rawForms && /^\/\//.test(String(value).trim())) opts.rawForms.add(url);
         if (!found.includes(url)) found.push(url);
     };
 
@@ -2625,12 +2641,35 @@ function extractUrlsFromText(text) {
         if (match) add(match[1], false);
     }
 
+    // 5. 导入文件时：全文扫描所有 http(s) 链接（JSON、TXT 等没有 <img> 上下文的文件也能识别），
+    //    仍然只保留“看起来像图片/图床”的地址。
+    if (opts.scanAll) {
+        const anyUrlRe = /https?:\/\/[^\s"'<>`)\]\\]+/gi;
+        while ((m = anyUrlRe.exec(source))) add(m[0], false);
+    }
+
     return found;
 }
 
-async function convertUrls(urls) {
+// 已经是自己仓库的直链：不需要再转换（避免重复上传）
+function isOwnHostUrl(url) {
+    const repo = (getSettings().repo || '').toLowerCase();
+    if (!repo) return false;
+    try {
+        const u = new URL(url);
+        const parts = u.pathname.split('/').filter(Boolean);
+        if (u.hostname === 'cdn.jsdelivr.net' && parts[0] === 'gh') return (parts[2] || '').split('@')[0].toLowerCase() === repo;
+        if (u.hostname === 'raw.githubusercontent.com') return (parts[1] || '').toLowerCase() === repo;
+    } catch (_) {}
+    return false;
+}
+
+// collector: 可选的 Map(原链接 → 新直链)，afterFn: 全部处理完（含失败重试）后的回调
+async function convertUrls(urls, collector, afterFn) {
     urls = Array.from(new Set(urls.map(s => s.trim()).filter(Boolean)));
-    if (!urls.length) { toast('未找到可转换链接'); return; }
+    const before = urls.length;
+    if (collector) urls = urls.filter(u => !isOwnHostUrl(u));
+    if (!urls.length) { toast(before ? '这些已经是你的图床链接了' : '未找到可转换链接'); if (afterFn) afterFn(); return; }
     if (!getSettings().token) { toast('请先配置 Token'); switchTab('settings'); return; }
 
     const files = [];
@@ -2638,7 +2677,9 @@ async function convertUrls(urls) {
     const results = await settleWithLimit(urls, 4, urlToFile);
     results.forEach((result, index) => {
         if (result.status === 'fulfilled') {
-            files.push(result.value);
+            const f = result.value;
+            if (collector) { f._srcUrl = urls[index]; f._collector = collector; }
+            files.push(f);
         } else {
             failures.push({ name: urls[index], message: (result.reason && result.reason.message) || '获取失败' });
         }
@@ -2650,10 +2691,12 @@ async function convertUrls(urls) {
         await handleFiles(files);
     }
 
+    if (afterFn) afterFn();
+
     if (failures.length) {
         showUploadErrorModal(failures, (f) => {
             closeUploadErrorModal();
-            convertUrls([f.name]); // name 字段这里存的就是原始链接
+            convertUrls([f.name], collector, afterFn); // name 字段这里存的就是原始链接
         });
         toast(failures.length + ' 个转换失败');
     }
@@ -2695,6 +2738,112 @@ async function handleImportFile(file) {
     if (isBatchUploading) { toast('上传中，请稍候'); return; }
     moveResultCardAfter('card-import-file');
     await convertUrls(urls);
+}
+
+// --- 导入文本文件：提取图床链接 → 转换 → 在文件里替换 → 输出新文件下载 ---
+let replaceOutput = null; // { url, name, replaced, total }
+
+function escapeRegExp(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+// 一次性替换：最长的链接优先，且链接后面不能紧跟链接字符，避免把 a.png?x=1 只替换掉一半
+function applyLinkMap(text, map, protoRelative) {
+    const keys = Array.from(map.keys()).sort((a, b) => b.length - a.length);
+    if (!keys.length) return { text, count: 0 };
+    let count = 0;
+    const forms = new Map(); // 文件里可能出现的写法 → 新直链
+    keys.forEach(k => {
+        forms.set(k, map.get(k));
+        if (k.indexOf('&') !== -1) forms.set(k.replace(/&/g, '&amp;'), map.get(k)); // HTML 里的 &amp; 写法
+    });
+    const fullKeys = Array.from(forms.keys()).sort((a, b) => b.length - a.length);
+    const tail = '(?![\\w%~/?&=#-])';
+    const fullRe = new RegExp('(' + fullKeys.map(escapeRegExp).join('|') + ')' + tail, 'g');
+    let out = text.replace(fullRe, (m) => { count++; return forms.get(m); });
+
+    // 协议相对写法 //host/path（仅当原文里确实这样写过）
+    const relKeys = keys.filter(k => protoRelative.has(k) && /^https:/i.test(k));
+    if (relKeys.length) {
+        const relForms = new Map();
+        relKeys.forEach(k => {
+            const rel = k.replace(/^https:/i, '');
+            relForms.set(rel, map.get(k));
+            if (rel.indexOf('&') !== -1) relForms.set(rel.replace(/&/g, '&amp;'), map.get(k));
+        });
+        const relRe = new RegExp('([^:\\w/]|^)(' + Array.from(relForms.keys()).sort((a, b) => b.length - a.length).map(escapeRegExp).join('|') + ')' + tail, 'g');
+        out = out.replace(relRe, (m, pre, hit) => { count++; return pre + relForms.get(hit); });
+    }
+    return { text: out, count };
+}
+
+function hideReplaceResult() {
+    if (replaceOutput && replaceOutput.url) URL.revokeObjectURL(replaceOutput.url);
+    replaceOutput = null;
+    const box = $('replace-result');
+    if (box) box.style.display = 'none';
+}
+
+function downloadReplaceOutput() {
+    if (!replaceOutput) return;
+    const a = document.createElement('a');
+    a.href = replaceOutput.url;
+    a.download = replaceOutput.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
+function buildReplaceOutput(fileName, mime, bom, originalText, map, protoRelative, total) {
+    if (!map.size) { hideReplaceResult(); return; }
+    const r = applyLinkMap(originalText, map, protoRelative);
+    if (replaceOutput && replaceOutput.url) URL.revokeObjectURL(replaceOutput.url);
+    const dot = fileName.lastIndexOf('.');
+    const outName = dot > 0 ? fileName.slice(0, dot) + '-replaced' + fileName.slice(dot) : fileName + '-replaced';
+    const parts = bom ? [new Uint8Array([0xEF, 0xBB, 0xBF]), r.text] : [r.text];
+    const blob = new Blob(parts, { type: mime || 'text/plain' });
+    replaceOutput = { url: URL.createObjectURL(blob), name: outName, replaced: r.count, total };
+    const failed = total - map.size;
+    $('replace-result-text').textContent = '已替换 ' + map.size + '/' + total + ' 个链接（共 ' + r.count + ' 处）' +
+        (failed > 0 ? '，' + failed + ' 个失败的保持原样' : '') + '。';
+    $('replace-download-btn').textContent = '下载 ' + outName;
+    $('replace-result').style.display = 'block';
+}
+
+async function handleReplaceFile(file) {
+    if (!file) return;
+    if (!getSettings().token) { toast('请先配置 Token'); switchTab('settings'); $('replace-file-input').value = ''; return; }
+    if (isBatchUploading) { toast('上传中，请稍候'); $('replace-file-input').value = ''; return; }
+    hideReplaceResult();
+
+    let text = '';
+    let bom = false;
+    try {
+        text = await file.text();
+        const head = new Uint8Array(await file.slice(0, 3).arrayBuffer());
+        bom = head.length === 3 && head[0] === 0xEF && head[1] === 0xBB && head[2] === 0xBF;
+    } catch (e) {
+        toast('读取失败：' + (e.message || '未知错误'));
+        $('replace-file-input').value = '';
+        return;
+    }
+    $('replace-file-input').value = '';
+
+    // 只处理 UTF-8 文本：二进制 / GBK 等文件替换后会损坏，直接拒绝
+    const bad = (text.match(/\uFFFD/g) || []).length;
+    if (text.indexOf('\u0000') !== -1 || (text.length && bad / text.length > 0.001)) {
+        toast('仅支持 UTF-8 文本文件');
+        return;
+    }
+
+    const protoRelative = new Set();
+    const urls = extractUrlsFromText(text, { scanAll: true, rawForms: protoRelative });
+    if (!urls.length) { toast('文件里没有图床链接'); return; }
+
+    const map = new Map(); // 原链接 → 新直链
+    const total = urls.filter(u => !isOwnHostUrl(u)).length;
+    const rebuild = () => buildReplaceOutput(file.name, file.type, bom, text, map, protoRelative, total);
+
+    moveResultCardAfter('card-replace-file');
+    await convertUrls(urls, map, rebuild);
 }
 
 // --- 批量处理逻辑 ---
@@ -2770,8 +2919,10 @@ async function handleFiles(files) {
     requestUploadWakeLock();
     const convertBtn = $('convert-link-btn');
     const importBtn = $('import-file-btn');
+    const replaceBtn = $('replace-file-btn');
     if (convertBtn) convertBtn.disabled = true;
     if (importBtn) importBtn.disabled = true;
+    if (replaceBtn) replaceBtn.disabled = true;
 
     try {
 
@@ -2848,6 +2999,7 @@ async function handleFiles(files) {
         releaseUploadWakeLock();
         if (convertBtn) convertBtn.disabled = false;
         if (importBtn) importBtn.disabled = false;
+        if (replaceBtn) replaceBtn.disabled = false;
     }
 }
 

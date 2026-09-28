@@ -799,7 +799,7 @@
 
         <div class="card" id="card-replace-file">
             <div class="title">Replace File Links</div>
-            <div class="sub">导入 UTF-8 文本文件（HTML / MD / CSS / JSON 等），转换里面的图床链接，并直接在文件里替换后下载新文件。</div>
+            <div class="sub">替换文本文件里的图床链接，并下载新文件。</div>
             <input type="file" id="replace-file-input" style="display:none" onchange="handleReplaceFile(this.files[0])">
             <button class="ghost-btn primary" id="replace-file-btn" onclick="document.getElementById('replace-file-input').click()">选择文件并替换</button>
             <div id="replace-result" style="display:none; margin-top:14px;">

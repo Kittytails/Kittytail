@@ -902,12 +902,12 @@
                 <input type="text" id="gh-proxy" class="url-input" placeholder="例如 https://your-worker.workers.dev" autocomplete="off">
             </div>
             <div class="input-group">
-                <span class="label">图片代理（可选，转换外链被跨域拦截时兜底）</span>
+                <span class="label">图片代理（可选）</span>
                 <input type="text" id="gh-imgproxy" class="url-input" placeholder="例如 https://img.your-worker.workers.dev/?url=" autocomplete="off">
             </div>
             <label class="cloud-delete-option">
                 <input type="checkbox" id="gh-pin">
-                <span>直链固定到提交版本（不受 CDN 分支缓存影响）</span>
+                <span>直链固定到提交版本</span>
             </label>
             <button class="ghost-btn primary" onclick="saveSettings()">保存并测试连接</button>
         </div>
@@ -2795,7 +2795,9 @@ async function runUpload(file, refs, ctx) {
 // 代理地址里含 {url} 就替换；否则把编码后的原链接直接接在末尾（如 https://x.workers.dev/?url=）
 function buildImgProxyUrl(tpl, target) {
     const enc = encodeURIComponent(target);
-    return tpl.indexOf('{url}') !== -1 ? tpl.replace('{url}', enc) : tpl + enc;
+    if (tpl.indexOf('{url}') !== -1) return tpl.replace('{url}', enc);
+    if (/[?&][^=&]*=$/.test(tpl)) return tpl + enc;          // 已写好 ?url= 之类，直接接上
+    return tpl + (tpl.indexOf('?') === -1 ? '?' : '&') + 'url=' + enc; // 只填了地址，自动补 ?url=
 }
 async function urlToFile(rawUrl) {
     let u;

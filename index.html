@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="color-scheme" content="light dark">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 <title>Direct Link</title>
 <meta name="application-name" content="Direct Link">
 <meta name="apple-mobile-web-app-title" content="Direct Link">
@@ -2871,29 +2871,6 @@ async function handleFiles(files) {
 })();
 </script>
 
-<script>
-/* 底栏固定在原位：键盘弹出、视口缩小或滚动时，不跟着页面一起往上移 */
-(function keepNavInPlace(){
-  const nav=document.querySelector('.bottom-nav'), vv=window.visualViewport;
-  if(!nav||!vv) return;
-  const editing=()=>{const a=document.activeElement;return !!a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable)};
-  let stableH=window.innerHeight, raf=0;
-  function apply(){
-    raf=0;
-    if(!editing()) stableH=window.innerHeight;
-    const dy=Math.round(vv.offsetTop+Math.max(0,stableH-window.innerHeight));
-    nav.style.transform=dy?'translate(-50%,'+dy+'px)':'';
-  }
-  function schedule(){ if(!raf) raf=requestAnimationFrame(apply); }
-  vv.addEventListener('resize',schedule);
-  vv.addEventListener('scroll',schedule);
-  window.addEventListener('resize',schedule);
-  window.addEventListener('orientationchange',()=>setTimeout(schedule,300));
-  document.addEventListener('focusin',schedule);
-  document.addEventListener('focusout',()=>setTimeout(schedule,350));
-  apply();
-})();
-</script>
 
 </body>
 </html>

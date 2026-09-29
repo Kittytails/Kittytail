@@ -26,7 +26,7 @@
         font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Roboto, sans-serif;
         background-color: var(--bg);
         margin: 0; 
-        padding: calc(18px + env(safe-area-inset-top)) 20px calc(120px + env(safe-area-inset-bottom));
+        padding: 18px 20px calc(120px + env(safe-area-inset-bottom));
         color: var(--text-main);
         display: flex; justify-content: center;
         -webkit-font-smoothing: antialiased;
@@ -327,7 +327,7 @@
 
     /* 顶部提示（Toast）：悬浮的磨砂玻璃圆角矩形，从上方滑下；本身不拦截页面点击，点提示条可立即收起。 */
     #kb-toast {
-        position: fixed; left: 0; right: 0; top: calc(10px + env(safe-area-inset-top));
+        position: fixed; left: 0; right: 0; top: 10px;
         display: flex; justify-content: center; padding: 0 47px; box-sizing: border-box; /* 47px = 页面边距 20 + 卡片边框 1 + 卡片内边距 26，正好对齐卡片内容区的左右边界 */
         pointer-events: none; z-index: 20000; text-align: center;
     }
@@ -340,7 +340,7 @@
         border-radius: 18px; box-shadow: 0 8px 28px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.04);
         font-size: 13px; font-weight: 700; letter-spacing: -0.2px; text-align: center;
         overflow-wrap: anywhere; word-break: break-word;
-        transform: translateY(calc(-100% - 16px - env(safe-area-inset-top))); opacity: 0; will-change: transform;
+        transform: translateY(calc(-100% - 16px)); opacity: 0; will-change: transform;
         transition: transform .28s cubic-bezier(.4,0,1,1), opacity .22s ease-in;
         backdrop-filter: blur(28px) saturate(145%); -webkit-backdrop-filter: blur(28px) saturate(145%);
         pointer-events: none; cursor: pointer;

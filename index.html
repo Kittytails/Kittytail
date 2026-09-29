@@ -98,7 +98,7 @@
     .repo-filter-group { margin: 0 0 18px; width: fit-content; }
     /* 仓库文件：与上方图库保持完全相同的三列、间距、缩略图与文件名规格 */
     .repo-live-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px 16px; }
-    .repo-live-item { position:relative; min-width:0; display:flex; flex-direction:column; gap:6px; cursor:pointer; touch-action:manipulation; -webkit-user-select:none; user-select:none; transition:transform .2s cubic-bezier(.34,1.56,.64,1); }
+    .repo-live-item { position:relative; min-width:0; display:flex; flex-direction:column; gap:6px; cursor:pointer; touch-action:manipulation; transition:transform .2s cubic-bezier(.34,1.56,.64,1); }
     .repo-live-item:active { transform:scale(.95); }
     .repo-live-preview { width:100%; aspect-ratio:1 / 1; display:flex; align-items:center; justify-content:center; overflow:hidden; border-radius:16px; border:1px solid rgba(0,0,0,.04); box-shadow:0 4px 10px rgba(0,0,0,.03); background:#F5F5F5; }
     .repo-live-preview img { width:100%; height:100%; object-fit:cover; display:block; }
@@ -113,7 +113,6 @@
     .repo-select-info { font-size:12px; font-weight:700; color:#222; }
     .repo-select-actions { display:flex; gap:7px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
     .repo-select-actions .small-btn { padding:7px 11px; border-radius:9px; white-space:nowrap; }
-    .repo-live-item.selectable { -webkit-user-select:none; user-select:none; }
     .repo-live-item.selected { transform:scale(.965); }
     .repo-live-item.selected .repo-live-preview { border:2px solid #111111; box-shadow:0 0 0 3px rgba(255,255,255,.92), 0 8px 18px rgba(0,0,0,.10); }
     .repo-live-select-mark {
@@ -165,7 +164,6 @@
     .gallery-tile .tile-name { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; text-align: center; padding: 0 2px; }
 
     /* 韩系 INS 黑白灰多选状态 */
-    .gallery-tile.selectable { -webkit-user-select: none; user-select: none; }
     .gallery-tile.selected { transform: scale(0.965); }
     .gallery-tile.selected img,
     .gallery-tile.selected .icon-tile { border: 2px solid #111111; box-shadow: 0 0 0 3px rgba(255,255,255,.92), 0 8px 18px rgba(0,0,0,.10); }
@@ -267,10 +265,6 @@
             }
 
     /* 选中状态 */
-    .nav-btn.active { 
-        background: transparent; /* 去除纯黑背景，确保黑色图标可见 */
-    }
-
     .nav-btn.active .icon { 
         opacity: 1; /* 选中状态呈现纯黑 */
         transform: scale(calc(var(--base-scale, 1) + 0.18)) translateY(1px); /* 选中时在各自基础比例上再放大一点 */
@@ -337,11 +331,11 @@
     #kb-toast .kb-toast-sheet {
         box-sizing: border-box; width: auto; max-width: min(100%, 446px); /* 446px = 容器 500 - 卡片左右内缩 54 */
         display: flex; align-items: center; justify-content: center; gap: 9px;
-        min-height: 44px; padding: 8px 16px;
+        min-height: 38px; padding: 6px 14px;
         /* 日间：实色黑（同主按钮） */
         background: #000000; color: #FFFFFF;
         border: 1px solid #000000;
-        border-radius: 18px; box-shadow: 0 8px 28px rgba(0,0,0,.22), 0 2px 6px rgba(0,0,0,.12);
+        border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,.22), 0 2px 6px rgba(0,0,0,.12);
         font-size: 13px; font-weight: 700; letter-spacing: -0.2px; text-align: center;
         overflow-wrap: anywhere; word-break: break-word;
         transform: translateY(calc(-100% - 16px - env(safe-area-inset-top))); opacity: 0; will-change: transform;
@@ -362,20 +356,17 @@
         #kb-toast .kb-toast-sheet { transform: none; }
     }
     #kb-toast .kb-toast-dot {
-        flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+        flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
         background: rgba(255,255,255,.16); display: flex; align-items: center; justify-content: center; color: inherit;
     }
     #kb-toast .kb-toast-dot svg { width: 13px; height: 13px; }
     #kb-toast .kb-toast-dot svg path { stroke: currentColor; }
-    #kb-toast .kb-toast-msg { line-height: 1.5; min-width: 0; flex: 0 1 auto; text-align: center; }
+    #kb-toast .kb-toast-msg { line-height: 1.4; min-width: 0; flex: 0 1 auto; text-align: center; }
     #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot { color: #FF6B60; background: rgba(255,107,96,.18); }
     .kb-spinner { width: 13px; height: 13px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: kbSpin .7s linear infinite; }
     @keyframes kbSpin { to { transform: rotate(360deg); } }
     /* 夜间：实色灰（同深色按钮 #2C2C2E） */
     html[data-theme="dark"] #kb-toast .kb-toast-sheet { background: #2C2C2E !important; color: #F5F5F7 !important; border-color: #48484A !important; box-shadow: 0 12px 40px rgba(0,0,0,.34), 0 2px 6px rgba(0,0,0,.18); backdrop-filter: none; -webkit-backdrop-filter: none; }
-    @media (prefers-color-scheme: dark) {
-        #kb-toast .kb-toast-sheet { background: #2C2C2E !important; color: #F5F5F7 !important; border-color: #48484A !important; backdrop-filter: none; -webkit-backdrop-filter: none; }
-    }
     html[data-theme="dark"] #kb-toast .kb-toast-dot { background: rgba(255,255,255,.14); }
     html[data-theme="dark"] #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot { color: #FF6B60; background: rgba(255,107,96,.20); }
 
@@ -550,7 +541,6 @@
             box-shadow: 0 12px 36px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.18);
         }
         .nav-btn .icon { filter: invert(1); }
-        .nav-btn.active .icon { filter: invert(1); }
 
     }
 
@@ -570,7 +560,7 @@
             color: #F5F5F7 !important;
             border-color: #38383A !important;
         }
-        .title, .label, .result-name, .sub, .result-status, .gallery-select-info {
+        .title, .label, .result-name, .gallery-select-info {
             color: #F5F5F7 !important;
         }
         .sub, .result-status, .filter-btn:not(.active) {
@@ -629,7 +619,6 @@
     html[data-theme="dark"] .title,
     html[data-theme="dark"] .label,
     html[data-theme="dark"] .result-name,
-    html[data-theme="dark"] .sub,
     html[data-theme="dark"] .result-status {
         color: #F5F5F7 !important;
     }
@@ -742,8 +731,7 @@
     }
 
     /* 夜间：删除小圆点的描边要和卡片底色一致，否则会出现一圈白边 */
-    html[data-theme="dark"] .repo-folder-del,
-    html[data-theme="dark"] .gallery-tile .tile-del { background: #F5F5F7; border-color: #1C1C1E; }
+    html[data-theme="dark"] .repo-folder-del { background: #F5F5F7; border-color: #1C1C1E; }
 
 </style>
 </head>
@@ -819,7 +807,7 @@
                 </div>
             </div>
             
-            <div class="gallery-select-bar" id="gallery-select-bar">
+            <div class="gallery-select-bar">
                 <div class="gallery-select-info" id="gallery-select-info">已选择 0 项</div>
                 <div class="gallery-select-actions">
                     <button class="small-btn" id="gallery-select-all-btn" onclick="toggleGallerySelectAll()">全选</button>
@@ -837,7 +825,7 @@
         </div>
 
         <!-- 仓库实时文件：独立卡片，紧跟在图库后面 -->
-        <div class="card repo-live-card">
+        <div class="card">
             <div class="card-head-row" style="align-items: center; margin-bottom: 12px;">
                 <div class="title" style="margin-bottom: 0;">Repository Files</div>
                 <div class="card-head-actions">
@@ -985,7 +973,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // 统一的图片扩展名（上传 / 链接转换 / 资源库判断共用同一份规则）
 const IMAGE_EXT_RE = /\.(?:png|jpe?g|webp|gif|avif|bmp|svg|ico|heic|heif)$/i;
-const FONT_EXT_RE = /\.(?:ttf|otf|woff2?|eot)$/i;
+const FONT_EXT_RE = /\.(?:ttf|otf|woff2?|eot)(?:$|[?#])/i;
 const MIME_EXT = {
     'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png': 'png', 'image/gif': 'gif', 'image/webp': 'webp',
     'image/avif': 'avif', 'image/bmp': 'bmp', 'image/svg+xml': 'svg', 'image/x-icon': 'ico',
@@ -1393,7 +1381,7 @@ function isFontAssetEntry(entry) {
     if (entry.isFont === true) return true;
     const name = String(entry.name || '');
     const url = String(entry.url || '');
-    return /\.(ttf|otf|woff2?|eot)(?:$|[?#])/i.test(name) || /\.(ttf|otf|woff2?|eot)(?:$|[?#])/i.test(url);
+    return FONT_EXT_RE.test(name) || FONT_EXT_RE.test(url);
 }
 
 function getGalleryEntryType(entry) {
@@ -1485,11 +1473,26 @@ function parseGithubAssetFromUrl(url) {
     try {
         const u = new URL(url);
         const parts = u.pathname.split('/').filter(Boolean);
-        if (parts[0] !== 'gh' || parts.length < 4) return null;
-        const repoPart = parts[2];
-        const at = repoPart.indexOf('@');
-        if (at < 0) return null;
-        return { owner: parts[1], repo: repoPart.slice(0, at), branch: decodeURIComponent(repoPart.slice(at + 1)), path: parts.slice(3).map(decodeURIComponent).join('/') };
+        if (u.hostname === 'cdn.jsdelivr.net' && parts[0] === 'gh' && parts.length >= 4) {
+            const repoPart = decodeURIComponent(parts[2]);
+            const at = repoPart.indexOf('@');
+            if (at < 0) return null;
+            return {
+                owner: decodeURIComponent(parts[1]),
+                repo: repoPart.slice(0, at),
+                branch: repoPart.slice(at + 1),
+                path: parts.slice(3).map(decodeURIComponent).join('/')
+            };
+        }
+        if (u.hostname === 'raw.githubusercontent.com' && parts.length >= 4) {
+            return {
+                owner: decodeURIComponent(parts[0]),
+                repo: decodeURIComponent(parts[1]),
+                branch: decodeURIComponent(parts[2]),
+                path: parts.slice(3).map(decodeURIComponent).join('/')
+            };
+        }
+        return null;
     } catch (_) { return null; }
 }
 
@@ -2656,14 +2659,15 @@ function pathExt(p) { const m = String(p || '').match(/\.[^./]+$/); return m ? m
 async function getRepoShaIndex(ctx, owner, branch, s) {
     if (ctx._shaIndex) return ctx._shaIndex;
     const idx = new Map();
-    ctx._shaIndex = idx;
     try {
         const tree = await githubRequest('/repos/' + owner + '/' + s.repo + '/git/trees/' + encodeURIComponent(branch) + '?recursive=1', { method: 'GET' }, s.token, s.proxy);
         (tree.tree || []).forEach(x => {
             if (x.type !== 'blob' || !x.sha || x.path.split('/').pop() === '.gitkeep') return;
             if (!idx.has(x.sha)) idx.set(x.sha, x.path);
         });
-    } catch (_) { /* 取不到就当没有，正常上传 */ }
+        // 只有读取成功后才缓存；临时网络失败不能把空索引永久当成“仓库没有可复用文件”。
+        ctx._shaIndex = idx;
+    } catch (_) { /* 取不到就当没有，当前文件继续正常上传；下一文件仍允许再次尝试查重 */ }
     return idx;
 }
 
@@ -2926,6 +2930,7 @@ async function runUpload(file, refs, ctx) {
         repoLiveLoaded = false; // 仓库内容已变化，下次进入资源库时重新读取
         return { ok: true };
     } catch (err) {
+        file._onProgress = null;
         const message = err.message || '未知错误';
 
         // 列表里只保留简洁的“失败”，避免长错误信息把卡片撑爆。
@@ -3341,7 +3346,7 @@ let uploadWakeLock = null;
 
 function isAllowedAssetFile(file) {
     if (!file || !file.name) return false;
-    return isImageFile(file) || /\.(ttf|otf|woff2?)$/i.test(file.name) || /^font\//i.test(file.type || '');
+    return isImageFile(file) || FONT_EXT_RE.test(file.name || '') || /^font\//i.test(file.type || '');
 }
 
 async function requestUploadWakeLock() {

@@ -365,10 +365,41 @@
     #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot { color: #FF6B60; background: rgba(255,107,96,.18); }
     .kb-spinner { width: 13px; height: 13px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: kbSpin .7s linear infinite; }
     @keyframes kbSpin { to { transform: rotate(360deg); } }
-    /* 夜间：实色灰（同深色按钮 #2C2C2E） */
-    html[data-theme="dark"] #kb-toast .kb-toast-sheet { background: #2C2C2E !important; color: #F5F5F7 !important; border-color: #48484A !important; box-shadow: 0 12px 40px rgba(0,0,0,.34), 0 2px 6px rgba(0,0,0,.18); backdrop-filter: none; -webkit-backdrop-filter: none; }
-    html[data-theme="dark"] #kb-toast .kb-toast-dot { background: rgba(255,255,255,.14); }
-    html[data-theme="dark"] #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot { color: #FF6B60; background: rgba(255,107,96,.20); }
+    /* 夜间 Toast：浅色底（与日间黑底反相），在深色卡片上更醒目 */
+    @media (prefers-color-scheme: dark) {
+        #kb-toast .kb-toast-sheet {
+            background: #F5F5F7 !important;
+            color: #111113 !important;
+            border-color: #F5F5F7 !important;
+            box-shadow: 0 12px 40px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.25);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        #kb-toast .kb-toast-dot {
+            background: rgba(0,0,0,.10);
+        }
+        #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot {
+            color: #D92D20;
+            background: rgba(217,45,32,.14);
+        }
+    }
+
+    /* 手动 / JS 夜间主题 */
+    html[data-theme="dark"] #kb-toast .kb-toast-sheet {
+        background: #F5F5F7 !important;
+        color: #111113 !important;
+        border-color: #F5F5F7 !important;
+        box-shadow: 0 12px 40px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.25);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+    html[data-theme="dark"] #kb-toast .kb-toast-dot {
+        background: rgba(0,0,0,.10);
+    }
+    html[data-theme="dark"] #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot {
+        color: #D92D20;
+        background: rgba(217,45,32,.14);
+    }
 
     /* ================= 系统日夜间适配 =================
        自动跟随设备的浅色/深色模式，无需手动切换。 */
@@ -1499,7 +1530,7 @@ function parseGithubAssetFromUrl(url) {
 async function deleteGithubAsset(entry) {
     const s = getSettings();
     if (!s.token) throw new Error('未配置 GitHub Token');
-    const parsed = entry.githubPath ? {
+    const parsed = (entry.githubPath && entry.githubOwner) ? {
         owner: entry.githubOwner, repo: entry.githubRepo || s.repo, branch: entry.githubBranch || 'main', path: entry.githubPath
     } : parseGithubAssetFromUrl(entry.url);
     if (!parsed) throw new Error('无法识别仓库路径');
@@ -2212,7 +2243,7 @@ function renderRepoLiveFiles() {
         } else {
             const icon = document.createElement('div');
             icon.className = 'repo-live-icon';
-            icon.textContent = file.type === 'font' ? 'Aa' : (file.name.split('.').pop() || 'FILE').slice(0,5);
+            icon.textContent = file.type === 'font' ? 'Aa' : ((file.name.includes('.') ? file.name.split('.').pop() : '') || 'FILE').slice(0,5).toUpperCase();
             preview.appendChild(icon);
         }
         item.appendChild(preview);
@@ -3167,6 +3198,19 @@ async function convertUrls(urls, collector, afterFn) {
     if (afterFn) afterFn();
 
     if (failures.length) {
+        const upModal = $('upload-error-modal');
+        if (upModal && upModal.classList.contains('show') && lastFailures.length) {
+            // 同批上传失败的弹窗还开着：合并展示，避免被覆盖后看不到上传失败原因
+            failures.unshift(...lastFailures.map(f => ({ name: f.name, message: f.message })));
+            showUploadErrorModal(failures, {
+                title: '部分链接未能转换或上传', sub: failures.length + ' 项失败，详情如下（上传失败的文件可在结果列表里点「重试」）',
+                onRetry: (f) => {
+                    closeUploadErrorModal();
+                    if (/^https?:\/\//i.test(f.name)) convertUrls([f.name], collector, afterFn);
+                }
+            });
+            return;
+        }
         showUploadErrorModal(failures, {
             title: '链接转换失败',
             sub: failures.length + ' 个链接未能转换，可逐条重试',

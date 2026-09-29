@@ -330,7 +330,7 @@
         /* left/right 47px = 页面边距 20 + 卡片边框 1 + 卡片内边距 26，正好对齐卡片内容区的左右边界。
            平时是 display:none（由 JS 控制）：iOS 26 会把「贴着屏幕顶边的 fixed 元素」当成顶栏，
            在状态栏区域盖一层不透明色块，把往上滚的内容挡住。 */
-        position: fixed; left: 47px; right: 47px; top: 10px;
+        position: fixed; left: 47px; right: 47px; top: calc(10px + env(safe-area-inset-top));
         display: none; justify-content: center; box-sizing: border-box;
         pointer-events: none; z-index: 20000; text-align: center;
     }
@@ -338,12 +338,13 @@
         box-sizing: border-box; width: auto; max-width: min(100%, 446px); /* 446px = 容器 500 - 卡片左右内缩 54 */
         display: flex; align-items: center; justify-content: center; gap: 9px;
         min-height: 44px; padding: 8px 16px;
-        background: rgba(248,248,250,.72); color: #111113;
-        border: 1px solid var(--border);
-        border-radius: 18px; box-shadow: 0 8px 28px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.04);
+        /* 日间：黑磨砂玻璃（同「主按钮」的黑色） */
+        background: rgba(17,17,19,.74); color: #FFFFFF;
+        border: 1px solid rgba(255,255,255,.14);
+        border-radius: 18px; box-shadow: 0 8px 28px rgba(0,0,0,.22), 0 2px 6px rgba(0,0,0,.12);
         font-size: 13px; font-weight: 700; letter-spacing: -0.2px; text-align: center;
         overflow-wrap: anywhere; word-break: break-word;
-        transform: translateY(calc(-100% - 16px)); opacity: 0; will-change: transform;
+        transform: translateY(calc(-100% - 16px - env(safe-area-inset-top))); opacity: 0; will-change: transform;
         transition: transform .28s cubic-bezier(.4,0,1,1), opacity .22s ease-in;
         backdrop-filter: blur(28px) saturate(145%); -webkit-backdrop-filter: blur(28px) saturate(145%);
         pointer-events: none; cursor: pointer;
@@ -362,17 +363,18 @@
     }
     #kb-toast .kb-toast-dot {
         flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
-        background: rgba(0,0,0,.08); display: flex; align-items: center; justify-content: center; color: inherit;
+        background: rgba(255,255,255,.16); display: flex; align-items: center; justify-content: center; color: inherit;
     }
     #kb-toast .kb-toast-dot svg { width: 13px; height: 13px; }
     #kb-toast .kb-toast-dot svg path { stroke: currentColor; }
     #kb-toast .kb-toast-msg { line-height: 1.5; min-width: 0; flex: 0 1 auto; text-align: center; }
-    #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot { color: #D93025; background: rgba(217,48,37,.10); }
+    #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot { color: #FF6B60; background: rgba(255,107,96,.18); }
     .kb-spinner { width: 13px; height: 13px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: kbSpin .7s linear infinite; }
     @keyframes kbSpin { to { transform: rotate(360deg); } }
-    html[data-theme="dark"] #kb-toast .kb-toast-sheet { background: rgba(30,30,32,.74); color: #F5F5F7; border-color: rgba(255,255,255,.10); box-shadow: 0 12px 40px rgba(0,0,0,.30); }
-    html[data-theme="dark"] #kb-toast .kb-toast-dot { background: rgba(255,255,255,.12); }
-    html[data-theme="dark"] #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot { color: #FF6B60; background: rgba(255,107,96,.16); }
+    /* 夜间：灰磨砂玻璃（同深色按钮的灰） */
+    html[data-theme="dark"] #kb-toast .kb-toast-sheet { background: rgba(58,58,60,.70); color: #F5F5F7; border-color: rgba(255,255,255,.16); box-shadow: 0 12px 40px rgba(0,0,0,.34), 0 2px 6px rgba(0,0,0,.18); }
+    html[data-theme="dark"] #kb-toast .kb-toast-dot { background: rgba(255,255,255,.14); }
+    html[data-theme="dark"] #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot { color: #FF6B60; background: rgba(255,107,96,.20); }
 
     /* ================= 系统日夜间适配 =================
        自动跟随设备的浅色/深色模式，无需手动切换。 */
@@ -736,6 +738,10 @@
         margin-top: 0;
     }
 
+    /* 夜间：删除小圆点的描边要和卡片底色一致，否则会出现一圈白边 */
+    html[data-theme="dark"] .repo-folder-del,
+    html[data-theme="dark"] .gallery-tile .tile-del { background: #F5F5F7; border-color: #1C1C1E; }
+
 </style>
 </head>
 <body>
@@ -1066,7 +1072,7 @@ function toast(msg, type) {
     if (wasShown && typeChanged) sheet.classList.add('swap');
     el.classList.add('show');
     clearTimeout(el._t);
-    if (type !== 'loading') el._t = setTimeout(hideToast, TOAST_MS[type]);
+    if (type !== 'loading') el._t = setTimeout(hideToast, Math.min(9000, TOAST_MS[type] + Math.max(0, String(msg).length - 14) * 90)); // 长文案多停一会儿
 }
 
 // --- 失败详情弹窗（上传 / 转换 / 删除失败共用） ---
@@ -1219,7 +1225,11 @@ document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
     if (dlgResolve) return finishDialog(null);
     const modal = $('upload-error-modal');
-    if (modal && modal.classList.contains('show')) closeUploadErrorModal();
+    if (modal && modal.classList.contains('show')) return closeUploadErrorModal();
+    const mv = $('move-sheet-backdrop');
+    if (mv && mv.classList.contains('show')) return closeMoveSheet();
+    const del = $('delete-sheet-backdrop');
+    if (del && del.classList.contains('show')) closeDeleteSheet();
 });
 
 
@@ -1699,7 +1709,7 @@ async function createRepoFolder() {
             url: '', rawUrl: '', owner: ctx.owner, repo: s.repo, branch: ctx.branch
         });
         renderRepoLiveFiles();
-        toast('已创建文件夹「' + name + '」');
+        toast('已创建文件夹「' + name + '」', 'ok');
     } catch (e) {
         toast('创建失败：' + (e.message || '未知错误'));
     }
@@ -2291,6 +2301,18 @@ function renderGallery() {
                 img.draggable = false;
                 img.src = entry.url;
                 img.loading = 'lazy';
+                const ref = historyAssetRef(entry);
+                const rawFallback = (ref && ref.owner && ref.repo && ref.path)
+                    ? repoRawUrl(ref.owner, ref.repo, entry.githubBranch || ref.branch || 'main', ref.path) : '';
+                let triedRaw = false;
+                img.onerror = () => {
+                    // jsDelivr 打不开时回退到 raw；仍失败则显示占位，不留空白格
+                    if (!triedRaw && rawFallback && rawFallback !== entry.url) { triedRaw = true; img.src = rawFallback; return; }
+                    const ph = document.createElement('div');
+                    ph.className = 'icon-tile';
+                    ph.textContent = 'IMG';
+                    img.replaceWith(ph);
+                };
                 tile.appendChild(img);
             } else {
                 const icon = document.createElement('div');
@@ -2575,6 +2597,7 @@ async function uploadBlobChunked(file, owner, s, onProgress) {
                     arm();
                     if (onProgress && ev.lengthComputable) onProgress('上传中 ' + Math.min(99, Math.round(ev.loaded / ev.total * 100)) + '%');
                 };
+                xhr.upload.onload = () => clearTimeout(stallTimer); // 请求体已发完，等待 GitHub 处理，不能再按“没有上传进度”误判卡死
                 xhr.onerror = () => {
                     clearTimeout(stallTimer);
                     reject(Object.assign(new Error('network'), { retryable: true, network: true }));
@@ -2663,7 +2686,10 @@ async function uploadToGithub(file, ctx) {
 
     const isImage = isImageFile(file);
     const folder = isImage ? 'images' : 'fonts';
-    let path = folder + '/' + getSafeFilename(file.name);
+    let safeName = getSafeFilename(file.name);
+    // 没有扩展名的图片按 MIME 补上，否则 CDN 会用错误的 Content-Type 返回，图片无法显示
+    if (isImage && !/\.[A-Za-z0-9]+$/.test(safeName) && MIME_EXT[file.type]) safeName += '.' + MIME_EXT[file.type];
+    let path = folder + '/' + safeName;
 
     // 内容查重：已有完全相同的文件就直接复用
     let contentSha = '';
@@ -2911,10 +2937,13 @@ async function runUpload(file, refs, ctx) {
         const retryBtn = document.createElement('button');
         retryBtn.className = 'ghost-btn retry-btn';
         retryBtn.textContent = '重试';
-        retryBtn.onclick = () => {
+        retryBtn.onclick = async () => {
+            if (isBatchUploading) { toast('上传中，请稍候', 'info'); return; }
             closeUploadErrorModal();
             refs.retried = true;
-            runUpload(file, refs, ctx);
+            isBatchUploading = true; // 重试期间占用上传锁，避免与新一批上传同时提交到同一分支
+            try { await runUpload(file, refs, ctx); }
+            finally { isBatchUploading = false; }
         };
         refs.action.appendChild(retryBtn);
 

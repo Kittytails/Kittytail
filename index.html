@@ -195,12 +195,15 @@
     .delete-sheet-backdrop {
         position: fixed; inset: 0; display: none; align-items: flex-end; justify-content: center;
         background: rgba(0,0,0,.22); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: 3000;
-        padding: 18px;
+        padding: 0;
     }
     .delete-sheet-backdrop.show { display: flex; }
     .delete-sheet {
-        width: min(500px, 100%); background: #FFFFFF; border-radius: 24px; padding: 22px 20px calc(20px + env(safe-area-inset-bottom));
-        box-shadow: 0 -12px 40px rgba(0,0,0,.14); border: 1px solid #EAEAEA;
+        width: 100%; max-width: 560px; box-sizing: border-box; background: #FFFFFF; border-radius: 30px 30px 0 0;
+        padding: 24px 20px calc(20px + env(safe-area-inset-bottom));
+        max-height: 86vh; overflow: auto;
+        box-shadow: 0 -18px 55px rgba(0,0,0,.12), 0 -2px 10px rgba(0,0,0,.05); border: 2px solid #EAEAEA;
+        animation: uploadErrorSheetIn .28s cubic-bezier(.22,1,.36,1);
     }
     .delete-sheet-title { font-size: 17px; font-weight: 750; color: #111; margin-bottom: 7px; }
     .delete-sheet-sub { font-size: 12px; line-height: 1.6; color: #888; margin-bottom: 15px; }
@@ -273,132 +276,88 @@
     }
 
 
-    /* 上传失败提示弹窗：错误详情不再撑大本次上传卡片 */
+    /* 失败详情弹窗（上传 / 转换 / 删除失败共用）：底部磨砂 Sheet，盖住悬浮底栏 */
     .upload-error-modal {
-        position: fixed;
-        inset: 0;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 24px;
-        background: rgba(0,0,0,.34);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        position: fixed; inset: 0; display: none; align-items: flex-end; justify-content: center; padding: 0;
+        background: rgba(20, 20, 24, .16);
+        backdrop-filter: blur(12px) saturate(115%); -webkit-backdrop-filter: blur(12px) saturate(115%);
         z-index: 10000;
     }
     .upload-error-modal.show { display: flex; }
     .upload-error-panel {
-        width: min(420px, 100%);
-        max-height: min(72vh, 620px);
-        overflow: auto;
-        background: var(--card-bg, #fff);
-        color: var(--text-main, #111);
-        border: 1px solid var(--border, #eaeaea);
-        border-radius: 22px;
-        padding: 22px;
-        box-shadow: 0 20px 60px rgba(0,0,0,.22);
-        animation: uploadErrorIn .22s ease-out;
+        width: 100%; max-width: 560px; max-height: min(78vh, 720px); overflow: auto; box-sizing: border-box; margin: 0;
+        background: rgba(248, 248, 250, .78); color: var(--text-main, #111);
+        border: 2px solid var(--border); border-radius: 30px 30px 0 0;
+        padding: 24px 20px calc(20px + env(safe-area-inset-bottom));
+        box-shadow: 0 -18px 55px rgba(0,0,0,.12), 0 -2px 10px rgba(0,0,0,.05);
+        backdrop-filter: blur(28px) saturate(145%); -webkit-backdrop-filter: blur(28px) saturate(145%);
+        animation: uploadErrorSheetIn .28s cubic-bezier(.22,1,.36,1);
     }
-    @keyframes uploadErrorIn {
-        from { opacity: 0; transform: translateY(8px) scale(.98); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    .upload-error-title {
-        font-size: 18px;
-        font-weight: 800;
-        margin-bottom: 6px;
-        letter-spacing: -.3px;
-    }
-    .upload-error-sub {
-        font-size: 12px;
-        color: var(--text-secondary, #888);
-        margin-bottom: 14px;
-    }
-    .upload-error-list {
-        display: flex;
-        flex-direction: column;
-        gap: 9px;
-        max-height: 42vh;
-        overflow: auto;
-    }
+    @keyframes uploadErrorSheetIn { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
+    .upload-error-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; letter-spacing: -.3px; }
+    .upload-error-sub { font-size: 12px; color: var(--text-secondary, #888); margin-bottom: 14px; line-height: 1.55; }
+    .upload-error-list { display: flex; flex-direction: column; gap: 9px; max-height: 42vh; overflow: auto; }
     .upload-error-item {
-        padding: 12px 13px;
-        border-radius: 13px;
-        background: rgba(127,127,127,.08);
-        border: 1px solid var(--border, #eaeaea);
+        padding: 12px 13px; border-radius: 15px;
+        background: rgba(255,255,255,.48); border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,.025);
     }
-    .upload-error-name {
-        font-size: 13px;
-        font-weight: 700;
-        margin-bottom: 4px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    .upload-error-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .upload-error-head .small-btn { flex-shrink: 0; }
+    .upload-error-name { flex: 1; min-width: 0; font-size: 13px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .upload-error-message { margin-top: 4px; font-size: 12px; line-height: 1.5; color: var(--text-secondary, #888); word-break: break-word; }
+    .upload-error-actions { display: grid; grid-template-columns: 1fr 1.6fr; gap: 9px; margin-top: 16px; }
+    .upload-error-actions button {
+        border-radius: 15px; padding: 13px 14px; font-size: 13px; font-weight: 700; cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
     }
-    .upload-error-message {
-        font-size: 12px;
-        line-height: 1.5;
-        color: var(--text-secondary, #888);
-        word-break: break-word;
-    }
-    .upload-error-close {
-        width: 100%;
-        margin-top: 16px;
-        border: 0;
-        border-radius: 12px;
-        padding: 12px 14px;
-        background: var(--primary, #000);
-        color: #fff;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-    }
-    html[data-theme="dark"] .upload-error-modal { background: rgba(0,0,0,.58); }
+    .upload-error-copy { border: 1px solid rgba(0,0,0,.08); background: rgba(0,0,0,.05); color: inherit; }
+    .upload-error-close { border: 0; background: rgba(17,17,17,.94); color: #fff; }
+    html[data-theme="dark"] .upload-error-modal { background: rgba(0,0,0,.34); }
+    html[data-theme="dark"] .upload-error-panel { background: rgba(30,30,32,.78); border-color: #38383A; }
+    html[data-theme="dark"] .upload-error-item { background: rgba(255,255,255,.07); border-color: #38383A; }
+    html[data-theme="dark"] .upload-error-copy { border-color: rgba(255,255,255,.14); background: rgba(255,255,255,.08); }
+    html[data-theme="dark"] .upload-error-close { background: #F5F5F7; color: #111113; }
 
+    /* 确认 / 输入对话框（替代浏览器原生 confirm / prompt）：复用删除确认层的外观 */
+    #dlg-backdrop { z-index: 9000; }
+    .dlg-error { display: none; margin: -6px 2px 12px; font-size: 12px; line-height: 1.5; color: #D93025; }
+    .dlg-error.show { display: block; }
+    html[data-theme="dark"] .dlg-error { color: #FF6B60; }
+
+    /* 顶部提示（Toast）：贴着页面顶端滑下；本身不拦截页面点击，点提示条可立即收起。
+       顶部留白 = 安全区（刘海 / 灵动岛，若页面没有延伸到状态栏下则为 0），不会被遮挡。 */
     #kb-toast {
-        position: fixed; left: 50%; top: 0;
-        margin-top: calc(14px + env(safe-area-inset-top));
-        display: flex; align-items: center; gap: 9px;
-        width: max-content;
-        background: rgba(28,28,30,.92); color: #ffffff;
-        padding: 13px 18px 13px 16px; border-radius: 15px;
-        font-size: 13px; font-weight: 600; letter-spacing: -0.1px;
-        opacity: 0; pointer-events: none;
-        transition: opacity .3s ease, transform .38s cubic-bezier(0.22, 1, 0.36, 1);
-        z-index: 9999; text-align: left;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10);
-        max-width: min(440px, 94vw);
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
-        transform: translate(-50%, -24px);
+        position: fixed; left: 0; right: 0; top: 0;
+        display: flex; justify-content: center;
+        pointer-events: none; z-index: 20000; text-align: center;
     }
-    #kb-toast.show { opacity: 1; transform: translate(-50%, 0); }
+    #kb-toast .kb-toast-sheet {
+        width: 100%; box-sizing: border-box;
+        display: flex; align-items: center; justify-content: center; gap: 12px;
+        min-height: 64px; padding: calc(18px + env(safe-area-inset-top)) 22px 18px;
+        background: rgba(248,248,250,.78); color: #111113;
+        border: 2px solid var(--border);
+        border-radius: 0 0 28px 28px; box-shadow: 0 12px 42px rgba(0,0,0,.10);
+        font-size: 15px; font-weight: 700; letter-spacing: -0.2px; text-align: center;
+        overflow-wrap: anywhere; word-break: break-word;
+        transform: translateY(-105%); transition: transform .38s cubic-bezier(.22,1,.36,1);
+        backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);
+        pointer-events: none; cursor: pointer;
+    }
+    #kb-toast.show .kb-toast-sheet { transform: translateY(0); pointer-events: auto; }
     #kb-toast .kb-toast-dot {
-        flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%;
-        background: rgba(255,255,255,.18); display: flex; align-items: center; justify-content: center;
-        color: inherit;
+        flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+        background: rgba(0,0,0,.08); display: flex; align-items: center; justify-content: center; color: inherit;
     }
-    #kb-toast .kb-toast-dot svg { width: 10px; height: 10px; }
+    #kb-toast .kb-toast-dot svg { width: 17px; height: 17px; }
     #kb-toast .kb-toast-dot svg path { stroke: currentColor; }
-    #kb-toast .kb-toast-msg { line-height: 1.4; min-width: 0; }
-
-    /* 顶部通知独立悬浮：避开页面标题和安全区，不再压住首张卡片。 */
-    #kb-toast {
-        top: calc(58px + env(safe-area-inset-top));
-        margin-top: 0;
-        max-width: min(430px, calc(100vw - 32px));
-        overflow-wrap: anywhere;
-        word-break: break-word;
-    }
-    @media (max-width: 520px) {
-        #kb-toast {
-            width: max-content;
-            max-width: calc(100vw - 32px);
-            padding: 11px 14px;
-            border-radius: 14px;
-            font-size: 12.5px;
-        }
-    }
+    #kb-toast .kb-toast-msg { line-height: 1.5; min-width: 0; flex: 0 1 auto; text-align: center; }
+    #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot { color: #D93025; background: rgba(217,48,37,.10); }
+    .kb-spinner { width: 16px; height: 16px; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: kbSpin .7s linear infinite; }
+    @keyframes kbSpin { to { transform: rotate(360deg); } }
+    html[data-theme="dark"] #kb-toast .kb-toast-sheet { background: #1C1C1E; color: #F5F5F7; border-color: #38383A; box-shadow: 0 12px 42px rgba(0,0,0,.28); backdrop-filter: none; -webkit-backdrop-filter: none; }
+    html[data-theme="dark"] #kb-toast .kb-toast-dot { background: rgba(255,255,255,.12); }
+    html[data-theme="dark"] #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot { color: #FF6B60; background: rgba(255,107,96,.16); }
 
     /* ================= 系统日夜间适配 =================
        自动跟随设备的浅色/深色模式，无需手动切换。 */
@@ -573,12 +532,6 @@
         .nav-btn .icon { filter: invert(1); }
         .nav-btn.active .icon { filter: invert(1); }
 
-        #kb-toast {
-            background: rgba(245,245,247,.94);
-            color: #111113;
-            box-shadow: 0 10px 30px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.2);
-        }
-        #kb-toast .kb-toast-dot { background: rgba(0,0,0,.08); }
     }
 
 
@@ -630,8 +583,6 @@
             border-color: rgba(255,255,255,.12) !important;
         }
         .nav-btn .icon { filter: invert(1) !important; }
-        #kb-toast { background:rgba(245,245,247,.94) !important; color:#111113 !important; }
-        #kb-toast .kb-toast-dot { background: rgba(0,0,0,.08) !important; }
     }
 
     /* JS 设置 data-theme 后，即使宿主页面/浏览器没有正确触发媒体查询也能切换 */
@@ -721,6 +672,23 @@
         border-color:rgba(255,255,255,.12) !important;
     }
     html[data-theme="dark"] .nav-btn .icon { filter:invert(1) !important; }
+    html[data-theme="dark"] #kb-toast {
+        background:transparent !important;
+        color:#F5F5F7 !important;
+        backdrop-filter:none !important;
+        -webkit-backdrop-filter:none !important;
+    }
+    html[data-theme="dark"] #kb-toast .kb-toast-sheet {
+        background:rgba(28,28,30,.78) !important;
+        color:#F5F5F7 !important;
+        border-color:rgba(255,255,255,.10) !important;
+        box-shadow:0 -12px 42px rgba(0,0,0,.28) !important;
+        backdrop-filter:blur(20px) saturate(180%) !important;
+        -webkit-backdrop-filter:blur(20px) saturate(180%) !important;
+    }
+    html[data-theme="dark"] #kb-toast .kb-toast-dot {
+        background:rgba(255,255,255,.12) !important;
+    }
 
 
     /* 长按多选：屏蔽系统的图片长按菜单 / 拖拽 / 选中，避免与自定义长按冲突 */
@@ -964,14 +932,33 @@
     </button>
 </div>
 
-<div id="kb-toast"></div>
+<div id="kb-toast" role="status" aria-live="polite"></div>
 
 <div class="upload-error-modal" id="upload-error-modal" onclick="if(event.target===this) closeUploadErrorModal()">
-    <div class="upload-error-panel" role="dialog" aria-modal="true" aria-labelledby="upload-error-title">
-        <div class="upload-error-title" id="upload-error-title">上传提示</div>
-        <div class="upload-error-sub" id="upload-error-sub">以下文件失败</div>
+    <div class="upload-error-panel" role="alertdialog" aria-modal="true" aria-labelledby="upload-error-title" aria-describedby="upload-error-sub">
+        <div class="upload-error-title" id="upload-error-title">上传失败</div>
+        <div class="upload-error-sub" id="upload-error-sub"></div>
         <div class="upload-error-list" id="upload-error-list"></div>
-        <button class="upload-error-close" type="button" onclick="closeUploadErrorModal()">知道了</button>
+        <div class="upload-error-actions">
+            <button class="upload-error-copy" id="upload-error-copy" type="button">复制详情</button>
+            <button class="upload-error-close" id="upload-error-close" type="button" onclick="closeUploadErrorModal()">知道了</button>
+        </div>
+    </div>
+</div>
+
+<!-- 通用确认 / 输入对话框 -->
+<div class="delete-sheet-backdrop" id="dlg-backdrop">
+    <div class="delete-sheet" role="alertdialog" aria-modal="true" aria-labelledby="dlg-title" aria-describedby="dlg-msg">
+        <div class="delete-sheet-title" id="dlg-title"></div>
+        <div class="delete-sheet-sub" id="dlg-msg"></div>
+        <div class="move-new-folder-row" id="dlg-input-row" style="display:none;">
+            <input type="text" id="dlg-input" autocomplete="off" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="dlg-error" id="dlg-error" role="alert"></div>
+        <div class="delete-sheet-actions">
+            <button class="delete-cancel" id="dlg-cancel" type="button">取消</button>
+            <button class="delete-confirm" id="dlg-ok" type="button">确定</button>
+        </div>
     </div>
 </div>
 
@@ -983,6 +970,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // 统一的图片扩展名（上传 / 链接转换 / 资源库判断共用同一份规则）
 const IMAGE_EXT_RE = /\.(?:png|jpe?g|webp|gif|avif|bmp|svg|ico|heic|heif)$/i;
+const FONT_EXT_RE = /\.(?:ttf|otf|woff2?|eot)$/i;
 const MIME_EXT = {
     'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png': 'png', 'image/gif': 'gif', 'image/webp': 'webp',
     'image/avif': 'avif', 'image/bmp': 'bmp', 'image/svg+xml': 'svg', 'image/x-icon': 'ico',
@@ -1026,68 +1014,192 @@ async function writeClipboard(text) {
     tmp.remove();
     return ok;
 }
-function toast(msg) {
-    let el = $('kb-toast');
-    const isError = /失败|错误|无法|请先|请填写|没有|暂无|还有.*正在|不对|已存在|未识别|未找到|请稍候|仅支持|不支持|不能|超时|未配置/.test(msg);
-    const iconSvg = isError
-        ? '<svg viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke-width="2.6" stroke-linecap="round"/></svg>'
-        : '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    el.innerHTML = '<span class="kb-toast-dot">' + iconSvg + '</span><span class="kb-toast-msg"></span>';
-    el.querySelector('.kb-toast-msg').textContent = msg;
+// --- 提示（Toast） ---
+// type: 'ok' | 'error' | 'info' | 'loading'。不传时按文案粗略判断（兼容旧调用）。
+// loading 不会自动消失，直到下一条提示出现或调用 hideToast()。
+const TOAST_ICONS = {
+    ok: '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    error: '<svg viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke-width="2.6" stroke-linecap="round"/></svg>',
+    info: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 11v6M12 7.2v.01" stroke-width="2.8" stroke-linecap="round"/></svg>',
+    loading: '<span class="kb-spinner"></span>'
+};
+const TOAST_MS = { ok: 2200, info: 2600, error: 3800 };
+const TOAST_ERROR_RE = /失败|错误|无法|请先|请填写|没有|暂无|不对|已存在|未识别|未找到|仅支持|不支持|不能|超时|未配置/;
+
+function hideToast() {
+    const el = $('kb-toast');
+    if (!el) return;
+    clearTimeout(el._t);
+    el.classList.remove('show');
+}
+
+function toast(msg, type) {
+    const el = $('kb-toast');
+    if (!el) return;
+    if (!TOAST_ICONS[type]) type = TOAST_ERROR_RE.test(msg) ? 'error' : 'ok';
+    el.innerHTML = '<div class="kb-toast-sheet"><span class="kb-toast-dot"></span><span class="kb-toast-msg"></span></div>';
+    const sheet = el.firstElementChild;
+    sheet.dataset.type = type;
+    sheet.querySelector('.kb-toast-dot').innerHTML = TOAST_ICONS[type];
+    sheet.querySelector('.kb-toast-msg').textContent = msg;
+    sheet.onclick = hideToast;
     el.classList.add('show');
     clearTimeout(el._t);
-    el._t = setTimeout(() => el.classList.remove('show'), 2400);
+    if (type !== 'loading') el._t = setTimeout(hideToast, TOAST_MS[type]);
 }
+
+// --- 失败详情弹窗（上传 / 转换 / 删除失败共用） ---
+// failures: [{ name, message }]
+// opts.title / opts.sub 可自定义文案；opts.onRetry 传入时每条失败记录带「重试」按钮，点击时调用 onRetry(failure)。
+let lastFailures = [];
 
 function closeUploadErrorModal() {
     const modal = $('upload-error-modal');
     if (modal) modal.classList.remove('show');
+    document.body.style.overflow = '';
 }
 
-// onRetry 可选：传入时每条失败记录会带一个「重试」按钮，点击时调用 onRetry(failure)。
-// 目前仅「转换外链」失败时会传入，重新粘贴整段内容很麻烦，单条重试体验更好。
-function showUploadErrorModal(failures, onRetry) {
+function showUploadErrorModal(failures, opts) {
     if (!failures || !failures.length) return;
+    opts = opts || {};
     const modal = $('upload-error-modal');
     const list = $('upload-error-list');
-    const title = $('upload-error-title');
-    const sub = $('upload-error-sub');
     if (!modal || !list) return;
+    hideToast(); // 提示条会盖住弹窗底部的按钮
 
-    title.textContent = failures.length === 1 ? '上传失败' : '部分文件上传失败';
-    sub.textContent = failures.length === 1
-        ? '详细原因如下'
-        : failures.length + ' 个文件未能上传，请检查网络或 GitHub 配置';
+    const n = failures.length;
+    lastFailures = failures;
+    $('upload-error-title').textContent = opts.title || (n === 1 ? '上传失败' : '部分文件上传失败');
+    $('upload-error-sub').textContent = opts.sub || (n === 1 ? '详细原因如下' : n + ' 个文件未能上传，请检查网络或 GitHub 配置');
 
     list.innerHTML = '';
     failures.forEach(f => {
         const item = document.createElement('div');
         item.className = 'upload-error-item';
         const head = document.createElement('div');
-        head.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:10px;';
+        head.className = 'upload-error-head';
         const name = document.createElement('div');
         name.className = 'upload-error-name';
-        name.style.marginBottom = '0';
+        name.title = f.name || '';
         name.textContent = f.name || '未命名文件';
         head.appendChild(name);
-        if (typeof onRetry === 'function') {
+        if (typeof opts.onRetry === 'function') {
             const retryBtn = document.createElement('button');
+            retryBtn.type = 'button';
             retryBtn.className = 'small-btn';
             retryBtn.textContent = '重试';
-            retryBtn.style.flexShrink = '0';
-            retryBtn.onclick = () => onRetry(f);
+            retryBtn.onclick = () => opts.onRetry(f);
             head.appendChild(retryBtn);
         }
         const msg = document.createElement('div');
         msg.className = 'upload-error-message';
-        msg.style.marginTop = '4px';
         msg.textContent = f.message || '未知错误';
         item.appendChild(head);
         item.appendChild(msg);
         list.appendChild(item);
     });
+    list.scrollTop = 0;
     modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    const closeBtn = $('upload-error-close');
+    if (closeBtn) closeBtn.focus({ preventScroll: true });
 }
+
+// --- 通用确认 / 输入对话框（替代浏览器原生 confirm / prompt） ---
+let dlgResolve = null;
+let dlgMode = 'confirm';
+let dlgValidate = null;
+
+function finishDialog(result) {
+    const bd = $('dlg-backdrop');
+    if (bd) bd.classList.remove('show');
+    const resolve = dlgResolve;
+    dlgResolve = null;
+    dlgValidate = null;
+    if (resolve) resolve(result);
+}
+
+function openDialog(o) {
+    if (dlgResolve) finishDialog(null); // 同一时间只保留一个对话框
+    hideToast();
+    $('dlg-title').textContent = o.title || '';
+    const msg = $('dlg-msg');
+    msg.textContent = o.message || '';
+    msg.style.display = o.message ? '' : 'none';
+    $('dlg-ok').textContent = o.confirmText || '确定';
+    $('dlg-cancel').textContent = o.cancelText || '取消';
+    dlgMode = o.input ? 'prompt' : 'confirm';
+    dlgValidate = o.validate || null;
+    const row = $('dlg-input-row');
+    const input = $('dlg-input');
+    const err = $('dlg-error');
+    err.classList.remove('show');
+    err.textContent = '';
+    row.style.display = o.input ? 'flex' : 'none';
+    input.value = (o.input && o.input.value) || '';
+    input.placeholder = (o.input && o.input.placeholder) || '';
+    return new Promise(resolve => {
+        dlgResolve = resolve;
+        $('dlg-backdrop').classList.add('show');
+        // 输入框自动聚焦；纯确认时默认聚焦「取消」，避免误按回车直接执行危险操作
+        setTimeout(() => (o.input ? input : $('dlg-cancel')).focus({ preventScroll: true }), 30);
+    });
+}
+
+// 返回 true / false
+function showConfirm(o) { return openDialog(o).then(v => v === true); }
+// 返回输入内容（字符串）或 null（取消）；validate(value) 返回错误文案时对话框保持打开并就地提示
+function showPrompt(o) {
+    return openDialog(Object.assign({}, o, { input: { value: o.value, placeholder: o.placeholder } }))
+        .then(v => (typeof v === 'string' ? v : null));
+}
+
+function submitDialog() {
+    if (!dlgResolve) return;
+    if (dlgMode !== 'prompt') return finishDialog(true);
+    const input = $('dlg-input');
+    const value = input.value.trim();
+    const problem = dlgValidate ? dlgValidate(value) : '';
+    if (problem) {
+        const err = $('dlg-error');
+        err.textContent = problem;
+        err.classList.add('show');
+        input.focus({ preventScroll: true });
+        return;
+    }
+    finishDialog(value);
+}
+
+$('dlg-ok').onclick = submitDialog;
+$('dlg-cancel').onclick = () => finishDialog(null);
+$('dlg-backdrop').onclick = e => { if (e.target === e.currentTarget) finishDialog(null); };
+$('dlg-input').onkeydown = e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); submitDialog(); } };
+$('dlg-input').oninput = () => $('dlg-error').classList.remove('show');
+
+$('upload-error-copy').onclick = async () => {
+    const text = lastFailures.map(f => (f.name || '未命名文件') + '：' + (f.message || '未知错误')).join('\n');
+    const ok = await writeClipboard(text);
+    const btn = $('upload-error-copy');
+    btn.textContent = ok ? '已复制' : '复制失败';
+    setTimeout(() => { btn.textContent = '复制详情'; }, 1600);
+};
+
+// 点击提示条以外的任意位置收起提示（点击本身照常生效，不被拦截；加载中的提示不受影响）
+document.addEventListener('pointerdown', e => {
+    const el = $('kb-toast');
+    if (!el || !el.classList.contains('show')) return;
+    const sheet = el.firstElementChild;
+    if (!sheet || sheet.dataset.type === 'loading' || sheet.contains(e.target)) return;
+    hideToast();
+}, true);
+
+// Esc 关闭最上层的弹窗
+document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (dlgResolve) return finishDialog(null);
+    const modal = $('upload-error-modal');
+    if (modal && modal.classList.contains('show')) closeUploadErrorModal();
+});
 
 
 // --- 底部导航 / 页面切换 ---
@@ -1113,7 +1225,7 @@ async function saveSettings() {
     const s = getSettings();
     if (!s.token) return toast('请填写 Token');
     if (!isValidRepoName(s.repo)) return toast('仓库名格式不对');
-    toast('测试连接…');
+    toast('测试连接…', 'loading');
     try {
         await githubRequest('/user', { method: 'GET' }, s.token, s.proxy);
         localStorage.setItem('kb_standalone_token', s.token);
@@ -1134,7 +1246,10 @@ async function saveSettings() {
 const HISTORY_KEY = 'kb_standalone_history';
 
 function loadHistory() {
-    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { return []; }
+    try {
+        const v = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+        return Array.isArray(v) ? v : [];
+    } catch (e) { return []; }
 }
 function saveHistory(list) {
     try {
@@ -1275,7 +1390,7 @@ function updateGallerySelectionUI() {
 function toggleGallerySelectAll() {
     if (!galleryMultiMode) return;
     const visibleList = getGalleryVisibleList();
-    if (!visibleList.length) return toast('暂无可选项目');
+    if (!visibleList.length) return toast('暂无可选项目', 'info');
 
     const allSelected = visibleList.every(e => gallerySelected.has(e.id));
     if (allSelected) {
@@ -1422,23 +1537,24 @@ async function confirmDeleteSelected() {
     if (failed) {
         if (progress) progress.classList.remove('show');
         closeDeleteSheet();
-        toast('本地已删，' + failed + ' 个仓库失败');
-        showUploadErrorModal(deleteFailures);
+        showUploadErrorModal(deleteFailures, { title: '仓库文件删除失败', sub: '本地记录已删除，以下 ' + failed + ' 个仓库文件未能删除' });
     } else {
         toast('已删除 ' + selected.length + ' 项');
         setTimeout(() => { if (progress) progress.classList.remove('show'); closeDeleteSheet(); }, 900);
     }
 }
 
-function clearHistory() {
-    if (!confirm('确定清空本地记录？')) return;
+async function clearHistory() {
+    if (!loadHistory().length) return toast('暂无记录', 'info');
+    const ok = await showConfirm({ title: '清空本地记录', message: '将清除资源库里的全部本地记录，不会删除仓库里的文件。', confirmText: '清空' });
+    if (!ok) return;
     localStorage.removeItem(HISTORY_KEY);
     exitGalleryMultiMode();
     toast('已清空');
 }
 function copyAllLinks() {
     const urls = getGalleryVisibleList().map(e => e.url).filter(Boolean);
-    if (!urls.length) return toast('暂无链接');
+    if (!urls.length) return toast('暂无链接', 'info');
     copyTextList(urls);
 }
 
@@ -1536,13 +1652,23 @@ function renderRepoBreadcrumb() {
 // 新建文件夹：GitHub 不支持空目录，用一个隐藏的 .gitkeep 占位文件来"创建"文件夹
 async function createRepoFolder() {
     if (!getSettings().token) return toast('请先配置 Token');
-    const name = (prompt('新建文件夹名称') || '').trim();
+    const name = await showPrompt({
+        title: '新建文件夹',
+        message: repoCurrentPath ? '将创建在「' + repoCurrentPath + '」下。' : '将创建在根目录下。',
+        placeholder: '文件夹名称',
+        confirmText: '创建',
+        validate: v => {
+            if (!v) return '请输入文件夹名称';
+            if (INVALID_FOLDER_NAME_RE.test(v)) return '名称不能包含 / \\ : * ? " < > |';
+            if (getRepoSubfolders().includes(v)) return '该文件夹已存在';
+            return '';
+        }
+    });
     if (!name) return;
-    if (INVALID_FOLDER_NAME_RE.test(name)) return toast('文件夹名称不能包含 / \\ : * ? " < > |');
-    if (getRepoSubfolders().includes(name)) return toast('文件夹已存在');
     const s = getSettings();
     const prefix = repoCurrentPath ? repoCurrentPath + '/' : '';
     const path = prefix + name + '/.gitkeep';
+    toast('正在创建…', 'loading');
     try {
         const ctx = await resolveGithubContext({ createIfMissing: true });
         const contentsPath = '/repos/' + ctx.owner + '/' + s.repo + '/contents/' + path.split('/').map(encodeURIComponent).join('/');
@@ -1565,11 +1691,16 @@ async function deleteRepoFolder(folderPath) {
     const filesInFolder = repoLiveFiles.filter(f => f.path.startsWith(prefix));
     const folderShortName = folderPath.split('/').pop();
     const realFiles = filesInFolder.filter(f => f.name !== '.gitkeep');
-    const ok = confirm('确定删除文件夹「' + folderShortName + '」' + (realFiles.length ? '及其中 ' + realFiles.length + ' 个文件？' : '？'));
+    const ok = await showConfirm({
+        title: '删除文件夹',
+        message: '确定删除文件夹「' + folderShortName + '」' + (realFiles.length ? '及其中 ' + realFiles.length + ' 个文件' : '') + '？删除会直接提交到仓库。',
+        confirmText: '删除'
+    });
     if (!ok) return;
     const failures = [];
     for (let i = 0; i < filesInFolder.length; i++) {
         const file = filesInFolder[i];
+        toast('正在删除 ' + (i + 1) + '/' + filesInFolder.length, 'loading');
         try {
             await deleteGithubAsset({ githubOwner: file.owner, githubRepo: file.repo, githubBranch: file.branch, githubPath: file.path, name: file.name });
         } catch (e) {
@@ -1583,8 +1714,7 @@ async function deleteRepoFolder(folderPath) {
     const statusEl = $('repo-live-status');
     if (statusEl) statusEl.textContent = '实时仓库 · ' + repoLiveFiles.length + ' 个文件';
     if (failures.length) {
-        toast('部分删除失败');
-        showUploadErrorModal(failures);
+        showUploadErrorModal(failures, { title: '部分文件删除失败', sub: failures.length + ' 个文件未能删除，其余已删除' });
     } else {
         toast('文件夹已删除');
     }
@@ -1644,6 +1774,7 @@ async function moveSelectedRepoFiles(targetFolder) {
     const selected = repoLiveFiles.filter(f => paths.includes(f.path));
     if (!selected.length) return exitRepoMultiMode();
     const s = getSettings();
+    toast('正在移动…', 'loading');
     try {
         const ctx = await resolveGithubContext();
         const refData = await githubRequest('/repos/' + ctx.owner + '/' + s.repo + '/git/ref/heads/' + ctx.branch, { method: 'GET' }, s.token, s.proxy);
@@ -1674,7 +1805,7 @@ async function moveSelectedRepoFiles(targetFolder) {
             treeChanges.push({ path: newPath, mode: '100644', type: 'blob', sha: f.sha });
             moves.push({ from: f.path, to: newPath });
         });
-        if (!treeChanges.length) { toast('所选文件已在目标位置'); exitRepoMultiMode(); return; }
+        if (!treeChanges.length) { toast('所选文件已在目标位置', 'info'); exitRepoMultiMode(); return; }
 
         const newTree = await githubRequest('/repos/' + ctx.owner + '/' + s.repo + '/git/trees', {
             method: 'POST', body: JSON.stringify({ base_tree: baseTreeSha, tree: treeChanges })
@@ -1762,7 +1893,7 @@ function updateRepoSelectionUI() {
 function toggleRepoSelectAll() {
     if (!repoMultiMode) return;
     const visible = getRepoVisibleList();
-    if (!visible.length) return toast('暂无可选文件');
+    if (!visible.length) return toast('暂无可选文件', 'info');
     const allSelected = visible.every(f => repoSelected.has(f.path));
     if (allSelected) visible.forEach(f => repoSelected.delete(f.path));
     else visible.forEach(f => repoSelected.add(f.path));
@@ -1797,7 +1928,11 @@ async function deleteSelectedRepoFiles() {
     if (!getSettings().token) return toast('请先配置 Token');
     const selected = repoLiveFiles.filter(f => paths.includes(f.path));
     if (!selected.length) return exitRepoMultiMode();
-    const ok = confirm('确定删除 ' + selected.length + ' 个仓库文件？');
+    const ok = await showConfirm({
+        title: '删除仓库文件',
+        message: '确定删除选中的 ' + selected.length + ' 个仓库文件？删除会直接提交到仓库。',
+        confirmText: '删除'
+    });
     if (!ok) return;
 
     const btn = $('repo-select-all-btn');
@@ -1808,6 +1943,7 @@ async function deleteSelectedRepoFiles() {
     try {
         for (let i = 0; i < selected.length; i++) {
             const file = selected[i];
+            toast('正在删除 ' + (i + 1) + '/' + selected.length, 'loading');
             try {
                 await deleteGithubAsset({ githubOwner:file.owner, githubRepo:file.repo, githubBranch:file.branch, githubPath:file.path, name:file.name });
             } catch (e) {
@@ -1835,8 +1971,7 @@ async function deleteSelectedRepoFiles() {
         renderGallery();
         $('repo-live-status').textContent = '实时仓库 · ' + repoLiveFiles.length + ' 个文件';
         if (failures.length) {
-            toast('已删除 ' + deletedKeys.size + ' 个，' + failures.length + ' 个失败');
-            showUploadErrorModal(failures);
+            showUploadErrorModal(failures, { title: '部分文件删除失败', sub: '已删除 ' + deletedKeys.size + ' 个，' + failures.length + ' 个失败' });
         } else {
             toast('已删除 ' + selected.length + ' 个仓库文件');
         }
@@ -1846,15 +1981,9 @@ async function deleteSelectedRepoFiles() {
     }
 }
 
-function isRepoImagePath(path) {
-    return /\.(png|jpe?g|webp|gif|avif|bmp|svg|ico|heic|heif)(?:$|\?)/i.test(path || '');
-}
-function isRepoFontPath(path) {
-    return /\.(ttf|otf|woff2?|eot)(?:$|\?)/i.test(path || '');
-}
 function repoFileType(path) {
-    if (isRepoImagePath(path)) return 'image';
-    if (isRepoFontPath(path)) return 'font';
+    if (IMAGE_EXT_RE.test(path || '')) return 'image';
+    if (FONT_EXT_RE.test(path || '')) return 'font';
     return 'file';
 }
 function repoCdnUrl(owner, repo, branch, path) {
@@ -2174,13 +2303,16 @@ function renderGallery() {
 }
 
 // 初始化读取
+// 返回本次是否真的清空了结果列表
 function clearCurrentUploadAtNewDay() {
-    if (isBatchUploading) return; // 上传进行中不清空结果列表
+    if (isBatchUploading) return false; // 上传进行中不清空结果列表
     const key = 'kb_current_upload_date';
     const today = formatDate(Date.now());
     const last = localStorage.getItem(key);
+    let cleared = false;
     if (last && last !== today) {
         const list = $('results-list');
+        cleared = !!(list && list.children.length);
         if (list) list.innerHTML = '';
         const card = $('result-card');
         if (card) card.style.display = 'none';
@@ -2188,17 +2320,14 @@ function clearCurrentUploadAtNewDay() {
         if (progress) progress.classList.remove('show');
     }
     localStorage.setItem(key, today);
+    return cleared;
 }
 
 function scheduleMidnightClear() {
     clearCurrentUploadAtNewDay();
     setInterval(() => {
-        const today = formatDate(Date.now());
         const last = localStorage.getItem('kb_current_upload_date');
-        if (last !== today) {
-            clearCurrentUploadAtNewDay();
-            toast('已清空上次上传');
-        }
+        if (last !== formatDate(Date.now()) && clearCurrentUploadAtNewDay()) toast('已清空上次上传');
     }, 30000);
 }
 
@@ -2292,16 +2421,18 @@ async function githubRequest(path, options = {}, token, proxy) {
                     await sleep(800 * attempt);
                     continue;
                 }
-                if (res.status === 401) throw new Error('Token 无效或已过期（401）');
-                if (res.status === 403) throw new Error(isRateLimited ? 'GitHub API 触发限流，已重试多次仍失败，请稍后再试' : 'GitHub 拒绝请求（403）：可能是 Token 权限不足');
-                if (res.status === 404) throw new Error('仓库或资源不存在（404）');
-                if (res.status === 422) throw new Error('GitHub 参数错误（422）：' + msg);
-                if (res.status === 429) throw new Error('GitHub API 触发限流（429），已重试多次仍失败，请稍后再试');
-                throw new Error('GitHub API ' + res.status + '：' + msg);
+                const fail = text => Object.assign(new Error(text), { http: true });
+                if (res.status === 401) throw fail('Token 无效或已过期（401）');
+                if (res.status === 403) throw fail(isRateLimited ? 'GitHub API 触发限流，已重试多次仍失败，请稍后再试' : 'GitHub 拒绝请求（403）：可能是 Token 权限不足');
+                if (res.status === 404) throw fail('仓库或资源不存在（404）');
+                if (res.status === 422) throw fail('GitHub 参数错误（422）：' + msg);
+                if (res.status === 429) throw fail('GitHub API 触发限流（429），已重试多次仍失败，请稍后再试');
+                throw fail('GitHub API ' + res.status + '：' + msg);
             }
             return data;
         } catch (e) {
             clearTimeout(timer);
+            if (e && e.http) throw e; // 服务器已明确返回错误：不属于网络故障，重试没有意义
             lastError = e;
             const raw = String(e && e.message || e || '');
             const networkError = e && (e.name === 'TypeError' || e.name === 'AbortError' || /Load failed|Failed to fetch|NetworkError|网络|fetch/i.test(raw));
@@ -2344,53 +2475,32 @@ function isImageFile(file) {
 
 // 生成不会覆盖仓库现有文件的路径。
 // 旧版本在再次上传同名文件时会 PUT 到同一路径，直接替换旧资源，导致历史直链内容被悄悄改变。
+function withNameSuffix(path, n) {
+    const dot = path.lastIndexOf('.');
+    return dot > path.lastIndexOf('/') ? path.slice(0, dot) + '-' + n + path.slice(dot) : path + '-' + n;
+}
 async function findAvailableGithubPath(initialPath, ctx, owner, branch, s) {
-    let path = initialPath;
-    let n = 2;
     // 如果资源库刚刚同步过仓库文件列表（同一个 owner/repo/branch），先在本地这份列表里查重，
     // 避免每个文件都单独发一次 GET 请求去问 GitHub「这个路径是否存在」，减少请求数量和限流风险。
-    const knownPaths = (repoLiveLoaded && repoLiveFiles.length && owner === (repoLiveFiles[0] && repoLiveFiles[0].owner)
-        && s.repo === (repoLiveFiles[0] && repoLiveFiles[0].repo) && branch === (repoLiveFiles[0] && repoLiveFiles[0].branch))
+    const first = repoLiveFiles[0];
+    const knownPaths = (repoLiveLoaded && first && owner === first.owner && s.repo === first.repo && branch === first.branch)
         ? new Set(repoLiveFiles.map(f => f.path))
         : null;
 
-    while (true) {
-        if (ctx && ctx.usedPaths && ctx.usedPaths.has(path)) {
-            const dot = path.lastIndexOf('.');
-            const base = dot > -1 ? path.slice(0, dot) : path;
-            const ext = dot > -1 ? path.slice(dot) : '';
-            path = base + '-' + n + ext;
-            n++;
-            continue;
+    let path = initialPath;
+    for (let n = 2; ; n++) {
+        let taken = !!((ctx && ctx.usedPaths && ctx.usedPaths.has(path)) || (knownPaths && knownPaths.has(path)));
+        if (!taken) {
+            const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+            try {
+                await githubRequest('/repos/' + owner + '/' + s.repo + '/contents/' + encodedPath + '?ref=' + encodeURIComponent(branch), { method: 'GET' }, s.token, s.proxy);
+                taken = true; // 已存在：换一个新名字，绝不覆盖旧文件
+            } catch (e) {
+                if (/404/.test(String(e && e.message || ''))) return path;
+                throw new Error('检查同名文件是否已存在时失败：' + (e.message || '未知错误'));
+            }
         }
-        if (knownPaths && knownPaths.has(path)) {
-            const dot = path.lastIndexOf('.');
-            const base = dot > -1 ? path.slice(0, dot) : path;
-            const ext = dot > -1 ? path.slice(dot) : '';
-            path = base + '-' + n + ext;
-            n++;
-            continue;
-        }
-
-        const encodedPath = path.split('/').map(encodeURIComponent).join('/');
-        try {
-            await githubRequest(
-                '/repos/' + owner + '/' + s.repo + '/contents/' + encodedPath + '?ref=' + encodeURIComponent(branch),
-                { method: 'GET' },
-                s.token,
-                s.proxy
-            );
-
-            // 已存在：换一个新名字，绝不覆盖旧文件。
-            const dot = path.lastIndexOf('.');
-            const base = dot > -1 ? path.slice(0, dot) : path;
-            const ext = dot > -1 ? path.slice(dot) : '';
-            path = base + '-' + n + ext;
-            n++;
-        } catch (e) {
-            if (/404/.test(String(e && e.message || ''))) return path;
-            throw new Error('检查同名文件是否已存在时失败：' + (e.message || '未知错误'));
-        }
+        path = withNameSuffix(initialPath, n);
     }
 }
 
@@ -2675,12 +2785,12 @@ async function copyTextList(urls) {
 function copyBatchLinks() {
     const inputs = document.querySelectorAll('#results-list .result-action .url-input');
     const urls = Array.from(inputs).map(i => i.value).filter(Boolean);
-    if (!urls.length) return toast('暂无链接');
+    if (!urls.length) return toast('暂无链接', 'info');
     copyTextList(urls);
 }
 
 function clearBatchResults() {
-    if (isBatchUploading) { toast('上传中，请稍候'); return; }
+    if (isBatchUploading) { toast('上传中，请稍候', 'info'); return; }
     const list = $('results-list');
     if (list) list.innerHTML = '';
     $('result-card').style.display = 'none';
@@ -2755,7 +2865,7 @@ async function runUpload(file, refs, ctx) {
             name: file.name,
             url: url.url || url,
             isImage: isImageFile(file),
-            isFont: !isImageFile(file) && /\.(ttf|otf|woff2?|eot)$/i.test(file.name || ''),
+            isFont: !isImageFile(file) && FONT_EXT_RE.test(file.name || ''),
             time: Date.now(),
             githubOwner: url.owner || '',
             githubRepo: url.repo || '',
@@ -2829,8 +2939,7 @@ async function urlToFile(rawUrl) {
     // 图床转换只接受图片响应；避免把网页、JSON、JS 等普通链接误上传到资源库。
     const contentType = String(blob.type || res.headers.get('content-type') || '').toLowerCase().split(';')[0].trim();
     if (!contentType.startsWith('image/')) {
-        const pathLooksImage = /\.(?:png|jpe?g|webp|gif|avif|bmp|svg|ico|heic|heif)(?:$|[?#])/i.test(u.pathname);
-        if (!pathLooksImage) throw new Error('该链接返回的不是图片，已跳过');
+        if (!IMAGE_EXT_RE.test(u.pathname)) throw new Error('该链接返回的不是图片，已跳过');
     }
 
     let name = '';
@@ -2891,7 +3000,7 @@ function extractUrlsFromText(text, opts) {
     const add = (value, explicitImageContext = false) => {
         const url = normalizeExtractedUrl(value);
         if (!url) return;
-        if (/\.(?:woff2?|ttf|otf|eot)$/i.test(new URL(url).pathname)) return; // 字体不属于图床转换范围
+        if (FONT_EXT_RE.test(new URL(url).pathname)) return; // 字体不属于图床转换范围
         if (!explicitImageContext && !looksLikeImageUrl(url)) return;
         // 记录原文里写成 //host/path（协议相对）的链接，替换文件时需要一并处理
         if (opts.rawForms && /^\/\//.test(String(value).trim())) opts.rawForms.add(url);
@@ -2975,7 +3084,7 @@ async function convertUrls(urls, collector, afterFn) {
     urls = Array.from(new Set(urls.map(s => s.trim()).filter(Boolean)));
     const before = urls.length;
     if (collector) urls = urls.filter(u => !isOwnHostUrl(u));
-    if (!urls.length) { toast(before ? '这些已经是你的图床链接了' : '未找到可转换链接'); if (afterFn) afterFn(); return; }
+    if (!urls.length) { toast(before ? '这些已经是你的图床链接了' : '未找到可转换链接', 'info'); if (afterFn) afterFn(); return; }
     if (!getSettings().token) { toast('请先配置 Token'); switchTab('settings'); return; }
 
     const files = [];
@@ -3000,11 +3109,14 @@ async function convertUrls(urls, collector, afterFn) {
     if (afterFn) afterFn();
 
     if (failures.length) {
-        showUploadErrorModal(failures, (f) => {
-            closeUploadErrorModal();
-            convertUrls([f.name], collector, afterFn); // name 字段这里存的就是原始链接
+        showUploadErrorModal(failures, {
+            title: '链接转换失败',
+            sub: failures.length + ' 个链接未能转换，可逐条重试',
+            onRetry: (f) => {
+                closeUploadErrorModal();
+                convertUrls([f.name], collector, afterFn); // name 字段这里存的就是原始链接
+            }
         });
-        toast(failures.length + ' 个转换失败');
     }
 }
 
@@ -3017,7 +3129,7 @@ async function handleExternalLinks() {
     if (!urls.length) { toast('未识别到链接'); return; }
     // 先做前置校验再清空输入框，失败时不丢用户粘贴的内容
     if (!getSettings().token) { toast('请先配置 Token'); switchTab('settings'); return; }
-    if (isBatchUploading) { toast('上传中，请稍候'); return; }
+    if (isBatchUploading) { toast('上传中，请稍候', 'info'); return; }
     box.value = '';
     moveResultCardAfter('card-convert-link');
     await convertUrls(urls);
@@ -3041,13 +3153,13 @@ async function handleImportFile(file) {
     $('import-file-input').value = '';
 
     if (!urls.length) { toast('文件里没有链接'); return; }
-    if (isBatchUploading) { toast('上传中，请稍候'); return; }
+    if (isBatchUploading) { toast('上传中，请稍候', 'info'); return; }
     moveResultCardAfter('card-import-file');
     await convertUrls(urls);
 }
 
 // --- 导入文本文件：提取图床链接 → 转换 → 在文件里替换 → 输出新文件下载 ---
-let replaceOutput = null; // { url, name, replaced, total }
+let replaceOutput = null; // { url, name }
 
 function escapeRegExp(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
@@ -3111,7 +3223,7 @@ function buildReplaceOutput(fileName, mime, bom, originalText, map, protoRelativ
     const outName = dot > 0 ? fileName.slice(0, dot) + '-replaced' + fileName.slice(dot) : fileName + '-replaced';
     const parts = bom ? [new Uint8Array([0xEF, 0xBB, 0xBF]), r.text] : [r.text];
     const blob = new Blob(parts, { type: mime || 'text/plain' });
-    replaceOutput = { url: URL.createObjectURL(blob), name: outName, replaced: r.count, total };
+    replaceOutput = { url: URL.createObjectURL(blob), name: outName };
     const failed = total - map.size;
     $('replace-result-text').textContent = '已替换 ' + map.size + '/' + total + ' 个链接（共 ' + r.count + ' 处）' +
         (failed > 0 ? '，' + failed + ' 个失败的保持原样' : '') + '。';
@@ -3122,7 +3234,7 @@ function buildReplaceOutput(fileName, mime, bom, originalText, map, protoRelativ
 async function handleReplaceFile(file) {
     if (!file) return;
     if (!getSettings().token) { toast('请先配置 Token'); switchTab('settings'); $('replace-file-input').value = ''; return; }
-    if (isBatchUploading) { toast('上传中，请稍候'); $('replace-file-input').value = ''; return; }
+    if (isBatchUploading) { toast('上传中，请稍候', 'info'); $('replace-file-input').value = ''; return; }
     hideReplaceResult();
 
     let text = '';
@@ -3221,13 +3333,13 @@ async function handleFiles(files) {
         }
     });
     if (!validFiles.length) {
-        if (invalidFailures.length) showUploadErrorModal(invalidFailures);
+        if (invalidFailures.length) showUploadErrorModal(invalidFailures, { title: '文件已跳过', sub: invalidFailures.length + ' 个文件不符合要求，未上传' });
         return;
     }
 
     // 防止在上一批还没跑完时又触发新一批（比如手快连点两次“转换”），
     // 否则两批会各自去请求 GitHub，互相抢节奏，又会撞回限流问题。
-    if (isBatchUploading) { toast('上传中，请稍候'); return; }
+    if (isBatchUploading) { toast('上传中，请稍候', 'info'); return; }
     isBatchUploading = true;
     requestUploadWakeLock();
     const convertBtn = $('convert-link-btn');
@@ -3264,8 +3376,12 @@ async function handleFiles(files) {
     } catch (e) {
         if (progress) progress.classList.remove('show');
         if (!list.children.length) $('result-card').style.display = 'none'; // 有上一批结果时保留
-        toast(e.message || '无法连接 GitHub，请检查 Token 或网络');
-        if (invalidFailures.length) showUploadErrorModal(invalidFailures);
+        const reason = e.message || '无法连接 GitHub，请检查 Token 或网络';
+        if (invalidFailures.length) {
+            showUploadErrorModal([{ name: '连接 GitHub', message: reason }].concat(invalidFailures), { title: '无法开始上传', sub: '连接 GitHub 失败，另有 ' + invalidFailures.length + ' 个文件不符合要求' });
+        } else {
+            toast(reason, 'error');
+        }
         return;
     }
 
@@ -3298,9 +3414,8 @@ async function handleFiles(files) {
             ? ('完成 · ' + (total - failedCount) + '/' + total + ' 成功，' + failedCount + ' 个失败')
             : ('上传完成 · ' + done + '/' + total + '，' + invalidFailures.length + ' 个文件被跳过');
         if (percent) percent.textContent = '100%';
-        // 批量上传只弹一次总提示，不会连续弹多个窗口。
+        // 批量上传只弹一次总提示，不会连续弹多个窗口（弹窗打开时不再叠加提示条）。
         showUploadErrorModal(failures);
-        toast(failures.length + ' 个文件失败');
     } else {
         if (text) text.textContent = '上传完成 · ' + done + '/' + total;
         if (percent) percent.textContent = '100%';

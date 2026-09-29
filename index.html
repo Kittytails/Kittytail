@@ -260,14 +260,18 @@
         height: 24px;
         object-fit: contain;
         opacity: 0.35; /* 未选中状态呈现灰色 */
-        transform: translateY(1px);
+        transform: scale(var(--base-scale, 1)) translateY(1px);
         transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
 
     /* 选中状态 */
+    .nav-btn.active { 
+        background: transparent; /* 去除纯黑背景，确保黑色图标可见 */
+    }
+
     .nav-btn.active .icon { 
         opacity: 1; /* 选中状态呈现纯黑 */
-        transform: scale(1.18) translateY(1px); /* 选中时略微放大 */
+        transform: scale(calc(var(--base-scale, 1) + 0.18)) translateY(1px); /* 选中时在各自基础比例上再放大一点 */
     }
 
 
@@ -320,6 +324,16 @@
     html[data-theme="dark"] .dlg-error { color: #FF6B60; }
 
     /* 顶部提示（Toast）：悬浮的磨砂玻璃圆角矩形，从上方滑下；本身不拦截页面点击，点提示条可立即收起。 */
+    /* ===== 提示栏配色（改颜色只需改这一组变量；夜间那组在下方） =====
+       日间：深墨色底 + 浅色字；成功/失败/提示三种图标各有语义色。 */
+    #kb-toast {
+        --t-bg: #1D1D1F; --t-fg: #F5F5F7; --t-border: #1D1D1F;
+        --t-shadow: 0 8px 28px rgba(0,0,0,.24), 0 2px 6px rgba(0,0,0,.12);
+        --t-dot: rgba(255,255,255,.14);
+        --t-ok: #34C759;   --t-ok-bg: rgba(52,199,89,.20);
+        --t-err: #FF6B60;  --t-err-bg: rgba(255,107,96,.20);
+        --t-info: #64A8FF; --t-info-bg: rgba(100,168,255,.20);
+    }
     #kb-toast {
         /* left/right 47px = 页面边距 20 + 卡片边框 1 + 卡片内边距 26，正好对齐卡片内容区的左右边界。
            平时是 display:none（由 JS 控制）：iOS 26 会把「贴着屏幕顶边的 fixed 元素」当成顶栏，
@@ -332,10 +346,9 @@
         box-sizing: border-box; width: auto; max-width: min(100%, 446px); /* 446px = 容器 500 - 卡片左右内缩 54 */
         display: flex; align-items: center; justify-content: center; gap: 9px;
         min-height: 38px; padding: 6px 14px;
-        /* 日间：实色黑（同主按钮） */
-        background: #000000; color: #FFFFFF;
-        border: 1px solid #000000;
-        border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,.22), 0 2px 6px rgba(0,0,0,.12);
+        background: var(--t-bg); color: var(--t-fg);
+        border: 1px solid var(--t-border);
+        border-radius: 12px; box-shadow: var(--t-shadow);
         font-size: 13px; font-weight: 700; letter-spacing: -0.2px; text-align: center;
         overflow-wrap: anywhere; word-break: break-word;
         transform: translateY(calc(-100% - 16px - env(safe-area-inset-top))); opacity: 0; will-change: transform;
@@ -357,48 +370,35 @@
     }
     #kb-toast .kb-toast-dot {
         flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
-        background: rgba(255,255,255,.16); display: flex; align-items: center; justify-content: center; color: inherit;
+        background: var(--t-dot); display: flex; align-items: center; justify-content: center; color: inherit;
     }
     #kb-toast .kb-toast-dot svg { width: 13px; height: 13px; }
     #kb-toast .kb-toast-dot svg path { stroke: currentColor; }
     #kb-toast .kb-toast-msg { line-height: 1.4; min-width: 0; flex: 0 1 auto; text-align: center; }
-    #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot { color: #FF6B60; background: rgba(255,107,96,.18); }
+    #kb-toast .kb-toast-sheet[data-type="ok"] .kb-toast-dot { color: var(--t-ok); background: var(--t-ok-bg); }
+    #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot { color: var(--t-err); background: var(--t-err-bg); }
+    #kb-toast .kb-toast-sheet[data-type="info"] .kb-toast-dot { color: var(--t-info); background: var(--t-info-bg); }
     .kb-spinner { width: 13px; height: 13px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: kbSpin .7s linear infinite; }
     @keyframes kbSpin { to { transform: rotate(360deg); } }
-    /* 夜间 Toast：浅色底（与日间黑底反相），在深色卡片上更醒目 */
+    /* 夜间：浅色底 + 深色字（与日间反相），在深色页面上更醒目 */
     @media (prefers-color-scheme: dark) {
-        #kb-toast .kb-toast-sheet {
-            background: #F5F5F7 !important;
-            color: #111113 !important;
-            border-color: #F5F5F7 !important;
-            box-shadow: 0 12px 40px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.25);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-        }
-        #kb-toast .kb-toast-dot {
-            background: rgba(0,0,0,.10);
-        }
-        #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot {
-            color: #D92D20;
-            background: rgba(217,45,32,.14);
+        #kb-toast {
+        --t-bg: #F5F5F7; --t-fg: #1D1D1F; --t-border: #F5F5F7;
+        --t-shadow: 0 12px 40px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.25);
+        --t-dot: rgba(0,0,0,.08);
+        --t-ok: #1E8E3E;   --t-ok-bg: rgba(30,142,62,.14);
+        --t-err: #D92D20;  --t-err-bg: rgba(217,45,32,.14);
+        --t-info: #0A63C9; --t-info-bg: rgba(10,99,201,.13);
         }
     }
-
     /* 手动 / JS 夜间主题 */
-    html[data-theme="dark"] #kb-toast .kb-toast-sheet {
-        background: #F5F5F7 !important;
-        color: #111113 !important;
-        border-color: #F5F5F7 !important;
-        box-shadow: 0 12px 40px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.25);
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-    }
-    html[data-theme="dark"] #kb-toast .kb-toast-dot {
-        background: rgba(0,0,0,.10);
-    }
-    html[data-theme="dark"] #kb-toast .kb-toast-sheet[data-type="error"] .kb-toast-dot {
-        color: #D92D20;
-        background: rgba(217,45,32,.14);
+    html[data-theme="dark"] #kb-toast {
+        --t-bg: #F5F5F7; --t-fg: #1D1D1F; --t-border: #F5F5F7;
+        --t-shadow: 0 12px 40px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.25);
+        --t-dot: rgba(0,0,0,.08);
+        --t-ok: #1E8E3E;   --t-ok-bg: rgba(30,142,62,.14);
+        --t-err: #D92D20;  --t-err-bg: rgba(217,45,32,.14);
+        --t-info: #0A63C9; --t-info-bg: rgba(10,99,201,.13);
     }
 
     /* ================= 系统日夜间适配 =================
@@ -572,6 +572,8 @@
             box-shadow: 0 12px 36px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.18);
         }
         .nav-btn .icon { filter: invert(1); }
+        .nav-btn.active .icon { filter: invert(1); }
+
 
     }
 

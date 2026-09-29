@@ -327,8 +327,11 @@
 
     /* 顶部提示（Toast）：悬浮的磨砂玻璃圆角矩形，从上方滑下；本身不拦截页面点击，点提示条可立即收起。 */
     #kb-toast {
-        position: fixed; left: 0; right: 0; top: 10px;
-        display: flex; justify-content: center; padding: 0 47px; box-sizing: border-box; /* 47px = 页面边距 20 + 卡片边框 1 + 卡片内边距 26，正好对齐卡片内容区的左右边界 */
+        /* left/right 47px = 页面边距 20 + 卡片边框 1 + 卡片内边距 26，正好对齐卡片内容区的左右边界。
+           平时是 display:none（由 JS 控制）：iOS 26 会把「贴着屏幕顶边的 fixed 元素」当成顶栏，
+           在状态栏区域盖一层不透明色块，把往上滚的内容挡住。 */
+        position: fixed; left: 47px; right: 47px; top: 10px;
+        display: none; justify-content: center; box-sizing: border-box;
         pointer-events: none; z-index: 20000; text-align: center;
     }
     #kb-toast .kb-toast-sheet {
@@ -1033,13 +1036,17 @@ function hideToast() {
     const el = $('kb-toast');
     if (!el) return;
     clearTimeout(el._t);
+    clearTimeout(el._d);
     el.classList.remove('show');
+    el._d = setTimeout(() => { el.style.display = 'none'; }, 450); // 退场动画放完后彻底移出页面
 }
 
 function toast(msg, type) {
     const el = $('kb-toast');
     if (!el) return;
     if (!TOAST_ICONS[type]) type = TOAST_ERROR_RE.test(msg) ? 'error' : 'ok';
+    clearTimeout(el._d);
+    el.style.display = 'flex';
     let sheet = el.firstElementChild;
     if (!sheet) {
         el.innerHTML = '<div class="kb-toast-sheet"><span class="kb-toast-dot"></span><span class="kb-toast-msg"></span></div>';

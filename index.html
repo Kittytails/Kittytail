@@ -260,14 +260,14 @@
         height: 24px;
         object-fit: contain;
         opacity: 0.35; /* 未选中状态呈现灰色 */
-        transform: scale(var(--base-scale, 1)) translateY(1px);
+        transform: translateY(1px);
         transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
 
     /* 选中状态 */
     .nav-btn.active .icon { 
         opacity: 1; /* 选中状态呈现纯黑 */
-        transform: scale(calc(var(--base-scale, 1) + 0.18)) translateY(1px); /* 选中时在各自基础比例上再放大一点 */
+        transform: scale(1.18) translateY(1px); /* 选中时略微放大 */
     }
 
 

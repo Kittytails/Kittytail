@@ -125,7 +125,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
         margin:-2px 0 14px; padding:10px 12px; border-radius:16px;
         background:#F3F3F3; border:1px solid #E4E4E4;
     }
-    .repo-multi-mode .repo-select-bar { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; align-items:center; padding:8px; }
+    .repo-multi-mode .repo-select-bar { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; align-items:center; padding:8px; }
     .repo-select-info { display:none; flex-shrink:0; font-size:12px; font-weight:700; color:#222; white-space:nowrap; }
     .repo-multi-mode .repo-select-info { display:block; }
     .repo-crumb-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:-4px 0 14px; min-height:22px; }
@@ -964,6 +964,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
                     <button class="small-btn" id="repo-select-all-btn" onclick="toggleRepoSelectAll()">全选</button>
                     <button class="small-btn" onclick="exitRepoMultiMode()">取消</button>
                     <button class="small-btn" onclick="openMoveSheet()">移动到</button>
+                    <button class="small-btn" id="repo-download-btn" onclick="downloadSelectedRepoFiles()">下载</button>
                     <button class="small-btn black" onclick="deleteSelectedRepoFiles()">删除选中</button>
                 </div>
             </div>
@@ -2497,6 +2498,86 @@ function toggleRepoSelection(path) {
     else repoSelected.add(path);
     updateRepoSelectionUI();
     syncRepoSelectionDom();
+}
+
+// ===== 下载仓库文件：图片 → 分享面板「存储图像」(相册)；其他文件 → 「存储到文件」 =====
+const DL_MIME = {
+    jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png', gif:'image/gif', webp:'image/webp',
+    avif:'image/avif', bmp:'image/bmp', svg:'image/svg+xml', ico:'image/x-icon', heic:'image/heic', heif:'image/heif',
+    ttf:'font/ttf', otf:'font/otf', woff:'font/woff', woff2:'font/woff2',
+    json:'application/json', txt:'text/plain', pdf:'application/pdf', zip:'application/zip'
+};
+async function fetchRepoFileAsFile(f) {
+    const urls = [f.url, f.rawUrl].filter(Boolean);
+    let lastErr = null;
+    for (const u of urls) {
+        try {
+            const res = await fetch(u, { cache: 'no-store' });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const blob = await res.blob();
+            const ext = (f.name.split('.').pop() || '').toLowerCase();
+            let type = blob.type;
+            if (!type || type === 'application/octet-stream' || (f.type === 'image' && !/^image\//.test(type))) {
+                type = DL_MIME[ext] || type || 'application/octet-stream';
+            }
+            return new File([blob], f.name, { type });
+        } catch (e) { lastErr = e; }
+    }
+    throw lastErr || new Error('下载失败');
+}
+function fallbackDownloadFiles(files) {
+    files.forEach((file, i) => setTimeout(() => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(file);
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+    }, i * 400));
+}
+async function saveFilesViaShare(files) {
+    if (navigator.canShare && navigator.canShare({ files }) && navigator.share) {
+        try { await navigator.share({ files }); return true; }
+        catch (e) { if (e && e.name === 'AbortError') return true; /* 用户关闭面板 */ }
+    }
+    fallbackDownloadFiles(files);
+    return false;
+}
+async function downloadSelectedRepoFiles() {
+    const paths = Array.from(repoSelected);
+    if (!paths.length) return toast('请先选择要下载的文件');
+    const selected = repoLiveFiles.filter(f => paths.includes(f.path));
+    if (!selected.length) return;
+    const btn = $('repo-download-btn');
+    if (btn) btn.disabled = true;
+    try {
+        const groups = [
+            { list: selected.filter(f => f.type === 'image'), label: '张图片', tip: '保存到相册', hint: '在弹出的面板里选「存储图像」' },
+            { list: selected.filter(f => f.type !== 'image'), label: '个文件', tip: '保存到文件', hint: '在弹出的面板里选「存储到“文件”」' }
+        ].filter(g => g.list.length);
+        for (const g of groups) {
+            const files = [];
+            const failed = [];
+            for (let i = 0; i < g.list.length; i++) {
+                toast('正在准备 ' + (i + 1) + '/' + g.list.length + '…', 'loading');
+                try { files.push(await fetchRepoFileAsFile(g.list[i])); }
+                catch (e) { failed.push(g.list[i].name); }
+            }
+            hideToast();
+            if (!files.length) { toast('下载失败：' + failed.join('、')); continue; }
+            // iOS 要求分享必须由点击直接触发，所以下载完再让用户点一次确认
+            const ok = await showConfirm({
+                title: g.tip,
+                message: '已准备好 ' + files.length + ' ' + g.label + (failed.length ? '（' + failed.length + ' 个失败）' : '') + '。' + g.hint + '。',
+                confirmText: '保存'
+            });
+            if (!ok) continue;
+            await saveFilesViaShare(files);
+        }
+    } finally {
+        if (btn) btn.disabled = false;
+    }
 }
 
 async function deleteSelectedRepoFiles() {

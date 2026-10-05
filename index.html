@@ -1296,8 +1296,6 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 #page-update .pref-ico svg * { vector-effect: non-scaling-stroke; }
 #page-update .pref-card:active .pref-ico { transform: scale(.9); }
 @media (prefers-reduced-motion: reduce) { #page-update .pref-ico { transition: none; } }
-.plug-desc { display: block; margin-top: 3px; font-size: 13px; font-weight: 400; line-height: 18px; letter-spacing: 0; color: var(--text-secondary); }
-.plug-desc.bad { color: #D93025; }
 .plug-note { margin: 14px 6px 0; line-height: 19px; }
 </style>
 </head>
@@ -1347,15 +1345,9 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
         </button>
       </div>
       <div class="group single">
-        <button class="row" type="button" data-keywords="preferences 偏好 自动跳转 heic jpg" onclick="openPage('prefs')">
+        <button class="row" type="button" data-keywords="settings preferences 设置 偏好 自动跳转 heic jpg plugin plugins 插件 扩展 脚本 js exif 隐私" onclick="openPage('prefs')">
           <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h8M17 8h3M4 16h3M12 16h8"/><circle cx="14.5" cy="8" r="2.5"/><circle cx="9.5" cy="16" r="2.5"/></svg></span>
-          <span class="row-body"><span class="row-title">偏好设置</span><span class="row-arrow"></span></span>
-        </button>
-      </div>
-      <div class="group single">
-        <button class="row" type="button" data-keywords="plugin plugins 插件 扩展 脚本 js exif 隐私" onclick="openPage('plugins')">
-          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 4.5a2 2 0 0 1 4 0V6h3.2c.7 0 1.3.6 1.3 1.3V10.5h-1.5a2 2 0 0 0 0 4H18v3.2c0 .7-.6 1.3-1.3 1.3H13.5v-1.5a2 2 0 0 0-4 0V19H6.3c-.7 0-1.3-.6-1.3-1.3V14.5h1.5a2 2 0 0 0 0-4H5V7.3C5 6.6 5.6 6 6.3 6H9.5z"/></svg></span>
-          <span class="row-body"><span class="row-title">插件</span><span class="row-arrow"></span></span>
+          <span class="row-body"><span class="row-title">设置</span><span class="row-arrow"></span></span>
         </button>
       </div>
       <div class="group single">
@@ -1590,7 +1582,7 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
         <div id="st-list"></div>
     </div>
 
-    <div class="page" id="page-prefs" data-title="Preferences" data-sub="改完即生效">
+    <div class="page" id="page-prefs" data-title="Settings" data-sub="改完即生效">
         <div class="pref-group">
             <label class="pref-card">
                 <span class="pref-text">上传后跳到资源库</span>
@@ -1671,11 +1663,8 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
                 <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
             </div>
         </div>
-    </div>
-
-    <div class="page" id="page-plugins" data-title="Plugins" data-sub="plugins.js 里的小脚本，可单独开关">
-        <div class="pref-group" id="plugin-list"></div>
-        <div class="sub plug-note" id="plugin-note"></div>
+        <div class="pref-group" id="plugin-list" style="display:none"></div>
+        <div class="sub plug-note" id="plugin-note" style="display:none"></div>
     </div>
 
     <div class="page" id="page-about" data-title="About" data-sub="使用说明与注意事项">
@@ -1706,7 +1695,7 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
             </div>
         </div>
         <div class="about-sec">
-            <div class="about-cap">偏好设置说明</div>
+            <div class="about-cap">设置说明</div>
             <div class="about-box">
             <div class="about-item"><div class="about-t">上传前处理</div><div class="about-d">关闭：原样上传。压缩：长边超过 2560px 的图片会等比缩小并重新压缩。WebP：转成 WebP，体积通常更小。小于 30KB 的图片，以及 GIF、SVG、ICO，不会被处理。<br>当前浏览器：<b id="about-webp-status">检测中…</b></div></div>
             <div class="about-item"><div class="about-t">HEIC 转 JPG</div><div class="about-d">iPhone 相册里的 HEIC / HEIF 图片在上传前转成 JPG，这样大多数网页和软件都能直接打开。</div></div>
@@ -1739,6 +1728,10 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
             <div class="about-item"><div class="about-t">单个文件</div><div class="about-d">单个文件最大 99MB，超过的会被跳过；超过 20MB 的文件 jsDelivr 不支持，会自动改用 GitHub raw 直链。</div></div>
             <div class="about-item"><div class="about-t">公开 / 私有</div><div class="about-d">新建仓库时可以选公开或私有。已有的仓库，在「选择上传仓库」列表里点右侧的「公开」或「私有」标签就能切换，切换前会让你确认。改为私有后外部打不开里面的文件，已贴出去的直链会失效；改为公开后任何人都能看到仓库里的全部内容。</div></div>
             </div>
+        </div>
+        <div class="about-sec">
+            <div class="about-cap">插件</div>
+            <div class="about-box" id="about-plugins"></div>
         </div>
         <div class="about-sec">
             <div class="about-cap">账号安全</div>
@@ -2648,7 +2641,8 @@ function openPage(name) {
     setPanel(el, true);
     if (name === 'gallery') { renderGallery(); loadRepoLiveFiles(false); }
     if (name === 'storage') loadStorage(false);
-    if (name === 'plugins') renderPlugins();
+    if (name === 'prefs') renderPlugins();
+    if (name === 'about') renderAboutPlugins();
     if (name === 'update' && typeof aboutOnOpen === 'function') aboutOnOpen();
 }
 function openGallery(seg) {
@@ -7838,24 +7832,37 @@ async function renderPlugins() {
     box.innerHTML = '';
     if (!DL.list.length) {
         box.style.display = 'none';
-        note.textContent = DL.loadError || '还没有插件。在页面同目录放一个 plugins.js，这里就会出现。';
+        note.style.display = DL.loadError ? '' : 'none';
+        note.textContent = DL.loadError ? '插件加载失败，详见「关于」' : '';
         return;
     }
     box.style.display = '';
+    note.style.display = DL.loadError ? '' : 'none';
+    note.textContent = DL.loadError ? '部分插件有问题，详见「关于」' : '';
     DL.list.forEach(p => {
         const on = pluginOn(p);
         const label = document.createElement('label');
         label.className = 'pref-card';
-        label.innerHTML = '<span class="pref-text">' + escapeHtmlAttr(p.name || p.id) +
-            (p.desc ? '<span class="plug-desc">' + escapeHtmlAttr(p.desc) + '</span>' : '') +
-            '</span><input type="checkbox" class="switch"' + (on ? ' checked' : '') + '>';
+        label.innerHTML = '<span class="pref-text">' + escapeHtmlAttr(p.name || p.id) + '</span>' +
+            '<input type="checkbox" class="switch"' + (on ? ' checked' : '') + '>';
         label.querySelector('input').addEventListener('change', e => {
             pluginSetOn(p, e.target.checked);
             toast((p.name || p.id) + (e.target.checked ? ' 已开启' : ' 已关闭'), 'info');
         });
         box.appendChild(label);
     });
-    note.textContent = DL.loadError || '插件和页面同源，能读到 Token。只启用自己写的或信得过的脚本。';
+}
+async function renderAboutPlugins() {
+    const box = $('about-plugins');
+    if (!box) return;
+    await pluginsReady();
+    let h = '<div class="about-item"><div class="about-t">关于插件</div><div class="about-d">插件是页面同目录 plugins.js 里的小脚本，可以在「设置」里单独开关。插件和页面同源，能读到 Token，只启用自己写的或信得过的脚本。</div></div>';
+    DL.list.forEach(p => {
+        h += '<div class="about-item"><div class="about-t">' + escapeHtmlAttr(p.name || p.id) + '</div><div class="about-d">' + escapeHtmlAttr(p.desc || '这个插件没有写说明。') + '</div></div>';
+    });
+    if (!DL.list.length) h += '<div class="about-item"><div class="about-t">还没有插件</div><div class="about-d">在页面同目录放一个 plugins.js，注册后会出现在「设置」里。</div></div>';
+    if (DL.loadError) h += '<div class="about-item"><div class="about-t">加载提示</div><div class="about-d">' + escapeHtmlAttr(DL.loadError) + '</div></div>';
+    box.innerHTML = h;
 }
 
 (function initOffline() {

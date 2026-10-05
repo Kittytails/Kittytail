@@ -157,8 +157,13 @@
   const G = 'html.dl-glass:root';
   const D = 'html.dl-glass:root[data-theme="dark"]';
 
-  // 大块内容面：卡片、分组、结果条
-  const SURFACE = ['.card', '.result-item', '.home .group', '.pref-group', '.acct-card', '.acct-group', '.st-group', '.about-box'];
+  // 列表的外框：不再画成一整条玻璃，只负责把里面的条目排开
+  const GROUPS = ['.home .group:not([hidden])', '.pref-group', '.acct-group', '.st-group', '.about-box'];
+  // 列表里的每一条：各自是一块独立的玻璃
+  const ROWS = ['.home .row', '.pref-card', '.acct-row', '.st-row', '.about-item'];
+  // 本来就是单独一块的卡片
+  const CARDS = ['.acct-card', '.result-item'];
+  const SURFACE = [].concat(ROWS, CARDS);
   // 悬浮层：底部搜索栏、多选坞、菜单、剪贴板提示条
   const FLOAT = ['.search-bar', '.sel-dock', '.more-menu', '.clip-banner'];
   // 底部弹层
@@ -196,13 +201,30 @@ ${D} {
   --lg-field: rgba(255,255,255,.07);
 }
 
-/* 卡片 / 分组 */
+/* 列表外框：去掉整条玻璃，条目之间留出缝隙 */
+${sel(GROUPS)} {
+  background: none !important; box-shadow: none !important; border-color: transparent !important;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  overflow: visible !important; border-radius: 0 !important;
+}
+/* 页面里的大卡片只是个容器，也不再画玻璃；里面的控件各自是玻璃 */
+${G} .card {
+  background: none !important; box-shadow: none !important; border-color: transparent !important;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+/* 每一条各自一块玻璃 */
 ${sel(SURFACE)} {
   background: var(--lg-spec), var(--lg-fill) !important;
   -webkit-backdrop-filter: var(--lg-blur); backdrop-filter: var(--lg-blur);
   border-color: var(--lg-edge) !important;
   box-shadow: var(--lg-inset), var(--lg-hair), var(--lg-shadow) !important;
 }
+${sel(ROWS)} { border-radius: 22px !important; }
+${sel(SURFACE.map(x => x + ':not(:last-child)'))} { margin-bottom: 8px; }
+${sel(SURFACE.map(x => x + ':active'))} { filter: brightness(.94); }
+/* 原来条目之间的细分隔线不要了 */
+${sel(['.home .row + .row .row-body::before', '.pref-card + .pref-card::before', '.acct-row + .acct-row::before', '.st-row + .st-row::before', '.about-item + .about-item::before'])} { display: none !important; }
+
 /* 资源库 / 仓库页的卡片本来就是透明的（网格直接铺在背景上），保持原样 */
 ${G} #page-gallery > .card {
   background: transparent !important; border: 0 !important; box-shadow: none !important;
@@ -264,16 +286,17 @@ ${sel(FIELD, D)} {
 }
 
 /* 分段选择器：凹槽 + 玻璃滑块 */
-${sel(['.filter-group', '.gallery-select-bar'])} {
+/* 资源库页的筛选按钮是一颗颗独立的小药丸，不套凹槽，保持原样 */
+${G} .page:not(#page-gallery) .filter-group, ${G} .gallery-select-bar {
   background: var(--lg-trough) !important;
   border-color: var(--lg-edge) !important;
   box-shadow: inset 0 1px 3px rgba(20,24,60,.10) !important;
 }
-${G} .filter-btn.active {
+${G} .page:not(#page-gallery) .filter-btn.active {
   background: var(--lg-chip) !important;
   box-shadow: var(--lg-inset), 0 3px 10px rgba(20,24,60,.12) !important;
 }
-${D} .filter-btn.active { box-shadow: var(--lg-inset), 0 3px 10px rgba(0,0,0,.4) !important; }
+${D} .page:not(#page-gallery) .filter-btn.active { box-shadow: var(--lg-inset), 0 3px 10px rgba(0,0,0,.4) !important; }
 
 /* 首页每一行的小图标：玻璃方块 */
 ${G} .home .row-icon {

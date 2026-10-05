@@ -1296,6 +1296,9 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 #page-update .pref-ico svg * { vector-effect: non-scaling-stroke; }
 #page-update .pref-card:active .pref-ico { transform: scale(.9); }
 @media (prefers-reduced-motion: reduce) { #page-update .pref-ico { transition: none; } }
+.plug-desc { display: block; margin-top: 3px; font-size: 13px; font-weight: 400; line-height: 18px; letter-spacing: 0; color: var(--text-secondary); }
+.plug-desc.bad { color: #D93025; }
+.plug-note { margin: 14px 6px 0; line-height: 19px; }
 </style>
 </head>
 <body>
@@ -1347,6 +1350,12 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
         <button class="row" type="button" data-keywords="preferences 偏好 自动跳转 heic jpg" onclick="openPage('prefs')">
           <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h8M17 8h3M4 16h3M12 16h8"/><circle cx="14.5" cy="8" r="2.5"/><circle cx="9.5" cy="16" r="2.5"/></svg></span>
           <span class="row-body"><span class="row-title">偏好设置</span><span class="row-arrow"></span></span>
+        </button>
+      </div>
+      <div class="group single">
+        <button class="row" type="button" data-keywords="plugin plugins 插件 扩展 脚本 js exif 隐私" onclick="openPage('plugins')">
+          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 4.5a2 2 0 0 1 4 0V6h3.2c.7 0 1.3.6 1.3 1.3V10.5h-1.5a2 2 0 0 0 0 4H18v3.2c0 .7-.6 1.3-1.3 1.3H13.5v-1.5a2 2 0 0 0-4 0V19H6.3c-.7 0-1.3-.6-1.3-1.3V14.5h1.5a2 2 0 0 0 0-4H5V7.3C5 6.6 5.6 6 6.3 6H9.5z"/></svg></span>
+          <span class="row-body"><span class="row-title">插件</span><span class="row-arrow"></span></span>
         </button>
       </div>
       <div class="group single">
@@ -1662,6 +1671,11 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
                 <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
             </div>
         </div>
+    </div>
+
+    <div class="page" id="page-plugins" data-title="Plugins" data-sub="plugins.js 里的小脚本，可单独开关">
+        <div class="pref-group" id="plugin-list"></div>
+        <div class="sub plug-note" id="plugin-note"></div>
     </div>
 
     <div class="page" id="page-about" data-title="About" data-sub="使用说明与注意事项">
@@ -2634,6 +2648,7 @@ function openPage(name) {
     setPanel(el, true);
     if (name === 'gallery') { renderGallery(); loadRepoLiveFiles(false); }
     if (name === 'storage') loadStorage(false);
+    if (name === 'plugins') renderPlugins();
     if (name === 'update' && typeof aboutOnOpen === 'function') aboutOnOpen();
 }
 function openGallery(seg) {
@@ -5818,6 +5833,7 @@ function startPrepare(file) {
             if (prefCompress() !== 'off' && isImageFile(work)) {
                 try { work = await preprocessFile(work); } catch (_) { /* 保持 work */ }
             }
+            try { work = await pluginBeforeUpload(work); } catch (_) { /* 插件出错不影响上传 */ }
             if (work !== file) file._processed = work;
         } finally { prepSem.release(); }
         const up = file._processed || file;
@@ -5892,6 +5908,7 @@ async function runUpload(file, refs, ctx) {
         if (!url.deduped) recordUploadOrder(url.owner, url.repo, url.path, stamp);
         repoLiveLoaded = false; // 仓库内容已变化，下次进入资源库时重新读取
         forgetFailedUpload(file);
+        pluginAfterUpload({ name: up.name, url: url.url || url, size: up.size || 0, isImage: isImageFile(up), deduped: !!url.deduped, owner: url.owner || '', repo: url.repo || '', branch: url.branch || '', path: url.path || '' });
         return { ok: true, url: url.url || url, name: up.name };
     } catch (err) {
         file._onProgress = null;
@@ -7556,7 +7573,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '1.9.1';
+const APP_VERSION = '1.10.0';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -7753,6 +7770,94 @@ async function offlineStatusRefresh() {
     if (el) el.textContent = await offlineStatusText();
 }
 async function offlineInfo() { toast(await offlineStatusText(), 'info'); }
+/* ---------- 插件（同目录的 plugins.js，里面可以放任意多个插件） ---------- */
+const PLUGIN_STATE_KEY = 'kb_pref_plugins';   // 带 kb_pref_ 前缀，会随设置备份一起导出
+const DL = window.DL = {
+    apiVersion: 2,
+    list: [],            // 已注册的插件（按注册顺序）
+    loadError: '',
+    ready: null,
+    register(def) {
+        if (!def || typeof def.id !== 'string') return;
+        const i = DL.list.findIndex(p => p.id === def.id);
+        if (i >= 0) DL.list[i] = def; else DL.list.push(def);
+    },
+    toast: (m, t) => toast(m, t),
+    isImage: f => isImageFile(f)
+};
+function pluginStateMap() { try { return JSON.parse(localStorage.getItem(PLUGIN_STATE_KEY) || '{}') || {}; } catch (_) { return {}; } }
+function pluginOn(p) { const m = pluginStateMap(); return m[p.id] !== undefined ? !!m[p.id] : !!p.default; }
+function pluginSetOn(p, on) { const m = pluginStateMap(); m[p.id] = !!on; try { localStorage.setItem(PLUGIN_STATE_KEY, JSON.stringify(m)); } catch (_) {} }
+function initPlugins() {
+    return new Promise(res => {
+        if (!isWebOrigin()) { DL.loadError = '当前不是从网址打开的，加载不了插件。请用 GitHub Pages 等网址访问。'; return res(); }
+        let syntaxMsg = '';
+        const onErr = e => { if (e.filename && /\/plugins\.js(\?|$)/.test(e.filename)) syntaxMsg = e.message || '脚本报错'; };
+        window.addEventListener('error', onErr);
+        const el = document.createElement('script');
+        el.src = new URL('plugins.js', location.href).href + '?t=' + Date.now();   // 带时间戳避开浏览器缓存；sw.js 会忽略它
+        el.async = true;
+        const done = () => { window.removeEventListener('error', onErr); el.remove(); res(); };
+        el.onload = () => {
+            if (!DL.list.length) DL.loadError = syntaxMsg ? 'plugins.js 有错误：' + syntaxMsg : 'plugins.js 里没有注册任何插件';
+            else if (syntaxMsg) DL.loadError = 'plugins.js 部分代码出错：' + syntaxMsg;
+            done();
+        };
+        el.onerror = () => { DL.loadError = ''; done(); };   // 没有这个文件 = 不用插件
+        document.head.appendChild(el);
+    });
+}
+DL.ready = initPlugins();
+async function pluginsReady() { try { await Promise.race([DL.ready, sleep(4000)]); } catch (_) {} }
+function activePlugins(hook) { return DL.list.filter(p => pluginOn(p) && typeof p[hook] === 'function'); }
+async function pluginBeforeUpload(file) {
+    await pluginsReady();
+    let work = file;
+    for (const p of activePlugins('beforeUpload')) {
+        try {
+            const out = await p.beforeUpload(work, DL);
+            if (out instanceof File && out !== work) {
+                carryFileProps(work, out);
+                if (!out._saveNote && work._saveNote) out._saveNote = work._saveNote;
+                work = out;
+            }
+        } catch (e) { console.warn('[插件 ' + p.id + ']', e); }
+    }
+    return work;
+}
+function pluginAfterUpload(info) {
+    for (const p of activePlugins('afterUpload')) {
+        try { Promise.resolve(p.afterUpload(info, DL)).catch(e => console.warn('[插件 ' + p.id + ']', e)); }
+        catch (e) { console.warn('[插件 ' + p.id + ']', e); }
+    }
+}
+async function renderPlugins() {
+    const box = $('plugin-list'), note = $('plugin-note');
+    if (!box) return;
+    await pluginsReady();
+    box.innerHTML = '';
+    if (!DL.list.length) {
+        box.style.display = 'none';
+        note.textContent = DL.loadError || '还没有插件。在页面同目录放一个 plugins.js，这里就会出现。';
+        return;
+    }
+    box.style.display = '';
+    DL.list.forEach(p => {
+        const on = pluginOn(p);
+        const label = document.createElement('label');
+        label.className = 'pref-card';
+        label.innerHTML = '<span class="pref-text">' + escapeHtmlAttr(p.name || p.id) +
+            (p.desc ? '<span class="plug-desc">' + escapeHtmlAttr(p.desc) + '</span>' : '') +
+            '</span><input type="checkbox" class="switch"' + (on ? ' checked' : '') + '>';
+        label.querySelector('input').addEventListener('change', e => {
+            pluginSetOn(p, e.target.checked);
+            toast((p.name || p.id) + (e.target.checked ? ' 已开启' : ' 已关闭'), 'info');
+        });
+        box.appendChild(label);
+    });
+    note.textContent = DL.loadError || '插件和页面同源，能读到 Token。只启用自己写的或信得过的脚本。';
+}
+
 (function initOffline() {
     if ('serviceWorker' in navigator && isWebOrigin()) {
         const reg = () => navigator.serviceWorker.register('sw.js').then(() => { try { offlineStatusRefresh(); } catch (_) {} }).catch(() => {});

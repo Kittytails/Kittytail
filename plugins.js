@@ -14,6 +14,10 @@
  *
  *     // 上传成功后（不等它跑完）。info: { name, url, size, isImage, deduped, owner, repo, branch, path }
  *     afterUpload(info, DL) { },
+ *
+ *     // 外观类插件用：页面加载完插件后、以及在「设置」里开关时调用。on = 现在是否开启。
+ *     // 需要页面 v1.11 及以上（DL.apiVersion >= 3）。
+ *     onToggle(on, DL) { },
  *   });
  *
  * 注意：
@@ -142,6 +146,155 @@
       const out = new File([res], file.name, { type: file.type, lastModified: file.lastModified });
       out._saveNote = (file._saveNote ? file._saveNote + ' · ' : '') + '已去隐私信息';
       return out;
+    }
+  });
+})();
+
+/* ========== 插件 2：液态玻璃 ========== */
+(function () {
+  'use strict';
+  const STYLE_ID = 'dl-liquid-glass';
+  const G = 'html.dl-glass:root';
+  const D = 'html.dl-glass:root[data-theme="dark"]';
+
+  // 大块内容面：卡片、分组、结果条
+  const SURFACE = ['.card', '.result-item', '.home .group', '.pref-group', '.acct-card', '.acct-group', '.st-group', '.about-box'];
+  // 悬浮层：底部搜索栏、多选坞、菜单、剪贴板提示条
+  const FLOAT = ['.search-bar', '.sel-dock', '.more-menu', '.clip-banner'];
+  // 底部弹层
+  const SHEET = ['.delete-sheet', '.upload-error-panel', '.save-sheet'];
+  // 小按钮
+  const BTN = ['.small-btn', '.ghost-btn', '.delete-cancel', '.cloud-delete-option'];
+  const BTN_PRIMARY = ['.ghost-btn.primary', '.small-btn.black', '.delete-confirm'];
+  const FIELD = ['input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file])', 'textarea', 'select', '.url-input', '.dropzone'];
+
+  const sel = (list, pre) => list.map(x => (pre || G) + ' ' + x).join(',\n');
+
+  const CSS = `
+${G} {
+  --lg-blur: blur(22px) saturate(180%);
+  --lg-blur-strong: blur(34px) saturate(190%);
+  --lg-fill: linear-gradient(160deg, rgba(255,255,255,.62), rgba(255,255,255,.28));
+  --lg-spec: radial-gradient(130% 100% at 0% 0%, rgba(255,255,255,.7), rgba(255,255,255,0) 55%);
+  --lg-edge: rgba(255,255,255,.8);
+  --lg-inset: inset 0 1.5px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(255,255,255,.35), inset 1px 0 0 rgba(255,255,255,.5), inset -1px 0 0 rgba(255,255,255,.25);
+  --lg-hair: 0 0 0 .5px rgba(60,60,67,.10);
+  --lg-shadow: 0 12px 36px rgba(20,24,60,.10), 0 2px 6px rgba(20,24,60,.05);
+  --lg-chip: linear-gradient(160deg, rgba(255,255,255,.85), rgba(255,255,255,.38));
+  --lg-trough: rgba(120,120,128,.14);
+  --lg-field: rgba(255,255,255,.45);
+}
+${D} {
+  --lg-fill: linear-gradient(160deg, rgba(255,255,255,.14), rgba(255,255,255,.05));
+  --lg-spec: radial-gradient(130% 100% at 0% 0%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%);
+  --lg-edge: rgba(255,255,255,.18);
+  --lg-inset: inset 0 1px 0 rgba(255,255,255,.28), inset 0 -1px 0 rgba(255,255,255,.04), inset 1px 0 0 rgba(255,255,255,.10), inset -1px 0 0 rgba(255,255,255,.05);
+  --lg-hair: 0 0 0 .5px rgba(255,255,255,.10);
+  --lg-shadow: 0 14px 40px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.25);
+  --lg-chip: linear-gradient(160deg, rgba(255,255,255,.20), rgba(255,255,255,.07));
+  --lg-trough: rgba(255,255,255,.08);
+  --lg-field: rgba(255,255,255,.07);
+}
+
+/* 卡片 / 分组 */
+${sel(SURFACE)} {
+  background: var(--lg-spec), var(--lg-fill) !important;
+  -webkit-backdrop-filter: var(--lg-blur); backdrop-filter: var(--lg-blur);
+  border-color: var(--lg-edge) !important;
+  box-shadow: var(--lg-inset), var(--lg-hair), var(--lg-shadow) !important;
+}
+/* 资源库 / 仓库页的卡片本来就是透明的（网格直接铺在背景上），保持原样 */
+${G} #page-gallery > .card {
+  background: transparent !important; border: 0 !important; box-shadow: none !important;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+
+/* 悬浮层 */
+${sel(FLOAT)} {
+  background: var(--lg-spec), var(--lg-fill) !important;
+  -webkit-backdrop-filter: var(--lg-blur-strong); backdrop-filter: var(--lg-blur-strong);
+  border-color: var(--lg-edge) !important;
+  box-shadow: var(--lg-inset), var(--lg-hair), var(--lg-shadow) !important;
+}
+
+/* 底部弹层 */
+${sel(SHEET)} {
+  background: var(--lg-spec), linear-gradient(180deg, rgba(252,252,254,.70), rgba(244,244,248,.56)) !important;
+  -webkit-backdrop-filter: var(--lg-blur-strong); backdrop-filter: var(--lg-blur-strong);
+  border-color: var(--lg-edge) !important;
+  box-shadow: var(--lg-inset), 0 -18px 55px rgba(20,24,60,.14) !important;
+}
+${sel(SHEET, D)} {
+  background: var(--lg-spec), linear-gradient(180deg, rgba(60,60,66,.62), rgba(36,36,40,.52)) !important;
+  box-shadow: var(--lg-inset), 0 -18px 55px rgba(0,0,0,.5) !important;
+}
+
+/* 按钮：玻璃小胶囊 */
+${sel(BTN)} {
+  background: var(--lg-chip) !important;
+  border-color: var(--lg-edge) !important;
+  box-shadow: var(--lg-inset), var(--lg-hair), 0 4px 12px rgba(20,24,60,.06) !important;
+}
+${sel(BTN_PRIMARY)} {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 16px rgba(0,0,0,.18) !important;
+}
+${sel(BTN_PRIMARY, D)} {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 6px 16px rgba(0,0,0,.35) !important;
+}
+
+/* 输入框 / 拖放区：凹进去的玻璃 */
+${sel(FIELD)} {
+  background: var(--lg-field) !important;
+  border-color: var(--lg-edge) !important;
+  box-shadow: inset 0 1px 3px rgba(20,24,60,.10), inset 0 -1px 0 rgba(255,255,255,.5) !important;
+}
+${sel(FIELD, D)} {
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.45), inset 0 -1px 0 rgba(255,255,255,.06) !important;
+}
+
+/* 分段选择器：凹槽 + 玻璃滑块 */
+${sel(['.filter-group', '.gallery-select-bar'])} {
+  background: var(--lg-trough) !important;
+  border-color: var(--lg-edge) !important;
+  box-shadow: inset 0 1px 3px rgba(20,24,60,.10) !important;
+}
+${G} .filter-btn.active {
+  background: var(--lg-chip) !important;
+  box-shadow: var(--lg-inset), 0 3px 10px rgba(20,24,60,.12) !important;
+}
+${D} .filter-btn.active { box-shadow: var(--lg-inset), 0 3px 10px rgba(0,0,0,.4) !important; }
+
+/* 首页每一行的小图标：玻璃方块 */
+${G} .home .row-icon {
+  background: var(--lg-chip);
+  box-shadow: var(--lg-inset), var(--lg-hair);
+}
+
+/* 系统要求「降低透明度」时，去掉模糊、加大不透明度 */
+@media (prefers-reduced-transparency: reduce) {
+  ${sel([].concat(SURFACE, FLOAT, SHEET))} {
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+    background: var(--card-bg) !important;
+  }
+}
+`;
+
+  DL.register({
+    id: 'liquid-glass',
+    name: '液态玻璃',
+    desc: '卡片、底栏、弹窗、按钮改成苹果液态玻璃质感：半透明、高光边缘、柔和投影。不改背景，背景透出多少取决于页面的背景。',
+    default: false,
+    onToggle(on) {
+      const root = document.documentElement;
+      let el = document.getElementById(STYLE_ID);
+      if (on) {
+        if (!el) { el = document.createElement('style'); el.id = STYLE_ID; document.head.appendChild(el); }
+        el.textContent = CSS;
+        root.classList.add('dl-glass');
+      } else {
+        root.classList.remove('dl-glass');
+        if (el) el.remove();
+      }
     }
   });
 })();

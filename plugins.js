@@ -172,26 +172,26 @@
 
   const CSS = `
 ${G} {
-  --lg-blur: blur(22px) saturate(180%);
-  --lg-blur-strong: blur(34px) saturate(190%);
-  --lg-fill: linear-gradient(160deg, rgba(255,255,255,.62), rgba(255,255,255,.28));
-  --lg-spec: radial-gradient(130% 100% at 0% 0%, rgba(255,255,255,.7), rgba(255,255,255,0) 55%);
-  --lg-edge: rgba(255,255,255,.8);
-  --lg-inset: inset 0 1.5px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(255,255,255,.35), inset 1px 0 0 rgba(255,255,255,.5), inset -1px 0 0 rgba(255,255,255,.25);
-  --lg-hair: 0 0 0 .5px rgba(60,60,67,.10);
-  --lg-shadow: 0 12px 36px rgba(20,24,60,.10), 0 2px 6px rgba(20,24,60,.05);
-  --lg-chip: linear-gradient(160deg, rgba(255,255,255,.85), rgba(255,255,255,.38));
-  --lg-trough: rgba(120,120,128,.14);
-  --lg-field: rgba(255,255,255,.45);
+  --lg-blur: blur(16px) saturate(165%) brightness(1.06);
+  --lg-blur-strong: blur(26px) saturate(180%) brightness(1.05);
+  --lg-fill: linear-gradient(160deg, rgba(255,255,255,.26), rgba(255,255,255,.10));
+  --lg-spec: radial-gradient(70% 45% at 12% 0%, rgba(255,255,255,.30), rgba(255,255,255,0) 70%);
+  --lg-edge: rgba(255,255,255,.38);
+  --lg-inset: inset 0 1px 1px rgba(255,255,255,.65), inset 0 -1px 1px rgba(255,255,255,.20), inset 0 0 0 .5px rgba(255,255,255,.35);
+  --lg-hair: 0 0 0 .5px rgba(0,0,0,.06);
+  --lg-shadow: 0 8px 26px rgba(0,0,0,.12);
+  --lg-chip: linear-gradient(160deg, rgba(255,255,255,.55), rgba(255,255,255,.18));
+  --lg-trough: rgba(120,120,128,.16);
+  --lg-field: rgba(255,255,255,.28);
 }
 ${D} {
-  --lg-fill: linear-gradient(160deg, rgba(255,255,255,.14), rgba(255,255,255,.05));
-  --lg-spec: radial-gradient(130% 100% at 0% 0%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%);
-  --lg-edge: rgba(255,255,255,.18);
-  --lg-inset: inset 0 1px 0 rgba(255,255,255,.28), inset 0 -1px 0 rgba(255,255,255,.04), inset 1px 0 0 rgba(255,255,255,.10), inset -1px 0 0 rgba(255,255,255,.05);
-  --lg-hair: 0 0 0 .5px rgba(255,255,255,.10);
-  --lg-shadow: 0 14px 40px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.25);
-  --lg-chip: linear-gradient(160deg, rgba(255,255,255,.20), rgba(255,255,255,.07));
+  --lg-fill: linear-gradient(160deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+  --lg-spec: radial-gradient(70% 45% at 12% 0%, rgba(255,255,255,.12), rgba(255,255,255,0) 70%);
+  --lg-edge: rgba(255,255,255,.16);
+  --lg-inset: inset 0 1px 1px rgba(255,255,255,.30), inset 0 -1px 1px rgba(255,255,255,.05), inset 0 0 0 .5px rgba(255,255,255,.12);
+  --lg-hair: 0 0 0 .5px rgba(255,255,255,.08);
+  --lg-shadow: 0 10px 30px rgba(0,0,0,.40);
+  --lg-chip: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
   --lg-trough: rgba(255,255,255,.08);
   --lg-field: rgba(255,255,255,.07);
 }
@@ -222,21 +222,21 @@ ${G} #searchBar input#searchInput, ${G} #page-gallery .searchpill input {
   background: transparent !important; box-shadow: none !important; border-color: transparent !important;
 }
 ${G} .search-bar {
-  background: var(--lg-spec), linear-gradient(160deg, rgba(255,255,255,.80), rgba(255,255,255,.58)) !important;
+  background: var(--lg-spec), linear-gradient(160deg, rgba(255,255,255,.62), rgba(255,255,255,.42)) !important;
 }
 ${D} .search-bar {
-  background: var(--lg-spec), linear-gradient(160deg, rgba(72,72,78,.78), rgba(44,44,48,.66)) !important;
+  background: var(--lg-spec), linear-gradient(160deg, rgba(72,72,78,.58), rgba(44,44,48,.44)) !important;
 }
 
 /* 底部弹层 */
 ${sel(SHEET)} {
-  background: var(--lg-spec), linear-gradient(180deg, rgba(252,252,254,.70), rgba(244,244,248,.56)) !important;
+  background: var(--lg-spec), linear-gradient(180deg, rgba(252,252,254,.58), rgba(244,244,248,.44)) !important;
   -webkit-backdrop-filter: var(--lg-blur-strong); backdrop-filter: var(--lg-blur-strong);
   border-color: var(--lg-edge) !important;
-  box-shadow: var(--lg-inset), 0 -18px 55px rgba(20,24,60,.14) !important;
+  box-shadow: var(--lg-inset), 0 -18px 55px rgba(0,0,0,.14) !important;
 }
 ${sel(SHEET, D)} {
-  background: var(--lg-spec), linear-gradient(180deg, rgba(60,60,66,.62), rgba(36,36,40,.52)) !important;
+  background: var(--lg-spec), linear-gradient(180deg, rgba(60,60,66,.52), rgba(36,36,40,.42)) !important;
   box-shadow: var(--lg-inset), 0 -18px 55px rgba(0,0,0,.5) !important;
 }
 

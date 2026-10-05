@@ -1307,8 +1307,7 @@ html.has-bg { --kb-ov: rgba(255,255,255,.22); }
 html.has-bg[data-theme="dark"] { --kb-ov: rgba(0,0,0,.38); }
 html.has-bg:root, html.has-bg:root body, html.has-bg:root .container, html.has-bg:root .home { background: transparent !important; }
 /* 子页面要盖住下面的主页：每个子页面自己也画一遍背景（子页面本来就是铺满屏幕的，位置和底层背景重合） */
-html.has-bg:root .page { background: linear-gradient(var(--kb-ov), var(--kb-ov)), var(--kb-bg-url) center / cover no-repeat !important; }
-html.has-bg:root .fog { display: none; }
+html.has-bg:root .page { background: linear-gradient(var(--kb-ov), var(--kb-ov)), var(--kb-bg-url) calc(50% - var(--kb-dx, 0px)) 50% / cover no-repeat !important; }
 .ap-thumb { flex: none; width: 34px; height: 34px; border-radius: 10px; margin-left: auto; background: rgba(127,127,127,.18) center/cover no-repeat; box-shadow: inset 0 0 0 .5px rgba(127,127,127,.35); }
 .ap-thumb[hidden] { display: none; }
 .pref-card .ap-thumb + .pref-chev { margin-left: 10px; }
@@ -2749,6 +2748,7 @@ document.addEventListener('pointermove', e => {
     }
     drag.dx = Math.max(0, dx);
     drag.p.style.transform = `translate3d(${drag.dx}px,0,0)`;
+    drag.p.style.setProperty('--kb-dx', drag.dx + 'px');   // 外观背景：页面滑动时让页面自己的背景反向移动，保持和底层背景对齐
     const prog = Math.min(1, drag.dx / window.innerWidth);
     parallaxEls().forEach((el, i) => {
         el.style.transform = `translate3d(${PARALLAX * (1 - prog)}%,0,0)`;
@@ -2763,7 +2763,8 @@ function endDrag(e) {
     const elapsed = Math.max(1, performance.now() - t);
     const shouldClose = e.type === 'pointerup' && (dx > window.innerWidth * 0.33 || dx / elapsed > 0.5);
     animating = true;
-    p.style.transition = `transform ${DURATION}ms ${EASE_IOS}`;
+    p.style.transition = `transform ${DURATION}ms ${EASE_IOS}, background-position ${DURATION}ms ${EASE_IOS}`;
+    p.style.setProperty('--kb-dx', (shouldClose ? window.innerWidth : 0) + 'px');
     p.style.transform = shouldClose ? 'translate3d(100%,0,0)' : 'translate3d(0,0,0)';
     parallaxEls().forEach((el, i) => {
         el.style.transition = `transform ${DURATION}ms ${EASE_IOS}, opacity ${DURATION}ms ${EASE_IOS}`;
@@ -2775,6 +2776,7 @@ function endDrag(e) {
         parallaxEls().forEach(el => { el.style.transition = 'none'; });
         if (shouldClose) setPanel(p, false);
         p.style.transform = '';
+        p.style.removeProperty('--kb-dx');
         parallaxEls().forEach(el => { el.style.transform = ''; el.style.opacity = ''; });
         p.offsetWidth;
         p.style.transition = '';
@@ -7618,7 +7620,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '1.12.1';
+const APP_VERSION = '1.12.3';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}

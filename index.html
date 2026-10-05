@@ -1303,7 +1303,11 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 #kb-bg::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,.22); }
 html[data-theme="dark"] #kb-bg::after { background: rgba(0,0,0,.38); }
 html.has-bg #kb-bg { display: block; }
-html.has-bg:root, html.has-bg:root body, html.has-bg:root .container, html.has-bg:root .home, html.has-bg:root .page { background: transparent !important; }
+html.has-bg { --kb-ov: rgba(255,255,255,.22); }
+html.has-bg[data-theme="dark"] { --kb-ov: rgba(0,0,0,.38); }
+html.has-bg:root, html.has-bg:root body, html.has-bg:root .container, html.has-bg:root .home { background: transparent !important; }
+/* 子页面要盖住下面的主页：每个子页面自己也画一遍背景（子页面本来就是铺满屏幕的，位置和底层背景重合） */
+html.has-bg:root .page { background: linear-gradient(var(--kb-ov), var(--kb-ov)), var(--kb-bg-url) center / cover no-repeat !important; }
 html.has-bg:root .fog { display: none; }
 .ap-thumb { flex: none; width: 34px; height: 34px; border-radius: 10px; margin-left: auto; background: rgba(127,127,127,.18) center/cover no-repeat; box-shadow: inset 0 0 0 .5px rgba(127,127,127,.35); }
 .ap-thumb[hidden] { display: none; }
@@ -7614,7 +7618,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '1.12.0';
+const APP_VERSION = '1.12.1';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -7823,6 +7827,7 @@ function apApply(blob) {
     if (apUrl) { URL.revokeObjectURL(apUrl); apUrl = ''; }
     if (blob) { apUrl = URL.createObjectURL(blob); bg.style.backgroundImage = 'url("' + apUrl + '")'; }
     else bg.style.backgroundImage = '';
+    document.documentElement.style[blob ? 'setProperty' : 'removeProperty']('--kb-bg-url', 'url("' + apUrl + '")');
     document.documentElement.classList.toggle('has-bg', !!blob);
     const th = $('ap-thumb'), cl = $('ap-clear');
     if (th) { th.hidden = !blob; th.style.backgroundImage = blob ? 'url("' + apUrl + '")' : ''; }

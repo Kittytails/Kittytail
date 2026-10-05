@@ -104,7 +104,6 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     html[data-theme="dark"] .delete-progress .progress-track { background:#343434; }
     .empty-hint { font-size: 13px; color: var(--text-secondary); text-align: center; padding: 40px 0; }
 
-    
     .repo-live-sub { margin-top:0; }
     .repo-filter-group { margin: 0 0 18px; width: fit-content; }
     .repo-filter-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 15px; }
@@ -130,9 +129,8 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .repo-multi-mode .repo-select-info { display:block; }
     .repo-crumb-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:-4px 0 14px; min-height:22px; }
     html[data-theme="dark"] .repo-select-info { color:#F5F5F7; }
-    @media (max-width:350px) { .repo-select-actions .small-btn { font-size:11px; } }
-    .repo-select-actions { display:contents; }
-    .repo-select-actions .small-btn { padding:9px 0; border-radius:9px; white-space:nowrap; text-align:center; }
+    @media (max-width:350px) {  }
+
     .repo-live-item.selected { transform:scale(.965); }
     .repo-live-select-mark {
         position:absolute; top:8px; right:8px; width:24px; height:24px; border-radius:50%;
@@ -144,7 +142,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .repo-multi-mode .repo-live-select-mark { display:flex; }
     .repo-live-item.selected .repo-live-select-mark { background:#111111; color:#FFFFFF; border-color:#111111; }
     .repo-live-item.long-pressing .repo-live-preview { transform:scale(.96); }
-    .repo-live-loading, .repo-live-empty { text-align:center; color:var(--text-secondary); font-size:12px; padding:28px 0; }
+    .repo-live-empty { text-align:center; color:var(--text-secondary); font-size:12px; padding:28px 0; }
     .repo-live-error { color:#555; }
     .repo-breadcrumb { display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin:0; min-width:0; font-size:12px; color:var(--text-secondary); }
     .repo-breadcrumb .crumb { cursor:pointer; padding:2px 4px; border-radius:6px; font-weight:600; }
@@ -152,7 +150,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .repo-breadcrumb .crumb-sep { opacity:.5; }
     .repo-folder-item .repo-live-preview { background:#F0F0F0; }
     .repo-folder-icon { font-size:26px; line-height:1; }
-    .repo-folder-del { position:absolute; top:-5px; right:-5px; width:12px; height:12px; border-radius:50%; background:var(--primary); border:4px solid #FFFFFF; box-sizing:content-box; cursor:pointer; z-index:5; padding:0; outline:none; }
+    
     .move-folder-list { max-height:38vh; overflow:auto; display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
     .move-folder-item { padding:11px 13px; border-radius:12px; background:#F6F6F6; border:1px solid #E8E8E8; font-size:13px; font-weight:600; color:#222; cursor:pointer; }
     .move-folder-item.active { background:#111111; color:#FFFFFF; border-color:#111111; }
@@ -204,8 +202,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     }
     .gallery-multi-mode .gallery-select-bar { display: flex; }
     .gallery-select-info { font-size: 12px; font-weight: 700; color: #222; white-space: nowrap; }
-    .gallery-select-actions { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-    .gallery-select-actions .small-btn { padding: 7px 11px; border-radius: 9px; white-space: nowrap; }
+
     .small-btn.black { background: #111111; color: #FFFFFF; border-color: #111111; }
 
     /* 删除确认层 */
@@ -233,66 +230,14 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .delete-cancel { background: #F2F2F2; color: #222; border: 1px solid #E4E4E4; }
     .delete-confirm { background: #111; color: #fff; border: 1px solid #111; }
 
-    
     .filter-group { display: flex; gap: 4px; margin-bottom: 18px; background: #F5F5F5; padding: 4px; border-radius: 14px; width: fit-content; }
     .filter-btn { border: none; background: transparent; padding: 6px 16px; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-radius: 10px; cursor: pointer; transition: 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .gallery-filter-group { flex-wrap: nowrap; }
+    .filter-btn[hidden] { display: none; }
     .filter-btn:active { transform: scale(0.95); }
     .filter-btn.active { background: #FFFFFF; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    
-    /* ================= 新版悬浮胶囊底栏 (图片版) ================= */
-
-    .bottom-nav { 
-        position: fixed; 
-        left: 50%; 
-        bottom: 32px; 
-        transform: translateX(-50%);
-        background: rgba(255, 255, 255, 0.85); 
-        backdrop-filter: blur(20px); 
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04); 
-        display: flex; 
-        align-items: center;
-        gap: 12px;
-        padding: 8px 16px; 
-        border-radius: 100px; 
-        z-index: 999; 
-    }
-
-    .nav-btn { 
-        background: transparent; 
-        border: none; 
-        width: 50px; 
-        height: 50px; 
-        border-radius: 50%; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        cursor: pointer; 
-        padding: 0;
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
-    }
-
-    .nav-btn .icon { 
-        width: 24px; 
-        height: 24px;
-        object-fit: contain;
-        opacity: 0.35; /* 未选中状态呈现灰色 */
-        transform: scale(var(--base-scale, 1)) translateY(1px);
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            }
 
     /* 选中状态 */
-    .nav-btn.active { 
-        background: transparent; /* 去除纯黑背景，确保黑色图标可见 */
-    }
-
-    .nav-btn.active .icon { 
-        opacity: 1; /* 选中状态呈现纯黑 */
-        transform: scale(calc(var(--base-scale, 1) + 0.18)) translateY(1px); /* 选中时在各自基础比例上再放大一点 */
-    }
-
 
     /* 失败详情弹窗（上传 / 转换 / 删除失败共用）：底部磨砂 Sheet，盖住悬浮底栏 */
     .upload-error-modal {
@@ -582,17 +527,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
             border-color: #F5F5F7;
         }
 
-        .bottom-nav {
-            background: rgba(38,38,40,.86);
-            border-color: rgba(255,255,255,.10);
-            box-shadow: 0 12px 36px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.18);
-        }
-        .nav-btn .icon { filter: invert(1); }
-        .nav-btn.active .icon { filter: invert(1); }
-
-
     }
-
 
     /* ===== 强制可靠的系统日夜间适配（CSS + JS 双保险） ===== */
     html { color-scheme: light dark; }
@@ -643,11 +578,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
             background: #48484A !important;
             color: #F5F5F7 !important;
         }
-        .bottom-nav {
-            background: rgba(38,38,40,.94) !important;
-            border-color: rgba(255,255,255,.12) !important;
-        }
-        .nav-btn .icon { filter: invert(1) !important; }
+
     }
 
     /* JS 设置 data-theme 后，即使宿主页面/浏览器没有正确触发媒体查询也能切换 */
@@ -735,11 +666,6 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
         background:#48484A !important;
         color:#F5F5F7 !important;
     }
-    html[data-theme="dark"] .bottom-nav {
-        background:rgba(38,38,40,.94) !important;
-        border-color:rgba(255,255,255,.12) !important;
-    }
-    html[data-theme="dark"] .nav-btn .icon { filter:invert(1) !important; }
 
     /* 长按多选：屏蔽系统的图片长按菜单 / 拖拽 / 选中，避免与自定义长按冲突 */
     .gallery-tile, .gallery-tile img, .repo-live-item, .repo-live-item img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
@@ -781,7 +707,6 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     }
 
     /* 夜间：删除小圆点的描边要和卡片底色一致，否则会出现一圈白边 */
-    html[data-theme="dark"] .repo-folder-del { background: #F5F5F7; border-color: #1C1C1E; }
 
     /* ===== 仓库选择 / 新建 ===== */
     .repo-target { width:100%; display:flex; align-items:center; gap:10px; margin:-2px 0 16px; padding:11px 13px; border-radius:12px; border:1px solid var(--border); background:#FAFAFA; color:var(--primary); font-family:inherit; font-size:13px; cursor:pointer; text-align:left; transition:.2s; }
@@ -796,6 +721,9 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .repo-pick-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .repo-pick-badge { flex-shrink:0; font-size:10px; font-weight:700; padding:2px 7px; border-radius:6px; background:#E6E6E6; color:#666; }
     .move-folder-item.active .repo-pick-badge { background:rgba(255,255,255,.2); color:#FFFFFF; }
+    .repo-pick-badge.tappable { border: 0; font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity .12s ease; }
+    .repo-pick-badge.tappable:active { opacity: .55; }
+
     .repo-pick-empty { padding:18px 0; text-align:center; font-size:12px; color:var(--text-secondary); }
     .repo-pick-right { display:flex; align-items:center; gap:6px; flex-shrink:0; }
     .repo-pick-del { width:32px; height:32px; margin:-6px -6px -6px 0; border:none; border-radius:9px; background:transparent; color:#8E8E93; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:.15s; }
@@ -815,7 +743,6 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     html[data-theme="dark"] .repo-pick-badge { background:#48484A; color:#D1D1D6; }
     html[data-theme="dark"] .move-folder-item.active .repo-pick-badge { background:rgba(0,0,0,.18); color:#111113; }
     html[data-theme="dark"] .repo-create-title { color:#F5F5F7; }
-
 
     /* ===== 排版微调：标题行 / 文件夹图标 / 文件名 / 吸顶操作栏 ===== */
     .card > .card-head-row .title { font-size:17px; letter-spacing:-0.3px; }
@@ -885,12 +812,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
 
     /* 统一圆角：所有按钮 / 输入框 / 弹层按钮都用同一个值（胶囊形的筛选、搜索框和圆形「…」按钮保持不变） */
     :root { --r-ctl: 12px; }
-    .small-btn, .ghost-btn, .url-input,
-    .result-action .url-input, .result-action .ghost-btn,
-    .repo-select-actions .small-btn, .gallery-select-actions .small-btn,
-    .card-head-actions .small-btn,
-    .delete-sheet-actions button, .upload-error-actions button,
-    .move-new-folder-row input, .repo-pick-search, .move-folder-item { border-radius: var(--r-ctl); }
+    .small-btn,.ghost-btn,.url-input,.result-action .url-input,.result-action .ghost-btn,.card-head-actions .small-btn,.delete-sheet-actions button,.upload-error-actions button,.move-new-folder-row input,.repo-pick-search,.move-folder-item { border-radius: var(--r-ctl); }
 
     /* 资源库顶部切换：外观沿用 filter-group / filter-btn */
     /* 所有筛选组统一成胶囊形 */
@@ -904,7 +826,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
 
 /* ================= 新版外壳：设置风格主页 + 子页面（照搬 设置18.html） ================= */
 :root { --s-top: calc(env(safe-area-inset-top) + 18px); --s-side: 18px; --s-bottom: calc(env(safe-area-inset-bottom) + 32px); }
-.bottom-nav { display: none !important; }
+
 body { display: block; padding: 0; min-height: 0; }
 .container { max-width: none; width: auto; }
 
@@ -1039,7 +961,6 @@ html[data-theme="dark"] #page-gallery .searchpill .sp-mic { color: #F5F5F7; }
 html[data-theme="dark"] #page-gallery .filter-btn { background: #2C2C2E; color: #98989F; }
 html[data-theme="dark"] #page-gallery .filter-btn.active { background: #F5F5F7; color: #111; }
 
-
 /* ⋯ 菜单（比原版大，比上一版小） */
 .more-menu { min-width: 156px; padding: 5px; border-radius: 18px; }
 .more-menu-item { height: 40px; padding: 0 14px; border-radius: 13px; gap: 12px; justify-content: space-between; font-size: 15px; font-weight: 500; }
@@ -1086,7 +1007,6 @@ html[data-theme="dark"] .av-btn:not(.plain) { background: #F5F5F7; color: #111; 
 .acct-del svg { width: 18px; height: 18px; }
 .acct-del:active { background: rgba(127,127,127,.18); }
 .acct-add .acct-title { font-weight: 500; }
-
 
 /* 修复：深色模式下资源库/仓库的筛选条被通用规则涂成方形灰块 */
 html[data-theme="dark"] #page-gallery .filter-group { background: transparent !important; border-color: transparent !important; }
@@ -1161,6 +1081,12 @@ html[data-theme="dark"] .sk {
     .sel-dock .dk-btn.on { background: rgba(60,60,67,.14); }
     .sel-dock .dk-btn:disabled { opacity: .35; pointer-events: none; }
     .sel-dock .dk-danger { color: #E5382E; }
+    @media (max-width: 430px) {
+        .sel-dock .dk-close, .sel-dock .dk-btn { width: 38px; height: 38px; }
+        .sel-dock .dk-btn svg { width: 22px; height: 22px; }
+        .sel-dock .dk-actions { gap: 2px; }
+        .sel-dock .dk-info { padding: 0 4px; min-width: 20px; }
+    }
     html[data-theme="dark"] .sel-dock { background: rgba(58,58,62,.72); color: #F5F5F7; box-shadow: 0 10px 32px rgba(0,0,0,.5), inset 0 0 0 .5px rgba(255,255,255,.14); }
     html[data-theme="dark"] .sel-dock .dk-close { color: #98989F; }
     html[data-theme="dark"] .sel-dock .dk-close:active { background: rgba(255,255,255,.16); }
@@ -1177,19 +1103,9 @@ html[data-theme="dark"] #page-gallery > .card {
     background: transparent !important; border: 0 !important; box-shadow: none !important;
 }
 
-/* 搜索框吸顶：页面往上滑时固定在顶部，不再跟着内容跑；只有键盘弹出时系统才会挪动 */
-#page-gallery .searchpill-wrap {
-    position: sticky; top: calc(env(safe-area-inset-top, 0px) + 8px); z-index: 30;
-    margin: 0 0 14px;
-}
+/* 搜索框：跟随内容正常排版，不吸顶、不悬浮（标题 → 搜索框 → 状态/路径 → 分类 → 文件） */
+#page-gallery .searchpill-wrap { position: static; margin: 0 0 14px; }
 #page-gallery .searchpill-wrap .searchpill { margin: 0; }
-#page-gallery .searchpill-wrap::before {
-    content: ''; position: absolute; z-index: -1; pointer-events: none;
-    left: -18px; right: -18px; top: calc(-1 * (env(safe-area-inset-top, 0px) + 8px)); bottom: -12px;
-    background: linear-gradient(to bottom, rgb(var(--fog)) 0, rgb(var(--fog)) calc(100% - 14px), rgba(var(--fog), 0) 100%);
-    opacity: 0; transition: opacity .15s ease;
-}
-#page-gallery .searchpill-wrap.stuck::before { opacity: 1; }
 
 /* 搜索框：右侧按钮 = 麦克风；输入内容后变成清除键 */
     .searchpill .sp-mic .ic-clear { display: none; }
@@ -1275,6 +1191,90 @@ body.page-open .search-bar { transform: translate3d(-28%,0,0); opacity: 0; trans
     body.page-open .home { transform: none; opacity: 1; }
     .delete-sheet, .save-sheet, .upload-error-panel, .show > .delete-sheet, .show > .save-sheet, .show > .upload-error-panel { transform: none; transition: none; }
 }
+
+/* ================= v1.4 存储页 ================= */
+.st-summary { padding: 22px 22px 20px; }
+.st-total-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.st-total { font-size: 34px; font-weight: 800; letter-spacing: -1px; line-height: 38px; color: var(--text-main); }
+.st-meta { margin-top: 4px; font-size: 13px; color: #8E8E93; }
+.st-sort { display: flex; width: max-content; margin: 14px 4px 12px; }
+#st-list .st-acct { margin: 18px 22px 8px; font-size: 13px; font-weight: 600; color: #8E8E93; }
+#st-list .st-acct:first-child { margin-top: 4px; }
+.st-group { background: var(--card-bg); border-radius: 26px; overflow: hidden; }
+.st-row { position: relative; padding: 14px 20px 15px; }
+.st-row + .st-row::before { content: ""; position: absolute; top: 0; left: 20px; right: 16px; height: .5px; background: rgba(60,60,67,.22); }
+.st-line { display: flex; align-items: center; gap: 8px; }
+.st-name { flex: 1; min-width: 0; font-size: 16px; font-weight: 600; letter-spacing: -.2px; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-badge { flex: none; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: rgba(127,127,127,.16); color: #777; }
+.st-badge.cur { background: var(--primary); color: var(--card-bg); }
+.st-size { flex: none; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-main); }
+.st-bar { display: flex; align-items: center; gap: 10px; margin-top: 9px; }
+.st-bar .progress-track { height: 5px; flex: 1; }
+.st-pct { flex: none; width: 34px; text-align: right; font-size: 12px; color: #8E8E93; font-variant-numeric: tabular-nums; }
+.st-bar .progress-fill.warn { background: #E08A00; }
+.st-bar .progress-fill.danger { background: #C62828; }
+.st-empty { padding: 28px 20px; text-align: center; font-size: 14px; color: #8E8E93; }
+.st-err { padding: 16px 20px; font-size: 13px; color: #C62828; }
+html[data-theme="dark"] .st-err { color: #FF6B63; }
+html[data-theme="dark"] .st-badge { color: #A1A1A6; }
+
+/* ================= v1.3 新功能样式 ================= */
+/* 子页面是纵向 flex 容器：内容超过一屏时，带 overflow:hidden 的卡片会被压扁，这里禁止收缩，改为整页滚动 */
+.page > * { flex-shrink: 0; }
+.pref-seg-card { cursor: default; }
+.pref-seg-card:active { background: transparent; }
+.pref-seg { flex: none; display: flex; gap: 3px; padding: 3px; border-radius: 999px; background: #ECECEE; }
+.pref-seg button { border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 600; color: #8E8E93; height: 30px; padding: 0 12px; border-radius: 999px; cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease; }
+.pref-seg button.active { background: #111; color: #fff; }
+html[data-theme="dark"] .pref-seg { background: #2C2C2E; }
+html[data-theme="dark"] .pref-seg button { color: #98989F; }
+html[data-theme="dark"] .pref-seg button.active { background: #F5F5F7; color: #111; }
+
+.copy-fmt-row { display: flex; align-items: center; gap: 10px; margin: 2px 0 14px; }
+.copy-fmt-row .cf-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); flex: none; }
+.copy-fmt-row .filter-group { margin: 0; }
+.copy-fmt-row .filter-btn { padding: 5px 12px; font-size: 12px; }
+
+.upload-paste { margin-top: 10px; padding: 16px; font-size: 15px; }
+.dropzone { padding: 34px 20px 30px; }
+.dropzone-icon { width: 34px; height: 34px; color: var(--text-secondary); margin: 0 auto 10px; display: block; }
+.dropzone-title { margin-bottom: 8px; }
+
+.dropzone:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.small-btn.pulse { animation: kbPulse 1.1s ease-in-out 3; }
+@keyframes kbPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(17,17,17,.0); } 50% { box-shadow: 0 0 0 5px rgba(17,17,17,.16); } }
+
+.clip-banner { position: fixed; z-index: 970; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 10px); width: min(calc(100% - 28px), 460px);
+    transform: translate(-50%, -140%); opacity: 0; pointer-events: none; transition: transform .38s var(--ease-ios), opacity .25s ease;
+    display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 12px; border-radius: 22px;
+    background: rgba(255,255,255,.82); -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
+    border: .5px solid rgba(0,0,0,.08); box-shadow: 0 10px 34px rgba(0,0,0,.14); }
+.clip-banner.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+.clip-banner img { width: 42px; height: 42px; border-radius: 11px; object-fit: cover; background: #eee; flex: none; }
+.clip-banner .cb-text { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; line-height: 19px; color: #111; }
+.clip-banner .cb-text span { display: block; font-size: 12px; font-weight: 500; color: #8E8E93; }
+.clip-banner .cb-go { flex: none; border: 0; border-radius: 999px; background: #111; color: #fff; font: inherit; font-size: 13px; font-weight: 700; height: 34px; padding: 0 16px; cursor: pointer; }
+.clip-banner .cb-x { flex: none; border: 0; background: none; width: 30px; height: 34px; color: #8E8E93; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.clip-banner .cb-x svg { width: 16px; height: 16px; }
+html[data-theme="dark"] .clip-banner { background: rgba(44,44,48,.82); border-color: rgba(255,255,255,.1); box-shadow: 0 10px 34px rgba(0,0,0,.5); }
+html[data-theme="dark"] .clip-banner .cb-text { color: #F5F5F7; }
+html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; }
+
+.gallery-tile .tile-badge { position: absolute; z-index: 3; top: 7px; left: 7px; padding: 2px 7px; border-radius: 999px; font-size: 10px; font-weight: 700; line-height: 14px; color: #fff; background: rgba(198,40,40,.92); pointer-events: none; }
+.gallery-tile .tile-badge.cdn { background: rgba(120,120,128,.92); }
+.gallery-grid.flat-sort { margin-top: 14px; }
+
+/* ================= 关于页 ================= */
+#page-about .about-sec + .about-sec { margin-top: 20px; }
+.about-cap { margin: 0 0 8px 4px; font-size: 13px; line-height: 18px; color: #999; }
+.about-box { background: var(--card-bg); border-radius: 26px; overflow: hidden; }
+.about-item { position: relative; padding: 14px 20px 15px; }
+.about-item + .about-item::before { content: ""; position: absolute; top: 0; left: 20px; right: 16px; height: .5px; background: rgba(60,60,67,.22); }
+.about-t { font-size: 16px; font-weight: 600; line-height: 22px; color: var(--text-main); }
+.about-d { margin-top: 4px; font-size: 13.5px; line-height: 20px; color: #8E8E93; }
+.about-d b { font-weight: 600; color: var(--text-main); }
+.about-sub { display: block; margin-top: 2px; font-size: 12.5px; line-height: 17px; font-weight: 400; letter-spacing: 0; color: #8E8E93; }
+#about-ver { font-weight: 500; color: #8E8E93; }
 </style>
 </head>
 <body>
@@ -1317,9 +1317,27 @@ body.page-open .search-bar { transform: translate3d(-28%,0,0); opacity: 0; trans
         </button>
       </div>
       <div class="group single">
+        <button class="row" type="button" data-keywords="storage 存储 空间 容量 用量 大小 占用" onclick="openPage('storage')">
+          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7.5" ry="2.8"/><path d="M4.5 6v6c0 1.55 3.36 2.8 7.5 2.8s7.5-1.25 7.5-2.8V6"/><path d="M4.5 12v6c0 1.55 3.36 2.8 7.5 2.8s7.5-1.25 7.5-2.8v-6"/></svg></span>
+          <span class="row-body"><span class="row-title">存储</span><span class="row-arrow"></span></span>
+        </button>
+      </div>
+      <div class="group single">
         <button class="row" type="button" data-keywords="preferences 偏好 自动跳转 heic jpg" onclick="openPage('prefs')">
           <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h8M17 8h3M4 16h3M12 16h8"/><circle cx="14.5" cy="8" r="2.5"/><circle cx="9.5" cy="16" r="2.5"/></svg></span>
           <span class="row-body"><span class="row-title">偏好设置</span><span class="row-arrow"></span></span>
+        </button>
+      </div>
+      <div class="group single">
+        <button class="row" type="button" data-keywords="backup update 备份 更新 版本 最新版 拉取 导出 导入" onclick="openPage('update')">
+          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12a7.5 7.5 0 0 1-13 5.1M4.5 12a7.5 7.5 0 0 1 13-5.1"/><path d="M17.8 3.5v3.6h-3.6M6.2 20.5v-3.6h3.6"/></svg></span>
+          <span class="row-body"><span class="row-title">备份与更新</span><span class="row-arrow"></span></span>
+        </button>
+      </div>
+      <div class="group single">
+        <button class="row" type="button" data-keywords="about 关于 说明 须知 注意事项 帮助 使用" onclick="openPage('about')">
+          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11.2v5"/><path d="M12 7.8h.01"/></svg></span>
+          <span class="row-body"><span class="row-title">关于</span><span class="row-arrow"></span></span>
         </button>
       </div>
     </div>
@@ -1336,26 +1354,26 @@ body.page-open .search-bar { transform: translate3d(-28%,0,0); opacity: 0; trans
 
 <div class="container">
 
-    <div class="page" id="page-upload" data-title="Upload" data-sub="批量上传图片或字体，自动生成直链">
+    <div class="page" id="page-upload" data-title="Upload" data-sub="批量上传，自动生成直链">
 
         <div class="card" id="card-upload">
             <div class="title">Upload</div>
-            <div class="sub">可批量上传图片或字体，自动生成直链。</div>
+            <div class="sub">批量上传，自动生成直链</div>
             <button class="repo-target" id="repo-target" type="button" onclick="openRepoSheet()">
                 <span class="repo-target-label">上传到</span>
                 <span class="repo-target-name" id="repo-target-name">未选择仓库</span>
                 <span class="repo-target-change">更换</span>
             </button>
 
-            <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+            <div class="dropzone" id="dropzone" role="button" tabindex="0" onclick="document.getElementById('file-input').click()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
                 <input type="file" id="file-input" multiple style="display:none" onchange="moveResultCardAfter('card-upload'); handleFiles(this.files)">
+                <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V5"/><path d="M7.5 9.5 12 5l4.5 4.5"/><path d="M5 15v2.5A1.5 1.5 0 0 0 6.5 19h11a1.5 1.5 0 0 0 1.5-1.5V15"/></svg>
                 <div class="dropzone-title">Click or drag files here</div>
-                <div class="dropzone-sub">支持拖入文件夹或 ZIP 压缩包 · 单文件 ≤ 99MB · 大于 20MB 使用 Raw 直链</div>
+                <div class="dropzone-sub">图片 · 字体 · ZIP</div>
             </div>
+            <button class="ghost-btn primary upload-paste" id="paste-btn" type="button" onclick="pasteUploadFromClipboard()">粘贴图片</button>
             <input type="file" id="folder-input" webkitdirectory directory multiple style="display:none" onchange="handleFolderInput(this)">
-            <button class="ghost-btn primary" id="folder-btn" type="button" style="margin-top:10px" onclick="document.getElementById('folder-input').click()">选择文件夹上传</button>
-            <input type="file" id="zip-input" accept=".zip,application/zip,application/x-zip-compressed" multiple style="display:none" onchange="moveResultCardAfter('card-upload'); handleFiles(this.files); this.value=''">
-            <button class="ghost-btn primary" id="zip-btn" type="button" style="margin-top:10px" onclick="document.getElementById('zip-input').click()">选择压缩包上传</button>
+            <button class="ghost-btn" id="folder-btn" type="button" style="margin-top:10px" onclick="document.getElementById('folder-input').click()">选择文件夹上传</button>
         </div>
 
         <div class="card" id="result-card" style="display:none;">
@@ -1366,7 +1384,15 @@ body.page-open .search-bar { transform: translate3d(-28%,0,0); opacity: 0; trans
                     <button class="small-btn danger" onclick="clearBatchResults()">清空</button>
                 </div>
             </div>
-            <div class="sub">上传后可直接复制直链。</div>
+            <div class="sub">上传后可直接复制链接。</div>
+            <div class="copy-fmt-row">
+                <span class="cf-label">复制格式</span>
+                <div class="filter-group" id="copy-fmt-group" role="tablist">
+                    <button type="button" class="filter-btn" data-cf="url" onclick="setCopyFormat('url')">直链</button>
+                    <button type="button" class="filter-btn" data-cf="md" onclick="setCopyFormat('md')">Markdown</button>
+                    <button type="button" class="filter-btn" data-cf="html" onclick="setCopyFormat('html')">HTML</button>
+                </div>
+            </div>
             <div class="batch-progress" id="batch-progress">
                 <div class="progress-meta"><span id="batch-progress-text">准备上传</span><span id="batch-progress-percent">0%</span></div>
                 <div class="progress-track"><div class="progress-fill" id="batch-progress-fill"></div></div>
@@ -1435,6 +1461,7 @@ body.page-open .search-bar { transform: translate3d(-28%,0,0); opacity: 0; trans
                 <button class="filter-btn" data-f="image" onclick="setGalleryFilter('image')">图片</button>
                 <button class="filter-btn" data-f="font" onclick="setGalleryFilter('font')">字体</button>
                 <button class="filter-btn" data-f="file" onclick="setGalleryFilter('file')">其他</button>
+                <button class="filter-btn dead-chip" id="gallery-dead-chip" data-f="dead" onclick="setGalleryFilter('dead')" hidden>失效</button>
             </div>
             <div id="gallery-container"></div>
         </div>
@@ -1514,15 +1541,82 @@ body.page-open .search-bar { transform: translate3d(-28%,0,0); opacity: 0; trans
         </div>
     </div>
 
-    <div class="page" id="page-prefs" data-title="Preferences" data-sub="修改后立即生效">
+    <div class="page" id="page-storage" data-title="Storage" data-sub="各仓库占用空间">
+        <div class="card st-summary">
+            <div class="st-total-row">
+                <div>
+                    <div class="st-total" id="st-total">—</div>
+                    <div class="st-meta" id="st-meta"></div>
+                </div>
+                <button class="small-btn" id="st-refresh" type="button" onclick="loadStorage(true)">刷新</button>
+            </div>
+        </div>
+        <div class="pref-seg st-sort" id="st-sort" role="tablist">
+            <button type="button" data-v="size" onclick="setStorageSort('size')">按大小</button>
+            <button type="button" data-v="recent" onclick="setStorageSort('recent')">最近更新</button>
+        </div>
+        <div id="st-list"></div>
+    </div>
+
+    <div class="page" id="page-prefs" data-title="Preferences" data-sub="改完即生效">
         <div class="pref-group">
             <label class="pref-card">
-                <span class="pref-text">上传后自动跳到资源库</span>
+                <span class="pref-text">上传后跳到资源库</span>
                 <input type="checkbox" class="switch" id="pref-autojump" onchange="savePrefs()">
             </label>
             <label class="pref-card">
-                <span class="pref-text">存相册时 HEIC 转 JPG</span>
+                <span class="pref-text">HEIC 转 JPG</span>
                 <input type="checkbox" class="switch" id="pref-heic" onchange="savePrefs()">
+            </label>
+        </div>
+        <div class="pref-group">
+            <div class="pref-card pref-seg-card">
+                <span class="pref-text">复制格式</span>
+                <div class="pref-seg" id="pref-copyfmt" role="tablist">
+                    <button type="button" data-v="url" onclick="setCopyFormat('url')">直链</button>
+                    <button type="button" data-v="md" onclick="setCopyFormat('md')">Markdown</button>
+                    <button type="button" data-v="html" onclick="setCopyFormat('html')">HTML</button>
+                </div>
+            </div>
+            <label class="pref-card">
+                <span class="pref-text">上传后自动复制</span>
+                <input type="checkbox" class="switch" id="pref-autocopy" onchange="savePrefs()">
+            </label>
+        </div>
+        <div class="pref-group">
+            <div class="pref-card pref-seg-card">
+                <span class="pref-text">上传前处理</span>
+                <div class="pref-seg" id="pref-compress" role="tablist">
+                    <button type="button" data-v="off" onclick="setCompressMode('off')">关闭</button>
+                    <button type="button" data-v="compress" onclick="setCompressMode('compress')">压缩</button>
+                    <button type="button" data-v="webp" onclick="setCompressMode('webp')">WebP</button>
+                </div>
+            </div>
+        </div>
+        <div class="pref-group">
+            <div class="pref-card pref-seg-card">
+                <span class="pref-text">文件名</span>
+                <div class="pref-seg" id="pref-naming" role="tablist">
+                    <button type="button" data-v="keep" onclick="setUploadPref('naming','keep')">原名</button>
+                    <button type="button" data-v="random" onclick="setUploadPref('naming','random')">随机</button>
+                </div>
+            </div>
+            <div class="pref-card pref-seg-card">
+                <span class="pref-text">文件夹</span>
+                <div class="pref-seg" id="pref-archive" role="tablist">
+                    <button type="button" data-v="flat" onclick="setUploadPref('archive','flat')">不分</button>
+                    <button type="button" data-v="month" onclick="setUploadPref('archive','month')">按月</button>
+                </div>
+            </div>
+        </div>
+        <div class="pref-group">
+            <label class="pref-card">
+                <span class="pref-text">检测剪贴板图片</span>
+                <input type="checkbox" class="switch" id="pref-clipwatch" onchange="savePrefs()">
+            </label>
+            <label class="pref-card">
+                <span class="pref-text">自动检测失效链接</span>
+                <input type="checkbox" class="switch" id="pref-linkcheck" onchange="savePrefs()">
             </label>
         </div>
         <div class="pref-group">
@@ -1544,6 +1638,98 @@ body.page-open .search-bar { transform: translate3d(-28%,0,0); opacity: 0; trans
                 <span class="pref-text">发送测试通知</span>
                 <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
             </div>
+        </div>
+    </div>
+
+    <div class="page" id="page-about" data-title="About" data-sub="使用说明与注意事项">
+        <div class="about-sec">
+            <div class="about-cap">这是什么</div>
+            <div class="about-box">
+            <div class="about-item"><div class="about-t">Direct Link</div><div class="about-d">把图片、字体、ZIP 上传到你自己的 GitHub 仓库，并自动生成可直接使用的直链。文件存在你自己的仓库里，不经过第三方服务器。</div></div>
+            <div class="about-item"><div class="about-t">数据只存在本机</div><div class="about-d">GitHub Token、仓库设置、偏好和上传记录都只保存在这台设备的浏览器里。清除网站数据、删除主屏幕 App 或换设备后，需要重新填写 Token 并设置偏好。</div></div>
+            </div>
+        </div>
+        <div class="about-sec">
+            <div class="about-cap">账户与直链</div>
+            <div class="about-box">
+            <div class="about-item"><div class="about-t">GitHub Token</div><div class="about-d">Token 需要有仓库读写权限。如果要在 App 里删除整个仓库，还需要给 Token 勾选 delete_repo 权限，否则会提示删除失败。请不要把 Token 发给别人。</div></div>
+            <div class="about-item"><div class="about-t">API 代理 / 图片代理（可选）</div><div class="about-d">访问 GitHub 不稳定时可以填写自己的代理地址。不填则直接连接 GitHub 和 jsDelivr。</div></div>
+            <div class="about-item"><div class="about-t">直链固定到提交版本</div><div class="about-d">开启后，直链里会带上本次提交的版本号，之后覆盖同名文件也不会改变这个链接的内容。关闭则链接跟随分支，覆盖同名文件后，链接指向的内容会更新（CDN 缓存可能有延迟）。</div></div>
+            </div>
+        </div>
+        <div class="about-sec">
+            <div class="about-cap">上传规则</div>
+            <div class="about-box">
+            <div class="about-item"><div class="about-t">支持的内容</div><div class="about-d">图片、字体和 ZIP。字体始终保持原文件名和原位置，不受「文件名」「文件夹」设置影响。</div></div>
+            <div class="about-item"><div class="about-t">大小限制</div><div class="about-d">单个文件最大 99MB，超过的会被跳过。超过 20MB 的文件 jsDelivr 不支持，会自动改用 GitHub raw 直链。导入 ZIP 压缩包时，压缩包本身不能超过 400MB。</div></div>
+            <div class="about-item"><div class="about-t">自动重试</div><div class="about-d">网络波动、超时、服务器 5xx、提交冲突、被限流这类临时问题会自动重试。Token 错误、仓库不存在、文件过大这类确定的错误不会重试，需要修正后在结果列表里手动点「重试」。</div></div>
+            <div class="about-item"><div class="about-t">重复文件</div><div class="about-d">8MB 以内的文件会先查重，避免传重复内容；更大的文件为了不占内存，跳过查重。</div></div>
+            <div class="about-item"><div class="about-t">并发与合并提交</div><div class="about-d">多个文件会同时上传（最多 3 个），传完的文件合并成一次 Git 提交，比逐个提交快得多。GitHub 对「创建内容」的请求有频率限制，遇到限流会自动放慢并重试；很多个小文件时速度主要受这个限制，不是网速。</div></div>
+            <div class="about-item"><div class="about-t">上传过程中</div><div class="about-d">批量上传时尽量保持页面打开。需要切到后台或锁屏时，建议打开「后台保活」。</div></div>
+            </div>
+        </div>
+        <div class="about-sec">
+            <div class="about-cap">偏好设置说明</div>
+            <div class="about-box">
+            <div class="about-item"><div class="about-t">上传前处理</div><div class="about-d">关闭：原样上传。压缩：长边超过 2560px 的图片会等比缩小并重新压缩。WebP：转成 WebP，体积通常更小。小于 30KB 的图片，以及 GIF、SVG、ICO，不会被处理。<br>当前浏览器：<b id="about-webp-status">检测中…</b></div></div>
+            <div class="about-item"><div class="about-t">HEIC 转 JPG</div><div class="about-d">iPhone 相册里的 HEIC / HEIF 图片在上传前转成 JPG，这样大多数网页和软件都能直接打开。</div></div>
+            <div class="about-item"><div class="about-t">文件名 / 文件夹</div><div class="about-d">文件名：原名保持原文件名；随机会生成一串随机字符，避免重名和暴露原名。文件夹：不分是全部放在同一层；按月会按上传月份归档，例如 2026-10。这两项只作用于图片。</div></div>
+            <div class="about-item"><div class="about-t">复制格式 / 自动复制</div><div class="about-d">复制格式可选直链、Markdown、HTML。开启「上传后自动复制」后，上传成功会自动按所选格式复制到剪贴板。</div></div>
+            <div class="about-item"><div class="about-t">上传后跳到资源库</div><div class="about-d">只有全部文件都上传成功才会跳转；有失败时会留在当前页，方便查看失败原因并重试。</div></div>
+            </div>
+        </div>
+        <div class="about-sec">
+            <div class="about-cap">检测与提醒</div>
+            <div class="about-box">
+            <div class="about-item"><div class="about-t">检测剪贴板图片</div><div class="about-d">打开 App 时检查剪贴板里有没有图片，有的话提示你直接上传。系统可能会弹出「允许粘贴」的确认，这是系统的隐私保护，选允许即可。</div></div>
+            <div class="about-item"><div class="about-t">自动检测失效链接</div><div class="about-d">打开资源库时自动检查已上传的链接是否还能访问，会产生额外的网络请求。不需要时可以关闭。</div></div>
+            <div class="about-item"><div class="about-t">后台保活</div><div class="about-d">开启后会循环播放无声音频，让 iOS 不要把页面挂起，锁屏或切到其他 App 时上传也能继续。开启期间可能会打断其他 App 正在播放的音乐或播客。控制中心会出现「后台保活中」的播放卡片，这是正常现象；会增加耗电。如果提示「点一下屏幕即可启用后台保活」，点一下屏幕即可。</div></div>
+            <div class="about-item"><div class="about-t">屏幕常亮</div><div class="about-d">上传时阻止屏幕自动锁定。只在页面处于前台时有效，同样会增加耗电。据我所知，较旧的 iOS 版本在主屏幕网页里可能不生效。</div></div>
+            <div class="about-item"><div class="about-t">上传完成通知</div><div class="about-d">只在 App 不在前台时发送，用来告诉你成功、失败、跳过各多少个。需要先授权通知。iPhone 上需要把本页添加到主屏幕再打开，而且单个 HTML 文件在部分 iOS 环境下发不了系统通知，请以「发送测试通知」的结果为准。可以点「发送测试通知」检查是否正常。</div></div>
+            </div>
+        </div>
+        <div class="about-sec">
+            <div class="about-cap">存储与保存文件</div>
+            <div class="about-box">
+            <div class="about-item"><div class="about-t">存储</div><div class="about-d">显示所有账号名下每个仓库占用的空间，可以按大小或最近更新排序。数据来自 GitHub，包含历史提交，刚上传或刚删除后数字可能有延迟。</div></div>
+            <div class="about-item"><div class="about-t">下载与导出</div><div class="about-d">图片下载时，在弹出的面板里选「存储图像」会进入相册；其他文件选「存储到“文件”」再选保存位置。也可以打包成 ZIP，或导出每行一个直链的 .txt 清单。</div></div>
+            </div>
+        </div>
+        <div class="about-sec">
+            <div class="about-cap">仓库规则</div>
+            <div class="about-box">
+            <div class="about-item"><div class="about-t">超过 1 GB 会怎样</div><div class="about-d">1 GB 是 GitHub 的建议上限，不是硬限制。用量到 80% 会提醒，超过后进度条变红。在超过 1 GB 的仓库里上传时，会先弹出确认，你可以选择继续上传，或者换一个仓库。过大的仓库可能被 GitHub 提醒瘦身，具体政策以 GitHub 官方为准。</div></div>
+            <div class="about-item"><div class="about-t">单个文件</div><div class="about-d">单个文件最大 99MB，超过的会被跳过；超过 20MB 的文件 jsDelivr 不支持，会自动改用 GitHub raw 直链。</div></div>
+            <div class="about-item"><div class="about-t">公开 / 私有</div><div class="about-d">新建仓库时可以选公开或私有。已有的仓库，在「选择上传仓库」列表里点右侧的「公开」或「私有」标签就能切换，切换前会让你确认。改为私有后外部打不开里面的文件，已贴出去的直链会失效；改为公开后任何人都能看到仓库里的全部内容。</div></div>
+            </div>
+        </div>
+        <div class="about-sec">
+            <div class="about-cap">账号安全</div>
+            <div class="about-box">
+            <div class="about-item"><div class="about-t">Token 怎么选</div><div class="about-d">Token 以明文保存在这台设备的浏览器里。建议在 GitHub 创建 fine-grained Token，只授权给你用来存图的那一个仓库，并只勾选读写内容所需的权限。这样即使泄露，影响范围也只有这一个仓库。要在 App 里新建、改名、删除仓库、切换公开 / 私有，Token 需要有仓库管理权限。</div></div>
+            <div class="about-item"><div class="about-t">怀疑泄露时</div><div class="about-d">立刻到 GitHub 的设置里删除这个 Token，再生成新的填进来。</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="page-update" data-title="Backup & Update" data-sub="备份设置、拉取最新版">
+        <div class="about-sec">
+            <div class="about-cap">备份与更新</div>
+            <div class="pref-group">
+                <div class="pref-card" role="button" tabindex="0" onclick="exportBackup()">
+                    <span class="pref-text">导出设置备份<span class="about-sub">偏好、上传记录、账号与 Token。文件含密钥，请妥善保管</span></span>
+                    <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
+                </div>
+                <div class="pref-card" role="button" tabindex="0" onclick="$('backup-input').click()">
+                    <span class="pref-text">导入设置备份<span class="about-sub">导入后会自动刷新，已有的记录和账号不会被覆盖</span></span>
+                    <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
+                </div>
+                <div class="pref-card" role="button" tabindex="0" onclick="pullLatest()">
+                    <span class="pref-text">拉取最新版<span class="about-sub" id="about-update-status">检查中…</span></span>
+                    <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
+                </div>
+            </div>
+            <input type="file" id="backup-input" accept=".json,application/json" style="display:none" onchange="importBackup(this.files[0]); this.value=''">
         </div>
     </div>
 
@@ -1639,6 +1825,8 @@ body.page-open .search-bar { transform: translate3d(-28%,0,0); opacity: 0; trans
         <div class="dk-info" id="gallery-select-info"><b>0</b></div>
         <div class="dk-actions">
             <button type="button" class="dk-btn" id="gallery-select-all-btn" onclick="toggleGallerySelectAll()" aria-label="全选" title="全选"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.4l2.7 2.7L16 9.6"/></svg></button>
+            <button type="button" class="dk-btn" onclick="copySelectedGallery()" aria-label="复制所选" title="复制所选"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11.5" height="11.5" rx="3.5"/><path d="M5.5 15V7.5A2.5 2.5 0 0 1 8 5h7.5"/></svg></button>
+            <button type="button" class="dk-btn" onclick="renameSelectedGallery()" aria-label="重命名" title="重命名"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19.5l.9-3.9L16.6 4.4a2.1 2.1 0 0 1 3 3L8.4 18.6z"/><path d="M14.5 6.5l3 3"/></svg></button>
             <button type="button" class="dk-btn" id="gallery-save-photos-btn" onclick="saveSelectedGalleryEntries('photos')" aria-label="存到相册" title="存到相册"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></svg></button>
             <button type="button" class="dk-btn" id="gallery-save-files-btn" onclick="openSaveSheet('gallery')" aria-label="存到文件" title="存到文件"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v10"/><path d="M8 10.5l4 4 4-4"/><path d="M5 15v2.5A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5V15"/></svg></button>
             <button type="button" class="dk-btn dk-danger" onclick="openDeleteSheet()" aria-label="删除" title="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15"/><path d="M9.5 7V5.2c0-.7.5-1.2 1.2-1.2h2.6c.7 0 1.2.5 1.2 1.2V7"/><path d="M6.5 7l.8 11.2A2 2 0 0 0 9.3 20h5.4a2 2 0 0 0 2-1.8L17.5 7"/></svg></button>
@@ -1649,7 +1837,9 @@ body.page-open .search-bar { transform: translate3d(-28%,0,0); opacity: 0; trans
         <div class="dk-info" id="repo-select-info"><b>0</b></div>
         <div class="dk-actions">
             <button type="button" class="dk-btn" id="repo-select-all-btn" onclick="toggleRepoSelectAll()" aria-label="全选" title="全选"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.4l2.7 2.7L16 9.6"/></svg></button>
+            <button type="button" class="dk-btn" onclick="copySelectedRepo()" aria-label="复制所选" title="复制所选"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11.5" height="11.5" rx="3.5"/><path d="M5.5 15V7.5A2.5 2.5 0 0 1 8 5h7.5"/></svg></button>
             <button type="button" class="dk-btn" onclick="openMoveSheet()" aria-label="移动" title="移动"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8A2.5 2.5 0 0 1 6 5.5h3l2 2h7A2.5 2.5 0 0 1 20.5 10v7a2.5 2.5 0 0 1-2.5 2.5H6A2.5 2.5 0 0 1 3.5 17z"/><path d="M9.5 13.5h5M12.5 11.5l2 2-2 2"/></svg></button>
+            <button type="button" class="dk-btn" onclick="renameSelectedRepo()" aria-label="重命名" title="重命名"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19.5l.9-3.9L16.6 4.4a2.1 2.1 0 0 1 3 3L8.4 18.6z"/><path d="M14.5 6.5l3 3"/></svg></button>
             <button type="button" class="dk-btn" id="repo-save-photos-btn" onclick="saveSelectedRepoFiles('photos')" aria-label="存到相册" title="存到相册"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></svg></button>
             <button type="button" class="dk-btn" id="repo-save-files-btn" onclick="openSaveSheet('repo')" aria-label="存到文件" title="存到文件"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v10"/><path d="M8 10.5l4 4 4-4"/><path d="M5 15v2.5A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5V15"/></svg></button>
             <button type="button" class="dk-btn dk-danger" onclick="deleteSelectedRepoFiles()" aria-label="删除" title="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15"/><path d="M9.5 7V5.2c0-.7.5-1.2 1.2-1.2h2.6c.7 0 1.2.5 1.2 1.2V7"/><path d="M6.5 7l.8 11.2A2 2 0 0 0 9.3 20h5.4a2 2 0 0 0 2-1.8L17.5 7"/></svg></button>
@@ -1661,6 +1851,12 @@ body.page-open .search-bar { transform: translate3d(-28%,0,0); opacity: 0; trans
 
 <!-- 新版图片图标底栏 -->
 
+<div class="clip-banner" id="clip-banner" role="status">
+    <img id="clip-thumb" alt="">
+    <div class="cb-text" id="clip-text"></div>
+    <button class="cb-go" type="button" onclick="uploadClipboardBanner()">上传</button>
+    <button class="cb-x" type="button" aria-label="关闭" onclick="hideClipBanner(true)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+</div>
 <div id="kb-toast" role="status" aria-live="polite"></div>
 
 <div class="upload-error-modal" id="upload-error-modal" onclick="if(event.target===this) closeUploadErrorModal()">
@@ -1701,9 +1897,25 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 // 暂时性故障（网络波动、超时、5xx、409 冲突、限流）才自动重试；Token 错误、404、文件过大等确定性错误不重试
 function isTransientUploadError(err) {
     const m = String((err && err.message) || '');
-    if (err && err.http) return /(?:^|\D)(408|409|429|500|502|503|504)(?:\D|$)|限流/.test(m);
+    if (err && err.http) {
+        if (err.status) return [408, 409, 425, 429, 500, 502, 503, 504].includes(err.status) || !!err.fastForward || /限流/.test(m);
+        return /(?:^|\D)(408|409|429|500|502|503|504)(?:\D|$)|限流|fast forward/i.test(m);
+    }
     return !/Token|未配置|过大|超过|不支持|HTTP 4\d\d/.test(m);
 }
+// 网络断开时先等恢复再重试（最多 maxMs），避免在断网期间把重试次数白白耗光
+function waitOnline(maxMs) {
+    if (typeof navigator === 'undefined' || navigator.onLine !== false) return Promise.resolve(true);
+    return new Promise(resolve => {
+        let done = false;
+        const fin = ok => { if (done) return; done = true; clearTimeout(t); window.removeEventListener('online', on); resolve(ok); };
+        const on = () => fin(true);
+        const t = setTimeout(() => fin(navigator.onLine !== false), maxMs || 60000);
+        window.addEventListener('online', on);
+    });
+}
+// GitHub 的 ref 路径：分支名里的 / 要保留，其他字符转义
+function refPath(branch) { return String(branch || '').split('/').map(encodeURIComponent).join('/'); }
 async function fetchWithRetry(url, opts, cfg) {
     const tries = (cfg && cfg.tries) || 2;
     const retryThrown = !(cfg && cfg.retryThrown === false);
@@ -1918,6 +2130,8 @@ function openDialog(o) {
     err.classList.remove('show');
     err.textContent = '';
     row.style.display = o.input ? 'flex' : 'none';
+    input.type = (o.input && o.input.type) || 'text';
+    input.setAttribute('autocomplete', input.type === 'password' ? 'new-password' : 'off');
     input.value = (o.input && o.input.value) || '';
     input.placeholder = (o.input && o.input.placeholder) || '';
     return new Promise(resolve => {
@@ -1932,7 +2146,7 @@ function openDialog(o) {
 function showConfirm(o) { return openDialog(o).then(v => v === true); }
 // 返回输入内容（字符串）或 null（取消）；validate(value) 返回错误文案时对话框保持打开并就地提示
 function showPrompt(o) {
-    return openDialog(Object.assign({}, o, { input: { value: o.value, placeholder: o.placeholder } }))
+    return openDialog(Object.assign({}, o, { input: { value: o.value, placeholder: o.placeholder, type: o.type } }))
         .then(v => (typeof v === 'string' ? v : null));
 }
 
@@ -2062,9 +2276,12 @@ function renderRepoPicker() {
         const name = document.createElement('span');
         name.className = 'repo-pick-name';
         name.textContent = r.name;
-        const badge = document.createElement('span');
-        badge.className = 'repo-pick-badge';
+        const badge = document.createElement('button');
+        badge.type = 'button';
+        badge.className = 'repo-pick-badge tappable';
+        badge.setAttribute('aria-label', '切换 ' + r.name + ' 的公开 / 私有');
         badge.textContent = r.private ? '私有' : '公开';
+        badge.onclick = ev => { ev.stopPropagation(); toggleRepoVisibility(r); };
         const right = document.createElement('span');
         right.className = 'repo-pick-right';
         const del = document.createElement('button');
@@ -2107,6 +2324,44 @@ function chooseRepo(r) {
     if (isPrivate) toast('已切换到 ' + name + '。私有仓库的直链在外部打不开', 'info');
     else toast('已切换到 ' + name, 'ok');
     if ($('page-gallery').classList.contains('active')) loadRepoLiveFiles(true);
+}
+
+// 切换仓库的公开 / 私有（PATCH /repos/{owner}/{repo}）
+async function toggleRepoVisibility(r) {
+    const s = getSettings();
+    let owner = localStorage.getItem('kb_standalone_owner') || '';
+    if (!owner) {
+        try { owner = (await githubRequest('/user', { method: 'GET' }, s.token, s.proxy)).login || ''; }
+        catch (e) { return toast('无法确认账号：' + (e.message || '未知错误')); }
+    }
+    const toPrivate = !r.private;
+    const ok = await showConfirm(toPrivate ? {
+        title: '把 ' + r.name + ' 改为私有？',
+        message: '改为私有后，外部访问不了这个仓库里的文件，已经贴到别处的直链会失效（CDN 缓存里的链接可能暂时还能打开，但不要依赖）。之后想恢复，可以再改回公开。',
+        confirmText: '改为私有'
+    } : {
+        title: '把 ' + r.name + ' 改为公开？',
+        message: '改为公开后，任何人都能看到这个仓库里的全部文件和提交历史，请确认里面没有不想公开的内容。',
+        confirmText: '改为公开'
+    });
+    if (!ok) return;
+    toast('正在修改…', 'loading');
+    try {
+        await githubRequest('/repos/' + encodeURIComponent(owner) + '/' + encodeURIComponent(r.name), { method: 'PATCH', body: JSON.stringify({ private: toPrivate }) }, s.token, s.proxy);
+    } catch (e) {
+        const msg = String(e && e.message || '');
+        if (/403/.test(msg)) toast('修改失败：Token 权限不足，需要仓库管理权限');
+        else if (/404/.test(msg)) toast('修改失败：仓库不存在，或 Token 没有该仓库的管理权限');
+        else if (/422/.test(msg)) toast('修改失败：GitHub 不允许这样改（账号套餐或仓库设置限制）');
+        else toast('修改失败：' + (msg || '未知错误'));
+        return;
+    }
+    r.private = toPrivate;
+    const entry = myRepos.find(x => x.name === r.name);
+    if (entry) entry.private = toPrivate;
+    try { invalidateStorage(); } catch (_) {}
+    renderRepoPicker();
+    toast('已改为' + (toPrivate ? '私有' : '公开'), 'ok');
 }
 
 // 删除仓库后清掉本地属于该仓库的资源库记录和排序记录（直链已经全部失效）
@@ -2351,6 +2606,8 @@ function openPage(name) {
     el.scrollTop = 0;
     setPanel(el, true);
     if (name === 'gallery') { renderGallery(); loadRepoLiveFiles(false); }
+    if (name === 'storage') loadStorage(false);
+    if (name === 'update' && typeof aboutOnOpen === 'function') aboutOnOpen();
 }
 function openGallery(seg) {
     seg = seg === 'repo' ? 'repo' : 'library';
@@ -2359,6 +2616,7 @@ function openGallery(seg) {
     const head = document.querySelector('#page-gallery > .panel-head');
     if (head) { head.querySelector('.panel-title').textContent = t[0]; head.querySelector('.panel-subtitle').textContent = t[1]; }
     openPage('gallery');
+    if (seg === 'library') maybeAutoLinkCheck();
 }
 function closePage() { const p = topPanel(); if (p) setPanel(p, false); }
 // 兼容旧代码里的 switchTab('upload' | 'gallery' | 'settings')
@@ -2378,22 +2636,6 @@ document.querySelectorAll('.page').forEach(p => {
     head.querySelector('.panel-subtitle').textContent = p.dataset.sub || PAGE_TITLES.gallery[1];
     p.insertBefore(head, p.firstChild);
 });
-
-/* ---------- 搜索框吸顶：吸住时才显示底部遮罩，避免内容从胶囊后面透出来 ---------- */
-(function () {
-    const pg = document.getElementById('page-gallery');
-    if (!pg) return;
-    let ticking = false;
-    const update = () => {
-        ticking = false;
-        pg.querySelectorAll('.searchpill-wrap').forEach(w => {
-            if (!w.offsetParent && getComputedStyle(w).position !== 'fixed') return; // 隐藏的那张卡片
-            const top = parseFloat(getComputedStyle(w).top) || 0;
-            w.classList.toggle('stuck', w.getBoundingClientRect().top <= top + 0.5 && pg.scrollTop > 2);
-        });
-    };
-    pg.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-})();
 
 /* ---------- 左边缘右滑返回（跟手） ---------- */
 const EDGE = 24, LOCK_DIST = 8, DURATION = 380, PARALLAX = -28;
@@ -2502,21 +2744,43 @@ document.addEventListener('pointercancel', endDrag);
     input.addEventListener('input', filter);
     input.addEventListener('keydown', e => { if (e.key === 'Enter') input.blur(); });
     document.getElementById('searchMic').addEventListener('click', () => input.focus());
-    /* 键盘弹出时，让悬浮栏贴在键盘上方 */
+    /* 键盘弹出时，让悬浮栏贴在键盘上方；键盘收起后无条件回到原位 */
     const vv = window.visualViewport;
+    let settleTimers = [];
+    const clearSettle = () => { settleTimers.forEach(clearTimeout); settleTimers = []; };
+    // 无动画、立刻清掉内联的 bottom，避免停在半路
+    const snapBack = () => {
+        if (!bar.style.bottom) return;
+        bar.style.transition = 'none';
+        bar.style.bottom = '';
+        void bar.offsetHeight;
+        bar.style.transition = '';
+    };
+    // iOS 的键盘动画结束得比 blur 晚，所以收起后多次校正（滚动位置 + 栏位置）
+    const settle = () => {
+        clearSettle();
+        snapBack();
+        [80, 250, 500, 900].forEach(ms => settleTimers.push(setTimeout(() => {
+            if (document.activeElement === input) return;
+            snapBack();
+            if (!document.body.classList.contains('kb-lock') && !document.body.classList.contains('page-open') && Math.abs(window.scrollY - lockY) > 1) window.scrollTo(0, lockY);
+        }, ms)));
+    };
+    const place = () => {
+        if (document.activeElement !== input) { snapBack(); return; }   // 没聚焦：一律不抬高
+        const kb = window.innerHeight - vv.height - vv.offsetTop;
+        if (kb > 80) bar.style.bottom = (kb + 10) + 'px'; else snapBack();
+    };
     if (vv) {
-        const place = () => {
-            // 只有输入框聚焦（键盘弹出）时才抬高；滚动 / 回弹时 visualViewport 也会变化，那时必须保持固定
-            if (document.activeElement !== input) { if (bar.style.bottom) bar.style.bottom = ''; return; }
-            const kb = window.innerHeight - vv.height - vv.offsetTop;
-            bar.style.bottom = kb > 80 ? (kb + 10) + 'px' : '';
-        };
-        input.addEventListener('focus', () => setTimeout(place, 50));
-        input.addEventListener('blur', () => { bar.style.bottom = ''; });
-        const pin = () => { if (document.activeElement === input && (vv.offsetTop > 0 || window.scrollY > 0)) window.scrollTo(0, 0); };
-        vv.addEventListener('resize', () => { place(); pin(); });
+        input.addEventListener('focus', () => { clearSettle(); setTimeout(place, 50); });
+        vv.addEventListener('resize', () => { place(); pin(); if (document.activeElement !== input) settle(); });
         vv.addEventListener('scroll', () => { place(); pin(); });
+        function pin() { if (document.activeElement === input && (vv.offsetTop > 0 || window.scrollY > 0)) window.scrollTo(0, 0); }
     }
+    input.addEventListener('blur', settle);
+    window.addEventListener('pageshow', settle);
+    window.addEventListener('orientationchange', settle);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') settle(); });
 })();
 
 
@@ -2699,7 +2963,7 @@ function applyDeviceHints() {
     const title = document.querySelector('#dropzone .dropzone-title');
     if (title) title.textContent = '点击选择文件';
     const sub = document.querySelector('#dropzone .dropzone-sub');
-    if (sub) sub.textContent = '单文件 ≤ 99MB · 大于 20MB 使用 Raw 直链';
+    if (sub) sub.textContent = '图片 · 字体 · ZIP';
     const folderBtn = $('folder-btn');
     if (folderBtn) folderBtn.style.display = 'none';
 }
@@ -2757,7 +3021,11 @@ function openLibraryMenu(btn) {
             enterGalleryMultiMode();
             toast('点图片即可选择', 'info');
         } },
+        { label: '排序', icon: ICON_SORT, onClick: () => openGallerySortMenu(btn) },
         { label: '复制全部', icon: ICON_COPY, onClick: copyAllLinks },
+        { label: '复制格式：' + COPY_FORMATS[prefCopyFormat()], icon: ICON_COPY, onClick: cycleCopyFormat },
+        { label: linkCheckRunning ? '停止检测' : '检测失效链接', icon: ICON_LINKCHK, onClick: () => runLinkCheck() },
+        { label: '清除失效记录', icon: ICON_TRASH, onClick: clearDeadRecords },
         { label: '清空记录', icon: ICON_TRASH, danger: true, onClick: clearHistory }
     ]);
 }
@@ -2768,7 +3036,9 @@ function openRepoMenu(btn) {
             enterRepoMultiMode();
             toast('点图片即可选择', 'info');
         } },
+        { label: '排序', icon: ICON_SORT, onClick: () => openRepoSortMenu(btn) },
         { label: '新建文件夹', icon: ICON_FOLDER_PLUS, onClick: createRepoFolder },
+        { label: '复制格式：' + COPY_FORMATS[prefCopyFormat()], icon: ICON_COPY, onClick: cycleCopyFormat },
         { label: '刷新', icon: ICON_REFRESH, onClick: () => loadRepoLiveFiles(true) }
     ]);
 }
@@ -2790,6 +3060,9 @@ function savePrefs() {
         localStorage.setItem(PREF_HEIC_KEY, $('pref-heic').checked ? '1' : '0');
         localStorage.setItem(PREF_KEEPALIVE_KEY, $('pref-keepalive').checked ? '1' : '0');
         localStorage.setItem(PREF_WAKELOCK_KEY, $('pref-wakelock').checked ? '1' : '0');
+        localStorage.setItem(PREF_AUTOCOPY_KEY, $('pref-autocopy').checked ? '1' : '0');
+        localStorage.setItem(PREF_CLIPWATCH_KEY, $('pref-clipwatch').checked ? '1' : '0');
+        localStorage.setItem(PREF_LINKCHECK_KEY, $('pref-linkcheck').checked ? '1' : '0');
     } catch (_) {}
     applyKeepModes(false); // 开关一改立即生效，不分页面、不分是否在上传
 }
@@ -2835,12 +3108,12 @@ async function sendTestNotification() {
     if (perm === 'default') perm = await askNotifyPermission();
     if (perm !== 'granted') return toast('没有通知权限，请到系统设置里允许通知', 'error');
     toast('5 秒后发送测试通知，现在可以切到后台', 'info');
-    keepAlive.start(); // 借用静音保活，避免切到后台后页面被挂起、通知发不出
+    keepAlive.start(true, true); // 借用静音保活（即使开关没开）：点击本身就是用户手势，可以播放；避免切到后台后页面被挂起、通知发不出
     clearTimeout(testNotifyTimer);
     testNotifyTimer = setTimeout(async () => {
         const ok = await showSysNotification('测试通知', '收到这条就说明：上传完成后会这样提醒你', 'dl-test');
         if (!prefKeepAlive()) keepAlive.stop();
-        if (document.visibilityState === 'visible') toast(ok ? '测试通知已发送' : '发送失败：当前环境不允许显示通知', ok ? 'ok' : 'error');
+        if (document.visibilityState === 'visible') toast(ok ? '测试通知已发送' : '发送失败：当前环境发不了系统通知（iPhone 上的单文件网页可能不支持）', ok ? 'ok' : 'error');
     }, 5000);
 }
 // 仅在页面不在前台、且用户开启了偏好时才发
@@ -2893,31 +3166,187 @@ async function saveSettings() {
     }
 }
 
-// --- 历史记录（不限量，全部保存） ---
-const HISTORY_KEY = 'kb_standalone_history';
-
-function loadHistory() {
-    try {
-        const v = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-        return Array.isArray(v) ? v : [];
-    } catch (e) { return []; }
-}
-function saveHistory(list) {
-    try {
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
-        return true;
-    } catch (e) {
-        console.warn('资源库记录保存失败：', e);
-        toast('保存失败，存储空间可能不足');
-        return false;
+// --- 本地数据库（IndexedDB）---
+// 资源库记录、上传顺序、失败上传队列都放这里。读写走内存缓存（启动时读一次），
+// 不再每次从 localStorage 整份 JSON.parse / stringify；落盘在后台防抖进行，也没有 5MB 的上限。
+// IndexedDB 不可用时（个别隐私模式 / 旧系统）自动退回 localStorage，行为和以前一样。
+const HISTORY_KEY = 'kb_standalone_history';            // 旧版 localStorage 键：迁移 + 兜底用
+const UPLOAD_ORDER_KEY = 'kb_standalone_upload_order';  // 同上
+const dlDB = (() => {
+    let dbP = null;
+    function open() {
+        if (dbP) return dbP;
+        dbP = new Promise((resolve, reject) => {
+            if (!window.indexedDB) return reject(new Error('no indexedDB'));
+            const rq = indexedDB.open('direct-link-db', 1);
+            rq.onupgradeneeded = () => {
+                const db = rq.result;
+                if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv');
+                if (!db.objectStoreNames.contains('failed')) db.createObjectStore('failed', { keyPath: 'id' });
+            };
+            rq.onsuccess = () => { const db = rq.result; db.onversionchange = () => { db.close(); dbP = null; }; resolve(db); };
+            rq.onerror = () => reject(rq.error || new Error('indexedDB open failed'));
+            rq.onblocked = () => reject(new Error('indexedDB blocked'));
+        });
+        dbP.catch(() => { dbP = null; });
+        return dbP;
     }
+    function tx(store, mode, fn) {
+        return open().then(db => new Promise((resolve, reject) => {
+            const t = db.transaction(store, mode);
+            let out;
+            const r = fn(t.objectStore(store));
+            if (r) r.onsuccess = () => { out = r.result; };
+            t.oncomplete = () => resolve(out);
+            t.onerror = t.onabort = () => reject(t.error || new Error('indexedDB transaction failed'));
+        }));
+    }
+    return {
+        get: (store, key) => tx(store, 'readonly', st => st.get(key)),
+        all: store => tx(store, 'readonly', st => st.getAll()),
+        put: (store, key, val) => tx(store, 'readwrite', st => key === undefined ? st.put(val) : st.put(val, key)),
+        del: (store, key) => tx(store, 'readwrite', st => st.delete(key))
+    };
+})();
+let storeReady = false, storeUsesIDB = false;
+let historyCache = [], orderCache = {};
+let historyTimer = null, orderTimer = null;
+let storeChannel = null;
+function readLegacyJSON(key, fallback) {
+    try { const v = JSON.parse(localStorage.getItem(key) || 'null'); return v == null ? fallback : v; } catch (_) { return fallback; }
+}
+const isPlainObj = o => !!o && typeof o === 'object' && !Array.isArray(o);
+async function initStore() {
+    if (storeReady) return;
+    try {
+        let h = await dlDB.get('kv', 'history');
+        let o = await dlDB.get('kv', 'upload_order');
+        const migrate = h === undefined || o === undefined;
+        if (h === undefined) { h = readLegacyJSON(HISTORY_KEY, []); if (!Array.isArray(h)) h = []; await dlDB.put('kv', 'history', h); }
+        if (o === undefined) { o = readLegacyJSON(UPLOAD_ORDER_KEY, {}); if (!isPlainObj(o)) o = {}; await dlDB.put('kv', 'upload_order', o); }
+        // 两份都确认写进 IndexedDB 之后，才清掉旧版 localStorage 里的副本
+        if (migrate) { try { localStorage.removeItem(HISTORY_KEY); localStorage.removeItem(UPLOAD_ORDER_KEY); } catch (_) {} }
+        historyCache = Array.isArray(h) ? h : [];
+        orderCache = isPlainObj(o) ? o : {};
+        storeUsesIDB = true;
+    } catch (e) {
+        console.warn('IndexedDB 不可用，改用 localStorage：', e);
+        const h = readLegacyJSON(HISTORY_KEY, []), o = readLegacyJSON(UPLOAD_ORDER_KEY, {});
+        historyCache = Array.isArray(h) ? h : [];
+        orderCache = isPlainObj(o) ? o : {};
+        storeUsesIDB = false;
+    }
+    storeReady = true;
+    try {
+        if (storeUsesIDB && typeof BroadcastChannel !== 'undefined') {
+            storeChannel = new BroadcastChannel('direct-link-store');
+            // 其他标签页改了记录：重新读一次再刷新
+            storeChannel.onmessage = ev => {
+                if (ev.data === 'history') dlDB.get('kv', 'history').then(h => { if (Array.isArray(h)) { historyCache = h; renderGallery(); } }).catch(() => {});
+                else if (ev.data === 'order') dlDB.get('kv', 'upload_order').then(o => { if (isPlainObj(o)) orderCache = o; }).catch(() => {});
+            };
+        }
+    } catch (_) {}
+}
+function flushHistory() {
+    historyTimer = null;
+    dlDB.put('kv', 'history', historyCache)
+        .then(() => { if (storeChannel) storeChannel.postMessage('history'); })
+        .catch(e => { console.warn('资源库记录保存失败：', e); toast('保存失败，存储空间可能不足'); });
+}
+function flushOrder() {
+    orderTimer = null;
+    dlDB.put('kv', 'upload_order', orderCache)
+        .then(() => { if (storeChannel) storeChannel.postMessage('order'); })
+        .catch(e => console.warn('上传顺序保存失败：', e));
+}
+// 页面进入后台 / 关闭前，把还没落盘的改动立即提交
+function flushStoreNow() {
+    if (historyTimer) { clearTimeout(historyTimer); flushHistory(); }
+    if (orderTimer) { clearTimeout(orderTimer); flushOrder(); }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushStoreNow(); });
+window.addEventListener('pagehide', flushStoreNow);
+
+// --- 历史记录（不限量，全部保存） ---
+// loadHistory() 返回内存里的同一个数组：要改就改完调用 saveHistory(list)；只读用 filter/map 即可。
+function loadHistory() { return historyCache; }
+function saveHistory(list) {
+    if (!storeReady) { console.warn('存储尚未就绪，忽略写入'); return false; }
+    historyCache = Array.isArray(list) ? list : [];
+    if (!storeUsesIDB) {
+        try { localStorage.setItem(HISTORY_KEY, JSON.stringify(historyCache)); return true; }
+        catch (e) { console.warn('资源库记录保存失败：', e); toast('保存失败，存储空间可能不足'); return false; }
+    }
+    if (!historyTimer) historyTimer = setTimeout(flushHistory, 300);
+    return true;
+}
+// --- 失败上传队列：失败的文件连同原始内容存进 IndexedDB，刷新 / 关掉页面后还能继续传 ---
+const FAILED_MAX_AGE = 14 * 24 * 3600 * 1000;   // 超过 14 天的自动清掉
+const FAILED_MAX_BYTES = 300 * 1024 * 1024;     // 队列总大小上限，避免占满本机存储
+async function persistFailedUpload(file, ctx, message) {
+    // 「替换文件」「外链转换」带有回调，只能在当前页面里重试，不入队
+    if (!storeUsesIDB || !file || file._collector || file._afterFn) return;
+    try {
+        if (!file._failId) file._failId = 'f-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+        const all = await dlDB.all('failed');
+        const used = all.reduce((n, r) => n + (r.id === file._failId ? 0 : (r.size || 0)), 0);
+        if (used + (file.size || 0) > FAILED_MAX_BYTES) return;
+        await dlDB.put('failed', undefined, {
+            id: file._failId, file, name: file.name, size: file.size || 0,
+            relPath: file._relPath || '', forceImage: !!file._forceImage, sniffExt: file._sniffExt || '',
+            owner: (ctx && ctx.owner) || '', repo: getSettings().repo, message: String(message || ''), time: Date.now()
+        });
+    } catch (_) { /* 存不下就算了：当前页面里的「重试」按钮照常可用 */ }
+}
+function forgetFailedUpload(file) {
+    if (file && file._failId && storeUsesIDB) dlDB.del('failed', file._failId).catch(() => {});
+}
+async function offerFailedUploads() {
+    if (!storeUsesIDB || isBatchUploading) return;
+    let recs;
+    try { recs = await dlDB.all('failed'); } catch (_) { return; }
+    const now = Date.now();
+    for (const r of recs.filter(r => now - (r.time || 0) > FAILED_MAX_AGE)) { try { await dlDB.del('failed', r.id); } catch (_) {} }
+    recs = recs.filter(r => now - (r.time || 0) <= FAILED_MAX_AGE);
+    const st = getSettings();
+    if (!st.token || !st.repo) return;
+    const mine = recs.filter(r => String(r.repo || '').toLowerCase() === st.repo.toLowerCase());
+    if (!mine.length) return;
+    mine.sort((a, b) => (a.time || 0) - (b.time || 0));
+    const total = mine.reduce((n, r) => n + (r.size || 0), 0);
+    const go = await showConfirm({
+        title: '继续上传 ' + mine.length + ' 个文件？',
+        message: '上次有 ' + mine.length + ' 个文件没有传成功（共 ' + fmtSize(total) + '）。要现在重新上传到 ' + st.repo + ' 吗？',
+        confirmText: '重新上传', cancelText: '先不处理'
+    });
+    if (!go) {
+        const drop = await showConfirm({ title: '丢弃这些文件？', message: '会把这 ' + mine.length + ' 个没传成功的文件从本机清掉，之后无法再继续上传。选「保留」下次打开还会提醒。', confirmText: '丢弃', cancelText: '保留' });
+        if (drop) for (const r of mine) { try { await dlDB.del('failed', r.id); } catch (_) {} }
+        return;
+    }
+    const files = mine.map(r => {
+        const f = (typeof File !== 'undefined' && r.file instanceof File) ? r.file : new File([r.file], r.name, { type: (r.file && r.file.type) || '' });
+        f._failId = r.id;
+        if (r.relPath) f._relPath = r.relPath;
+        if (r.forceImage) f._forceImage = true;
+        if (r.sniffExt) f._sniffExt = r.sniffExt;
+        return f;
+    });
+    await handleFiles(files);
 }
 function addToHistory(entry) {
     const list = loadHistory();
     // 资源库画廊固定“最新的在最上面”；本次上传结果列表另有自己的顺序（按上传先后），互不影响。
     list.unshift(entry);
     saveHistory(list);
-    renderGallery();
+    scheduleRenderGallery();
+}
+// 批量上传时每传完一个就整页重绘一次，100 个文件要重绘 100 次：合并成最多每 400ms 一次
+let galleryRenderTimer = null;
+function scheduleRenderGallery() {
+    if (galleryRenderTimer) return;
+    galleryRenderTimer = setTimeout(() => { galleryRenderTimer = null; renderGallery(); }, 400);
 }
 function removeHistoryItem(id) {
     const list = loadHistory().filter(e => e.id !== id);
@@ -2928,19 +3357,16 @@ function removeHistoryItem(id) {
 // --- 上传顺序（实时仓库按此排序）---
 // GitHub 的文件树只按路径字母序返回、不带上传时间，所以上传成功时在本地记一笔时间。
 // 单独存一份（不随图库记录被删而丢失）；没有记录的文件（别的设备/手动上传）视为最早。
-const UPLOAD_ORDER_KEY = 'kb_standalone_upload_order';
 const REPO_SORT_NEWEST_FIRST = false; // false = 先上传的在前；改成 true = 最新上传的在最前
 function uploadKey(owner, repo, path) {
     return [String(owner || '').toLowerCase(), String(repo || '').toLowerCase(), path].join('\u0000');
 }
-function loadUploadOrder() {
-    try {
-        const o = JSON.parse(localStorage.getItem(UPLOAD_ORDER_KEY) || '{}');
-        return (o && typeof o === 'object') ? o : {};
-    } catch (_) { return {}; }
-}
+function loadUploadOrder() { return orderCache; }
 function saveUploadOrder(o) {
-    try { localStorage.setItem(UPLOAD_ORDER_KEY, JSON.stringify(o)); } catch (_) {}
+    orderCache = isPlainObj(o) ? o : {};
+    if (!storeReady) return;
+    if (!storeUsesIDB) { try { localStorage.setItem(UPLOAD_ORDER_KEY, JSON.stringify(orderCache)); } catch (_) {} return; }
+    if (!orderTimer) orderTimer = setTimeout(flushOrder, 300);
 }
 function recordUploadOrder(owner, repo, path, time) {
     if (!path) return;
@@ -2965,31 +3391,10 @@ function buildUploadRank() {
     Object.keys(order).forEach(k => rank.set(k, order[k]));
     return rank;
 }
-function sortByUploadOrder(list) {
-    const rank = buildUploadRank();
-    const t = f => rank.get(uploadKey(f.owner, f.repo, f.path)) || 0;
-    const dir = REPO_SORT_NEWEST_FIRST ? -1 : 1;
-    return list.slice().sort((a, b) => (t(a) - t(b)) * dir || a.path.localeCompare(b.path, 'zh', { numeric: true }));
-}
 function pruneOrderOnly(files) {
     const order = loadUploadOrder();
     let changed = false;
     files.forEach(f => { const k = uploadKey(f.owner, f.repo, f.path); if (k in order) { delete order[k]; changed = true; } });
-    if (changed) saveUploadOrder(order);
-}
-// 仓库文件被删除后，同步清掉本地图库记录和顺序记录
-function pruneHistoryForFiles(files) {
-    if (!files.length) return;
-    const keys = new Set(files.map(f => uploadKey(f.owner, f.repo, f.path)));
-    const history = loadHistory();
-    const next = history.filter(e => {
-        const p = historyAssetRef(e);
-        return !(p && keys.has(uploadKey(p.owner, p.repo, p.path)));
-    });
-    if (next.length !== history.length) { saveHistory(next); renderGallery(); }
-    const order = loadUploadOrder();
-    let changed = false;
-    keys.forEach(k => { if (k in order) { delete order[k]; changed = true; } });
     if (changed) saveUploadOrder(order);
 }
 
@@ -3022,12 +3427,6 @@ function getGalleryEntryType(entry) {
 
 let gallerySearch = '';
 let gallerySearchTimer = null;
-function clearGallerySearch(ev) {
-    if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-    const el = $('gallery-search');
-    if (el) { el.value = ''; el.focus({ preventScroll: true }); }
-    onGallerySearchInput();
-}
 // 搜索框右侧按钮：没内容时是麦克风（点一下聚焦输入），有内容时变成清除键
 function searchPillAction(btn, ev) {
     if (ev) { ev.preventDefault(); ev.stopPropagation(); }
@@ -3056,8 +3455,8 @@ function onGallerySearchInput() {
 }
 function getGalleryVisibleList() {
     const q = (typeof gallerySearch === 'string') ? gallerySearch : '';
-    return loadHistory().filter(e => (galleryFilter === 'all' || getGalleryEntryType(e) === galleryFilter)
-        && (!q || (String(e.name || '') + ' ' + String(e.url || '')).toLowerCase().includes(q)));
+    return sortGalleryEntries(loadHistory().filter(e => (galleryFilter === 'all' || (galleryFilter === 'dead' ? linkStatusOf(e.id) === 'dead' : getGalleryEntryType(e) === galleryFilter))
+        && (!q || (String(e.name || '') + ' ' + String(e.url || '')).toLowerCase().includes(q))));
 }
 
 // 选中数量位数变化时，悬浮条按内容平滑伸缩（图标之间的间距始终固定）
@@ -3223,24 +3622,9 @@ async function deleteRepoFiles(files) {
     for (const group of groups.values()) {
         const { owner, repo, branch } = group[0];
         try {
-            const base = '/repos/' + owner + '/' + repo;
-            const refData = await githubRequest(base + '/git/ref/heads/' + branch, { method: 'GET' }, s.token, s.proxy);
-            const headSha = refData.object.sha;
-            const headCommit = await githubRequest(base + '/git/commits/' + headSha, { method: 'GET' }, s.token, s.proxy);
-            const newTree = await githubRequest(base + '/git/trees', {
-                method: 'POST',
-                body: JSON.stringify({
-                    base_tree: headCommit.tree.sha,
-                    tree: group.map(f => ({ path: f.path, mode: '100644', type: 'blob', sha: null }))
-                })
-            }, s.token, s.proxy);
-            const newCommit = await githubRequest(base + '/git/commits', {
-                method: 'POST',
-                body: JSON.stringify({ message: '删除 ' + group.length + ' 个文件', tree: newTree.sha, parents: [headSha] })
-            }, s.token, s.proxy);
-            await githubRequest(base + '/git/refs/heads/' + branch, {
-                method: 'PATCH', body: JSON.stringify({ sha: newCommit.sha })
-            }, s.token, s.proxy);
+            await commitTreeChanges(owner, repo, branch,
+                group.map(f => ({ path: f.path, mode: '100644', type: 'blob', sha: null })),
+                '删除 ' + group.length + ' 个文件', s);
         } catch (batchErr) {
             console.warn('批量删除失败，改为逐个删除：', batchErr);
             for (let i = 0; i < group.length; i++) {
@@ -3249,6 +3633,7 @@ async function deleteRepoFiles(files) {
                 try {
                     await deleteGithubAsset({ githubOwner: file.owner, githubRepo: file.repo, githubBranch: file.branch, githubPath: file.path, name: file.name });
                 } catch (e) {
+                    if (e && e.status === 404) continue; // 文件已经不在仓库里（之前删过 / 在别处删了）：视为删除成功
                     failures.push({ path: file.path, name: file.name, message: e.message || '未知错误' });
                 }
             }
@@ -3280,22 +3665,34 @@ async function confirmDeleteSelected() {
     const deleteFailures = [];
     const total = selected.length;
     try {
-        for (let i = 0; i < total; i++) {
-            const entry = selected[i];
-            if (text) text.textContent = deleteCloud ? ('正在删除 ' + (i + 1) + '/' + total + '：' + entry.name) : ('正在删除 ' + (i + 1) + '/' + total);
-            if (percent) percent.textContent = Math.round((i / total) * 100) + '%';
-            if (fill) fill.style.width = ((i / total) * 100) + '%';
-            if (deleteCloud) {
-                try { await deleteGithubAsset(entry); }
-                catch (e) {
-                    deleteFailures.push({ name: entry.name, message: e.message || '未知错误' });
-                    console.warn('GitHub 删除失败:', entry.name, e);
-                }
+        if (deleteCloud) {
+            // 批量：所有仓库文件一次提交删完（原来每个文件 2 个请求 + 1 次提交，慢而且容易互相冲突）
+            const s0 = getSettings();
+            const seen = new Set(), files = [];
+            selected.forEach(entry => {
+                const parsed = (entry.githubPath && entry.githubOwner)
+                    ? { owner: entry.githubOwner, repo: entry.githubRepo || s0.repo, branch: entry.githubBranch || 'main', path: entry.githubPath }
+                    : parseGithubAssetFromUrl(entry.url);
+                if (!parsed) { deleteFailures.push({ name: entry.name, message: '无法识别仓库路径' }); return; }
+                const repoName = parsed.repo || s0.repo, br = parsed.branch || 'main';
+                const key = [uploadKey(parsed.owner, repoName, parsed.path), br].join('\u0001');
+                if (seen.has(key)) return; // 复用链接产生的重复记录指向同一个文件，只删一次
+                seen.add(key);
+                files.push({ owner: parsed.owner, repo: repoName, branch: br, path: parsed.path, name: entry.name });
+            });
+            if (text) text.textContent = '正在删除 ' + files.length + ' 个仓库文件…';
+            if (fill) fill.style.width = '35%';
+            if (percent) percent.textContent = '35%';
+            try {
+                const fails = await deleteRepoFiles(files);
+                fails.forEach(f => deleteFailures.push({ name: f.name, message: f.message }));
+            } catch (e) {
+                files.forEach(f => deleteFailures.push({ name: f.name, message: (e && e.message) || '未知错误' }));
             }
-            await sleep(40);
-            if (fill) fill.style.width = (((i + 1) / total) * 100) + '%';
-            if (percent) percent.textContent = Math.round(((i + 1) / total) * 100) + '%';
+            hideToast();
         }
+        if (fill) fill.style.width = '100%';
+        if (percent) percent.textContent = '100%';
     } finally {
         isDeleting = false;
         setDeleteSheetBusy(false);
@@ -3323,18 +3720,50 @@ async function confirmDeleteSelected() {
     }
 }
 
+// 一键清除「已确认失效」的本地记录（只动本地记录，不碰仓库）
+async function clearDeadRecords() {
+    const hist = loadHistory();
+    const dead = hist.filter(e => linkStatusOf(e.id) === 'dead');
+    if (!dead.length) return toast('没有已确认失效的链接。可以先点「检测失效链接」', 'info');
+    const ok = await showConfirm({
+        title: '清除 ' + dead.length + ' 条失效记录',
+        message: '这些链接已经打不开，多半是仓库里的文件被删除或改名了。只会清除资源库里的本地记录，不会动仓库。',
+        confirmText: '清除'
+    });
+    if (!ok) return;
+    const ids = new Set(dead.map(e => e.id));
+    saveHistory(hist.filter(e => !ids.has(e.id)));
+    saveLinkStatus();
+    gallerySelected.clear();
+    updateGallerySelectionUI();
+    renderGallery();
+    toast('已清除 ' + dead.length + ' 条失效记录', 'ok');
+}
 async function clearHistory() {
     if (!loadHistory().length) return toast('暂无记录', 'info');
     const ok = await showConfirm({ title: '清空本地记录', message: '将清除资源库里的全部本地记录，不会删除仓库里的文件。', confirmText: '清空' });
     if (!ok) return;
-    localStorage.removeItem(HISTORY_KEY);
+    saveHistory([]);
     exitGalleryMultiMode();
     toast('已清空');
 }
+// 复制所选：按当前复制格式（直链 / Markdown / HTML）一次复制
+async function copySelectedGallery() {
+    if (!gallerySelected.size) return toast('请先选择', 'info');
+    const items = getGalleryVisibleList().filter(e => gallerySelected.has(e.id) && e.url).map(e => ({ url: e.url, name: e.name }));
+    if (!items.length) return toast('所选项目没有可复制的链接', 'info');
+    await copyTextList(items);
+}
+async function copySelectedRepo() {
+    if (!repoSelected.size) return toast('请先选择', 'info');
+    const items = repoLiveFiles.filter(f => repoSelected.has(f.path)).map(f => ({ url: repoShareUrl(f), name: (f.name || String(f.path || '').split('/').pop()) })).filter(x => x.url);
+    if (!items.length) return toast('所选项目没有可复制的链接', 'info');
+    await copyTextList(items);
+}
 function copyAllLinks() {
-    const urls = getGalleryVisibleList().map(e => e.url).filter(Boolean);
-    if (!urls.length) return toast('暂无链接', 'info');
-    copyTextList(urls);
+    const items = getGalleryVisibleList().filter(e => e.url).map(e => ({ url: e.url, name: e.name }));
+    if (!items.length) return toast('暂无链接', 'info');
+    copyTextList(items);
 }
 
 let galleryFilter = 'all';
@@ -3350,12 +3779,6 @@ function setGalleryFilter(f) {
 let repoFilter = 'all';
 let repoSearch = ''; // 非空时在整个仓库里按路径搜索，忽略当前所在文件夹
 let repoSearchTimer = null;
-function clearRepoSearch(ev) {
-    if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-    const el = $('repo-search');
-    if (el) { el.value = ''; el.focus({ preventScroll: true }); }
-    onRepoSearchInput();
-}
 function onRepoSearchInput() {
     const cur = (($('repo-search') && $('repo-search').value) || '');
     const pill = $('repo-searchpill');
@@ -3486,33 +3909,6 @@ async function createRepoFolder() {
     }
 }
 
-// 删除整个文件夹（连同其中所有文件）
-async function deleteRepoFolder(folderPath) {
-    if (!getSettings().token) return toast('请先配置 Token');
-    const prefix = folderPath + '/';
-    const filesInFolder = repoLiveFiles.filter(f => f.path.startsWith(prefix));
-    const folderShortName = folderPath.split('/').pop();
-    const realFiles = filesInFolder.filter(f => f.name !== '.gitkeep');
-    const ok = await showConfirm({
-        title: '删除文件夹',
-        message: '确定删除文件夹「' + folderShortName + '」' + (realFiles.length ? '及其中 ' + realFiles.length + ' 个文件' : '') + '？删除会直接提交到仓库。',
-        confirmText: '删除'
-    });
-    if (!ok) return;
-    toast('正在删除 ' + filesInFolder.length + ' 个文件…', 'loading');
-    const failures = await deleteRepoFiles(filesInFolder);
-    const failedPaths = new Set(failures.map(x => x.path));
-    pruneHistoryForFiles(filesInFolder.filter(f => !failedPaths.has(f.path)));
-    repoLiveFiles = repoLiveFiles.filter(f => !(f.path.startsWith(prefix) && !failedPaths.has(f.path)));
-    renderRepoLiveFiles();
-    const statusEl = $('repo-live-status');
-    if (statusEl) statusEl.textContent = '实时仓库 · ' + repoLiveFiles.length + ' 个文件';
-    if (failures.length) {
-        showUploadErrorModal(failures, { title: '部分文件删除失败', sub: failures.length + ' 个文件未能删除，其余已删除' });
-    } else {
-        toast('文件夹已删除');
-    }
-}
 
 // --- 移动文件到文件夹 ---
 function openMoveSheet() {
@@ -3571,10 +3967,6 @@ async function moveSelectedRepoFiles(targetFolder) {
     toast('正在移动…', 'loading');
     try {
         const ctx = await resolveGithubContext();
-        const refData = await githubRequest('/repos/' + ctx.owner + '/' + s.repo + '/git/ref/heads/' + ctx.branch, { method: 'GET' }, s.token, s.proxy);
-        const latestCommitSha = refData.object.sha;
-        const latestCommit = await githubRequest('/repos/' + ctx.owner + '/' + s.repo + '/git/commits/' + latestCommitSha, { method: 'GET' }, s.token, s.proxy);
-        const baseTreeSha = latestCommit.tree.sha;
 
         const prefix = targetFolder ? targetFolder + '/' : '';
         const treeChanges = [];
@@ -3601,17 +3993,8 @@ async function moveSelectedRepoFiles(targetFolder) {
         });
         if (!treeChanges.length) { toast('所选文件已在目标位置', 'info'); exitRepoMultiMode(); return; }
 
-        const newTree = await githubRequest('/repos/' + ctx.owner + '/' + s.repo + '/git/trees', {
-            method: 'POST', body: JSON.stringify({ base_tree: baseTreeSha, tree: treeChanges })
-        }, s.token, s.proxy);
-
-        const newCommit = await githubRequest('/repos/' + ctx.owner + '/' + s.repo + '/git/commits', {
-            method: 'POST', body: JSON.stringify({ message: '移动 ' + moves.length + ' 个文件到 ' + (targetFolder || '根目录'), tree: newTree.sha, parents: [latestCommitSha] })
-        }, s.token, s.proxy);
-
-        await githubRequest('/repos/' + ctx.owner + '/' + s.repo + '/git/refs/heads/' + ctx.branch, {
-            method: 'PATCH', body: JSON.stringify({ sha: newCommit.sha })
-        }, s.token, s.proxy);
+        await commitTreeChanges(ctx.owner, s.repo, ctx.branch, treeChanges,
+            '移动 ' + moves.length + ' 个文件到 ' + (targetFolder || '根目录'), s);
 
         const history = loadHistory();
         const order = loadUploadOrder();
@@ -3669,7 +4052,7 @@ function getRepoVisibleList() {
         const rest = f.path.slice(prefix.length);
         return rest.length > 0 && rest.indexOf('/') === -1;
     });
-    return sortByUploadOrder(list);
+    return sortRepoFiles(list);
 }
 
 function updateRepoSelectionUI() {
@@ -3828,6 +4211,7 @@ async function heicToJpegFile(file) {
         ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, c.width, c.height);
         ctx.drawImage(img, 0, 0);
         const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
+        c.width = c.height = 0;
         if (!blob) throw new Error('转换失败');
         return new File([blob], file.name.replace(HEIC_RE, '') + '.jpg', { type: 'image/jpeg' });
     } finally { URL.revokeObjectURL(url); }
@@ -4105,7 +4489,7 @@ async function loadRepoLiveFiles(force = false) {
     container.innerHTML = skeletonGrid(9);
     try {
         const ctx = await resolveGithubContext();
-        const tree = await githubRequest('/repos/' + ctx.owner + '/' + s.repo + '/git/trees/' + encodeURIComponent(ctx.branch) + '?recursive=1', { method:'GET' }, s.token, s.proxy);
+        const tree = await fetchRepoTree(ctx.owner, s.repo, ctx.branch, s);
         if (seq !== repoLoadSeq) return; // 期间已发起更新的读取（比如换了仓库），这次结果作废
         repoLiveFiles = (tree.tree || [])
             .filter(x => x.type === 'blob')
@@ -4127,7 +4511,7 @@ async function loadRepoLiveFiles(force = false) {
         repoLiveLoaded = true;
         repoLiveLoadedAt = Date.now();
         renderRepoLiveFiles();
-        status.textContent = (tree.truncated ? '仓库文件较多，仅显示部分 · ' : '实时仓库 · ') + repoLiveFiles.length + ' 个文件 · ' + ctx.owner + '/' + s.repo;
+        status.textContent = (tree.truncated ? '仓库文件太多，部分目录未能读全 · ' : '实时仓库 · ') + repoLiveFiles.length + ' 个文件 · ' + ctx.owner + '/' + s.repo;
     } catch (e) {
         if (seq !== repoLoadSeq) return;
         repoLiveLoaded = false;
@@ -4149,6 +4533,7 @@ async function loadRepoLiveFiles(force = false) {
 function renderRepoLiveFiles() {
     const container = $('repo-live-container');
     if (!container) return;
+    setTimeout(updateUsageUI, 0);
     if (repoLiveLoaded) {
         while (repoCurrentPath && !repoLiveFiles.some(f => f.path.startsWith(repoCurrentPath + '/'))) {
             const i = repoCurrentPath.lastIndexOf('/');
@@ -4214,7 +4599,7 @@ function renderRepoLiveFiles() {
                 toggleRepoSelection(file.path);
                 return;
             }
-            copyText(repoShareUrl(file));
+            copyText(repoShareUrl(file), file.name);
         };
         item.onpointerdown = (ev) => {
             if (ev.pointerType === 'mouse' && ev.button !== 0) return;
@@ -4316,7 +4701,18 @@ function galleryRepoSize(entry) {
     }
     return gallerySizeCache.map.get(uploadKey(ref.owner, ref.repo, ref.path)) || 0;
 }
+function refreshDeadChip() {
+    const chip = $('gallery-dead-chip');
+    if (!chip) return;
+    const ids = new Set(loadHistory().map(e => e.id));
+    let n = 0;
+    Object.keys(linkStatus).forEach(k => { if (ids.has(k) && linkStatus[k] && linkStatus[k].s === 'dead') n++; });
+    chip.hidden = n === 0;
+    chip.textContent = n ? '失效 ' + n : '失效';
+    if (!n && galleryFilter === 'dead') { galleryFilter = 'all'; document.querySelectorAll('.filter-btn[data-f]').forEach(b => b.classList.toggle('active', b.dataset.f === 'all')); }
+}
 function renderGallery() {
+    try { refreshDeadChip(); } catch (_) {}
     const container = $('gallery-container');
     const list = getGalleryVisibleList();
     container.innerHTML = '';
@@ -4325,18 +4721,23 @@ function renderGallery() {
         if (galleryFilter === 'font') msg = '暂无字体文件';
         if (galleryFilter === 'image') msg = '暂无图片';
         if (galleryFilter === 'file') msg = '暂无其他文件';
+        if (galleryFilter === 'dead') msg = '没有失效链接';
         container.innerHTML = `<div class="empty-hint" style="grid-column:1/-1;">${msg}</div>`;
         return;
     }
 
+    // 按时间排序时按日期分组；按大小 / 名称排序时不分日期，整体一组
+    const sortMode = prefGallerySort();
+    const byDate = sortMode === 'new' || sortMode === 'old';
+    const flatTitle = (GALLERY_SORTS.find(x => x[0] === sortMode) || [])[1] || '';
     const groups = {};
     list.forEach(entry => {
-        const d = formatDate(entry.time || Date.now());
+        const d = byDate ? formatDate(entry.time || Date.now()) : flatTitle;
         if(!groups[d]) groups[d] = [];
         groups[d].push(entry);
     });
 
-    const dates = Object.keys(groups).sort((a,b) => b.localeCompare(a));
+    const dates = Object.keys(groups).sort((a,b) => !byDate ? 0 : (sortMode === 'old' ? a.localeCompare(b) : b.localeCompare(a)));
 
     dates.forEach(dateStr => {
         const header = document.createElement('div');
@@ -4358,7 +4759,7 @@ function renderGallery() {
                     return;
                 }
                 if (galleryMultiMode) toggleGallerySelection(entry.id);
-                else if (!longPressMoved) copyText(entry.url);
+                else if (!longPressMoved) copyText(entry.url, entry.name);
             };
             tile.onpointerdown = (ev) => {
                 suppressNextGalleryClick = false; // 上一次长按遗留的标志在新一轮按下时复位
@@ -4418,6 +4819,14 @@ function renderGallery() {
             selectMark.className = 'select-mark';
             selectMark.textContent = gallerySelected.has(entry.id) ? '✓' : '';
             tile.appendChild(selectMark);
+            const linkSt = linkStatusOf(entry.id);
+            if (linkSt === 'dead' || linkSt === 'cdn') {
+                const badge = document.createElement('div');
+                badge.className = 'tile-badge' + (linkSt === 'cdn' ? ' cdn' : '');
+                badge.textContent = linkSt === 'dead' ? '失效' : 'CDN 未同步';
+                badge.title = linkSt === 'dead' ? '检测时这个链接打不开（文件已被删除或改名）' : '仓库里有这个文件，但 jsDelivr 还没同步到';
+                tile.appendChild(badge);
+            }
 
             const nameTag = document.createElement('div');
             nameTag.className = 'tile-name';
@@ -4466,7 +4875,8 @@ function scheduleMidnightClear() {
     }, 30000);
 }
 
-window.onload = () => {
+window.onload = async () => {
+    try { await initStore(); } catch (_) { storeReady = true; }
     scheduleMidnightClear();
     const savedToken = localStorage.getItem('kb_standalone_token') || '';
     $('gh-token').value = savedToken;
@@ -4480,6 +4890,7 @@ window.onload = () => {
     $('pref-keepalive').checked = prefKeepAlive();
     $('pref-wakelock').checked = prefWakeLock();
     $('pref-notify').checked = prefNotify() && notifySupported() && Notification.permission === 'granted';
+    initV13Prefs();
     updateRepoTarget();
     initAccounts();
     applyDeviceHints();
@@ -4489,10 +4900,11 @@ window.onload = () => {
     try { savedSeg = localStorage.getItem(GSEG_KEY) === 'repo' ? 'repo' : 'library'; } catch (_) {}
     setGallerySeg(savedSeg);
     if (!savedToken) switchTab('settings');
+    setTimeout(offerFailedUploads, 1200); // 上次没传完的文件：问一下要不要继续
 };
 
 // 其他标签页修改了资源库记录时同步刷新
-window.addEventListener('storage', e => { if (e.key === HISTORY_KEY) renderGallery(); });
+window.addEventListener('storage', e => { if (!storeUsesIDB && e.key === HISTORY_KEY) { const h = readLegacyJSON(HISTORY_KEY, []); historyCache = Array.isArray(h) ? h : []; renderGallery(); } });
 
 // --- 拖拽处理 ---
 function handleDragOver(e) { e.preventDefault(); $('dropzone').classList.add('dragover'); }
@@ -4612,16 +5024,53 @@ function moveResultCardAfter(cardId) {
 }
 
 // --- GitHub API 核心 ---
+// 读取仓库文件树。recursive=1 在文件特别多（约 10 万条 / 7MB）时会被 GitHub 截断，
+// 这时改成按目录逐层读取，把被截断的部分补全；个别目录读不到才会降级为「只显示部分」。
+async function fetchRepoTree(owner, repo, branch, auth) {
+    const base = '/repos/' + owner + '/' + repo + '/git/trees/';
+    const first = await githubRequest(base + encodeURIComponent(branch) + '?recursive=1', { method: 'GET' }, auth.token, auth.proxy);
+    if (!first.truncated || !first.sha) return { tree: first.tree || [], truncated: !!first.truncated };
+    const out = [], pending = [{ sha: first.sha, prefix: '' }];
+    let incomplete = false, active = 0, failed = false;
+    const walk = async job => {
+        const t = await githubRequest(base + job.sha, { method: 'GET' }, auth.token, auth.proxy);
+        if (t.truncated) incomplete = true; // 单个目录就超限：只能显示部分
+        (t.tree || []).forEach(x => {
+            if (x.type === 'tree') pending.push({ sha: x.sha, prefix: job.prefix + x.path + '/' });
+            else if (x.type === 'blob') out.push(Object.assign({}, x, { path: job.prefix + x.path }));
+        });
+    };
+    try {
+        await new Promise((resolve, reject) => {
+            const pump = () => {
+                if (failed) return;
+                while (active < 4 && pending.length) {
+                    const job = pending.shift(); active++;
+                    walk(job).then(() => { active--; pump(); }, e => { failed = true; reject(e); });
+                }
+                if (!active && !pending.length) resolve();
+            };
+            pump();
+        });
+    } catch (_) {
+        return { tree: first.tree || [], truncated: true }; // 补读失败：退回被截断的原结果
+    }
+    return { tree: out, truncated: incomplete };
+}
 async function githubRequest(path, options = {}, token, proxy) {
     if (!token) throw new Error('未配置 GitHub Token');
     const base = proxy || 'https://api.github.com';
     const url = base + path;
     const maxAttempts = 5;
     let lastError = null;
+    // 请求体越大，允许的时间越长（按至少 20KB/s 估算），否则慢网下大请求会被 60 秒误杀
+    const bodyLen = (options.body && (options.body.length || options.body.size)) || 0;
+    const timeoutMs = 60000 + Math.min(240000, Math.round(bodyLen / 20));
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        if (attempt > 1) await waitOnline(60000);
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 60000);
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
         try {
             const headers = {
                 'Accept': 'application/vnd.github+json',
@@ -4636,9 +5085,8 @@ async function githubRequest(path, options = {}, token, proxy) {
                 cache: 'no-store',
                 signal: controller.signal
             });
+            const text = await res.text(); // 读响应体也在超时保护内
             clearTimeout(timer);
-
-            const text = await res.text();
             let data = {};
             try { data = text ? JSON.parse(text) : {}; } catch (_) { data = { message: text }; }
 
@@ -4662,11 +5110,11 @@ async function githubRequest(path, options = {}, token, proxy) {
                     await sleep(800 * attempt + Math.random() * 300);
                     continue;
                 }
-                const fail = text => Object.assign(new Error(text), { http: true });
+                const fail = text => Object.assign(new Error(text), { http: true, status: res.status, fastForward: /fast.?forward/i.test(msg) });
                 if (res.status === 401) throw fail('Token 无效或已过期（401）');
                 if (res.status === 403) throw fail(isRateLimited ? 'GitHub API 触发限流，已重试多次仍失败，请稍后再试' : 'GitHub 拒绝请求（403）：可能是 Token 权限不足');
                 if (res.status === 404) throw fail('仓库或资源不存在（404）');
-                if (res.status === 422) throw fail('GitHub 参数错误（422）：' + msg);
+                if (res.status === 422) throw fail((/fast.?forward/i.test(msg) ? '分支刚被更新（非快进提交）：' : 'GitHub 参数错误（422）：') + msg);
                 if (res.status === 429) throw fail('GitHub API 触发限流（429），已重试多次仍失败，请稍后再试');
                 throw fail('GitHub API ' + res.status + '：' + msg);
             }
@@ -4678,7 +5126,7 @@ async function githubRequest(path, options = {}, token, proxy) {
             const raw = String(e && e.message || e || '');
             const networkError = e && (e.name === 'TypeError' || e.name === 'AbortError' || /Load failed|Failed to fetch|NetworkError|网络|fetch/i.test(raw));
             if (!networkError || attempt === maxAttempts) {
-                if (e && e.name === 'AbortError') throw new Error('连接 GitHub 超时（60 秒），请检查网络后重试');
+                if (e && e.name === 'AbortError') throw new Error('连接 GitHub 超时（' + Math.round(timeoutMs / 1000) + ' 秒），请检查网络后重试');
                 if (networkError) throw new Error('无法连接 GitHub API（' + base.replace(/^https?:\/\//, '') + '）。这通常是当前网络拦截、代理/VPN 或对方服务器暂时不可达导致的，不是图片文件损坏');
                 throw e;
             }
@@ -4731,6 +5179,10 @@ async function findAvailableGithubPath(initialPath, ctx, owner, branch, s) {
     let path = initialPath;
     for (let n = 2; ; n++) {
         let taken = !!((ctx && ctx.usedPaths && ctx.usedPaths.has(path)) || (knownPaths && knownPaths.has(path)));
+        if (!taken && ctx && ctx._pathSet && !ctx._treeTruncated) {
+            if (ctx._pathSet.has(path)) taken = true;
+            else return path; // 整棵树里都没有这个路径：不用再逐个文件 GET 确认
+        }
         if (!taken) {
             const encodedPath = path.split('/').map(encodeURIComponent).join('/');
             try {
@@ -4745,17 +5197,18 @@ async function findAvailableGithubPath(initialPath, ctx, owner, branch, s) {
     }
 }
 
-// 大文件上传 blob：
-// 1) 内存：不再把整个文件转成一个巨大的 base64 字符串再 JSON.stringify（那样会同时存在好几份拷贝），
-//    而是每 3MB 转一段，直接塞进 Blob 里（浏览器可把 Blob 放在磁盘/外部内存），JS 堆里同一时刻只有一小段。
+// 创建 blob（所有文件统一走这条路，后续由「提交队列」把一批 blob 合并成一次提交）：
+// 1) 内存：每 3MB 转一段 base64，并立刻装进独立的 Blob（浏览器可放到磁盘/外部内存），JS 堆里同一时刻只有一小段。
 //    分块必须是 3 字节的整数倍，各段 base64 拼起来才是合法的 base64。
-// 2) 超时：改用 XHR，只要还在持续上传就不会超时；只有连续 45 秒完全没有进展才判定卡死。
-//    blob 按内容寻址，重复提交是安全的，所以卡住/断线后可以自动重试。
-async function uploadBlobChunked(file, owner, s, onProgress) {
+// 2) 超时：用 XHR，只要还在持续上传就不会超时；连续 45 秒没有进展判定卡死；请求体发完后再等 90 秒响应。
+//    blob 按内容寻址，重复创建是安全的，所以卡住/断线/5xx 后可以自动重试。
+// 3) 限流：创建内容的请求统一排队（gateContentRequest），遇到二级限流会自动放慢并按 Retry-After 等待。
+async function uploadBlobChunked(file, owner, s, onProgress, ctx) {
     const CHUNK = 3 * 1024 * 1024;
     const STALL_MS = 45000;
-    const MAX_ATTEMPTS = 3;
-    const parts = ['{"encoding":"base64","content":"'];
+    const RESP_MS = 90000;
+    const MAX_ATTEMPTS = 4;
+    const parts = [new Blob(['{"encoding":"base64","content":"'])];
     for (let off = 0; off < file.size; off += CHUNK) {
         const dataUrl = await new Promise((resolve, reject) => {
             const r = new FileReader();
@@ -4763,10 +5216,10 @@ async function uploadBlobChunked(file, owner, s, onProgress) {
             r.onerror = () => reject(new Error('读取文件失败'));
             r.readAsDataURL(file.slice(off, off + CHUNK));
         });
-        parts.push(dataUrl.slice(dataUrl.indexOf(',') + 1));
+        parts.push(new Blob([dataUrl.slice(dataUrl.indexOf(',') + 1)]));
         if (onProgress) onProgress('准备中 ' + Math.min(99, Math.round(off / file.size * 100)) + '%');
     }
-    parts.push('"}');
+    parts.push(new Blob(['"}']));
     const body = new Blob(parts, { type: 'application/json' });
     parts.length = 0;
 
@@ -4776,9 +5229,12 @@ async function uploadBlobChunked(file, owner, s, onProgress) {
 
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
         try {
+            await waitOnline(60000);
+            if (ctx) await gateContentRequest(ctx);
             return await new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
-                let stallTimer = null;
+                let stallTimer = null, respTimer = null;
+                const clearAll = () => { clearTimeout(stallTimer); clearTimeout(respTimer); };
                 const arm = () => {
                     clearTimeout(stallTimer);
                     stallTimer = setTimeout(() => {
@@ -4793,21 +5249,31 @@ async function uploadBlobChunked(file, owner, s, onProgress) {
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 xhr.upload.onprogress = ev => {
                     arm();
-                    if (onProgress && ev.lengthComputable) onProgress('上传中 ' + Math.min(99, Math.round(ev.loaded / ev.total * 100)) + '%');
+                    if (onProgress && ev.lengthComputable) {
+                        const f = ev.loaded / ev.total;
+                        onProgress('上传中 ' + Math.min(99, Math.round(f * 100)) + '%', f);
+                    }
                 };
-                xhr.upload.onload = () => clearTimeout(stallTimer); // 请求体已发完，等待 GitHub 处理，不能再按“没有上传进度”误判卡死
-                xhr.onerror = () => {
+                xhr.upload.onload = () => { // 请求体已发完，等待 GitHub 处理：改用「响应超时」而不是「上传无进展」
                     clearTimeout(stallTimer);
+                    clearTimeout(respTimer);
+                    respTimer = setTimeout(() => {
+                        reject(Object.assign(new Error('resp-timeout'), { retryable: true, stalled: true, respTimeout: true }));
+                        xhr.abort();
+                    }, RESP_MS);
+                };
+                xhr.onerror = () => {
+                    clearAll();
                     reject(Object.assign(new Error('network'), { retryable: true, network: true }));
                 };
                 xhr.onload = () => {
-                    clearTimeout(stallTimer);
+                    clearAll();
                     let data = {};
                     try { data = xhr.responseText ? JSON.parse(xhr.responseText) : {}; } catch (_) { data = { message: xhr.responseText }; }
                     if (xhr.status >= 200 && xhr.status < 300) return resolve(data);
                     const msg = data.message || ('HTTP ' + xhr.status);
                     const limited = xhr.status === 429 || (xhr.status === 403 && /rate limit|abuse|secondary/i.test(msg));
-                    const retryable = limited || [502, 503, 504].includes(xhr.status);
+                    const retryable = limited || [408, 500, 502, 503, 504].includes(xhr.status);
                     let text;
                     if (xhr.status === 401) text = 'Token 无效或已过期（401）';
                     else if (limited) text = 'GitHub API 触发限流，已重试多次仍失败，请稍后再试';
@@ -4816,21 +5282,98 @@ async function uploadBlobChunked(file, owner, s, onProgress) {
                     else if (xhr.status === 413) text = '文件太大，GitHub 拒绝接收（413）';
                     else if (xhr.status === 422) text = 'GitHub 参数错误（422）：' + msg;
                     else text = 'GitHub API ' + xhr.status + '：' + msg;
-                    reject(Object.assign(new Error(text), { retryable, limited }));
+                    const ra = Number(xhr.getResponseHeader('retry-after'));
+                    reject(Object.assign(new Error(text), { http: true, status: xhr.status, retryable, limited, retryAfterMs: ra > 0 ? Math.min(ra, 60) * 1000 : 0 }));
                 };
                 arm();
                 xhr.send(body);
             });
         } catch (e) {
             lastErr = e;
+            if (e.limited && ctx && ctx._gate) ctx._gate.gap = Math.min(3000, Math.round(ctx._gate.gap * 1.6)); // 被限流：之后放慢节奏
             if (!e.retryable || attempt === MAX_ATTEMPTS) break;
             if (onProgress) onProgress('重试中 ' + attempt + '/' + (MAX_ATTEMPTS - 1));
-            await sleep((e.limited ? 4000 : 1500) * attempt);
+            await sleep(e.limited ? Math.max(4000 * attempt, e.retryAfterMs || 0) : 1500 * attempt);
         }
     }
-    if (lastErr && lastErr.stalled) throw new Error('上传长时间没有进展（' + STALL_MS / 1000 + ' 秒），可能是网络太慢或中断，请换个网络后重试');
+    if (lastErr && lastErr.stalled) throw new Error(lastErr.respTimeout
+        ? 'GitHub 长时间没有响应（' + RESP_MS / 1000 + ' 秒），请稍后重试'
+        : '上传长时间没有进展（' + STALL_MS / 1000 + ' 秒），可能是网络太慢或中断，请换个网络后重试');
     if (lastErr && lastErr.network) throw new Error('无法连接 GitHub API（' + base.replace(/^https?:\/\//, '') + '）。这通常是当前网络拦截、代理/VPN 或对方服务器暂时不可达导致的，不是文件损坏');
     throw lastErr || new Error('上传失败');
+}
+
+// 创建内容类请求的统一节流：并发上传时按固定间隔发出，被限流后自动放慢（见 uploadBlobChunked）
+function gateContentRequest(ctx) {
+    const g = ctx._gate || (ctx._gate = { next: 0, gap: 700 });
+    const now = Date.now();
+    const at = Math.max(now, g.next);
+    g.next = at + g.gap;
+    return at > now ? sleep(at - now) : Promise.resolve();
+}
+
+// 一次提交一组树改动（新增 / 删除 / 移动都用它）。
+// 分支在别处被更新（非快进 / 409 / 5xx）时，自动重新取最新提交再来一次，不再直接报「参数错误」。
+// cache：{sha, tree}，连续提交时复用上次提交的结果，省掉每次读取分支头的 2 个请求。
+async function commitTreeChanges(owner, repo, branch, changes, message, s, cache) {
+    const base = '/repos/' + owner + '/' + repo;
+    const rp = refPath(branch);
+    let lastErr = null;
+    for (let attempt = 1; attempt <= 4; attempt++) {
+        try {
+            let headSha, treeSha;
+            if (cache && cache.sha && cache.tree) { headSha = cache.sha; treeSha = cache.tree; }
+            else {
+                const refData = await githubRequest(base + '/git/ref/heads/' + rp, { method: 'GET' }, s.token, s.proxy);
+                headSha = refData.object.sha;
+                const headCommit = await githubRequest(base + '/git/commits/' + headSha, { method: 'GET' }, s.token, s.proxy);
+                treeSha = headCommit.tree.sha;
+            }
+            const newTree = await githubRequest(base + '/git/trees', { method: 'POST', body: JSON.stringify({ base_tree: treeSha, tree: changes }) }, s.token, s.proxy);
+            const newCommit = await githubRequest(base + '/git/commits', { method: 'POST', body: JSON.stringify({ message, tree: newTree.sha, parents: [headSha] }) }, s.token, s.proxy);
+            await githubRequest(base + '/git/refs/heads/' + rp, { method: 'PATCH', body: JSON.stringify({ sha: newCommit.sha }) }, s.token, s.proxy);
+            if (cache) { cache.sha = newCommit.sha; cache.tree = newTree.sha; }
+            return newCommit.sha;
+        } catch (e) {
+            lastErr = e;
+            if (cache) { cache.sha = ''; cache.tree = ''; } // 缓存可能已过期，下次重新读取
+            const conflict = e && e.http && (e.fastForward || e.status === 409 || e.status === 422 || e.status === 500 || e.status === 502 || e.status === 503 || e.status === 504);
+            const emptyRepo = e && e.status === 409 && /empty/i.test(String(e.message));
+            if (!conflict || emptyRepo || attempt === 4) throw e;
+            await sleep(500 * attempt + Math.random() * 400);
+        }
+    }
+    throw lastErr;
+}
+
+// 提交队列：并发上传的文件各自创建好 blob 后进入队列，攒一小会儿合并成一次提交（blob→tree→commit→ref 只做一轮）。
+// 一次只有一个提交在飞，彻底避开同一分支并发写入造成的 409 / 非快进冲突。
+function getCommitQueue(ctx, owner, s, branch) {
+    if (ctx._cq) return ctx._cq;
+    const q = { pending: [], flushing: false, timer: null, head: { sha: '', tree: '' } };
+    const flush = async () => {
+        q.timer = null;
+        if (q.flushing || !q.pending.length) return;
+        q.flushing = true;
+        const batch = q.pending.splice(0, 100);
+        try {
+            const changes = batch.map(e => ({ path: e.path, mode: '100644', type: 'blob', sha: e.sha }));
+            const msg = batch.length === 1 ? '上传素材 ' + batch[0].path : '上传 ' + batch.length + ' 个素材';
+            const sha = await commitTreeChanges(owner, s.repo, branch, changes, msg, s, q.head);
+            batch.forEach(e => e.resolve(sha));
+        } catch (err) {
+            batch.forEach(e => e.reject(err));
+        } finally {
+            q.flushing = false;
+            if (q.pending.length && !q.timer) q.timer = setTimeout(flush, 0);
+        }
+    };
+    q.add = (path, sha) => new Promise((resolve, reject) => {
+        q.pending.push({ path, sha, resolve, reject });
+        if (!q.flushing && !q.timer) q.timer = setTimeout(flush, q.pending.length >= 100 ? 0 : 300);
+    });
+    ctx._cq = q;
+    return q;
 }
 
 // --- 上传前按内容查重：Git 的 blob sha = SHA-1("blob <字节数>\0" + 内容) ---
@@ -4838,29 +5381,35 @@ async function uploadBlobChunked(file, owner, s, onProgress) {
 const DEDUP_MAX_SIZE = 8 * 1024 * 1024; // 更大的文件整份读进内存算哈希太吃力，跳过查重
 async function gitBlobSha(file) {
     if (typeof crypto === 'undefined' || !crypto.subtle) return ''; // 非 https 环境没有 SubtleCrypto
-    const data = new Uint8Array(await file.arrayBuffer());
-    const head = new TextEncoder().encode('blob ' + data.length + '\0');
-    const all = new Uint8Array(head.length + data.length);
-    all.set(head, 0);
-    all.set(data, head.length);
+    const head = new TextEncoder().encode('blob ' + file.size + '\0');
+    const all = await new Blob([head, file]).arrayBuffer(); // 一次拼好，比先读出文件再手动拷贝少占一份内存
     const digest = new Uint8Array(await crypto.subtle.digest('SHA-1', all));
     return Array.from(digest, b => b.toString(16).padStart(2, '0')).join('');
 }
 function pathExt(p) { const m = String(p || '').match(/\.[^./]+$/); return m ? m[0].toLowerCase() : ''; }
 // 整批只取一次仓库文件树（每批 1 次请求），本批新传的文件也会加进来
-async function getRepoShaIndex(ctx, owner, branch, s) {
-    if (ctx._shaIndex) return ctx._shaIndex;
-    const idx = new Map();
-    try {
-        const tree = await githubRequest('/repos/' + owner + '/' + s.repo + '/git/trees/' + encodeURIComponent(branch) + '?recursive=1', { method: 'GET' }, s.token, s.proxy);
-        (tree.tree || []).forEach(x => {
-            if (x.type !== 'blob' || !x.sha || x.path.split('/').pop() === '.gitkeep') return;
-            if (!idx.has(x.sha)) idx.set(x.sha, x.path);
-        });
-        // 只有读取成功后才缓存；临时网络失败不能把空索引永久当成“仓库没有可复用文件”。
-        ctx._shaIndex = idx;
-    } catch (_) { /* 取不到就当没有，当前文件继续正常上传；下一文件仍允许再次尝试查重 */ }
-    return idx;
+function getRepoShaIndex(ctx, owner, branch, s) {
+    if (ctx._shaIndex) return Promise.resolve(ctx._shaIndex);
+    if (ctx._shaIndexP) return ctx._shaIndexP; // 并发上传时多个文件同时来查，只发一次请求
+    const p = (async () => {
+        const idx = new Map();
+        try {
+            const tree = await fetchRepoTree(owner, s.repo, branch, s);
+            (tree.tree || []).forEach(x => {
+                if (x.type !== 'blob' || !x.sha || x.path.split('/').pop() === '.gitkeep') return;
+                if (!idx.has(x.sha)) idx.set(x.sha, x.path);
+            });
+            // 同一棵树顺便拿来判断路径是否已存在；树被 GitHub 截断（仓库特别大）时不能据此断定「不存在」
+            ctx._pathSet = new Set((tree.tree || []).filter(x => x.type === 'blob').map(x => x.path));
+            ctx._treeTruncated = !!tree.truncated;
+            // 只有读取成功后才缓存；临时网络失败不能把空索引永久当成“仓库没有可复用文件”。
+            ctx._shaIndex = idx;
+        } catch (_) { /* 取不到就当没有，当前文件继续正常上传；下一文件仍允许再次尝试查重 */ }
+        return idx;
+    })();
+    ctx._shaIndexP = p;
+    p.then(() => { if (ctx._shaIndexP === p) ctx._shaIndexP = null; });
+    return p;
 }
 
 // --- 固定到提交版本：拿到本次提交的 sha，直链用 @sha 而不是 @分支 ---
@@ -4871,6 +5420,32 @@ async function resolvePinRef(commitSha, owner, branch, s) {
         const ref = await githubRequest('/repos/' + owner + '/' + s.repo + '/git/ref/heads/' + encodeURIComponent(branch), { method: 'GET' }, s.token, s.proxy);
         return (ref && ref.object && ref.object.sha) || branch;
     } catch (_) { return branch; }
+}
+
+// 路径分配：并发上传时必须串行决定「用哪个文件名」并立刻占位，否则两个同名文件会同时选中同一个路径
+function reservePath(initialPath, ctx, owner, branch, s) {
+    const run = () => findAvailableGithubPath(initialPath, ctx, owner, branch, s).then(p => { ctx.usedPaths.add(p); return p; });
+    const prev = ctx._allocChain || Promise.resolve();
+    const next = prev.then(run, run);
+    ctx._allocChain = next.catch(() => {});
+    return next;
+}
+
+// 仅用于「空仓库」兜底：空仓库不能创建 blob，只有 Contents API 能创建第一个提交
+async function uploadViaContentsApi(file, path, owner, branch, s) {
+    if (file.size > 25 * 1024 * 1024) throw new Error('这个仓库还是空的，大文件无法作为第一个提交。请先在仓库里随便传一个小文件，或新建仓库时让 App 自动初始化');
+    const content = await fileToBase64(file);
+    const contentsPath = '/repos/' + owner + '/' + s.repo + '/contents/' + path.split('/').map(encodeURIComponent).join('/');
+    let putRes = null;
+    try {
+        putRes = await githubRequest(contentsPath, { method: 'PUT', body: JSON.stringify({ message: '上传素材 ' + path, content, branch }) }, s.token, s.proxy);
+    } catch (e) {
+        // 之前的重试其实已写入成功、只是响应丢了：再次 PUT 会得到 422。路径已确认“原本不存在”，此时若已存在就是我们写进去的。
+        if (!/422/.test(String(e && e.message || ''))) throw e;
+        try { await githubRequest(contentsPath + '?ref=' + encodeURIComponent(branch), { method: 'GET' }, s.token, s.proxy); }
+        catch (_) { throw e; }
+    }
+    return putRes && putRes.commit && putRes.commit.sha;
 }
 
 async function uploadToGithub(file, ctx) {
@@ -4888,84 +5463,83 @@ async function uploadToGithub(file, ctx) {
     let safeName = getSafeFilename(file.name);
     // 没有扩展名的图片按 MIME 补上，否则 CDN 会用错误的 Content-Type 返回，图片无法显示
     if (isImage && !/\.[A-Za-z0-9]+$/.test(safeName) && (MIME_EXT[file.type] || file._sniffExt)) safeName += '.' + (MIME_EXT[file.type] || file._sniffExt);
+    if (isImage && uploadPref('naming') === 'random') {
+        const m = safeName.match(/\.[A-Za-z0-9]+$/);
+        safeName = randomFileStem() + (m ? m[0].toLowerCase() : '');
+    }
     let subDir = '';
     if (file._relPath) {
         const parts = String(file._relPath).split('/').filter(Boolean);
         parts.pop(); // 去掉文件名本身
         subDir = parts.map(safeDirName).join('/');
+    } else if (isImage && uploadPref('archive') === 'month') {
+        subDir = monthDirName();
     }
     let path = folder + '/' + (subDir ? subDir + '/' : '') + safeName;
 
     // 内容查重：已有完全相同的文件就直接复用
     let contentSha = '';
+    let pendRelease = null;
     if (file.size > 0 && file.size <= DEDUP_MAX_SIZE) {
-        try { contentSha = await gitBlobSha(file); } catch (_) { contentSha = ''; }
+        try { contentSha = await (file._shaP || gitBlobSha(file)); } catch (_) { contentSha = ''; }
         if (contentSha) {
-            const idx = await getRepoShaIndex(ctx, owner, branch, s);
-            const hit = idx.get(contentSha);
-            if (hit && pathExt(hit) === pathExt(path)) {
-                const ref = await resolvePinRef('', owner, branch, s);
-                return Object.assign(assetResult(file, owner, s.repo, branch, hit, ref), { deduped: true });
+            // 并发上传时，同一批里内容相同的文件：后到的等先到的传完，再查重复用，避免各传一份
+            const m = ctx._shaPending || (ctx._shaPending = new Map());
+            let pend;
+            while ((pend = m.get(contentSha))) { try { await pend; } catch (_) {} }
+            const pr = new Promise(r => { pendRelease = () => { if (m.get(contentSha) === pr) m.delete(contentSha); r(); }; });
+            m.set(contentSha, pr);
+            try {
+                const idx = await getRepoShaIndex(ctx, owner, branch, s);
+                const hit = idx.get(contentSha);
+                if (hit && pathExt(hit) === pathExt(path)) {
+                    const ref = await resolvePinRef('', owner, branch, s);
+                    pendRelease(); pendRelease = null;
+                    return Object.assign(assetResult(file, owner, s.repo, branch, hit, ref), { deduped: true });
+                }
+            } catch (e) { if (pendRelease) { pendRelease(); pendRelease = null; } throw e; }
+        }
+    }
+
+    let reserved = '';
+    try {
+        // 无论是本批次重名，还是仓库里已经存在同名文件，都自动换名，避免覆盖历史资源。
+        path = await reservePath(path, ctx, owner, branch, s);
+        reserved = path;
+
+        let commitSha = '';
+        const repoKey = owner + '/' + s.repo;
+        let viaBlob = !ctx._emptyRepo;
+        if (viaBlob) {
+            try {
+                if (!(file._blob && file._blob.key === repoKey)) { // 失败重试时 blob 已经建好就不再重传
+                    const blob = await uploadBlobChunked(file, owner, s, file._onProgress, ctx);
+                    file._blob = { key: repoKey, sha: blob.sha };
+                }
+            } catch (e) {
+                if (e && e.status === 409 && /empty/i.test(String(e.message))) { ctx._emptyRepo = true; viaBlob = false; }
+                else throw e;
             }
         }
-    }
-
-    // 无论是本批次重名，还是仓库里已经存在同名文件，都自动换名，避免覆盖历史资源。
-    path = await findAvailableGithubPath(path, ctx, owner, branch, s);
-
-    // 小文件（<800KB）走原来的 Contents API，一次请求搞定
-    if (file.size < 800 * 1024) {
-        const content = await fileToBase64(file);
-        const body = { message: '上传素材 ' + path, content, branch };
-
-        // 不传 sha：这里只允许“创建新文件”，不允许静默覆盖旧资源。
-        const contentsPath = '/repos/' + owner + '/' + s.repo + '/contents/' + path.split('/').map(encodeURIComponent).join('/');
-        let putRes = null;
-        try {
-            putRes = await githubRequest(contentsPath, { method: 'PUT', body: JSON.stringify(body) }, s.token, s.proxy);
-        } catch (e) {
-            // 之前的重试其实已写入成功、只是响应丢了：再次 PUT 会得到 422。
-            // 路径在上面已确认“原本不存在”，此时若已存在，说明就是我们写进去的，视为成功。
-            if (!/422/.test(String(e && e.message || ''))) throw e;
-            try {
-                await githubRequest(contentsPath + '?ref=' + encodeURIComponent(branch), { method: 'GET' }, s.token, s.proxy);
-            } catch (_) { throw e; }
+        if (viaBlob) {
+            if (file._onProgress) file._onProgress('提交中…', 1);
+            // 进入提交队列：和同时在传的其他文件合并成一次提交
+            commitSha = await getCommitQueue(ctx, owner, s, branch).add(path, file._blob.sha);
+        } else {
+            if (file._onProgress) file._onProgress('提交中…');
+            commitSha = await uploadViaContentsApi(file, path, owner, branch, s);
+            ctx._emptyRepo = false; // 第一个提交已经建好，之后的文件恢复走批量提交
+            if (ctx._cq) ctx._cq.head = { sha: '', tree: '' };
         }
 
-        ctx.usedPaths.add(path);
+        reserved = ''; // 成功：路径保持占用
         if (contentSha && ctx._shaIndex) ctx._shaIndex.set(contentSha, path);
-        const ref = await resolvePinRef(putRes && putRes.commit && putRes.commit.sha, owner, branch, s);
+        const ref = await resolvePinRef(commitSha, owner, branch, s);
         return assetResult(file, owner, s.repo, branch, path, ref);
+    } finally {
+        if (reserved) ctx.usedPaths.delete(reserved); // 失败：释放占位，重试时可以重新分配
+        if (pendRelease) pendRelease();
     }
-
-    // 大文件（常见于字体）：改用 Git Data API（blob→tree→commit→ref），避免 Contents API 的小文件限制。
-    const blob = await uploadBlobChunked(file, owner, s, file._onProgress);
-
-    const refData = await githubRequest('/repos/' + owner + '/' + s.repo + '/git/ref/heads/' + branch, { method: 'GET' }, s.token, s.proxy);
-    const latestCommitSha = refData.object.sha;
-    const latestCommit = await githubRequest('/repos/' + owner + '/' + s.repo + '/git/commits/' + latestCommitSha, { method: 'GET' }, s.token, s.proxy);
-    const baseTreeSha = latestCommit.tree.sha;
-
-    const newTree = await githubRequest('/repos/' + owner + '/' + s.repo + '/git/trees',
-        { method: 'POST', body: JSON.stringify({
-            base_tree: baseTreeSha,
-            tree: [{ path, mode: '100644', type: 'blob', sha: blob.sha }]
-        }) }, s.token, s.proxy);
-
-    const newCommit = await githubRequest('/repos/' + owner + '/' + s.repo + '/git/commits',
-        { method: 'POST', body: JSON.stringify({
-            message: '上传素材 ' + path,
-            tree: newTree.sha,
-            parents: [latestCommitSha]
-        }) }, s.token, s.proxy);
-
-    await githubRequest('/repos/' + owner + '/' + s.repo + '/git/refs/heads/' + branch,
-        { method: 'PATCH', body: JSON.stringify({ sha: newCommit.sha }) }, s.token, s.proxy);
-
-    ctx.usedPaths.add(path);
-    if (contentSha && ctx._shaIndex) ctx._shaIndex.set(contentSha, path);
-    const ref = await resolvePinRef(newCommit.sha, owner, branch, s);
-    return assetResult(file, owner, s.repo, branch, path, ref);
 }
 
 // --- 结果条目构建（本次上传列表用） ---
@@ -5025,20 +5599,29 @@ function buildResultItem(name, isImage) {
     return { item, thumb, head, input, btn, action };
 }
 
-async function copyText(url) {
-    toast((await writeClipboard(url)) ? '已复制直链' : '复制失败，请手动复制');
+async function copyText(url, name) {
+    const fmt = prefCopyFormat();
+    toast((await writeClipboard(formatLink(url, name, fmt))) ? FMT_COPIED_ONE[fmt] : '复制失败，请手动复制');
 }
 
-async function copyTextList(urls) {
-    toast((await writeClipboard(urls.join('\n'))) ? ('已复制 ' + urls.length + ' 条链接') : '复制失败，请手动复制');
+// items：字符串（直链）或 { url, name }
+async function copyTextList(items) {
+    const fmt = prefCopyFormat();
+    const lines = items.map(it => typeof it === 'string' ? formatLink(it, '', fmt) : formatLink(it.url, it.name, fmt));
+    toast((await writeClipboard(lines.join('\n'))) ? FMT_COPIED_MANY[fmt](lines.length) : '复制失败，请手动复制');
 }
 
 // --- 本次上传结果：复制全部 / 清空 ---
+function collectBatchLinks() {
+    return Array.from(document.querySelectorAll('#results-list .result-item')).map(it => ({
+        url: ((it.querySelector('.result-action .url-input') || {}).value || ''),
+        name: ((it.querySelector('.result-name') || {}).textContent || '')
+    })).filter(x => x.url);
+}
 function copyBatchLinks() {
-    const inputs = document.querySelectorAll('#results-list .result-action .url-input');
-    const urls = Array.from(inputs).map(i => i.value).filter(Boolean);
-    if (!urls.length) return toast('暂无链接', 'info');
-    copyTextList(urls);
+    const items = collectBatchLinks();
+    if (!items.length) return toast('暂无链接', 'info');
+    copyTextList(items);
 }
 
 function clearBatchResults() {
@@ -5070,18 +5653,59 @@ async function resolveGithubContext(opts = {}) {
     try {
         const repoData = await githubRequest('/repos/' + owner + '/' + s.repo, { method: 'GET' }, s.token, s.proxy);
         branch = repoData.default_branch || 'main';
+        repoUsage = { kb: Number(repoData.size) || 0, at: Date.now(), repo: s.repo };
     } catch (e) {
         if (e.message.includes('404') || e.message.includes('Not Found')) {
             // 只有“上传”才允许自动创建仓库；单纯浏览资源库不应有创建仓库的副作用。
             if (!opts.createIfMissing) throw new Error('仓库 ' + owner + '/' + s.repo + ' 不存在，上传第一个文件时会自动创建');
             const created = await githubRequest('/user/repos', { method: 'POST', body: JSON.stringify({ name: s.repo, auto_init: true }) }, s.token, s.proxy);
             branch = created.default_branch || 'main';
+            repoUsage = { kb: 0, at: Date.now(), repo: s.repo };
         } else throw e;
     }
     return { owner, branch, usedPaths: new Set() };
 }
 
 // --- 单个文件上传（含重试） ---
+// 上传前处理（HEIC 转 JPG / 压缩 / 转 WebP）+ 查重哈希。放进并发池后，下一批文件在当前文件上传时就开始处理，
+// 但同一时刻最多只处理 2 张（canvas 很吃内存，手机上同时处理太多会被系统杀掉页面）。
+const prepSem = (() => {
+    let free = 2; const q = [];
+    return {
+        acquire() { return free > 0 ? (free--, Promise.resolve()) : new Promise(r => q.push(r)); },
+        release() { const n = q.shift(); if (n) n(); else free++; }
+    };
+})();
+function carryFileProps(from, to) {
+    ['_collector', '_srcUrl', '_afterFn', '_forceImage', '_sniffExt', '_orderTime'].forEach(k => { if (from[k] !== undefined) to[k] = from[k]; });
+    if (from._relPath) to._relPath = from._relPath;
+    return to;
+}
+function startPrepare(file) {
+    if (!file || file._prep) return;
+    file._prep = (async () => {
+        await prepSem.acquire();
+        try {
+            let work = file;
+            // 偏好「HEIC 转 JPG」：上传前转换（原先只在“存到相册”时生效，和说明不符）。转不了（非 Safari）就保持原文件。
+            if (prefHeicJpg() && isHeicFile(file)) {
+                try {
+                    const jpg = await heicToJpegFile(file);
+                    carryFileProps(file, jpg);
+                    if (file._relPath) jpg._relPath = file._relPath.replace(HEIC_RE, '') + '.jpg';
+                    jpg._forceImage = true;
+                    work = jpg;
+                } catch (_) { work = file; }
+            }
+            if (prefCompress() !== 'off' && isImageFile(work)) {
+                try { work = await preprocessFile(work); } catch (_) { /* 保持 work */ }
+            }
+            if (work !== file) file._processed = work;
+        } finally { prepSem.release(); }
+        const up = file._processed || file;
+        if (up.size > 0 && up.size <= DEDUP_MAX_SIZE && !up._shaP) up._shaP = gitBlobSha(up).catch(() => '');
+    })().catch(() => {});
+}
 async function runUpload(file, refs, ctx) {
     const statusEl = refs.head.querySelector('.result-status');
     statusEl.className = 'result-status';
@@ -5094,28 +5718,37 @@ async function runUpload(file, refs, ctx) {
     const oldRetry = refs.action.querySelector('.retry-btn');
     if (oldRetry) oldRetry.remove();
 
-    file._onProgress = t => { statusEl.textContent = t; };
+    file._onProgress = (t, f) => { statusEl.textContent = t; if (f != null && file._setFrac) file._setFrac(f); };
     try {
+        // 上传前处理；结果缓存在 file 上，失败重试时不会重复处理
+        if (!file._prep) startPrepare(file);
+        if (!file._processed) statusEl.textContent = '处理中…';
+        await file._prep;
+        const up = file._processed || file;
+        up._onProgress = file._onProgress;
         let url = null, upErr = null;
         for (let attempt = 0; attempt < 3; attempt++) {
-            try { url = await uploadToGithub(file, ctx); upErr = null; break; }
+            try { url = await uploadToGithub(up, ctx); upErr = null; break; }
             catch (e) {
                 upErr = e;
                 if (attempt === 2 || !isTransientUploadError(e)) break;
                 statusEl.textContent = '重试中 ' + (attempt + 1) + '/2…';
-                if (ctx) ctx._shaIndex = null; // 重新读取仓库内容，避免“上次其实已成功”造成重复文件
+                if (ctx) { ctx._shaIndex = null; ctx._pathSet = null; } // 重新读取仓库内容，避免“上次其实已成功”造成重复文件
+                await waitOnline(60000);
                 await sleep(1500 * (attempt + 1) + Math.random() * 400);
             }
         }
         if (upErr) throw upErr;
-        file._onProgress = null;
+        file._onProgress = null; up._onProgress = null;
+        if (file._setFrac) file._setFrac(1);
         statusEl.className = 'result-status ok';
-        statusEl.textContent = url.deduped ? '✓ 已存在 · 复用' : (url.viaRaw ? '✓ 成功 · raw' : '✓ 成功');
+        const saveNote = up._saveNote ? (' · ' + up._saveNote) : '';
+        statusEl.textContent = url.deduped ? '✓ 已存在 · 复用' : (url.viaRaw ? '✓ 成功 · raw' : '✓ 成功') + saveNote;
         if (url.deduped) statusEl.title = '仓库里已有内容完全相同的文件，直接复用了它的直链，没有重复上传';
         else if (url.viaRaw) statusEl.title = '超过 20MB，jsDelivr 不支持，已改用 GitHub raw 直链';
         refs.input.value = url.url || url;
         refs.btn.disabled = false;
-        refs.btn.onclick = () => copyText(url.url || url);
+        refs.btn.onclick = () => copyText(url.url || url, up.name);
         if (file._collector && file._srcUrl) file._collector.set(file._srcUrl, url.url || url);
         if (refs.retried && file._afterFn) file._afterFn(); // 「替换文件」流程里手动重试成功：重新生成可下载的替换结果
 
@@ -5124,24 +5757,27 @@ async function runUpload(file, refs, ctx) {
             const pr = historyAssetRef(e);
             return pr && uploadKey(pr.owner, pr.repo, pr.path) === uploadKey(url.owner, url.repo, url.path);
         });
+        const stamp = file._orderTime || Date.now(); // 并发上传时按选择顺序打时间，图库 / 仓库排序不会因为谁先传完而乱
         if (!alreadyInHistory) addToHistory({
             id: Date.now() + '-' + Math.random().toString(36).slice(2),
-            name: file.name,
+            name: up.name,
             url: url.url || url,
-            isImage: isImageFile(file),
-            isFont: !isImageFile(file) && FONT_EXT_RE.test(file.name || ''),
-            size: file.size || 0,
-            time: Date.now(),
+            isImage: isImageFile(up),
+            isFont: !isImageFile(up) && FONT_EXT_RE.test(up.name || ''),
+            size: up.size || 0,
+            time: stamp,
             githubOwner: url.owner || '',
             githubRepo: url.repo || '',
             githubBranch: url.branch || '',
             githubPath: url.path || ''
         });
-        if (!url.deduped) recordUploadOrder(url.owner, url.repo, url.path, Date.now());
+        if (!url.deduped) recordUploadOrder(url.owner, url.repo, url.path, stamp);
         repoLiveLoaded = false; // 仓库内容已变化，下次进入资源库时重新读取
-        return { ok: true };
+        forgetFailedUpload(file);
+        return { ok: true, url: url.url || url, name: up.name };
     } catch (err) {
         file._onProgress = null;
+        if (file._processed) file._processed._onProgress = null;
         const message = err.message || '未知错误';
 
         // 列表里只保留简洁的“失败”，避免长错误信息把卡片撑爆。
@@ -5151,6 +5787,7 @@ async function runUpload(file, refs, ctx) {
         statusEl.style.cursor = 'pointer';
 
         const failure = { name: file.name, message };
+        persistFailedUpload(file, ctx, message);
         statusEl.onclick = () => showUploadErrorModal([failure]);
 
         const retryBtn = document.createElement('button');
@@ -5587,7 +6224,7 @@ function appIconSrc() {
     try { const src = appIconSrc(); if (src) appIconBlobUrl = URL.createObjectURL(await (await fetch(src)).blob()); } catch (_) {}
 })();
 const keepAlive = (() => {
-    let audio = null, active = false, armed = false, warned = false;
+    let audio = null, active = false, armed = false, warned = false, watchdog = null;
     function makeWavUrl() {
         const rate = 8000, secs = 4, n = rate * secs;
         const buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
@@ -5605,7 +6242,11 @@ const keepAlive = (() => {
         audio.loop = true; audio.preload = 'auto';
         audio.setAttribute('playsinline', '');
         // 来电 / 闹钟 / 控制中心暂停等系统打断后，上传还没结束就自动接着播
-        audio.addEventListener('pause', () => { if (active) setTimeout(() => { if (active && audio.paused) tryPlay(); }, 300); });
+        audio.addEventListener('pause', () => { if (active) setTimeout(() => { if (active && audio && audio.paused) tryPlay(); }, 300); });
+        // 音频元素出错 / 被系统回收：丢掉重建，否则保活会悄悄失效
+        const rebuild = () => { if (!active) return; audio = null; setTimeout(() => { if (active) tryPlay(); }, 500); };
+        audio.addEventListener('error', rebuild);
+        audio.addEventListener('ended', () => { if (active) tryPlay(); });
         return audio;
     }
     function setSession(on) {
@@ -5634,22 +6275,35 @@ const keepAlive = (() => {
         });
     }
     return {
-        start(quiet) { if (active || !prefKeepAlive()) return; active = true; warned = !!quiet; setSession(true); tryPlay(); },
+        start(quiet, force) {
+            if (active || (!force && !prefKeepAlive())) return;
+            active = true; warned = !!quiet; setSession(true); tryPlay();
+            // 看门狗：每 4 秒确认一次还在播。来电结束、被其他 App 抢走音频、被系统静默暂停时，不用等切回前台就能自己恢复
+            clearInterval(watchdog);
+            watchdog = setInterval(() => { if (active && (!audio || audio.paused)) tryPlay(); }, 4000);
+        },
         stop() {
             if (!active && !(audio && !audio.paused)) return;
             active = false;
+            clearInterval(watchdog); watchdog = null;
             if (audio) { try { audio.pause(); audio.currentTime = 0; } catch (_) {} }
             setSession(false);
         },
-        resume() { if (active && audio && audio.paused) tryPlay(); }
+        resume() { if (active && (!audio || audio.paused)) tryPlay(); }
     };
 })();
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') keepAlive.resume(); });
 window.addEventListener('pageshow', () => keepAlive.resume());
+// iOS 音频会话被打断（来电 / 闹钟 / Siri）后恢复时，立刻把静音音频接上
+try { if (navigator.audioSession && navigator.audioSession.addEventListener) navigator.audioSession.addEventListener('statechange', () => keepAlive.resume()); } catch (_) {}
+try { if ('mediaSession' in navigator) navigator.mediaSession.setActionHandler('play', () => keepAlive.resume()); } catch (_) {}
 
 /* ===== 保活 / 常亮：由两个开关直接决定，开着就一直生效（不再只在上传时） ===== */
+let wakeLockPending = false;
 async function requestScreenWakeLock() {
     if (!prefWakeLock() || !('wakeLock' in navigator) || document.visibilityState !== 'visible') return;
+    if (wakeLockPending) return; // 申请还没返回时又来一次（切回前台 + 开关同时触发）：不能重复申请，否则旧的 lock 丢了引用就再也释放不掉
+    wakeLockPending = true;
     try {
         if (uploadWakeLock && !uploadWakeLock.released) return;
         const lock = await navigator.wakeLock.request('screen');
@@ -5661,6 +6315,7 @@ async function requestScreenWakeLock() {
             if (prefWakeLock() && document.visibilityState === 'visible') setTimeout(requestScreenWakeLock, 150);
         });
     } catch (_) { uploadWakeLock = null; }
+    finally { wakeLockPending = false; }
 }
 
 function releaseWakeLockOnly() {
@@ -5684,6 +6339,12 @@ document.addEventListener('visibilitychange', () => {
 });
 // 启动时按开关状态开启；iOS 不允许无手势播放音频，被拒绝时会在第一次触摸时自动补上（静默，不弹提示）
 applyKeepModes(true);
+
+// 上传中关闭 / 刷新页面：桌面浏览器会先提示一下（iOS 主屏幕 App 不支持，但无害）
+window.addEventListener('beforeunload', e => { if (isBatchUploading) { e.preventDefault(); e.returnValue = ''; } });
+// 上传中断网 / 恢复：给个明确提示，重试会等到网络恢复后再继续（见 waitOnline）
+window.addEventListener('offline', () => { if (isBatchUploading) toast('网络已断开，恢复后会自动继续', 'info'); });
+window.addEventListener('online', () => { if (isBatchUploading) toast('网络已恢复，继续上传', 'ok'); });
 
 
 // ===== ZIP 压缩包导入：在浏览器里解压，只取图片 / 字体 =====
@@ -5792,6 +6453,8 @@ async function handleFiles(files) {
     expanded.forEach(file => {
         if (!isAllowedAssetFile(file)) {
             invalidFailures.push({ name: file.name || '未命名文件', message: '不支持的文件类型，仅支持图片和 TTF/OTF/WOFF/WOFF2 字体' });
+        } else if (!file.size) {
+            invalidFailures.push({ name: file.name || '未命名文件', message: '文件大小为 0（可能还在 iCloud、没下载到本机）' });
         } else if (file.size > MAX_UPLOAD_SIZE) {
             invalidFailures.push({ name: file.name || '未命名文件', message: '文件超过 ' + Math.round(MAX_UPLOAD_SIZE / 1048576) + 'MB，无法安全上传到 GitHub' });
         } else {
@@ -5801,6 +6464,22 @@ async function handleFiles(files) {
     if (!validFiles.length) {
         if (invalidFailures.length) showUploadErrorModal(invalidFailures, { title: '文件已跳过', sub: invalidFailures.length + ' 个文件不符合要求，未上传' });
         return;
+    }
+
+    // 仓库已超过 GitHub 建议的 1GB：上传前让用户确认一次（同一仓库确认过就不再反复问）
+    {
+        const cur = getSettings();
+        const usedNow = repoUsedBytesNow();
+        if (usedNow >= REPO_SOFT_LIMIT && overLimitOkRepo !== cur.repo) {
+            const goOn = await showConfirm({
+                title: '仓库已超过 1 GB',
+                message: cur.repo + ' 已用 ' + fmtSize(usedNow) + '，超过 GitHub 建议的 1 GB。继续上传也可以，但建议清理不用的文件，或换一个仓库。',
+                confirmText: '继续上传',
+                cancelText: '换个仓库'
+            });
+            if (!goOn) { openRepoSheet(); return; }
+            overLimitOkRepo = cur.repo;
+        }
     }
 
     // 防止在上一批还没跑完时又触发新一批（比如手快连点两次“转换”），
@@ -5828,6 +6507,7 @@ async function handleFiles(files) {
     let done = 0;
     const failures = invalidFailures.slice();
     let failedCount = 0; // 仅统计上传失败的文件（不含被跳过的非法文件）
+    const batchOk = []; // 本批成功的 { url, name }，用于自动复制
 
     if (progress) progress.classList.add('show');
     if (fill) fill.style.width = '0%';
@@ -5851,31 +6531,67 @@ async function handleFiles(files) {
         return;
     }
 
-    for (let i = 0; i < validFiles.length; i++) {
-        const file = validFiles[i];
-        const isImage = isImageFile(file);
-        const refs = buildResultItem(file._relPath || file.name, isImage);
-        if (isImage) {
+    // ---- 并发上传池：最多 3 个文件同时传；在途数据超过 48MB 时先等一等（手机内存有限）----
+    // 先把所有结果行建好（状态“等待中”），缩略图等轮到该文件时再加载，避免一次性解码几十张大图。
+    const POOL = 3, MAX_INFLIGHT_BYTES = 48 * 1024 * 1024;
+    const batchStamp = Date.now();
+    const items = validFiles.map((file, i) => {
+        file._orderTime = batchStamp + i; // 按选择顺序给时间戳，不受谁先传完影响
+        const refs = buildResultItem(file._relPath || file.name, isImageFile(file));
+        refs.head.querySelector('.result-status').textContent = '等待中';
+        list.appendChild(refs.item);
+        return { file, refs, i };
+    });
+    const results = new Array(items.length);
+    const fracs = new Map();
+    let active = 0, nextIdx = 0, inflightBytes = 0;
+    const updateBar = () => {
+        let part = 0; fracs.forEach(f => { part += f; });
+        const pct = Math.min(100, Math.round(((done + part) / total) * 100));
+        if (fill) fill.style.width = pct + '%';
+        if (percent) percent.textContent = pct + '%';
+        if (text && done < total) text.textContent = '正在上传 · 已完成 ' + done + '/' + total + (active > 1 ? '（同时 ' + active + ' 个）' : '');
+    };
+    const launch = async it => {
+        const { file, refs, i } = it;
+        if (isImageFile(file)) {
             const objUrl = URL.createObjectURL(file);
             refs.thumb.onload = refs.thumb.onerror = () => URL.revokeObjectURL(objUrl);
             refs.thumb.src = objUrl;
         }
-        list.appendChild(refs.item);
-        if (text) text.textContent = '正在上传 ' + (i + 1) + '/' + total + '：' + file.name;
-
-        const result = await runUpload(file, refs, ctx);
+        startPrepare(items[i + 1] && items[i + 1].file); // 传当前这个的同时，提前处理后面两个
+        startPrepare(items[i + 2] && items[i + 2].file);
+        file._setFrac = f => { fracs.set(i, Math.max(0, Math.min(1, f))); updateBar(); };
+        fracs.set(i, 0);
+        let result;
+        try { result = await runUpload(file, refs, ctx); }
+        catch (e) { result = { ok: false, failure: { name: file.name, message: (e && e.message) || '未知错误' } }; }
+        file._setFrac = null;
+        fracs.delete(i);
+        results[i] = result;
         if (!result.ok && result.failure) { failures.push(result.failure); failedCount++; }
-
         done++;
-        const pct = Math.round((done / total) * 100);
-        if (fill) fill.style.width = pct + '%';
-        if (percent) percent.textContent = pct + '%';
-
-        // 文件之间留一点间隔，避免短时间内请求过于密集触发 GitHub 限流。
-        if (i < validFiles.length - 1) await new Promise(r => setTimeout(r, 300));
-    }
+        updateBar();
+    };
+    await new Promise(resolve => {
+        const pump = () => {
+            while (active < POOL && nextIdx < items.length) {
+                const it = items[nextIdx];
+                const sz = it.file.size || 0;
+                if (active > 0 && inflightBytes + sz > MAX_INFLIGHT_BYTES) break;
+                nextIdx++; active++; inflightBytes += sz;
+                launch(it).then(() => {}, () => {}).then(() => { active--; inflightBytes -= sz; pump(); });
+            }
+            if (active === 0 && nextIdx >= items.length) resolve();
+        };
+        updateBar();
+        pump();
+    });
+    results.forEach(r => { if (r && r.ok && r.url) batchOk.push({ url: r.url, name: r.name }); }); // 按选择顺序，自动复制的链接顺序和文件顺序一致
 
     notifyUploadDone(total - failedCount, failedCount, invalidFailures.length);
+    const autoCopy = (prefAutoCopy() && batchOk.length) ? await autoCopyBatch(batchOk) : 'off';
+    afterBatchUsageCheck(ctx);
     if (failures.length) {
         if (text) text.textContent = failedCount
             ? ('完成 · ' + (total - failedCount) + '/' + total + ' 成功，' + failedCount + ' 个失败')
@@ -5886,7 +6602,9 @@ async function handleFiles(files) {
     } else {
         if (text) text.textContent = '上传完成 · ' + done + '/' + total;
         if (percent) percent.textContent = '100%';
-        toast('上传完成');
+        if (autoCopy === 'ok') toast('上传完成，已复制 ' + batchOk.length + ' 条链接');
+        else if (autoCopy === 'fail') toast('上传完成。系统拦截了自动复制，请点「复制全部」', 'info');
+        else toast('上传完成');
         // 全部成功才跳转；有失败时留在原页，方便看失败原因和重试
         if (prefAutoJump() && done > 0) {
             setTimeout(() => {
@@ -5906,6 +6624,778 @@ async function handleFiles(files) {
         if (importBtn) importBtn.disabled = false;
         if (replaceBtn) replaceBtn.disabled = false;
     }
+}
+
+
+/* ====================================================================
+   v1.3 新功能：复制格式 / 自动复制 / 粘贴上传 / 压缩与 WebP / 重命名 /
+   排序 / 仓库用量 / 失效链接检测
+   ==================================================================== */
+const PREF_COPYFMT_KEY = 'kb_pref_copyfmt';
+const PREF_AUTOCOPY_KEY = 'kb_pref_autocopy';
+const PREF_CLIPWATCH_KEY = 'kb_pref_clipwatch';
+const PREF_LINKCHECK_KEY = 'kb_pref_linkcheck';
+const PREF_COMPRESS_KEY = 'kb_pref_compress';
+const GALLERY_SORT_KEY = 'kb_gallery_sort';
+const REPO_SORT_KEY = 'kb_repo_sort';
+const LINKCHK_KEY = 'kb_link_check';
+const LINKCHK_AT_KEY = 'kb_link_check_at';
+function lsGet(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (_) {} }
+function prefAutoCopy() { return lsGet(PREF_AUTOCOPY_KEY) === '1'; }
+function prefClipWatch() { return lsGet(PREF_CLIPWATCH_KEY) === '1'; }
+function prefLinkCheck() { return lsGet(PREF_LINKCHECK_KEY) === '1'; }
+
+/* ---------- 1. 复制格式：直链 / Markdown / HTML ---------- */
+const COPY_FORMATS = { url: '直链', md: 'Markdown', html: 'HTML' };
+const FMT_COPIED_ONE = { url: '已复制直链', md: '已复制 Markdown', html: '已复制 HTML' };
+const FMT_COPIED_MANY = {
+    url: n => '已复制 ' + n + ' 条链接',
+    md: n => '已复制 ' + n + ' 条 Markdown',
+    html: n => '已复制 ' + n + ' 条 HTML'
+};
+function prefCopyFormat() { const v = lsGet(PREF_COPYFMT_KEY); return COPY_FORMATS[v] ? v : 'url'; }
+function linkNameFromUrl(url) {
+    try { return decodeURIComponent(String(url).split(/[?#]/)[0].split('/').pop() || ''); } catch (_) { return ''; }
+}
+function escapeHtmlAttr(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+// 图片 → ![名称](链接) / <img>；字体等其他文件 → 普通超链接
+function formatLink(url, name, fmt) {
+    fmt = fmt || prefCopyFormat();
+    if (fmt === 'url') return url;
+    const full = String(name || '').trim() || linkNameFromUrl(url);
+    const base = full.split('/').pop(); // 文件夹上传时名称带路径，只取文件名
+    const isImg = IMAGE_EXT_RE.test(base) || IMAGE_EXT_RE.test(String(url).split(/[?#]/)[0]);
+    const alt = base.replace(/\.[^./]+$/, '') || base;
+    if (fmt === 'md') {
+        const u = String(url).replace(/\(/g, '%28').replace(/\)/g, '%29'); // 文件名里的括号会截断 Markdown 链接
+        return isImg ? '![' + alt.replace(/[\[\]]/g, '') + '](' + u + ')' : '[' + base.replace(/[\[\]]/g, '') + '](' + u + ')';
+    }
+    return isImg
+        ? '<img src="' + escapeHtmlAttr(url) + '" alt="' + escapeHtmlAttr(alt) + '">'
+        : '<a href="' + escapeHtmlAttr(url) + '">' + escapeHtmlAttr(base) + '</a>';
+}
+function refreshCopyFormatUI() {
+    const v = prefCopyFormat();
+    document.querySelectorAll('#pref-copyfmt button').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+    document.querySelectorAll('#copy-fmt-group .filter-btn').forEach(b => b.classList.toggle('active', b.dataset.cf === v));
+}
+function setCopyFormat(v) {
+    if (!COPY_FORMATS[v]) return;
+    lsSet(PREF_COPYFMT_KEY, v);
+    refreshCopyFormatUI();
+}
+function cycleCopyFormat() {
+    const order = ['url', 'md', 'html'];
+    const next = order[(order.indexOf(prefCopyFormat()) + 1) % order.length];
+    setCopyFormat(next);
+    toast('复制格式：' + COPY_FORMATS[next]);
+}
+
+/* ---------- 2. 上传后自动复制 ---------- */
+async function autoCopyBatch(items) {
+    const fmt = prefCopyFormat();
+    const ok = await writeClipboard(items.map(it => formatLink(it.url, it.name, fmt)).join('\n'));
+    if (!ok) {
+        // iPhone 常在长时间上传后拒绝「没有用户操作」的复制：让「复制全部」闪一下，提醒手动点一次
+        const btn = document.querySelector('#result-card .card-head-actions .small-btn');
+        if (btn) { btn.classList.remove('pulse'); void btn.offsetWidth; btn.classList.add('pulse'); setTimeout(() => btn.classList.remove('pulse'), 3600); }
+    }
+    return ok ? 'ok' : 'fail';
+}
+
+/* ---------- 3. 剪贴板 / 相册上传 ---------- */
+const CLIP_EXT = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif', 'image/heic': 'heic', 'image/heif': 'heif', 'image/avif': 'avif', 'image/bmp': 'bmp' };
+function clipboardFileName(type, i) {
+    const d = new Date(), p = n => String(n).padStart(2, '0');
+    return 'paste-' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds())
+        + (i ? '-' + (i + 1) : '') + '.' + (CLIP_EXT[type] || 'png');
+}
+async function readClipboardImages() {
+    if (!navigator.clipboard || !navigator.clipboard.read) throw Object.assign(new Error('unsupported'), { code: 'unsupported' });
+    const items = await navigator.clipboard.read();
+    const files = [];
+    for (const it of items) {
+        const t = it.types.find(x => /^image\//i.test(x));
+        if (!t) continue;
+        const blob = await it.getType(t);
+        files.push(new File([blob], clipboardFileName(t, files.length), { type: t }));
+    }
+    return files;
+}
+async function pasteUploadFromClipboard() {
+    if (isBatchUploading) return toast('上传中，请稍候', 'info');
+    let files;
+    try { files = await readClipboardImages(); }
+    catch (e) {
+        if (e && e.code === 'unsupported') toast('当前环境读不了剪贴板，请点上方虚线框从相册选择', 'error');
+        else toast('没有拿到剪贴板权限，请在弹出的提示里选「允许粘贴」后再点一次', 'error');
+        return;
+    }
+    if (!files.length) return toast('剪贴板里没有图片，先复制一张图', 'info');
+    moveResultCardAfter('card-upload');
+    handleFiles(files);
+}
+// 在上传页直接 Ctrl/⌘+V、或长按输入框粘贴图片
+document.addEventListener('paste', e => {
+    const up = $('page-upload');
+    if (!up || !up.classList.contains('active')) return;
+    const dlg = $('dlg-backdrop');
+    if (dlg && dlg.classList.contains('show')) return;
+    let files = Array.from((e.clipboardData && e.clipboardData.files) || []).filter(f => /^image\//i.test(f.type));
+    if (!files.length) return;
+    e.preventDefault();
+    files = files.map((f, i) => (f.name && !/^image\.(png|jpe?g)$/i.test(f.name)) ? f : new File([f], clipboardFileName(f.type, i), { type: f.type }));
+    moveResultCardAfter('card-upload');
+    handleFiles(files);
+});
+
+// 「回到 App 时检测剪贴板图片」：发现图片就弹出横幅，点「上传」才会真正上传
+let clipBannerFiles = null, clipBannerTimer = null, lastClipSig = '', clipChecking = false;
+function showClipBanner(files) {
+    clipBannerFiles = files;
+    const img = $('clip-thumb');
+    if (img._url) URL.revokeObjectURL(img._url);
+    img._url = URL.createObjectURL(files[0]);
+    img.src = img._url;
+    const t = $('clip-text');
+    t.textContent = '剪贴板里有 ' + files.length + ' 张图片';
+    const sp = document.createElement('span');
+    sp.textContent = '点「上传」传到图床';
+    t.appendChild(sp);
+    $('clip-banner').classList.add('show');
+    clearTimeout(clipBannerTimer);
+    clipBannerTimer = setTimeout(() => hideClipBanner(false), 12000);
+}
+function hideClipBanner(dismissed) {
+    $('clip-banner').classList.remove('show');
+    clearTimeout(clipBannerTimer);
+    if (dismissed) clipBannerFiles = null;
+}
+function uploadClipboardBanner() {
+    const files = clipBannerFiles;
+    hideClipBanner(true);
+    if (!files || !files.length) return;
+    if (!$('page-upload').classList.contains('active')) openPage('upload');
+    moveResultCardAfter('card-upload');
+    handleFiles(files);
+}
+async function checkClipboardOnOpen() {
+    if (!prefClipWatch() || clipChecking || isBatchUploading) return;
+    if (document.visibilityState !== 'visible') return;
+    const s = getSettings();
+    if (!s.token || !s.repo) return;
+    clipChecking = true;
+    try {
+        const files = await readClipboardImages();
+        if (!files.length) return;
+        const sig = files.map(f => f.type + ':' + f.size).join('|');
+        if (sig === lastClipSig) return; // 同一张图只提示一次
+        lastClipSig = sig;
+        showClipBanner(files);
+    } catch (_) { /* 没权限 / 没图片：安静地什么都不做 */ }
+    finally { clipChecking = false; }
+}
+(function () {
+    let t = null;
+    const kick = () => { clearTimeout(t); t = setTimeout(checkClipboardOnOpen, 600); };
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') kick(); });
+    window.addEventListener('focus', kick);
+    window.addEventListener('pageshow', kick);
+    setTimeout(kick, 1500);
+})();
+
+/* ---------- 4. 上传前压缩 / 转 WebP ---------- */
+/* ---------- 文件名 / 文件夹归档（只作用于图片；字体保持原名、原位置） ---------- */
+const UPLOAD_PREFS = { naming: { key: 'kb_pref_naming', def: 'keep', ok: ['keep', 'random'] }, archive: { key: 'kb_pref_archive', def: 'flat', ok: ['flat', 'month'] } };
+function uploadPref(name) { const o = UPLOAD_PREFS[name], v = lsGet(o.key); return o.ok.indexOf(v) >= 0 ? v : o.def; }
+function refreshUploadPrefUI() {
+    Object.keys(UPLOAD_PREFS).forEach(n => document.querySelectorAll('#pref-' + n + ' button').forEach(b => b.classList.toggle('active', b.dataset.v === uploadPref(n))));
+}
+function setUploadPref(name, v) {
+    const o = UPLOAD_PREFS[name];
+    if (!o || o.ok.indexOf(v) < 0) return;
+    lsSet(o.key, v);
+    refreshUploadPrefUI();
+}
+function randomFileStem() {
+    const a = new Uint8Array(6);
+    try { crypto.getRandomValues(a); } catch (_) { for (let i = 0; i < a.length; i++) a[i] = Math.floor(Math.random() * 256); }
+    return Array.from(a, x => (x % 36).toString(36)).join('') + Date.now().toString(36).slice(-3);
+}
+function monthDirName() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
+function prefCompress() { const v = lsGet(PREF_COMPRESS_KEY); return (v === 'compress' || v === 'webp') ? v : 'off'; }
+function refreshCompressUI() {
+    const v = prefCompress();
+    document.querySelectorAll('#pref-compress button').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+}
+function setCompressMode(v) {
+    lsSet(PREF_COMPRESS_KEY, v === 'compress' || v === 'webp' ? v : 'off');
+    refreshCompressUI();
+    toast(v === 'webp' ? '上传前会把图片转成 WebP' : v === 'compress' ? '上传前会压缩图片' : '已关闭上传前处理');
+}
+let webpEncodeOk = null, webpFallbackToasted = false;
+function canEncodeWebp() {
+    if (webpEncodeOk !== null) return Promise.resolve(webpEncodeOk);
+    return new Promise(res => {
+        try {
+            const c = document.createElement('canvas'); c.width = c.height = 2;
+            // Safari 不支持 WebP 编码时会悄悄回退成 PNG，所以要核对返回的类型
+            c.toBlob(b => { webpEncodeOk = !!b && b.type === 'image/webp'; res(webpEncodeOk); }, 'image/webp', 0.8);
+        } catch (_) { webpEncodeOk = false; res(false); }
+    });
+}
+function loadImageForCanvas(file) {
+    return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('无法解码')); };
+        img.src = url;
+    });
+}
+function canvasBlob(c, type, q) {
+    return new Promise(r => { try { c.toBlob(r, type, q); } catch (_) { r(null); } });
+}
+// 返回处理后的 File；不需要 / 不划算 / 出错时原样返回传入的 file
+async function preprocessFile(file) {
+    const mode = prefCompress();
+    if (mode === 'off' || !isImageFile(file)) return file;
+    const name = file.name || '';
+    const type = (file.type || '').toLowerCase();
+    if (/\.(gif|svg|ico)$/i.test(name) || /^image\/(gif|svg\+xml|x-icon|vnd\.microsoft\.icon)$/.test(type)) return file; // 动图 / 矢量 / 图标不动
+    if (file.size < 30 * 1024) return file;
+    let img;
+    try { img = await loadImageForCanvas(file); } catch (_) { return file; }
+    const w0 = img.naturalWidth, h0 = img.naturalHeight;
+    if (!w0 || !h0) return file;
+    const k = Math.min(1, 2560 / Math.max(w0, h0));
+    const w = Math.max(1, Math.round(w0 * k)), h = Math.max(1, Math.round(h0 * k));
+    const isJpeg = type === 'image/jpeg' || /\.jpe?g$/i.test(name);
+    const isPng = type === 'image/png' || /\.png$/i.test(name);
+    const isWebp = type === 'image/webp' || /\.webp$/i.test(name);
+    const webpOk = await canEncodeWebp();
+    let target;
+    if (mode === 'webp') {
+        if (webpOk) target = 'image/webp';
+        else {
+            if (!webpFallbackToasted) { webpFallbackToasted = true; toast('这个浏览器不能转 WebP，已改为普通压缩', 'info'); }
+            target = isPng ? 'image/png' : (isWebp ? 'image/webp' : 'image/jpeg');
+        }
+    } else {
+        target = isJpeg ? 'image/jpeg' : isPng ? 'image/png' : isWebp ? 'image/webp' : (webpOk ? 'image/webp' : 'image/jpeg');
+    }
+    if (target === 'image/webp' && !webpOk) return file; // 读得了 WebP 却编不了：不动它
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    const g = c.getContext('2d');
+    if (target === 'image/jpeg') { g.fillStyle = '#FFFFFF'; g.fillRect(0, 0, w, h); } // JPEG 没有透明，避免透明处变黑
+    g.drawImage(img, 0, 0, w, h);
+    const blob = await canvasBlob(c, target, 0.82);
+    c.width = c.height = 0; img.src = ''; // 立即释放画布和解码后的位图：iOS Safari 不会主动回收，批量处理容易把页面撑爆
+    if (!blob || blob.type !== target) return file;
+    const sameKind = (target === 'image/jpeg' && isJpeg) || (target === 'image/png' && isPng) || (target === 'image/webp' && isWebp);
+    if (blob.size >= file.size * (sameKind ? 0.97 : 1)) return file; // 没省下什么就保留原图
+    const EXT = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' };
+    const swapExt = n => sameKind ? n : (/\.[^./]+$/.test(n) ? n.replace(/\.[^./]+$/, EXT[target]) : n + EXT[target]);
+    const out = new File([blob], swapExt(name || 'image'), { type: target });
+    ['_collector', '_srcUrl', '_afterFn', '_forceImage', '_sniffExt'].forEach(p => { if (file[p] !== undefined) out[p] = file[p]; });
+    if (file._relPath) out._relPath = swapExt(file._relPath);
+    out._saveNote = '省 ' + Math.max(1, Math.round((1 - blob.size / file.size) * 100)) + '%';
+    return out;
+}
+
+/* ---------- 5. 重命名（一次 Git 提交：删旧路径 + 用同一个 blob 建新路径） ---------- */
+const BAD_FILENAME_RE = /[\/\\:*?"<>|]/;
+function pathDirname(p) { const i = String(p).lastIndexOf('/'); return i < 0 ? '' : p.slice(0, i); }
+function pathBasename(p) { return String(p).split('/').pop(); }
+const ICON_SORT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5v14M8 19l-3-3M8 19l3-3M16 19V5M16 5l-3 3M16 5l3 3"/></svg>';
+const ICON_LINKCHK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>';
+
+function applyLocalRename(owner, repo, branch, from, to) {
+    const newName = pathBasename(to);
+    const same = (a, b) => String(a || '').toLowerCase() === String(b || '').toLowerCase();
+    const f = repoLiveFiles.find(x => x.path === from && same(x.owner, owner) && same(x.repo, repo));
+    if (f) {
+        f.path = to; f.name = newName; f.type = repoFileType(to);
+        f.url = repoCdnUrl(f.owner, f.repo, f.branch, to);
+        f.rawUrl = repoRawUrl(f.owner, f.repo, f.branch, to);
+    }
+    const order = loadUploadOrder();
+    const oldK = uploadKey(owner, repo, from);
+    if (order[oldK] !== undefined) { order[uploadKey(owner, repo, to)] = order[oldK]; delete order[oldK]; saveUploadOrder(order); }
+    const history = loadHistory();
+    let changed = false;
+    history.forEach(e => {
+        const p = historyAssetRef(e);
+        if (!p || p.path !== from) return;
+        if (p.owner && !same(p.owner, owner)) return;
+        if (p.repo && !same(p.repo, repo)) return;
+        const viaRaw = /raw\.githubusercontent\.com/.test(e.url || '');
+        const pinned = /[@/][0-9a-f]{40}\//i.test(e.url || ''); // 固定到提交的直链：旧提交里旧路径依然有效，保持不变
+        const b = e.githubBranch || branch;
+        e.githubOwner = owner; e.githubRepo = repo; e.githubBranch = b; e.githubPath = to; e.name = newName;
+        if (!pinned) e.url = viaRaw ? repoRawUrl(owner, repo, b, to) : repoCdnUrl(owner, repo, b, to);
+        delete linkStatus[e.id];
+        changed = true;
+    });
+    if (changed) { saveHistory(history); saveLinkStatus(); renderGallery(); }
+}
+
+async function doRename(ref, newName) {
+    const s = getSettings();
+    if (!s.token) { toast('请先配置 Token'); return false; }
+    const repo = ref.repo || s.repo;
+    const branch = ref.branch || 'main';
+    const dir = pathDirname(ref.path);
+    const newPath = (dir ? dir + '/' : '') + newName;
+    toast('正在重命名…', 'loading');
+    try {
+        let owner = ref.owner;
+        if (!owner) owner = (await resolveGithubContext()).owner;
+        const contentsUrl = p => '/repos/' + owner + '/' + repo + '/contents/' + p.split('/').map(encodeURIComponent).join('/') + '?ref=' + encodeURIComponent(branch);
+        // 目标名字已被占用就不继续，绝不覆盖
+        const listKnown = repoLiveLoaded && String(repo).toLowerCase() === String(s.repo).toLowerCase();
+        let exists = false;
+        if (listKnown) exists = repoLiveFiles.some(f => f.path === newPath);
+        else {
+            try { await githubRequest(contentsUrl(newPath), { method: 'GET' }, s.token, s.proxy); exists = true; }
+            catch (e) { if (!/404/.test(String(e && e.message))) throw e; }
+        }
+        if (exists) { toast('已存在同名文件：' + newName, 'error'); return false; }
+        const meta = await githubRequest(contentsUrl(ref.path), { method: 'GET' }, s.token, s.proxy);
+        if (!meta || !meta.sha) throw new Error('读取原文件失败');
+        await commitTreeChanges(owner, repo, branch, [
+            { path: ref.path, mode: '100644', type: 'blob', sha: null },
+            { path: newPath, mode: '100644', type: 'blob', sha: meta.sha }
+        ], '重命名 ' + pathBasename(ref.path) + ' → ' + newName, s);
+        applyLocalRename(owner, repo, branch, ref.path, newPath);
+        renderRepoLiveFiles();
+        toast('已重命名为 ' + newName);
+        return true;
+    } catch (e) {
+        toast('重命名失败：' + ((e && e.message) || '未知错误'), 'error');
+        return false;
+    }
+}
+
+async function renameAsset(ref) {
+    const oldName = pathBasename(ref.path);
+    const m = oldName.match(/\.[^./]+$/);
+    const oldExt = m ? m[0] : '';
+    const val = await showPrompt({
+        title: '重命名文件',
+        message: '改名后，原来的直链会失效；已经贴在文章或 README 里的链接需要手动更新。',
+        value: oldName, placeholder: '新文件名', confirmText: '重命名',
+        validate: v => {
+            if (!v) return '请输入文件名';
+            if (BAD_FILENAME_RE.test(v)) return '文件名不能包含 / \\ : * ? " < > |';
+            if (/^\.+$/.test(v) || v.length > 150) return '文件名不合法';
+            return '';
+        }
+    });
+    if (val === null) return false;
+    let nn = val.trim();
+    if (oldExt && !nn.toLowerCase().endsWith(oldExt.toLowerCase())) nn += oldExt; // 扩展名保持不变，否则 CDN 会用错误的类型返回
+    if (nn === oldName) { toast('名称没有变化', 'info'); return false; }
+    return doRename(ref, nn);
+}
+async function renameSelectedRepo() {
+    if (repoSelected.size !== 1) return toast(repoSelected.size ? '重命名一次只能选一个文件' : '请先选择一个文件', 'info');
+    const f = repoLiveFiles.find(x => x.path === Array.from(repoSelected)[0]);
+    if (!f) return;
+    if (await renameAsset({ owner: f.owner, repo: f.repo, branch: f.branch, path: f.path })) exitRepoMultiMode();
+}
+async function renameSelectedGallery() {
+    if (gallerySelected.size !== 1) return toast(gallerySelected.size ? '重命名一次只能选一个文件' : '请先选择一个文件', 'info');
+    const e = loadHistory().find(x => x.id === Array.from(gallerySelected)[0]);
+    if (!e) return;
+    const p = historyAssetRef(e);
+    if (!p || !p.path) return toast('无法识别这个文件在仓库里的位置', 'error');
+    const ok = await renameAsset({ owner: p.owner || '', repo: p.repo || getSettings().repo, branch: e.githubBranch || p.branch || 'main', path: p.path });
+    if (ok) exitGalleryMultiMode();
+}
+
+/* ---------- 6. 排序 ---------- */
+const GALLERY_SORTS = [['new', '时间 · 新到旧'], ['old', '时间 · 旧到新'], ['size-desc', '大小 · 大到小'], ['size-asc', '大小 · 小到大'], ['name', '名称 A–Z']];
+const REPO_SORTS = [['time-asc', '上传时间 · 早到晚'], ['time-desc', '上传时间 · 晚到早'], ['size-desc', '大小 · 大到小'], ['size-asc', '大小 · 小到大'], ['name', '名称 A–Z']];
+function prefGallerySort() { const v = lsGet(GALLERY_SORT_KEY); return GALLERY_SORTS.some(x => x[0] === v) ? v : 'new'; }
+function prefRepoSort() {
+    const v = lsGet(REPO_SORT_KEY);
+    return REPO_SORTS.some(x => x[0] === v) ? v : (REPO_SORT_NEWEST_FIRST ? 'time-desc' : 'time-asc');
+}
+function entrySizeForSort(e) { return Number(e.size) || galleryRepoSize(e) || 0; }
+function sortGalleryEntries(list) {
+    const m = prefGallerySort();
+    if (m === 'new') return list; // 记录本来就是最新的在前
+    const a = list.slice();
+    const t = e => e.time || 0;
+    if (m === 'old') a.sort((x, y) => t(x) - t(y));
+    else if (m === 'size-desc') a.sort((x, y) => entrySizeForSort(y) - entrySizeForSort(x) || t(y) - t(x));
+    else if (m === 'size-asc') a.sort((x, y) => entrySizeForSort(x) - entrySizeForSort(y) || t(y) - t(x));
+    else a.sort((x, y) => String(x.name || '').localeCompare(String(y.name || ''), 'zh', { numeric: true }));
+    return a;
+}
+function sortRepoFiles(list) {
+    const m = prefRepoSort();
+    const cmpName = (a, b) => a.path.localeCompare(b.path, 'zh', { numeric: true });
+    const a = list.slice();
+    if (m === 'name') return a.sort(cmpName);
+    if (m === 'size-desc') return a.sort((x, y) => (y.size || 0) - (x.size || 0) || cmpName(x, y));
+    if (m === 'size-asc') return a.sort((x, y) => (x.size || 0) - (y.size || 0) || cmpName(x, y));
+    const rank = buildUploadRank();
+    const t = f => rank.get(uploadKey(f.owner, f.repo, f.path)) || 0;
+    const dir = m === 'time-desc' ? -1 : 1;
+    return a.sort((x, y) => (t(x) - t(y)) * dir || cmpName(x, y));
+}
+function openGallerySortMenu(btn) {
+    const cur = prefGallerySort();
+    openMoreMenu(btn, GALLERY_SORTS.map(([k, label]) => ({ label, icon: k === cur ? CHECK_SVG : '', onClick: () => setGallerySort(k) })));
+}
+function openRepoSortMenu(btn) {
+    const cur = prefRepoSort();
+    openMoreMenu(btn, REPO_SORTS.map(([k, label]) => ({ label, icon: k === cur ? CHECK_SVG : '', onClick: () => setRepoSort(k) })));
+}
+function setGallerySort(k) {
+    lsSet(GALLERY_SORT_KEY, k);
+    gallerySelected.clear();
+    updateGallerySelectionUI();
+    renderGallery();
+}
+function setRepoSort(k) {
+    lsSet(REPO_SORT_KEY, k);
+    repoSelected.clear();
+    updateRepoSelectionUI();
+    renderRepoLiveFiles();
+}
+
+/* ---------- 7. 仓库用量提示 ---------- */
+let repoUsage = null; // { kb, at, repo }  —— kb 来自 GitHub 的仓库信息（含历史记录，更新会有延迟）
+const REPO_SOFT_LIMIT = 1024 * 1024 * 1024; // GitHub 建议单个仓库保持在 1 GB 以内
+function fmtSize(n) {
+    if (n >= 1073741824) return (n / 1073741824).toFixed(2) + ' GB';
+    return formatBytes(n) || '0 B';
+}
+function updateUsageUI() {
+    const box = $('repo-usage');
+    if (!box) return;
+    const s = getSettings();
+    const treeBytes = repoLiveLoaded ? repoLiveFiles.reduce((n, f) => n + (f.size || 0), 0) : 0;
+    const apiBytes = (repoUsage && repoUsage.repo === s.repo && repoUsage.kb) ? repoUsage.kb * 1024 : 0;
+    const used = Math.max(treeBytes, apiBytes);
+    if (!s.token || !s.repo || !used) { box.hidden = true; return; }
+    const pct = used / REPO_SOFT_LIMIT * 100;
+    box.hidden = false;
+    $('usage-text').textContent = '已用 ' + fmtSize(used) + ' / 建议上限 1 GB';
+    $('usage-pct').textContent = (pct < 1 ? '<1' : Math.round(pct)) + '%';
+    const fill = $('usage-fill');
+    fill.style.width = Math.max(1, Math.min(100, pct)) + '%';
+    fill.classList.toggle('warn', pct >= 80 && pct < 100);
+    fill.classList.toggle('danger', pct >= 100);
+    const tip = $('usage-tip');
+    if (pct >= 100) { tip.hidden = false; tip.className = 'usage-tip danger'; tip.textContent = '已超过 GitHub 建议的 1 GB。建议尽快清理不用的文件，或新建一个仓库继续上传。'; }
+    else if (pct >= 80) { tip.hidden = false; tip.className = 'usage-tip'; tip.textContent = '快到建议上限了。可以清理不用的文件，或换一个新仓库继续上传。'; }
+    else tip.hidden = true;
+}
+let overLimitOkRepo = '';
+function repoUsedBytesNow() {
+    const s = getSettings();
+    const treeBytes = repoLiveLoaded ? repoLiveFiles.reduce((n, f) => n + (f.size || 0), 0) : 0;
+    const apiBytes = (repoUsage && repoUsage.repo === s.repo && repoUsage.kb) ? repoUsage.kb * 1024 : 0;
+    return Math.max(treeBytes, apiBytes);
+}
+async function afterBatchUsageCheck(ctx) {
+    try {
+        const s = getSettings();
+        const info = await githubRequest('/repos/' + ctx.owner + '/' + s.repo, { method: 'GET' }, s.token, s.proxy);
+        repoUsage = { kb: Number(info.size) || 0, at: Date.now(), repo: s.repo };
+        invalidateStorage();
+        updateUsageUI();
+        const pct = repoUsage.kb * 1024 / REPO_SOFT_LIMIT * 100;
+        if (pct >= 80 && Date.now() - Number(lsGet('kb_usage_warn_at') || 0) > 12 * 3600 * 1000) {
+            lsSet('kb_usage_warn_at', String(Date.now()));
+            setTimeout(() => toast('仓库已用 ' + Math.round(pct) + '%（建议上限 1 GB），快满了，可以清理或换个仓库', 'info'), 2800);
+        }
+    } catch (_) { /* 拿不到就算了，不影响上传 */ }
+}
+
+/* ---------- 8. 失效链接检测 ---------- */
+function loadLinkStatus() {
+    try { const o = JSON.parse(lsGet(LINKCHK_KEY) || '{}'); return (o && typeof o === 'object') ? o : {}; } catch (_) { return {}; }
+}
+let linkStatus = loadLinkStatus(); // { 记录id: { s: 'ok'|'dead'|'cdn', t: 时间 } }
+let linkCheckRunning = false, linkCheckStop = false;
+function saveLinkStatus() {
+    const ids = new Set(loadHistory().map(e => e.id));
+    Object.keys(linkStatus).forEach(k => { if (!ids.has(k)) delete linkStatus[k]; });
+    lsSet(LINKCHK_KEY, JSON.stringify(linkStatus));
+}
+function linkStatusOf(id) { const v = linkStatus[id]; return v ? v.s : ''; }
+// 返回 'ok' | 'missing'（404/410）| 'net'（连不上、超时、被限流等，不能断定是链接坏了）
+async function probeUrl(url) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 12000);
+    try {
+        let r;
+        try { r = await fetch(url, { method: 'HEAD', cache: 'no-store', signal: ctrl.signal }); }
+        catch (e) {
+            if (ctrl.signal.aborted) return 'net';
+            r = await fetch(url, { cache: 'no-store', signal: ctrl.signal }); // 个别环境不让 HEAD：改 GET，拿到状态码就中止下载
+            try { ctrl.abort(); } catch (_) {}
+        }
+        if (r.ok) return 'ok';
+        if (r.status === 404 || r.status === 410) return 'missing';
+        return 'net';
+    } catch (_) { return 'net'; }
+    finally { clearTimeout(timer); }
+}
+// 逐个检测：'ok' 能打开；'dead' CDN 和 raw 都 404；'cdn' 仅 CDN 404（刚上传或改名，jsDelivr 还没同步）；'net' 无法判断
+async function checkEntryLink(entry) {
+    const r1 = await probeUrl(entry.url);
+    if (r1 === 'ok') return 'ok';
+    if (r1 === 'net') return 'net';
+    const ref = historyAssetRef(entry);
+    if (ref && ref.owner && ref.repo && ref.path) {
+        const raw = repoRawUrl(ref.owner, ref.repo, entry.githubBranch || ref.branch || 'main', ref.path);
+        if (raw !== entry.url) {
+            const r2 = await probeUrl(raw);
+            if (r2 === 'ok') return 'cdn';
+            if (r2 === 'net') return 'net';
+        }
+    }
+    return 'dead';
+}
+// 按仓库批量预检：每个仓库只读 1 次文件树（大仓库自动按目录分批），树里还在的文件直接判定为「能打开」；
+// 树里找不到的、读不到树的、没有对应 Token 的、固定到提交的记录，仍然逐个请求链接来确认（所以不会误报失效）。
+function tokenForOwner(owner) {
+    const want = String(owner || '').toLowerCase();
+    if (!want) return null;
+    let live = null; try { live = accReadLive(); } catch (_) {}
+    const hit = (live ? [live] : []).concat(accLoad()).find(a => a && a.token && String(a.owner || '').toLowerCase() === want);
+    return hit ? { token: hit.token, proxy: hit.proxy || '' } : null;
+}
+async function precheckLinksByRepo(entries) {
+    const okIds = new Set(), groups = new Map();
+    entries.forEach(e => {
+        const ref = historyAssetRef(e);
+        if (!ref || !ref.owner || !ref.repo || !ref.path) return;
+        const branch = e.githubBranch || ref.branch || '';
+        if (!branch || /^[0-9a-f]{40}$/i.test(branch)) return;
+        const k = [String(ref.owner).toLowerCase(), String(ref.repo).toLowerCase(), branch].join('\u0000');
+        let g = groups.get(k);
+        if (!g) groups.set(k, g = { owner: ref.owner, repo: ref.repo, branch, items: [] });
+        g.items.push({ id: e.id, path: ref.path });
+    });
+    const jobs = Array.from(groups.values());
+    let idx = 0;
+    const worker = async () => {
+        while (idx < jobs.length && !linkCheckStop) {
+            const g = jobs[idx++];
+            const auth = tokenForOwner(g.owner);
+            if (!auth) continue;
+            try {
+                const tree = await fetchRepoTree(g.owner, g.repo, g.branch, auth);
+                const paths = new Set(tree.tree.filter(x => x.type === 'blob').map(x => x.path));
+                g.items.forEach(it => { if (paths.has(it.path)) okIds.add(it.id); });
+            } catch (_) { /* 这个仓库读不到：它的记录改走逐个检测 */ }
+        }
+    };
+    await Promise.all(Array.from({ length: Math.min(3, jobs.length) }, worker));
+    return okIds;
+}
+// 进度条只在「检测链接」提示还留在屏幕上时才刷新：用户点掉它、或被「上传完成」之类的新提示顶替后，不再反复弹回来
+function linkCheckProgressToast(done, total) {
+    const el = $('kb-toast'), m = el && el.querySelector('.kb-toast-msg');
+    if (!el || !m || !el.classList.contains('show') || m.textContent.indexOf('检测链接') !== 0) return;
+    toast('检测链接 ' + done + '/' + total, 'loading');
+}
+async function runLinkCheck(opts) {
+    opts = opts || {};
+    if (linkCheckRunning) { linkCheckStop = true; toast('正在停止检测…', 'info'); return; }
+    const entries = loadHistory().filter(e => e.url);
+    if (!entries.length) { if (!opts.silent) toast('资源库里还没有记录', 'info'); return; }
+    const quiet = !!opts.silent;
+    linkCheckRunning = true; linkCheckStop = false;
+    const total = entries.length;
+    let done = 0, next = 0;
+    const found = { ok: [], dead: [], cdn: [], net: [] };
+    if (!quiet) toast('检测链接 0/' + total, 'loading');
+    let todo = entries;
+    async function worker() {
+        while (!linkCheckStop && next < todo.length) {
+            const e = todo[next++];
+            let r = 'net';
+            try { r = await checkEntryLink(e); } catch (_) {}
+            found[r].push(e.id);
+            done++;
+            if (!quiet && (done % 4 === 0 || done === total)) linkCheckProgressToast(done, total);
+        }
+    }
+    try {
+        let pre = new Set();
+        try { pre = await precheckLinksByRepo(entries); } catch (_) {}
+        pre.forEach(id => found.ok.push(id));
+        done = pre.size;
+        if (!quiet && done) linkCheckProgressToast(done, total);
+        todo = entries.filter(e => !pre.has(e.id));
+        await Promise.all(Array.from({ length: Math.min(6, todo.length) }, worker));
+    }
+    finally { linkCheckRunning = false; }
+    const stopped = linkCheckStop;
+    linkCheckStop = false;
+    // 大部分都连不上，多半是网络问题（或 jsDelivr 被限制）：别把结果当真
+    if (done >= 5 && found.net.length >= done * 0.6) {
+        if (!quiet) toast('大部分链接连不上，可能是网络问题，这次结果没有保存', 'error');
+        return;
+    }
+    const now = Date.now();
+    ['ok', 'dead', 'cdn'].forEach(k => found[k].forEach(id => { linkStatus[id] = { s: k, t: now }; }));
+    saveLinkStatus();
+    if (!stopped) lsSet(LINKCHK_AT_KEY, String(now));
+    renderGallery();
+    const dead = found.dead.length, cdn = found.cdn.length, net = found.net.length;
+    if (quiet) {
+        if (dead) toast('资源库里有 ' + dead + ' 个链接已失效，图片上有红色标记', 'info');
+        return;
+    }
+    if (stopped) return toast('已停止：检测了 ' + done + '/' + total + ' 个，发现 ' + dead + ' 个失效', 'info');
+    if (!dead) {
+        return toast('检测完成：' + (total - net) + ' 个链接都能打开'
+            + (cdn ? '，其中 ' + cdn + ' 个 CDN 还没同步' : '') + (net ? '，' + net + ' 个暂时连不上' : ''));
+    }
+    // 检测期间用户已经切到别的页面：不要弹确认框、也不要在看不见的资源库里偷偷进入多选
+    const gp = $('page-gallery');
+    if (gp && !gp.classList.contains('active')) return toast('检测完成：发现 ' + dead + ' 个失效链接，到资源库里可以看到红色标记', 'info');
+    hideToast();
+    const yes = await showConfirm({
+        title: '发现 ' + dead + ' 个失效链接',
+        message: '这些链接已经打不开，多半是仓库里的文件被删除或改名了。要选中它们吗？选中后可以直接删除这些记录。',
+        confirmText: '选中失效项', cancelText: '先不选'
+    });
+    if (!yes) return;
+    gallerySearch = '';
+    const gs = $('gallery-search'); if (gs) gs.value = '';
+    const pill = $('gallery-searchpill'); if (pill) pill.classList.remove('has-text');
+    setGalleryFilter('all');
+    galleryMultiMode = true;
+    found.dead.forEach(id => gallerySelected.add(id));
+    updateGallerySelectionUI();
+    renderGallery();
+    const first = document.querySelector('#gallery-container .gallery-tile .tile-badge:not(.cdn)');
+    if (first) first.parentElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+function maybeAutoLinkCheck() {
+    if (!prefLinkCheck() || linkCheckRunning || isBatchUploading) return;
+    if (Date.now() - Number(lsGet(LINKCHK_AT_KEY) || 0) < 7 * 24 * 3600 * 1000) return;
+    if (!loadHistory().length) return;
+    setTimeout(() => runLinkCheck({ silent: true }), 1200);
+}
+
+/* ---------- 9. 存储页：所有账号名下每个仓库的占用空间 ---------- */
+const ST_CACHE_KEY = 'kb_storage_cache', ST_SORT_KEY = 'kb_storage_sort';
+let storageData = null, storageLoading = false, storageSeq = 0;
+function storageSort() { return lsGet(ST_SORT_KEY) === 'recent' ? 'recent' : 'size'; }
+function setStorageSort(v) { lsSet(ST_SORT_KEY, v === 'recent' ? 'recent' : 'size'); renderStorage(); }
+function storageAgo(t) {
+    const m = Math.floor((Date.now() - t) / 60000);
+    return m < 1 ? '刚刚更新' : m < 60 ? m + ' 分钟前更新' : m < 1440 ? Math.floor(m / 60) + ' 小时前更新' : Math.floor(m / 1440) + ' 天前更新';
+}
+async function fetchStorageForAccount(a) {
+    const all = [];
+    for (let page = 1; page <= 10; page++) {
+        const batch = await githubRequest('/user/repos?per_page=100&sort=pushed&direction=desc&affiliation=owner&page=' + page, { method: 'GET' }, a.token, a.proxy || '');
+        if (!Array.isArray(batch)) break;
+        batch.forEach(r => all.push({ name: r.name, owner: (r.owner && r.owner.login) || a.owner || '', private: !!r.private, archived: !!r.archived, kb: Number(r.size) || 0, pushed: Date.parse(r.pushed_at || '') || 0 }));
+        if (batch.length < 100) break;
+    }
+    return all;
+}
+async function loadStorage(force) {
+    try { accSnapshot(); } catch (_) {}
+    if (!storageData) { try { storageData = JSON.parse(lsGet(ST_CACHE_KEY) || 'null'); } catch (_) { storageData = null; } }
+    renderStorage();
+    const fresh = storageData && Date.now() - storageData.at < 5 * 60 * 1000;
+    if (storageLoading || (!force && fresh)) return;
+    const accounts = accLoad().filter(a => a.token);
+    if (!accounts.length) { storageData = null; renderStorage(); return; }
+    storageLoading = true;
+    const seq = ++storageSeq;
+    const btn = $('st-refresh'); if (btn) { btn.disabled = true; btn.textContent = '读取中…'; }
+    if (!storageData) $('st-list').innerHTML = skeletonRows(4);
+    try {
+        const groups = await Promise.all(accounts.map(async a => {
+            const g = { id: a.id, label: accLabel(a), owner: a.owner || '', repo: a.repo || '', repos: [], err: '' };
+            try { g.repos = await fetchStorageForAccount(a); if (!g.owner && g.repos[0]) g.owner = g.repos[0].owner; }
+            catch (e) { g.err = (e && e.message) || '读取失败'; }
+            return g;
+        }));
+        if (seq !== storageSeq) return;
+        storageData = { at: Date.now(), groups, active: accActiveId() };
+        lsSet(ST_CACHE_KEY, JSON.stringify(storageData));
+    } finally {
+        storageLoading = false;
+        if (btn) { btn.disabled = false; btn.textContent = '刷新'; }
+        renderStorage();
+    }
+}
+function renderStorage() {
+    const list = $('st-list'); if (!list) return;
+    document.querySelectorAll('#st-sort button').forEach(b => b.classList.toggle('active', b.dataset.v === storageSort()));
+    const d = storageData;
+    if (!d || !d.groups) {
+        $('st-total').textContent = '—'; $('st-meta').textContent = '';
+        if (!storageLoading) { list.innerHTML = ''; const e = document.createElement('div'); e.className = 'st-empty'; e.textContent = accLoad().some(a => a.token) ? '暂无数据' : '请先在设置里填写 Token'; list.appendChild(e); }
+        return;
+    }
+    const act = accLoad().find(x => x.id === accActiveId());
+    let total = 0, count = 0;
+    d.groups.forEach(g => g.repos.forEach(r => { total += r.kb * 1024; count++; }));
+    $('st-total').textContent = fmtSize(total) || '0 B';
+    $('st-meta').textContent = count + ' 个仓库 · ' + storageAgo(d.at);
+    list.innerHTML = '';
+    const multi = d.groups.length > 1;
+    const byRecent = storageSort() === 'recent';
+    d.groups.forEach(g => {
+        if (multi) { const h = document.createElement('div'); h.className = 'st-acct'; h.textContent = g.label; list.appendChild(h); }
+        const box = document.createElement('div'); box.className = 'st-group';
+        if (g.err) { const e = document.createElement('div'); e.className = 'st-err'; e.textContent = '读取失败：' + g.err; box.appendChild(e); }
+        else if (!g.repos.length) { const e = document.createElement('div'); e.className = 'st-empty'; e.textContent = '没有仓库'; box.appendChild(e); }
+        g.repos.slice().sort((a, b) => byRecent ? b.pushed - a.pushed : b.kb - a.kb).forEach(r => {
+            const used = r.kb * 1024, pct = used / REPO_SOFT_LIMIT * 100;
+            const row = document.createElement('div'); row.className = 'st-row';
+            const line = document.createElement('div'); line.className = 'st-line';
+            const nm = document.createElement('span'); nm.className = 'st-name'; nm.textContent = r.name; line.appendChild(nm);
+            const isCur = act && g.id === act.id && String(act.repo || '').toLowerCase() === r.name.toLowerCase();
+            const tags = [isCur ? ['当前', 'cur'] : null, r.archived ? ['已归档', ''] : null, r.private ? ['私有', ''] : null].filter(Boolean);
+            tags.forEach(t => { const b = document.createElement('span'); b.className = 'st-badge ' + t[1]; b.textContent = t[0]; line.appendChild(b); });
+            const sz = document.createElement('span'); sz.className = 'st-size'; sz.textContent = used ? fmtSize(used) : '0 B'; line.appendChild(sz);
+            row.appendChild(line);
+            const bar = document.createElement('div'); bar.className = 'st-bar';
+            const tr = document.createElement('div'); tr.className = 'progress-track';
+            const fl = document.createElement('div'); fl.className = 'progress-fill' + (pct >= 100 ? ' danger' : pct >= 80 ? ' warn' : '');
+            fl.style.width = (used ? Math.max(1, Math.min(100, pct)) : 0) + '%'; tr.appendChild(fl); bar.appendChild(tr);
+            const pc = document.createElement('span'); pc.className = 'st-pct'; pc.textContent = (used && pct < 1 ? '<1' : Math.round(pct)) + '%'; bar.appendChild(pc);
+            row.appendChild(bar); box.appendChild(row);
+        });
+        list.appendChild(box);
+    });
+}
+function invalidateStorage() { storageData = null; try { localStorage.removeItem(ST_CACHE_KEY); } catch (_) {} }
+
+/* ---------- 初始化 ---------- */
+function initV13Prefs() {
+    $('pref-autocopy').checked = prefAutoCopy();
+    $('pref-clipwatch').checked = prefClipWatch();
+    $('pref-linkcheck').checked = prefLinkCheck();
+    refreshCopyFormatUI();
+    refreshCompressUI();
+    refreshUploadPrefUI();
+    canEncodeWebp().then(ok => {
+        const st = $('about-webp-status');
+        if (st) st.textContent = ok ? '支持 WebP，选 WebP 会真正转成 WebP' : '不支持 WebP，选 WebP 时会自动改用普通压缩';
+    });
 }
 
 </script>
@@ -5940,6 +7430,179 @@ async function handleFiles(files) {
 })();
 </script>
 
+
+<script>
+/* ================= v1.6：拉取最新版 / 设置备份 ================= */
+const APP_VERSION = '1.8';
+(function () {
+    // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
+    try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
+    const v = document.getElementById('about-ver'); if (v) v.textContent = 'v' + APP_VERSION;
+})();
+function appBaseUrl() { return location.href.split('#')[0].split('?')[0]; }
+function isWebOrigin() { return /^https?:$/.test(location.protocol); }
+async function fetchRemoteVersion() {
+    const r = await fetch(appBaseUrl() + '?_=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const txt = await r.text();
+    const m = txt.match(/APP_VERSION\s*=\s*'([^']+)'/);
+    return m ? m[1] : '';
+}
+async function aboutOnOpen() {
+    const el = document.getElementById('about-update-status');
+    if (!el) return;
+    if (!isWebOrigin()) { el.textContent = '当前是本地文件，无法在线更新'; return; }
+    el.textContent = '检查中…';
+    try {
+        const rv = await fetchRemoteVersion();
+        if (!rv) el.textContent = '无法识别线上版本，可以直接点这里强制刷新';
+        else if (rv === APP_VERSION) el.textContent = '已是最新版 v' + APP_VERSION + '。如果内容不对，点这里强制刷新';
+        else el.textContent = '发现新版本 v' + rv + '（当前 v' + APP_VERSION + '），点这里更新';
+    } catch (_) { el.textContent = '检查失败，可能没网或线上文件不可访问'; }
+}
+async function pullLatest() {
+    if (typeof isBatchUploading !== 'undefined' && isBatchUploading) return toast('正在上传，等上传完再更新', 'info');
+    if (!isWebOrigin()) return toast('当前是本地文件，无法在线更新。请从你部署的网址打开', 'error');
+    toast('正在拉取…', 'loading');
+    let rv = '';
+    try { rv = await fetchRemoteVersion(); }
+    catch (_) { return toast('拉取失败：连不上线上文件，请检查网络', 'error'); }
+    if (rv && rv === APP_VERSION) {
+        const again = await showConfirm({ title: '已是最新版 v' + APP_VERSION, message: '线上版本和当前一致。如果你觉得页面内容不对，可以强制重新加载一次。Token、偏好和上传记录不会被清除。', confirmText: '强制重新加载' });
+        if (!again) return;
+        toast('正在刷新…', 'loading');
+    }
+    try {
+        if ('serviceWorker' in navigator) { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r => r.unregister())); }
+    } catch (_) {}
+    try { if (window.caches) { const ks = await caches.keys(); await Promise.all(ks.map(k => caches.delete(k))); } } catch (_) {}
+    try { await fetch(appBaseUrl(), { cache: 'reload' }); } catch (_) {}   // 刷新浏览器对该网址的 HTTP 缓存，下次从桌面图标打开也是新版
+    location.replace(appBaseUrl() + '?_=' + Date.now());
+}
+
+/* ---------- 设置备份 ---------- */
+/* ---------- 备份加密（口令 → PBKDF2-SHA256 → AES-GCM-256） ---------- */
+const BK_ITER = 250000;
+const bkHasCrypto = () => typeof crypto !== 'undefined' && !!crypto.subtle && typeof TextEncoder !== 'undefined';
+function bkB64(u8) { let t = ''; for (let i = 0; i < u8.length; i += 0x8000) t += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(t); }
+function bkUnB64(t) { return Uint8Array.from(atob(t), c => c.charCodeAt(0)); }
+async function bkKey(pass, salt, iter) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+async function bkEncrypt(obj, pass) {
+    const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await bkKey(pass, salt, BK_ITER);
+    const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify(obj))));
+    return { app: 'direct-link', backupVersion: 3, encrypted: true, kdf: 'PBKDF2-SHA256', iter: BK_ITER, salt: bkB64(salt), iv: bkB64(iv), data: bkB64(ct), appVersion: APP_VERSION, time: new Date().toISOString() };
+}
+async function bkDecrypt(env, pass) {
+    const iter = Number(env.iter);
+    if (!(iter >= 10000 && iter <= 5000000)) throw new Error('bad iter');
+    const key = await bkKey(pass, bkUnB64(env.salt), iter);
+    const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bkUnB64(env.iv) }, key, bkUnB64(env.data));
+    return JSON.parse(new TextDecoder().decode(pt));
+}
+async function askDecryptBackup(env) {
+    if (!bkHasCrypto()) { toast('当前环境不支持解密，请用 https 地址打开后再导入', 'error'); return null; }
+    for (let tries = 0; tries < 5; tries++) {
+        const pass = await showPrompt({ title: '输入备份口令', message: tries ? '口令不对，请再试一次。' : '这份备份是加密的，需要导出时设置的口令。', placeholder: '口令', type: 'password' });
+        if (pass === null) return null;
+        try { toast('正在解密…', 'loading'); const d = await bkDecrypt(env, pass); hideToast(); return d; }
+        catch (_) { hideToast(); }
+    }
+    toast('口令多次不对，已取消导入', 'error');
+    return null;
+}
+
+const BACKUP_KEYS_EXTRA = ['kb_gallery_sort', 'kb_repo_sort', 'kb_gallery_seg', 'kb_storage_sort'];
+async function exportBackup() {
+    const go = await showConfirm({
+        title: '导出备份（含 Token）',
+        message: '备份里包含你的 GitHub Token。接下来请设置一个口令，备份会用它加密；忘记口令就无法恢复，请记牢。',
+        confirmText: '继续'
+    });
+    if (!go) return;
+    let pass = '';
+    if (bkHasCrypto()) {
+        pass = await showPrompt({ title: '设置备份口令', message: '至少 6 位，导入备份时要输入同一个口令。', placeholder: '口令', type: 'password', validate: v => v.length < 6 ? '口令至少 6 位' : '' });
+        if (pass === null) return;
+        const again = await showPrompt({ title: '再输入一次口令', placeholder: '再次输入口令', type: 'password', validate: v => v !== pass ? '两次输入不一致' : '' });
+        if (again === null) return;
+    } else {
+        const plain = await showConfirm({ title: '当前环境无法加密', message: '这个环境不支持加密功能（需要 https 地址）。只能导出明文备份，里面的 Token 谁拿到都能用，请只保存在自己的设备上。', confirmText: '导出明文' });
+        if (!plain) return;
+    }
+    try {
+        const prefs = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (/^kb_pref_/.test(k) || BACKUP_KEYS_EXTRA.indexOf(k) >= 0) prefs[k] = localStorage.getItem(k);
+        }
+        const live = accReadLive();
+        const data = {
+            app: 'direct-link', backupVersion: 2, appVersion: APP_VERSION, time: new Date().toISOString(),
+            containsToken: true,
+            prefs: prefs,
+            settings: { token: live.token, repo: live.repo, proxy: live.proxy, imgProxy: live.imgProxy, pin: live.pin, owner: live.owner },
+            accounts: accLoad(),
+            activeAccount: accActiveId(),
+            history: loadHistory()
+        };
+        const out = pass ? await bkEncrypt(data, pass) : data;
+        const name = 'direct-link-backup-' + new Date().toISOString().slice(0, 10) + (pass ? '-encrypted' : '') + '.json';
+        const blob = new Blob([JSON.stringify(out)], { type: 'application/json' });
+        const file = new File([blob], name, { type: 'application/json' });
+        if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+            navigator.share({ files: [file], title: 'Direct Link 备份' }).catch(err => { if (!err || err.name !== 'AbortError') toast('导出失败', 'error'); });
+            return;
+        }
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = name;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+        toast(pass ? '已导出加密备份，请记牢口令' : '已导出备份（明文含 Token，请妥善保管）', 'ok');
+    } catch (e) { toast('导出失败：' + (e && e.message || '未知错误'), 'error'); }
+}
+async function importBackup(file) {
+    if (!file) return;
+    if (typeof isBatchUploading !== 'undefined' && isBatchUploading) return toast('正在上传，等上传完再导入', 'info');
+    let data;
+    try { data = JSON.parse(await file.text()); } catch (_) { return toast('这不是有效的备份文件', 'error'); }
+    if (data && data.app === 'direct-link' && data.encrypted) { data = await askDecryptBackup(data); if (!data) return; }
+    if (!data || data.app !== 'direct-link' || typeof data.prefs !== 'object') return toast('这不是 Direct Link 的备份文件', 'error');
+    const ok = await showConfirm({
+        title: '导入这份备份？',
+        message: '会恢复偏好设置，补回缺少的上传记录和账号（已有的不会被覆盖），并在当前 Token、仓库、代理为空时填入备份里的值。导入后页面会自动刷新。',
+        confirmText: '导入'
+    });
+    if (!ok) return;
+    try {
+        Object.keys(data.prefs).forEach(k => {
+            if ((/^kb_pref_/.test(k) || BACKUP_KEYS_EXTRA.indexOf(k) >= 0) && typeof data.prefs[k] === 'string') localStorage.setItem(k, data.prefs[k]);
+        });
+        const st = data.settings || {};
+        const fill = (liveKey, val) => { if (val && !localStorage.getItem(liveKey)) localStorage.setItem(liveKey, val); };
+        fill(ACC_LIVE.token, st.token); fill(ACC_LIVE.repo, st.repo); fill(ACC_LIVE.proxy, st.proxy); fill(ACC_LIVE.imgProxy, st.imgProxy); fill(ACC_LIVE.owner, st.owner);
+        if (st.pin && localStorage.getItem(ACC_LIVE.pin) === null) localStorage.setItem(ACC_LIVE.pin, '1');
+        if (Array.isArray(data.accounts) && data.accounts.length) {
+            const curAcc = accLoad();
+            const accIds = new Set(curAcc.map(a => a && a.id));
+            const addAcc = data.accounts.filter(a => a && a.id && !accIds.has(a.id));
+            if (addAcc.length && !accSave(curAcc.concat(addAcc))) return;
+            if (data.activeAccount && !accActiveId()) { try { localStorage.setItem(ACC_ACTIVE, data.activeAccount); } catch (_) {} }
+        }
+        if (Array.isArray(data.history) && data.history.length) {
+            const cur = loadHistory();
+            const ids = new Set(cur.map(e => e && e.id));
+            const add = data.history.filter(e => e && e.id && !ids.has(e.id));
+            if (add.length && !saveHistory(cur.concat(add))) return toast('导入失败：存储空间不足', 'error');
+        }
+    } catch (e) { return toast('导入失败：' + (e && e.message || '未知错误'), 'error'); }
+    toast('导入完成，正在刷新…', 'ok');
+    setTimeout(() => location.reload(), 700);
+}
+</script>
 
 </body>
 </html>

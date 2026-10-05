@@ -1287,6 +1287,15 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 /* 多选时每个格子一个毛玻璃层会很吃力：改成实色底，肉眼几乎看不出区别 */
 .gallery-tile .select-mark { -webkit-backdrop-filter:none; backdrop-filter:none; }
 @media (max-width: 360px) { .sel-dock .dk-close, .sel-dock .dk-btn { width:34px; height:34px; } .sel-dock .dk-btn svg { width:20px; height:20px; } }
+
+/* 备份与更新页：行首图标（和主界面一致） */
+#page-update .pref-card { padding-left: 16px; gap: 14px; }
+#page-update .pref-card + .pref-card::before { left: 66px; }
+#page-update .pref-ico { flex: none; width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: rgba(127,127,127,.12); color: var(--text-main); transition: transform .16s cubic-bezier(.2,.8,.2,1); }
+#page-update .pref-ico svg { width: 20px; height: 20px; }
+#page-update .pref-ico svg * { vector-effect: non-scaling-stroke; }
+#page-update .pref-card:active .pref-ico { transform: scale(.9); }
+@media (prefers-reduced-motion: reduce) { #page-update .pref-ico { transition: none; } }
 </style>
 </head>
 <body>
@@ -1728,22 +1737,22 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 
     <div class="page" id="page-update" data-title="Backup & Update" data-sub="备份设置、拉取最新版">
         <div class="about-sec">
-            <div class="about-cap">备份与更新</div>
             <div class="pref-group">
                 <div class="pref-card" role="button" tabindex="0" onclick="exportBackup()">
-                    <span class="pref-text">导出设置备份<span class="about-sub">偏好、上传记录、账号与 Token。文件含密钥，请妥善保管</span></span>
+                    <span class="pref-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M8 7.5L12 4l4 3.5"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></span><span class="pref-text">导出设置备份</span>
                     <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
                 </div>
                 <div class="pref-card" role="button" tabindex="0" onclick="$('backup-input').click()">
-                    <span class="pref-text">导入设置备份<span class="about-sub">导入后会自动刷新，已有的记录和账号不会被覆盖</span></span>
+                    <span class="pref-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M8 11.5l4 3.5 4-3.5"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></span><span class="pref-text">导入设置备份</span>
                     <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
                 </div>
                 <div class="pref-card" role="button" tabindex="0" onclick="pullLatest()">
-                    <span class="pref-text">拉取最新版<span class="about-sub" id="about-update-status">检查中…</span></span>
+                    <span class="pref-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M13.8 6.7h3.5V3.2"/></svg></span><span class="pref-text">拉取最新版</span>
                     <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
                 </div>
-                <div class="pref-card">
-                    <span class="pref-text">离线使用<span class="about-sub" id="about-offline-status">检查中…</span></span>
+                <div class="pref-card" role="button" tabindex="0" onclick="offlineInfo()">
+                    <span class="pref-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v7M8.8 12.2l3.2 3.2 3.2-3.2"/></svg></span><span class="pref-text">离线使用</span>
+                    <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
                 </div>
             </div>
             <input type="file" id="backup-input" accept=".json,application/json" style="display:none" onchange="importBackup(this.files[0]); this.value=''">
@@ -7547,7 +7556,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '1.9';
+const APP_VERSION = '1.9.1';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -7729,18 +7738,21 @@ async function revertRawLinks() {
 }
 
 /* ---------- 离线使用（Service Worker，需要同目录的 sw.js） ---------- */
-async function offlineStatusRefresh() {
-    const el = $('about-offline-status');
-    if (!el) return;
-    if (!isWebOrigin()) { el.textContent = '当前是本地文件，用不了离线缓存'; return; }
-    if (!('serviceWorker' in navigator)) { el.textContent = '这个浏览器不支持离线缓存'; return; }
+async function offlineStatusText() {
+    if (!isWebOrigin()) return '当前是本地文件，用不了离线缓存';
+    if (!('serviceWorker' in navigator)) return '这个浏览器不支持离线缓存';
     try {
         const reg = await navigator.serviceWorker.getRegistration();
-        el.textContent = (reg && (reg.active || reg.installing || reg.waiting))
-            ? '已启用：没网也能打开 App、浏览资源库（看过的缩略图会缓存）'
-            : '未启用：把 sw.js 放到和本页面同一目录，重新打开一次即可';
-    } catch (_) { el.textContent = '检查失败'; }
+        return (reg && (reg.active || reg.installing || reg.waiting))
+            ? '离线已启用：没网也能打开 App、浏览资源库'
+            : '离线未启用：把 sw.js 放到和本页面同一目录，重新打开一次';
+    } catch (_) { return '检查失败'; }
 }
+async function offlineStatusRefresh() {
+    const el = $('about-offline-status');
+    if (el) el.textContent = await offlineStatusText();
+}
+async function offlineInfo() { toast(await offlineStatusText(), 'info'); }
 (function initOffline() {
     if ('serviceWorker' in navigator && isWebOrigin()) {
         const reg = () => navigator.serviceWorker.register('sw.js').then(() => { try { offlineStatusRefresh(); } catch (_) {} }).catch(() => {});

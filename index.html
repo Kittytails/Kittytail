@@ -1297,6 +1297,17 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 #page-update .pref-card:active .pref-ico { transform: scale(.9); }
 @media (prefers-reduced-motion: reduce) { #page-update .pref-ico { transition: none; } }
 .plug-note { margin: 14px 6px 0; line-height: 19px; }
+
+/* ===== 外观：自定义背景 ===== */
+#kb-bg { position: fixed; inset: 0; z-index: -1; display: none; pointer-events: none; background-size: cover; background-position: center; background-repeat: no-repeat; }
+#kb-bg::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,.22); }
+html[data-theme="dark"] #kb-bg::after { background: rgba(0,0,0,.38); }
+html.has-bg #kb-bg { display: block; }
+html.has-bg:root, html.has-bg:root body, html.has-bg:root .container, html.has-bg:root .home, html.has-bg:root .page { background: transparent !important; }
+html.has-bg:root .fog { display: none; }
+.ap-thumb { flex: none; width: 34px; height: 34px; border-radius: 10px; margin-left: auto; background: rgba(127,127,127,.18) center/cover no-repeat; box-shadow: inset 0 0 0 .5px rgba(127,127,127,.35); }
+.ap-thumb[hidden] { display: none; }
+.pref-card .ap-thumb + .pref-chev { margin-left: 10px; }
 </style>
 </head>
 <body>
@@ -1342,6 +1353,12 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
         <button class="row" type="button" data-keywords="storage 存储 空间 容量 用量 大小 占用" onclick="openPage('storage')">
           <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7.5" ry="2.8"/><path d="M4.5 6v6c0 1.55 3.36 2.8 7.5 2.8s7.5-1.25 7.5-2.8V6"/><path d="M4.5 12v6c0 1.55 3.36 2.8 7.5 2.8s7.5-1.25 7.5-2.8v-6"/></svg></span>
           <span class="row-body"><span class="row-title">存储</span><span class="row-arrow"></span></span>
+        </button>
+      </div>
+      <div class="group single">
+        <button class="row" type="button" data-keywords="appearance 外观 背景 壁纸 主题 玻璃 液态" onclick="openPage('appearance')">
+          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.4 0 2-.9 2-1.8 0-1.3-1.2-1.4-1.2-2.6 0-1 .8-1.6 1.8-1.6H17a3.5 3.5 0 0 0 3.5-3.5C20.5 6.7 16.7 3.5 12 3.5z"/><path d="M7.8 11.2h.01M10.6 7.8h.01M15 8.2h.01"/></svg></span>
+          <span class="row-body"><span class="row-title">外观</span><span class="row-arrow"></span></span>
         </button>
       </div>
       <div class="group single">
@@ -1667,6 +1684,26 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
         <div class="sub plug-note" id="plugin-note" style="display:none"></div>
     </div>
 
+    <div class="page" id="page-appearance" data-title="Appearance" data-sub="背景与质感">
+        <div class="pref-group">
+            <div class="pref-card" role="button" tabindex="0" id="ap-pick">
+                <span class="pref-text">更换背景</span>
+                <span class="ap-thumb" id="ap-thumb" hidden></span>
+                <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
+            </div>
+            <div class="pref-card" role="button" tabindex="0" id="ap-clear" style="display:none">
+                <span class="pref-text">移除背景</span>
+            </div>
+        </div>
+        <div class="pref-group" id="ap-glass-group" style="display:none">
+            <label class="pref-card">
+                <span class="pref-text">液态玻璃</span>
+                <input type="checkbox" class="switch" id="ap-glass">
+            </label>
+        </div>
+        <input type="file" id="ap-file" accept="image/*" hidden>
+    </div>
+
     <div class="page" id="page-about" data-title="About" data-sub="使用说明与注意事项">
         <div class="about-sec">
             <div class="about-cap">这是什么</div>
@@ -1727,6 +1764,15 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
             <div class="about-item"><div class="about-t">超过 1 GB 会怎样</div><div class="about-d">1 GB 是 GitHub 的建议上限，不是硬限制。用量到 80% 会提醒，超过后进度条变红。在超过 1 GB 的仓库里上传时，会先弹出确认，你可以选择继续上传，或者换一个仓库。过大的仓库可能被 GitHub 提醒瘦身，具体政策以 GitHub 官方为准。</div></div>
             <div class="about-item"><div class="about-t">单个文件</div><div class="about-d">单个文件最大 99MB，超过的会被跳过；超过 20MB 的文件 jsDelivr 不支持，会自动改用 GitHub raw 直链。</div></div>
             <div class="about-item"><div class="about-t">公开 / 私有</div><div class="about-d">新建仓库时可以选公开或私有。已有的仓库，在「选择上传仓库」列表里点右侧的「公开」或「私有」标签就能切换，切换前会让你确认。改为私有后外部打不开里面的文件，已贴出去的直链会失效；改为公开后任何人都能看到仓库里的全部内容。</div></div>
+            </div>
+        </div>
+        <div class="about-sec">
+            <div class="about-cap">外观</div>
+            <div class="about-box">
+            <div class="about-item"><div class="about-t">更换背景</div><div class="about-d">在主页「外观」里选一张图片当整个 App 的背景。图片会先缩到最长边 2000 像素、转成 JPEG 再保存，原图不受影响。背景只保存在这台设备的浏览器里，不会上传到 GitHub，也不会进设置备份，换设备要重新选。清除浏览器网站数据会让背景消失。</div></div>
+            <div class="about-item"><div class="about-t">文字清晰度</div><div class="about-d">设了背景后，图片上会盖一层淡淡的遮罩：浅色模式偏白，深色模式偏黑，保证文字看得清。背景太花时，换一张颜色柔和的图效果更好。</div></div>
+            <div class="about-item"><div class="about-t">移除背景</div><div class="about-d">「外观」里点「移除背景」就会恢复成原来的纯色背景。</div></div>
+            <div class="about-item"><div class="about-t">液态玻璃</div><div class="about-d">需要 plugins.js 里有「液态玻璃」插件，开关同时出现在「外观」和「设置」里。开启后卡片、底部搜索栏、菜单、弹窗、按钮变成半透明玻璃质感。iPhone 的浏览器内核做不到苹果系统那种边缘折射，这里是磨砂模糊加高光边缘和投影。背景越有颜色、越有层次，玻璃感越明显；纯色背景下主要看到高光边和阴影。系统开了「降低透明度」时会自动去掉模糊。</div></div>
             </div>
         </div>
         <div class="about-sec">
@@ -2642,6 +2688,7 @@ function openPage(name) {
     if (name === 'gallery') { renderGallery(); loadRepoLiveFiles(false); }
     if (name === 'storage') loadStorage(false);
     if (name === 'prefs') renderPlugins();
+    if (name === 'appearance') renderAppearance();
     if (name === 'about') renderAboutPlugins();
     if (name === 'update' && typeof aboutOnOpen === 'function') aboutOnOpen();
 }
@@ -7567,7 +7614,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '1.11.0';
+const APP_VERSION = '1.12.0';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -7764,6 +7811,70 @@ async function offlineStatusRefresh() {
     if (el) el.textContent = await offlineStatusText();
 }
 async function offlineInfo() { toast(await offlineStatusText(), 'info'); }
+/* ---------- 外观：自定义背景（图片存在 IndexedDB，不进设置备份） ---------- */
+const AP_DB = 'kb_appearance';
+function apDb() { return new Promise((res, rej) => { const r = indexedDB.open(AP_DB, 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+async function apGet() { const db = await apDb(); return new Promise(res => { const q = db.transaction('kv').objectStore('kv').get('bg'); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); }); }
+async function apSet(blob) { const db = await apDb(); return new Promise((res, rej) => { const t = db.transaction('kv', 'readwrite'); if (blob) t.objectStore('kv').put(blob, 'bg'); else t.objectStore('kv').delete('bg'); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); }
+let apUrl = '';
+function apApply(blob) {
+    let bg = $('kb-bg');
+    if (!bg) { bg = document.createElement('div'); bg.id = 'kb-bg'; bg.setAttribute('aria-hidden', 'true'); document.body.insertBefore(bg, document.body.firstChild); }
+    if (apUrl) { URL.revokeObjectURL(apUrl); apUrl = ''; }
+    if (blob) { apUrl = URL.createObjectURL(blob); bg.style.backgroundImage = 'url("' + apUrl + '")'; }
+    else bg.style.backgroundImage = '';
+    document.documentElement.classList.toggle('has-bg', !!blob);
+    const th = $('ap-thumb'), cl = $('ap-clear');
+    if (th) { th.hidden = !blob; th.style.backgroundImage = blob ? 'url("' + apUrl + '")' : ''; }
+    if (cl) cl.style.display = blob ? '' : 'none';
+}
+function apCompress(file) {
+    return new Promise((res, rej) => {
+        const url = URL.createObjectURL(file), img = new Image();
+        img.onload = () => {
+            const MAX = 2000, k = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
+            const c = document.createElement('canvas');
+            c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
+            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+            URL.revokeObjectURL(url);
+            c.toBlob(b => b ? res(b) : rej(new Error('转换失败')), 'image/jpeg', 0.85);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('读不了这张图片')); };
+        img.src = url;
+    });
+}
+async function renderAppearance() {
+    await pluginsReady();
+    const p = DL.list.find(x => x.id === 'liquid-glass'), grp = $('ap-glass-group'), sw = $('ap-glass');
+    if (!grp || !sw) return;
+    grp.style.display = p ? '' : 'none';
+    if (p) sw.checked = pluginOn(p);
+}
+(function apInit() {
+    const pick = $('ap-pick'), clear = $('ap-clear'), file = $('ap-file'), sw = $('ap-glass');
+    if (pick && file) {
+        const open = () => file.click();
+        pick.addEventListener('click', open);
+        pick.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+        file.addEventListener('change', async () => {
+            const f = file.files && file.files[0]; file.value = '';
+            if (!f) return;
+            try { const blob = await apCompress(f); await apSet(blob); apApply(blob); toast('背景已更换', 'ok'); }
+            catch (e) { toast('更换背景失败：' + (e && e.message || e), 'error'); }
+        });
+    }
+    if (clear) {
+        const doClear = async () => { try { await apSet(null); } catch (_) {} apApply(null); toast('背景已移除', 'ok'); };
+        clear.addEventListener('click', doClear);
+        clear.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doClear(); } });
+    }
+    if (sw) sw.addEventListener('change', () => {
+        const p = DL.list.find(x => x.id === 'liquid-glass'); if (!p) return;
+        pluginSetOn(p, sw.checked); pluginToggle(p, sw.checked);
+    });
+    apGet().then(b => { if (b) apApply(b); }).catch(() => {});
+})();
+
 /* ---------- 插件（同目录的 plugins.js，里面可以放任意多个插件） ---------- */
 const PLUGIN_STATE_KEY = 'kb_pref_plugins';   // 带 kb_pref_ 前缀，会随设置备份一起导出
 const DL = window.DL = {

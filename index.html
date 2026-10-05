@@ -1171,7 +1171,27 @@ html[data-theme="dark"] .sk {
     /* 悬浮坞出现时，给列表底部留出空间，最后一排不会被挡住 */
     body.gallery-multi-mode #page-gallery[data-seg="library"], body.repo-multi-mode #page-gallery[data-seg="repo"] { padding-bottom: calc(var(--s-bottom) + 84px); }
 
-    /* 搜索框：右侧按钮 = 麦克风；输入内容后变成清除键 */
+    /* 修复：夜间模式下通用 .card 的 !important 底色盖过了资源库/仓库的透明外壳，出现一圈黑框 */
+#page-gallery > .card,
+html[data-theme="dark"] #page-gallery > .card {
+    background: transparent !important; border: 0 !important; box-shadow: none !important;
+}
+
+/* 搜索框吸顶：页面往上滑时固定在顶部，不再跟着内容跑；只有键盘弹出时系统才会挪动 */
+#page-gallery .searchpill-wrap {
+    position: sticky; top: calc(env(safe-area-inset-top, 0px) + 8px); z-index: 30;
+    margin: 0 0 14px;
+}
+#page-gallery .searchpill-wrap .searchpill { margin: 0; }
+#page-gallery .searchpill-wrap::before {
+    content: ''; position: absolute; z-index: -1; pointer-events: none;
+    left: -18px; right: -18px; top: calc(-1 * (env(safe-area-inset-top, 0px) + 8px)); bottom: -12px;
+    background: linear-gradient(to bottom, rgb(var(--fog)) 0, rgb(var(--fog)) calc(100% - 14px), rgba(var(--fog), 0) 100%);
+    opacity: 0; transition: opacity .15s ease;
+}
+#page-gallery .searchpill-wrap.stuck::before { opacity: 1; }
+
+/* 搜索框：右侧按钮 = 麦克风；输入内容后变成清除键 */
     .searchpill .sp-mic .ic-clear { display: none; }
     .searchpill.has-text .sp-mic .ic-mic { display: none; }
     .searchpill.has-text .sp-mic .ic-clear { display: block; }
@@ -1208,6 +1228,53 @@ html[data-theme="dark"] .sk {
     html[data-theme="dark"] .save-opt:active, html[data-theme="dark"] .save-cancel:active { background: rgba(255,255,255,.16); }
 
     .pref-chev { flex: none; width: 8px; height: 14px; color: #B5B5BA; }
+
+/* ================= 丝滑转场（iOS 风格） ================= */
+:root { --ease-ios: cubic-bezier(.32,.72,0,1); --dur-push: .48s; --dur-pop: .36s; }
+
+/* 子页面：整页从右侧推入，不再淡入淡出；退出时同样滑出 */
+.page {
+    opacity: 1; transform: translate3d(100%,0,0); backface-visibility: hidden;
+    box-shadow: -18px 0 48px rgba(0,0,0,0);
+    transition: transform var(--dur-pop) var(--ease-ios), box-shadow var(--dur-pop) var(--ease-ios), visibility 0s linear var(--dur-pop);
+}
+.page.active {
+    transform: translate3d(0,0,0); box-shadow: -18px 0 48px rgba(0,0,0,.10);
+    transition: transform var(--dur-push) var(--ease-ios), box-shadow var(--dur-push) var(--ease-ios), visibility 0s linear 0s;
+}
+html[data-theme="dark"] .page.active { box-shadow: -18px 0 48px rgba(0,0,0,.55); }
+
+/* 主页：子页面推入时轻微左移 + 变暗（视差），退出时回位 */
+.home { transition: transform var(--dur-pop) var(--ease-ios), opacity var(--dur-pop) var(--ease-ios); }
+body.page-open .home { transform: translate3d(-28%,0,0); opacity: .5; transition-duration: var(--dur-push); }
+.search-bar { transition: bottom .2s ease, transform var(--dur-pop) var(--ease-ios), opacity var(--dur-pop) var(--ease-ios); }
+body.page-open .search-bar { transform: translate3d(-28%,0,0); opacity: 0; transition-duration: .2s, var(--dur-push), var(--dur-push); }
+.search-bar[inert] { visibility: visible; } /* 子页面会盖住它，这里不再瞬间消失，转场才连贯 */
+
+/* 底部弹层 / 对话框：背景淡入淡出，面板弹簧式升起并带退场动画 */
+.delete-sheet-backdrop, .upload-error-modal {
+    display: flex; visibility: hidden; opacity: 0; pointer-events: none;
+    transition: opacity .28s ease, visibility 0s linear .32s;
+}
+.delete-sheet-backdrop.show, .upload-error-modal.show {
+    visibility: visible; opacity: 1; pointer-events: auto;
+    transition: opacity .3s ease, visibility 0s linear 0s;
+}
+.delete-sheet, .save-sheet, .upload-error-panel {
+    animation: none; transform: translate3d(0,100%,0);
+    transition: transform .32s var(--ease-ios);
+}
+.show > .delete-sheet, .show > .save-sheet, .show > .upload-error-panel {
+    transform: translate3d(0,0,0); transition: transform .46s var(--ease-ios);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page, .page.active { transition: opacity .18s linear, visibility 0s linear .18s; transform: none; opacity: 0; }
+    .page.active { opacity: 1; transition: opacity .18s linear; }
+    .home, .search-bar { transition: none; }
+    body.page-open .home { transform: none; opacity: 1; }
+    .delete-sheet, .save-sheet, .upload-error-panel, .show > .delete-sheet, .show > .save-sheet, .show > .upload-error-panel { transform: none; transition: none; }
+}
 </style>
 </head>
 <body>
@@ -1358,11 +1425,11 @@ html[data-theme="dark"] .sk {
                 </div>
             </div>
             
-            <label class="searchpill" id="gallery-searchpill">
+            <div class="searchpill-wrap"><label class="searchpill" id="gallery-searchpill">
                 <svg class="sp-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.9-4.9"/></svg>
                 <input id="gallery-search" type="search" placeholder="Search" aria-label="Search" enterkeyhint="search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" oninput="onGallerySearchInput()">
                 <button class="sp-btn sp-mic" type="button" aria-label="Voice" tabindex="-1" onmousedown="event.preventDefault()" onclick="searchPillAction(this, event)"><svg class="ic-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6"/></svg><svg class="ic-clear" viewBox="0 0 24 24" fill="none" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#A6A6AB" stroke="none"/><path d="M9 9l6 6M15 9l-6 6" stroke="#fff" stroke-width="2.4"/></svg></button>
-            </label>
+            </label></div>
             <div class="filter-group gallery-filter-group">
                 <button class="filter-btn active" data-f="all" onclick="setGalleryFilter('all')">全部</button>
                 <button class="filter-btn" data-f="image" onclick="setGalleryFilter('image')">图片</button>
@@ -1380,11 +1447,11 @@ html[data-theme="dark"] .sk {
                     <button class="more-btn" id="repo-refresh-btn" type="button" aria-label="More" aria-haspopup="menu" aria-expanded="false" onclick="openRepoMenu(this)"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="4.5" cy="12" r="2.1"/><circle cx="12" cy="12" r="2.1"/><circle cx="19.5" cy="12" r="2.1"/></svg></button>
                 </div>
             </div>
-            <label class="searchpill" id="repo-searchpill">
+            <div class="searchpill-wrap"><label class="searchpill" id="repo-searchpill">
                 <svg class="sp-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.9-4.9"/></svg>
                 <input id="repo-search" type="search" placeholder="Search" aria-label="Search" enterkeyhint="search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" oninput="onRepoSearchInput()">
                 <button class="sp-btn sp-mic" type="button" aria-label="Voice" tabindex="-1" onmousedown="event.preventDefault()" onclick="searchPillAction(this, event)"><svg class="ic-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6"/></svg><svg class="ic-clear" viewBox="0 0 24 24" fill="none" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#A6A6AB" stroke="none"/><path d="M9 9l6 6M15 9l-6 6" stroke="#fff" stroke-width="2.4"/></svg></button>
-            </label>
+            </label></div>
             <div class="sub repo-live-sub" id="repo-live-status">读取中…</div>
             <div class="repo-crumb-row">
                 <div class="repo-breadcrumb" id="repo-breadcrumb"></div>
@@ -1460,11 +1527,11 @@ html[data-theme="dark"] .sk {
         </div>
         <div class="pref-group">
             <label class="pref-card">
-                <span class="pref-text">上传时后台保活</span>
+                <span class="pref-text">后台保活</span>
                 <input type="checkbox" class="switch" id="pref-keepalive" onchange="savePrefs()">
             </label>
             <label class="pref-card">
-                <span class="pref-text">上传时屏幕常亮</span>
+                <span class="pref-text">屏幕常亮</span>
                 <input type="checkbox" class="switch" id="pref-wakelock" onchange="savePrefs()">
             </label>
         </div>
@@ -2256,6 +2323,7 @@ function setPanel(panel, open) {
     panel.setAttribute('aria-hidden', String(!open));
     panel.inert = !open;
     try { renderAccountUI(); } catch (_) {}
+    document.body.classList.toggle('page-open', !!topPanel());
     const sb = document.getElementById('searchBar');
     if (sb) sb.inert = !!topPanel();                 // 子页面打开时，底部搜索栏不可聚焦
     /* 打开面板时压入一条历史记录，这样安卓返回键 / 浏览器返回是关面板而不是退出页面 */
@@ -2311,8 +2379,26 @@ document.querySelectorAll('.page').forEach(p => {
     p.insertBefore(head, p.firstChild);
 });
 
+/* ---------- 搜索框吸顶：吸住时才显示底部遮罩，避免内容从胶囊后面透出来 ---------- */
+(function () {
+    const pg = document.getElementById('page-gallery');
+    if (!pg) return;
+    let ticking = false;
+    const update = () => {
+        ticking = false;
+        pg.querySelectorAll('.searchpill-wrap').forEach(w => {
+            if (!w.offsetParent && getComputedStyle(w).position !== 'fixed') return; // 隐藏的那张卡片
+            const top = parseFloat(getComputedStyle(w).top) || 0;
+            w.classList.toggle('stuck', w.getBoundingClientRect().top <= top + 0.5 && pg.scrollTop > 2);
+        });
+    };
+    pg.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+})();
+
 /* ---------- 左边缘右滑返回（跟手） ---------- */
-const EDGE = 24, LOCK_DIST = 8, DURATION = 250;
+const EDGE = 24, LOCK_DIST = 8, DURATION = 380, PARALLAX = -28;
+const EASE_IOS = 'cubic-bezier(.32,.72,0,1)';
+function parallaxEls() { return ['home', 'searchBar'].map(id => document.getElementById(id)).filter(Boolean); }
 let drag = null, animating = false;
 document.addEventListener('pointerdown', e => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -2328,11 +2414,17 @@ document.addEventListener('pointermove', e => {
         if (Math.abs(dy) > Math.abs(dx) || dx < 0) { drag = null; return; }
         drag.locked = true;
         drag.p.style.transition = 'none';
+        parallaxEls().forEach(el => { el.style.transition = 'none'; });
         try { drag.p.setPointerCapture(e.pointerId); } catch (_) {}
         if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     }
     drag.dx = Math.max(0, dx);
-    drag.p.style.transform = `translateX(${drag.dx}px)`;
+    drag.p.style.transform = `translate3d(${drag.dx}px,0,0)`;
+    const prog = Math.min(1, drag.dx / window.innerWidth);
+    parallaxEls().forEach((el, i) => {
+        el.style.transform = `translate3d(${PARALLAX * (1 - prog)}%,0,0)`;
+        if (i === 0) el.style.opacity = String(.5 + .5 * prog);
+    });
 });
 function endDrag(e) {
     if (!drag || e.pointerId !== drag.id) return;
@@ -2342,14 +2434,22 @@ function endDrag(e) {
     const elapsed = Math.max(1, performance.now() - t);
     const shouldClose = e.type === 'pointerup' && (dx > window.innerWidth * 0.33 || dx / elapsed > 0.5);
     animating = true;
-    p.style.transition = `transform ${DURATION}ms cubic-bezier(.22,.8,.2,1)`;
-    p.style.transform = shouldClose ? 'translateX(100%)' : 'translateX(0)';
+    p.style.transition = `transform ${DURATION}ms ${EASE_IOS}`;
+    p.style.transform = shouldClose ? 'translate3d(100%,0,0)' : 'translate3d(0,0,0)';
+    parallaxEls().forEach((el, i) => {
+        el.style.transition = `transform ${DURATION}ms ${EASE_IOS}, opacity ${DURATION}ms ${EASE_IOS}`;
+        el.style.transform = shouldClose ? 'translate3d(0,0,0)' : `translate3d(${PARALLAX}%,0,0)`;
+        if (i === 0) el.style.opacity = shouldClose ? '1' : '.5';
+    });
     setTimeout(() => {
         p.style.transition = 'none';
+        parallaxEls().forEach(el => { el.style.transition = 'none'; });
         if (shouldClose) setPanel(p, false);
         p.style.transform = '';
+        parallaxEls().forEach(el => { el.style.transform = ''; el.style.opacity = ''; });
         p.offsetWidth;
         p.style.transition = '';
+        parallaxEls().forEach(el => { el.style.transition = ''; });
         animating = false;
     }, DURATION);
 }
@@ -2406,9 +2506,13 @@ document.addEventListener('pointercancel', endDrag);
     const vv = window.visualViewport;
     if (vv) {
         const place = () => {
+            // 只有输入框聚焦（键盘弹出）时才抬高；滚动 / 回弹时 visualViewport 也会变化，那时必须保持固定
+            if (document.activeElement !== input) { if (bar.style.bottom) bar.style.bottom = ''; return; }
             const kb = window.innerHeight - vv.height - vv.offsetTop;
             bar.style.bottom = kb > 80 ? (kb + 10) + 'px' : '';
         };
+        input.addEventListener('focus', () => setTimeout(place, 50));
+        input.addEventListener('blur', () => { bar.style.bottom = ''; });
         const pin = () => { if (document.activeElement === input && (vv.offsetTop > 0 || window.scrollY > 0)) window.scrollTo(0, 0); };
         vv.addEventListener('resize', () => { place(); pin(); });
         vv.addEventListener('scroll', () => { place(); pin(); });
@@ -2676,8 +2780,8 @@ const PREF_KEEPALIVE_KEY = 'kb_pref_keepalive';
 const PREF_WAKELOCK_KEY = 'kb_pref_wakelock';
 const PREF_NOTIFY_KEY = 'kb_pref_notify';
 function prefNotify() { try { return localStorage.getItem(PREF_NOTIFY_KEY) === '1'; } catch (_) { return false; } } // 默认关闭（需要系统授权）
-function prefKeepAlive() { try { return localStorage.getItem(PREF_KEEPALIVE_KEY) !== '0'; } catch (_) { return true; } } // 默认开启
-function prefWakeLock() { try { return localStorage.getItem(PREF_WAKELOCK_KEY) !== '0'; } catch (_) { return true; } } // 默认开启（与此前行为一致）
+function prefKeepAlive() { try { return localStorage.getItem(PREF_KEEPALIVE_KEY) === '1'; } catch (_) { return false; } } // 默认关闭；开启后整个 App 内全程保活
+function prefWakeLock() { try { return localStorage.getItem(PREF_WAKELOCK_KEY) === '1'; } catch (_) { return false; } } // 默认关闭；开启后整个 App 内一直常亮
 function prefAutoJump() { try { return localStorage.getItem(PREF_AUTOJUMP_KEY) !== '0'; } catch (_) { return true; } } // 默认开启
 function prefHeicJpg() { try { return localStorage.getItem(PREF_HEIC_KEY) === '1'; } catch (_) { return false; } }
 function savePrefs() {
@@ -2687,11 +2791,7 @@ function savePrefs() {
         localStorage.setItem(PREF_KEEPALIVE_KEY, $('pref-keepalive').checked ? '1' : '0');
         localStorage.setItem(PREF_WAKELOCK_KEY, $('pref-wakelock').checked ? '1' : '0');
     } catch (_) {}
-    // 上传进行中切换开关要立即生效（原来只有「关」会生效，「开」要等下一次上传）
-    if (typeof isBatchUploading !== 'undefined' && isBatchUploading) {
-        if ($('pref-keepalive').checked) keepAlive.start(); else keepAlive.stop();
-        if ($('pref-wakelock').checked) requestUploadWakeLock(); else releaseWakeLockOnly();
-    } else if (!$('pref-keepalive').checked) keepAlive.stop();
+    applyKeepModes(false); // 开关一改立即生效，不分页面、不分是否在上传
 }
 
 
@@ -2739,7 +2839,7 @@ async function sendTestNotification() {
     clearTimeout(testNotifyTimer);
     testNotifyTimer = setTimeout(async () => {
         const ok = await showSysNotification('测试通知', '收到这条就说明：上传完成后会这样提醒你', 'dl-test');
-        if (!isBatchUploading) keepAlive.stop();
+        if (!prefKeepAlive()) keepAlive.stop();
         if (document.visibilityState === 'visible') toast(ok ? '测试通知已发送' : '发送失败：当前环境不允许显示通知', ok ? 'ok' : 'error');
     }, 5000);
 }
@@ -5474,8 +5574,9 @@ function isAllowedAssetFile(file) {
     return isImageFile(file) || FONT_EXT_RE.test(file.name || '') || /^font\//i.test(file.type || '');
 }
 
-/* ===== 后台保活：上传期间循环播放一段人耳听不到的静音音频，让 iOS 不把页面挂起 =====
-   仅在上传进行时开启；上传结束立即停止。iOS 要求播放由点击触发，若被拒绝，会在下一次触摸时自动补上。 */
+/* ===== 后台保活：开关打开期间，循环播放一段人耳听不到的静音音频，让 iOS 不把页面挂起 =====
+   与是否在上传无关：开关开着，整个 App 里的所有功能都受保护；关掉开关才停止。
+   iOS 要求播放由点击触发，若被拒绝，会在下一次触摸时自动补上。 */
 // 应用图标：给锁屏 / 控制中心的「正在播放」用（取页面自带的图标）
 let appIconBlobUrl = '';
 function appIconSrc() {
@@ -5512,7 +5613,7 @@ const keepAlive = (() => {
         try {
             if ('mediaSession' in navigator && window.MediaMetadata)
                 navigator.mediaSession.metadata = on ? new MediaMetadata({
-                    title: '正在上传…', artist: 'Direct Link', album: 'Direct Link',
+                    title: '后台保活中', artist: 'Direct Link', album: 'Direct Link',
                     artwork: (appIconBlobUrl || appIconSrc()) ? [{ src: appIconBlobUrl || appIconSrc(), sizes: '192x192', type: 'image/png' }] : []
                 }) : null;
         } catch (_) {}
@@ -5533,7 +5634,7 @@ const keepAlive = (() => {
         });
     }
     return {
-        start() { if (active || !prefKeepAlive()) return; active = true; warned = false; setSession(true); tryPlay(); },
+        start(quiet) { if (active || !prefKeepAlive()) return; active = true; warned = !!quiet; setSession(true); tryPlay(); },
         stop() {
             if (!active && !(audio && !audio.paused)) return;
             active = false;
@@ -5546,15 +5647,18 @@ const keepAlive = (() => {
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') keepAlive.resume(); });
 window.addEventListener('pageshow', () => keepAlive.resume());
 
-async function requestUploadWakeLock() {
-    if (isBatchUploading) keepAlive.start();
-    if (!prefWakeLock() || !('wakeLock' in navigator) || !isBatchUploading || document.visibilityState !== 'visible') return;
+/* ===== 保活 / 常亮：由两个开关直接决定，开着就一直生效（不再只在上传时） ===== */
+async function requestScreenWakeLock() {
+    if (!prefWakeLock() || !('wakeLock' in navigator) || document.visibilityState !== 'visible') return;
     try {
         if (uploadWakeLock && !uploadWakeLock.released) return;
-        uploadWakeLock = await navigator.wakeLock.request('screen');
-        uploadWakeLock.addEventListener('release', () => {
-            uploadWakeLock = null;
-            if (isBatchUploading && document.visibilityState === 'visible') setTimeout(requestUploadWakeLock, 150);
+        const lock = await navigator.wakeLock.request('screen');
+        if (!prefWakeLock()) { lock.release().catch(() => {}); return; } // 申请期间开关被关掉了
+        uploadWakeLock = lock;
+        lock.addEventListener('release', () => {
+            if (uploadWakeLock === lock) uploadWakeLock = null;
+            // 系统自动释放（切后台等）后，回到前台会重新申请；这里处理前台被意外释放的情况
+            if (prefWakeLock() && document.visibilityState === 'visible') setTimeout(requestScreenWakeLock, 150);
         });
     } catch (_) { uploadWakeLock = null; }
 }
@@ -5565,16 +5669,21 @@ function releaseWakeLockOnly() {
     if (lock && !lock.released) lock.release().catch(() => {});
 }
 
-function releaseUploadWakeLock() {
-    keepAlive.stop();
-    const lock = uploadWakeLock;
-    uploadWakeLock = null;
-    if (lock && !lock.released) lock.release().catch(() => {});
+// 按当前开关状态，同步「后台保活」和「屏幕常亮」
+function applyKeepModes(quiet) {
+    if (prefKeepAlive()) keepAlive.start(quiet); else keepAlive.stop();
+    if (prefWakeLock()) requestScreenWakeLock(); else releaseWakeLockOnly();
 }
 
+// 兼容旧调用：上传开始 / 结束时只需要按开关同步一次，不会再因为上传结束而关掉
+function requestUploadWakeLock() { applyKeepModes(true); }
+function releaseUploadWakeLock() { applyKeepModes(true); }
+
 document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && isBatchUploading) requestUploadWakeLock();
+    if (document.visibilityState === 'visible') applyKeepModes(true);
 });
+// 启动时按开关状态开启；iOS 不允许无手势播放音频，被拒绝时会在第一次触摸时自动补上（静默，不弹提示）
+applyKeepModes(true);
 
 
 // ===== ZIP 压缩包导入：在浏览器里解压，只取图片 / 字体 =====

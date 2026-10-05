@@ -1275,6 +1275,18 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 .about-d b { font-weight: 600; color: var(--text-main); }
 .about-sub { display: block; margin-top: 2px; font-size: 12.5px; line-height: 17px; font-weight: 400; letter-spacing: 0; color: #8E8E93; }
 #about-ver { font-weight: 500; color: #8E8E93; }
+
+/* ===== v1.9：标签 / 收藏 / 滚动 / 性能 ===== */
+.gallery-tile .tile-fav { position:absolute; z-index:3; top:7px; left:7px; width:20px; height:20px; border-radius:50%; background:rgba(17,17,17,.55); color:#FFD60A; font-size:12px; line-height:20px; text-align:center; pointer-events:none; }
+.gallery-tile .tile-badge + .tile-fav { top:29px; }
+.gallery-multi-mode .gallery-tile .tile-fav { display:none; }
+.gallery-sentinel { height:1px; width:100%; }
+#page-gallery .gallery-filter-group { overflow-x:auto; max-width:100%; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+#page-gallery .gallery-filter-group::-webkit-scrollbar { display:none; }
+#page-gallery .gallery-filter-group .filter-btn { flex:none; }
+/* 多选时每个格子一个毛玻璃层会很吃力：改成实色底，肉眼几乎看不出区别 */
+.gallery-tile .select-mark { -webkit-backdrop-filter:none; backdrop-filter:none; }
+@media (max-width: 360px) { .sel-dock .dk-close, .sel-dock .dk-btn { width:34px; height:34px; } .sel-dock .dk-btn svg { width:20px; height:20px; } }
 </style>
 </head>
 <body>
@@ -1462,6 +1474,8 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
                 <button class="filter-btn" data-f="font" onclick="setGalleryFilter('font')">字体</button>
                 <button class="filter-btn" data-f="file" onclick="setGalleryFilter('file')">其他</button>
                 <button class="filter-btn dead-chip" id="gallery-dead-chip" data-f="dead" onclick="setGalleryFilter('dead')" hidden>失效</button>
+                <button class="filter-btn" id="gallery-fav-chip" data-f="fav" onclick="setGalleryFilter('fav')" hidden>收藏</button>
+                <button class="filter-btn" id="gallery-tag-chip" onclick="openTagFilterMenu(this)" hidden>标签</button>
             </div>
             <div id="gallery-container"></div>
         </div>
@@ -1728,6 +1742,9 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
                     <span class="pref-text">拉取最新版<span class="about-sub" id="about-update-status">检查中…</span></span>
                     <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
                 </div>
+                <div class="pref-card">
+                    <span class="pref-text">离线使用<span class="about-sub" id="about-offline-status">检查中…</span></span>
+                </div>
             </div>
             <input type="file" id="backup-input" accept=".json,application/json" style="display:none" onchange="importBackup(this.files[0]); this.value=''">
         </div>
@@ -1829,6 +1846,7 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
             <button type="button" class="dk-btn" onclick="renameSelectedGallery()" aria-label="重命名" title="重命名"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19.5l.9-3.9L16.6 4.4a2.1 2.1 0 0 1 3 3L8.4 18.6z"/><path d="M14.5 6.5l3 3"/></svg></button>
             <button type="button" class="dk-btn" id="gallery-save-photos-btn" onclick="saveSelectedGalleryEntries('photos')" aria-label="存到相册" title="存到相册"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></svg></button>
             <button type="button" class="dk-btn" id="gallery-save-files-btn" onclick="openSaveSheet('gallery')" aria-label="存到文件" title="存到文件"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v10"/><path d="M8 10.5l4 4 4-4"/><path d="M5 15v2.5A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5V15"/></svg></button>
+            <button type="button" class="dk-btn" id="gallery-tag-btn" data-menu-btn onclick="openTagActionMenu(this)" aria-label="标签与收藏" title="标签与收藏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.2V5.5a2 2 0 0 1 2-2h6.7a2 2 0 0 1 1.4.6l6.8 6.8a2 2 0 0 1 0 2.8l-6.7 6.7a2 2 0 0 1-2.8 0L4.1 13.6a2 2 0 0 1-.6-1.4z"/><circle cx="8.5" cy="8.5" r="1.2"/></svg></button>
             <button type="button" class="dk-btn dk-danger" onclick="openDeleteSheet()" aria-label="删除" title="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15"/><path d="M9.5 7V5.2c0-.7.5-1.2 1.2-1.2h2.6c.7 0 1.2.5 1.2 1.2V7"/><path d="M6.5 7l.8 11.2A2 2 0 0 0 9.3 20h5.4a2 2 0 0 0 2-1.8L17.5 7"/></svg></button>
         </div>
     </div>
@@ -2976,7 +2994,7 @@ function closeMoreMenu() {
     moreMenuEl.remove();
     moreMenuEl = null;
 }
-function openMoreMenu(btn, items) {
+function openMoreMenu(btn, items, opts) {
     if (moreMenuEl && moreMenuEl._btn === btn) return closeMoreMenu(); // 再点一次收起
     closeMoreMenu();
     const m = document.createElement('div');
@@ -2996,8 +3014,11 @@ function openMoreMenu(btn, items) {
     });
     document.body.appendChild(m);
     const r = btn.getBoundingClientRect();
-    m.style.top = (r.bottom + 8) + 'px';
+    if (opts && opts.up) m.style.bottom = Math.max(8, window.innerHeight - r.top + 8) + 'px';   // 底部浮条的菜单向上展开
+    else m.style.top = (r.bottom + 8) + 'px';
     m.style.right = Math.max(8, window.innerWidth - r.right) + 'px';
+    const mr0 = m.getBoundingClientRect();
+    if (mr0.left < 8) { m.style.right = 'auto'; m.style.left = '8px'; }
     m._btn = btn;
     moreMenuEl = m;
     btn.setAttribute('aria-expanded', 'true');
@@ -3005,7 +3026,7 @@ function openMoreMenu(btn, items) {
 }
 // 点菜单以外的地方、滚动、旋转屏幕都收起菜单
 document.addEventListener('pointerdown', e => {
-    if (moreMenuEl && !moreMenuEl.contains(e.target) && !e.target.closest('.more-btn')) closeMoreMenu();
+    if (moreMenuEl && !moreMenuEl.contains(e.target) && !e.target.closest('.more-btn, [data-menu-btn]')) closeMoreMenu();
 }, true);
 window.addEventListener('scroll', closeMoreMenu, { passive: true });
 window.addEventListener('resize', closeMoreMenu);
@@ -3015,6 +3036,8 @@ const ICON_TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 const ICON_FOLDER_PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8A2.5 2.5 0 0 1 6 5.5h3a2 2 0 0 1 1.5 .7l1 1.1a2 2 0 0 0 1.5 .7H18A2.5 2.5 0 0 1 20.5 10.5V17A2.5 2.5 0 0 1 18 19.5H6A2.5 2.5 0 0 1 3.5 17z"/><path d="M12 11.1v5.2M9.4 13.7h5.2"/></svg>';
 const ICON_REFRESH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M13.8 6.7h3.5V3.2"/></svg>';
 function openLibraryMenu(btn) {
+    const nCdn = loadHistory().filter(e => linkStatusOf(e.id) === 'cdn').length;
+    const nRaw = loadHistory().filter(e => e.fixedRaw).length;
     openMoreMenu(btn, [
         { label: '选择', icon: ICON_SELECT, onClick: () => {
             if (!getGalleryVisibleList().length) return toast('暂无可选项目', 'info');
@@ -3025,6 +3048,8 @@ function openLibraryMenu(btn) {
         { label: '复制全部', icon: ICON_COPY, onClick: copyAllLinks },
         { label: '复制格式：' + COPY_FORMATS[prefCopyFormat()], icon: ICON_COPY, onClick: cycleCopyFormat },
         { label: linkCheckRunning ? '停止检测' : '检测失效链接', icon: ICON_LINKCHK, onClick: () => runLinkCheck() },
+        ...(nCdn ? [{ label: '修复 CDN 未同步（' + nCdn + '）', icon: ICON_REFRESH, onClick: () => fixCdnLinks() }] : []),
+        ...(nRaw ? [{ label: '改回 jsDelivr（' + nRaw + '）', icon: ICON_REFRESH, onClick: () => revertRawLinks() }] : []),
         { label: '清除失效记录', icon: ICON_TRASH, onClick: clearDeadRecords },
         { label: '清空记录', icon: ICON_TRASH, danger: true, onClick: clearHistory }
     ]);
@@ -3427,6 +3452,7 @@ function getGalleryEntryType(entry) {
 
 let gallerySearch = '';
 let gallerySearchTimer = null;
+let galleryTag = '', galleryRenderedN = 0, galleryIO = null;
 // 搜索框右侧按钮：没内容时是麦克风（点一下聚焦输入），有内容时变成清除键
 function searchPillAction(btn, ev) {
     if (ev) { ev.preventDefault(); ev.stopPropagation(); }
@@ -3448,6 +3474,7 @@ function onGallerySearchInput() {
         const v = cur.trim().toLowerCase();
         if (v === gallerySearch) return;
         gallerySearch = v;
+        galleryRenderedN = 0;
         gallerySelected.clear();
         updateGallerySelectionUI();
         renderGallery();
@@ -3455,8 +3482,10 @@ function onGallerySearchInput() {
 }
 function getGalleryVisibleList() {
     const q = (typeof gallerySearch === 'string') ? gallerySearch : '';
-    return sortGalleryEntries(loadHistory().filter(e => (galleryFilter === 'all' || (galleryFilter === 'dead' ? linkStatusOf(e.id) === 'dead' : getGalleryEntryType(e) === galleryFilter))
-        && (!q || (String(e.name || '') + ' ' + String(e.url || '')).toLowerCase().includes(q))));
+    const tagF = galleryTag;
+    return sortGalleryEntries(loadHistory().filter(e => (galleryFilter === 'all' || (galleryFilter === 'dead' ? linkStatusOf(e.id) === 'dead' : galleryFilter === 'fav' ? !!e.fav : getGalleryEntryType(e) === galleryFilter))
+        && (!tagF || entryTags(e).includes(tagF))
+        && (!q || (String(e.name || '') + ' ' + String(e.url || '') + ' ' + entryTags(e).join(' ')).toLowerCase().includes(q))));
 }
 
 // 选中数量位数变化时，悬浮条按内容平滑伸缩（图标之间的间距始终固定）
@@ -3769,6 +3798,7 @@ function copyAllLinks() {
 let galleryFilter = 'all';
 function setGalleryFilter(f) {
     galleryFilter = f;
+    galleryRenderedN = 0;
     gallerySelected.clear(); // 避免“选中的项目在当前筛选里看不见却仍会被删除”
     // 切换分类时只影响图库自己的按钮，避免和下方“仓库文件”的分类状态互相干扰。
     document.querySelectorAll('.filter-btn[data-f]').forEach(b => b.classList.toggle('active', b.dataset.f === f));
@@ -4643,6 +4673,7 @@ function renderRepoLiveFiles() {
             const img = document.createElement('img');
             let triedRaw = false;
             img.draggable = false;
+            img.decoding = 'async';
             img.src = file.url;
             img.loading = 'lazy';
             img.onerror = () => {
@@ -4702,6 +4733,7 @@ function galleryRepoSize(entry) {
     return gallerySizeCache.map.get(uploadKey(ref.owner, ref.repo, ref.path)) || 0;
 }
 function refreshDeadChip() {
+    try { refreshTagChips(); } catch (_) {}
     const chip = $('gallery-dead-chip');
     if (!chip) return;
     const ids = new Set(loadHistory().map(e => e.id));
@@ -4711,7 +4743,8 @@ function refreshDeadChip() {
     chip.textContent = n ? '失效 ' + n : '失效';
     if (!n && galleryFilter === 'dead') { galleryFilter = 'all'; document.querySelectorAll('.filter-btn[data-f]').forEach(b => b.classList.toggle('active', b.dataset.f === 'all')); }
 }
-function renderGallery() {
+function renderGallery(opts) {
+    if (galleryIO) { galleryIO.disconnect(); galleryIO = null; }
     try { refreshDeadChip(); } catch (_) {}
     const container = $('gallery-container');
     const list = getGalleryVisibleList();
@@ -4722,6 +4755,8 @@ function renderGallery() {
         if (galleryFilter === 'image') msg = '暂无图片';
         if (galleryFilter === 'file') msg = '暂无其他文件';
         if (galleryFilter === 'dead') msg = '没有失效链接';
+        if (galleryFilter === 'fav') msg = '还没有收藏';
+        if (galleryTag) msg = '没有带「' + galleryTag + '」标签的项目';
         container.innerHTML = `<div class="empty-hint" style="grid-column:1/-1;">${msg}</div>`;
         return;
     }
@@ -4739,16 +4774,12 @@ function renderGallery() {
 
     const dates = Object.keys(groups).sort((a,b) => !byDate ? 0 : (sortMode === 'old' ? a.localeCompare(b) : b.localeCompare(a)));
 
-    dates.forEach(dateStr => {
-        const header = document.createElement('div');
-        header.className = 'gallery-date-header';
-        header.textContent = dateStr;
-        container.appendChild(header);
-
-        const grid = document.createElement('div');
-        grid.className = 'gallery-grid';
-
-        groups[dateStr].forEach(entry => {
+    const CHUNK = 90;
+    const queue = [];
+    dates.forEach(dateStr => groups[dateStr].forEach(entry => queue.push({ dateStr, entry })));
+    const gridOf = {};
+    let rendered = 0;
+    const buildTile = (entry) => {
             const tile = document.createElement('div');
             tile.className = 'gallery-tile' + (gallerySelected.has(entry.id) ? ' selected' : '');
             tile.title = galleryMultiMode ? '点击选择' : '点击复制直链 · 长按多选';
@@ -4790,6 +4821,8 @@ function renderGallery() {
             if (entry.isImage) {
                 const img = document.createElement('img');
                 img.draggable = false;
+                img.decoding = 'async';
+                if (/^https:\/\/(cdn\.jsdelivr\.net|raw\.githubusercontent\.com)\//.test(entry.url || '')) img.crossOrigin = 'anonymous';   // 让离线缓存能存下缩略图
                 img.src = entry.url;
                 img.loading = 'lazy';
                 const ref = historyAssetRef(entry);
@@ -4828,6 +4861,7 @@ function renderGallery() {
                 tile.appendChild(badge);
             }
 
+            if (entry.fav) { const st = document.createElement('div'); st.className = 'tile-fav'; st.textContent = '★'; tile.appendChild(st); }
             const nameTag = document.createElement('div');
             nameTag.className = 'tile-name';
             nameTag.textContent = entry.name;
@@ -4840,10 +4874,46 @@ function renderGallery() {
             del.onclick = (ev) => { ev.stopPropagation(); removeHistoryItem(entry.id); };
             tile.appendChild(del);
 
-            grid.appendChild(tile);
-        });
-        container.appendChild(grid);
-    });
+        return tile;
+    };
+    const renderMore = (n) => {
+        const end = Math.min(queue.length, rendered + n);
+        for (; rendered < end; rendered++) {
+            const q = queue[rendered];
+            let grid = gridOf[q.dateStr];
+            if (!grid) {
+                const header = document.createElement('div');
+                header.className = 'gallery-date-header';
+                header.textContent = q.dateStr;
+                container.appendChild(header);
+                grid = document.createElement('div');
+                grid.className = 'gallery-grid';
+                container.appendChild(grid);
+                gridOf[q.dateStr] = grid;
+            }
+            grid.appendChild(buildTile(q.entry));
+        }
+        galleryRenderedN = rendered;
+    };
+    // 图多的时候不一次性建几百个格子：先建一屏多一点，滚到底部附近再接着建
+    renderMore((opts && opts.all) ? queue.length : Math.max(CHUNK, galleryRenderedN));
+    if (rendered < queue.length) {
+        const sentinel = document.createElement('div');
+        sentinel.className = 'gallery-sentinel';
+        container.appendChild(sentinel);
+        const fill = () => {
+            for (let k = 0; k < 12 && rendered < queue.length; k++) {
+                if (sentinel.getBoundingClientRect().top > window.innerHeight + 1200) break;
+                renderMore(CHUNK);
+                container.appendChild(sentinel);
+            }
+            if (rendered >= queue.length) { if (galleryIO) { galleryIO.disconnect(); galleryIO = null; } sentinel.remove(); }
+        };
+        if ('IntersectionObserver' in window) {
+            galleryIO = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) fill(); }, { rootMargin: '1200px 0px' });
+            galleryIO.observe(sentinel);
+        } else renderMore(queue.length);
+    }
 }
 
 // 初始化读取
@@ -5057,6 +5127,38 @@ async function fetchRepoTree(owner, repo, branch, auth) {
     }
     return { tree: out, truncated: incomplete };
 }
+// ---- GitHub 限流：全局冷却（所有请求共用一个倒计时，避免并发请求各自乱撞）+ 额度提示 ----
+const RATE_WAIT_MAX_MS = 90000;
+let ghCooldownUntil = 0, ghQuota = null, ghLowWarnedReset = 0;
+function ghClock(ts) { try { return new Date(ts).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }); } catch (_) { return ''; } }
+function ghExhaustedError(until) {
+    return Object.assign(new Error('GitHub 额度已用完，约 ' + ghClock(until) + ' 恢复，到时再试'), { http: true, status: 403 });
+}
+async function ghWaitCooldown() {
+    let shown = false;
+    for (;;) {
+        const left = ghCooldownUntil - Date.now();
+        if (left <= 0) break;
+        if (left > RATE_WAIT_MAX_MS + 2000) throw ghExhaustedError(ghCooldownUntil);   // 要等太久：直接失败，别让界面卡着
+        if (left > 2500) { shown = true; toast('GitHub 限流，' + Math.ceil(left / 1000) + ' 秒后自动继续', 'loading'); }
+        await sleep(Math.min(left, 1000));
+    }
+    if (shown) {
+        const el = $('kb-toast'), m = el && el.querySelector('.kb-toast-msg');
+        if (m && m.textContent.indexOf('GitHub 限流') === 0) hideToast();
+    }
+}
+function ghNoteQuota(res) {
+    try {
+        const rem = res.headers.get('x-ratelimit-remaining'), lim = res.headers.get('x-ratelimit-limit'), rst = res.headers.get('x-ratelimit-reset');
+        if (rem === null || rem === '') return;
+        ghQuota = { remaining: Number(rem), limit: Number(lim), reset: Number(rst) * 1000 };
+        if (ghQuota.remaining <= 60 && ghQuota.limit >= 1000 && ghLowWarnedReset !== ghQuota.reset) {
+            ghLowWarnedReset = ghQuota.reset;
+            toast('GitHub 本小时额度只剩 ' + ghQuota.remaining + ' 次，约 ' + ghClock(ghQuota.reset) + ' 恢复', 'info');
+        }
+    } catch (_) {}
+}
 async function githubRequest(path, options = {}, token, proxy) {
     if (!token) throw new Error('未配置 GitHub Token');
     const base = proxy || 'https://api.github.com';
@@ -5069,6 +5171,7 @@ async function githubRequest(path, options = {}, token, proxy) {
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         if (attempt > 1) await waitOnline(60000);
+        await ghWaitCooldown();
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), timeoutMs);
         try {
@@ -5085,6 +5188,7 @@ async function githubRequest(path, options = {}, token, proxy) {
                 cache: 'no-store',
                 signal: controller.signal
             });
+            ghNoteQuota(res);
             const text = await res.text(); // 读响应体也在超时保护内
             clearTimeout(timer);
             let data = {};
@@ -5095,13 +5199,18 @@ async function githubRequest(path, options = {}, token, proxy) {
                 // GitHub 在短时间内并发/连续请求过多时会触发限流（403 rate limit / abuse，或 429），
                 // 这类错误等一等再重试通常就能成功，不应该直接判定为失败。
                 const isRateLimited = res.status === 429 || (res.status === 403 && /rate limit|abuse|secondary/i.test(msg));
-                if (isRateLimited && attempt < maxAttempts) {
+                if (isRateLimited) {
                     const retryAfter = Number(res.headers.get('retry-after'));
                     const resetAt = Number(res.headers.get('x-ratelimit-reset'));
-                    let waitMs = retryAfter ? retryAfter * 1000 : (resetAt ? (resetAt * 1000 - Date.now()) : 0);
-                    if (!waitMs || waitMs < 0 || !isFinite(waitMs)) waitMs = 1200 * attempt;
-                    await new Promise(r => setTimeout(r, Math.min(waitMs, 15000)));
-                    continue;
+                    const exhausted = res.headers.get('x-ratelimit-remaining') === '0' && resetAt > 0;
+                    let waitMs = retryAfter ? retryAfter * 1000 : (exhausted ? (resetAt * 1000 - Date.now()) : 0);
+                    if (!waitMs || waitMs < 0 || !isFinite(waitMs)) waitMs = [6000, 15000, 30000, 60000][Math.min(attempt, 4) - 1];
+                    if (waitMs > RATE_WAIT_MAX_MS) {   // 每小时额度用完：等一个小时不现实，直接告诉用户几点恢复
+                        ghCooldownUntil = Math.max(ghCooldownUntil, Date.now() + waitMs);
+                        throw ghExhaustedError(Date.now() + waitMs);
+                    }
+                    ghCooldownUntil = Math.max(ghCooldownUntil, Date.now() + waitMs + 300);
+                    if (attempt < maxAttempts) continue;
                 }
                 const reqMethod = String(options.method || 'GET').toUpperCase();
                 const transient = [408, 500, 502, 503, 504].includes(res.status)
@@ -7236,6 +7345,9 @@ async function runLinkCheck(opts) {
     try {
         let pre = new Set();
         try { pre = await precheckLinksByRepo(entries); } catch (_) {}
+        // 最近 3 天上传的 jsDelivr 链接：就算仓库里有文件，CDN 也可能还没同步，要实际打开确认
+        const recentMs = 3 * 24 * 3600 * 1000, nowT = Date.now();
+        entries.forEach(e => { if (pre.has(e.id) && nowT - (e.time || 0) < recentMs && /cdn\.jsdelivr\.net/.test(e.url || '')) pre.delete(e.id); });
         pre.forEach(id => found.ok.push(id));
         done = pre.size;
         if (!quiet && done) linkCheckProgressToast(done, total);
@@ -7262,6 +7374,8 @@ async function runLinkCheck(opts) {
     }
     if (stopped) return toast('已停止：检测了 ' + done + '/' + total + ' 个，发现 ' + dead + ' 个失效', 'info');
     if (!dead) {
+        const gp1 = $('page-gallery');
+        if (cdn && gp1 && gp1.classList.contains('active')) { hideToast(); return fixCdnLinks(); }
         return toast('检测完成：' + (total - net) + ' 个链接都能打开'
             + (cdn ? '，其中 ' + cdn + ' 个 CDN 还没同步' : '') + (net ? '，' + net + ' 个暂时连不上' : ''));
     }
@@ -7282,7 +7396,7 @@ async function runLinkCheck(opts) {
     galleryMultiMode = true;
     found.dead.forEach(id => gallerySelected.add(id));
     updateGallerySelectionUI();
-    renderGallery();
+    renderGallery({ all: true });
     const first = document.querySelector('#gallery-container .gallery-tile .tile-badge:not(.cdn)');
     if (first) first.parentElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
 }
@@ -7433,7 +7547,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '1.8';
+const APP_VERSION = '1.9';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -7449,6 +7563,7 @@ async function fetchRemoteVersion() {
     return m ? m[1] : '';
 }
 async function aboutOnOpen() {
+    try { offlineStatusRefresh(); } catch (_) {}
     const el = document.getElementById('about-update-status');
     if (!el) return;
     if (!isWebOrigin()) { el.textContent = '当前是本地文件，无法在线更新'; return; }
@@ -7479,6 +7594,162 @@ async function pullLatest() {
     try { await fetch(appBaseUrl(), { cache: 'reload' }); } catch (_) {}   // 刷新浏览器对该网址的 HTTP 缓存，下次从桌面图标打开也是新版
     location.replace(appBaseUrl() + '?_=' + Date.now());
 }
+
+
+/* ---------- 标签 / 收藏（资源库） ---------- */
+const ICON_TAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.2V5.5a2 2 0 0 1 2-2h6.7a2 2 0 0 1 1.4.6l6.8 6.8a2 2 0 0 1 0 2.8l-6.7 6.7a2 2 0 0 1-2.8 0L4.1 13.6a2 2 0 0 1-.6-1.4z"/><circle cx="8.5" cy="8.5" r="1.2"/></svg>';
+const ICON_STAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.6l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.6l-5.1 2.7 1-5.7-4.1-4 5.7-.8z"/></svg>';
+function entryTags(e) { return e && Array.isArray(e.tags) ? e.tags : []; }
+function parseTagInput(v) {
+    return Array.from(new Set(String(v || '').split(/[\s,，、;；#]+/).map(x => x.trim().slice(0, 20)).filter(Boolean))).slice(0, 10);
+}
+function selectedGalleryEntries() { return loadHistory().filter(e => gallerySelected.has(e.id)); }
+function commitGalleryMeta(msg) {
+    saveHistory(loadHistory());
+    renderGallery();
+    updateGallerySelectionUI();
+    if (msg) toast(msg, 'ok');
+}
+function refreshTagChips() {
+    const fc = $('gallery-fav-chip'), tc = $('gallery-tag-chip');
+    let nf = 0;
+    const tags = new Set();
+    loadHistory().forEach(e => { if (e.fav) nf++; entryTags(e).forEach(x => tags.add(x)); });
+    if (fc) { fc.hidden = nf === 0; fc.textContent = '收藏'; }
+    if (galleryTag && !tags.has(galleryTag)) galleryTag = '';
+    if (tc) { tc.hidden = tags.size === 0; tc.textContent = galleryTag ? '#' + galleryTag : '标签'; tc.classList.toggle('active', !!galleryTag); }
+    if (!nf && galleryFilter === 'fav') {
+        galleryFilter = 'all';
+        document.querySelectorAll('.filter-btn[data-f]').forEach(b => b.classList.toggle('active', b.dataset.f === 'all'));
+    }
+}
+function setGalleryTag(x) {
+    galleryTag = x || '';
+    galleryRenderedN = 0;
+    gallerySelected.clear();
+    updateGallerySelectionUI();
+    renderGallery();
+}
+function openTagFilterMenu(btn) {
+    const counts = new Map();
+    loadHistory().forEach(e => entryTags(e).forEach(x => counts.set(x, (counts.get(x) || 0) + 1)));
+    const arr = Array.from(counts.entries()).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh')).slice(0, 14);
+    const items = arr.map(([x, n]) => ({ label: (x === galleryTag ? '✓ ' : '') + '#' + x + '  ' + n, onClick: () => setGalleryTag(x === galleryTag ? '' : x) }));
+    if (galleryTag) items.unshift({ label: '清除标签筛选', onClick: () => setGalleryTag('') });
+    if (items.length) openMoreMenu(btn, items);
+}
+function openTagActionMenu(btn) {
+    const sel = selectedGalleryEntries();
+    if (!sel.length) return toast('先选择项目', 'info');
+    const allFav = sel.every(e => e.fav);
+    const tagSet = new Set();
+    sel.forEach(e => entryTags(e).forEach(x => tagSet.add(x)));
+    const items = [
+        { label: allFav ? '取消收藏' : '收藏', icon: ICON_STAR, onClick: () => setFavSelected(!allFav) },
+        { label: '添加标签…', icon: ICON_TAG, onClick: addTagsToSelected }
+    ];
+    if (tagSet.size) items.push({ label: '移除标签…', icon: ICON_TAG, onClick: () => openRemoveTagMenu(btn, Array.from(tagSet).slice(0, 12)) });
+    openMoreMenu(btn, items, { up: true });
+}
+function openRemoveTagMenu(btn, tags) {
+    openMoreMenu(btn, tags.map(x => ({ label: '移除 #' + x, onClick: () => removeTagFromSelected(x) })), { up: true });
+}
+function setFavSelected(on) {
+    const sel = selectedGalleryEntries();
+    if (!sel.length) return;
+    sel.forEach(e => { if (on) e.fav = true; else delete e.fav; });
+    commitGalleryMeta((on ? '已收藏 ' : '已取消收藏 ') + sel.length + ' 项');
+}
+async function addTagsToSelected() {
+    const sel = selectedGalleryEntries();
+    if (!sel.length) return;
+    const v = await showPrompt({
+        title: '添加标签',
+        message: '给 ' + sel.length + ' 个项目添加标签，多个用空格或逗号隔开。',
+        placeholder: '例如：头像 素材',
+        confirmText: '添加',
+        validate: s => parseTagInput(s).length ? '' : '请输入至少一个标签'
+    });
+    if (v === null) return;
+    const add = parseTagInput(v);
+    if (!add.length) return;
+    sel.forEach(e => { const set = new Set(entryTags(e)); add.forEach(x => set.add(x)); e.tags = Array.from(set).slice(0, 20); });
+    commitGalleryMeta('已添加标签 ' + add.map(x => '#' + x).join(' '));
+}
+function removeTagFromSelected(x) {
+    const sel = selectedGalleryEntries();
+    sel.forEach(e => { const left = entryTags(e).filter(y => y !== x); if (left.length) e.tags = left; else delete e.tags; });
+    commitGalleryMeta('已移除 #' + x);
+}
+
+/* ---------- CDN 未同步：一键改用 raw 直链 ---------- */
+async function fixCdnLinks() {
+    const list = loadHistory().filter(e => linkStatusOf(e.id) === 'cdn');
+    if (!list.length) return toast('没有需要修复的链接', 'info');
+    const yes = await showConfirm({
+        title: '改用 raw 直链？',
+        message: list.length + ' 个文件已在仓库里，但 jsDelivr 还没同步，现在打不开。改成 raw.githubusercontent.com 后马上能用（部分网络需要代理才能访问 raw）。只会改这些记录的直链，之后可以在菜单里改回 jsDelivr。',
+        confirmText: '改成 raw', cancelText: '先不改'
+    });
+    if (!yes) return;
+    let n = 0;
+    const now = Date.now();
+    list.forEach(e => {
+        const ref = historyAssetRef(e);
+        if (!ref || !ref.owner || !ref.repo || !ref.path) return;
+        const raw = repoRawUrl(ref.owner, ref.repo, e.githubBranch || ref.branch || 'main', ref.path);
+        if (raw === e.url) return;
+        e.url = raw; e.fixedRaw = true;
+        linkStatus[e.id] = { s: 'ok', t: now };
+        n++;
+    });
+    saveHistory(loadHistory());
+    saveLinkStatus();
+    renderGallery();
+    toast(n ? '已把 ' + n + ' 个链接改成 raw' : '没有可以修改的链接', n ? 'ok' : 'info');
+}
+async function revertRawLinks() {
+    const list = loadHistory().filter(e => e.fixedRaw);
+    if (!list.length) return toast('没有需要改回的链接', 'info');
+    const yes = await showConfirm({ title: '改回 jsDelivr？', message: '把之前改成 raw 的 ' + list.length + ' 个链接改回 jsDelivr。如果 jsDelivr 还没同步，它们会再次打不开，建议先点「检测失效链接」确认。', confirmText: '改回', cancelText: '取消' });
+    if (!yes) return;
+    let n = 0;
+    list.forEach(e => {
+        const ref = historyAssetRef(e);
+        delete e.fixedRaw;
+        if (!ref || !ref.owner || !ref.repo || !ref.path) return;
+        e.url = repoCdnUrl(ref.owner, ref.repo, e.githubBranch || ref.branch || 'main', ref.path);
+        delete linkStatus[e.id];
+        n++;
+    });
+    saveHistory(loadHistory());
+    saveLinkStatus();
+    renderGallery();
+    toast('已改回 ' + n + ' 个链接', 'ok');
+}
+
+/* ---------- 离线使用（Service Worker，需要同目录的 sw.js） ---------- */
+async function offlineStatusRefresh() {
+    const el = $('about-offline-status');
+    if (!el) return;
+    if (!isWebOrigin()) { el.textContent = '当前是本地文件，用不了离线缓存'; return; }
+    if (!('serviceWorker' in navigator)) { el.textContent = '这个浏览器不支持离线缓存'; return; }
+    try {
+        const reg = await navigator.serviceWorker.getRegistration();
+        el.textContent = (reg && (reg.active || reg.installing || reg.waiting))
+            ? '已启用：没网也能打开 App、浏览资源库（看过的缩略图会缓存）'
+            : '未启用：把 sw.js 放到和本页面同一目录，重新打开一次即可';
+    } catch (_) { el.textContent = '检查失败'; }
+}
+(function initOffline() {
+    if ('serviceWorker' in navigator && isWebOrigin()) {
+        const reg = () => navigator.serviceWorker.register('sw.js').then(() => { try { offlineStatusRefresh(); } catch (_) {} }).catch(() => {});
+        if (document.readyState === 'complete') reg(); else window.addEventListener('load', reg, { once: true });
+    }
+    let offT = null;
+    window.addEventListener('offline', () => { clearTimeout(offT); offT = setTimeout(() => toast('已离线：资源库还能看，上传和仓库操作需要联网', 'info'), 600); });
+    window.addEventListener('online', () => { clearTimeout(offT); toast('网络已恢复', 'ok'); });
+})();
 
 /* ---------- 设置备份 ---------- */
 /* ---------- 备份加密（口令 → PBKDF2-SHA256 → AES-GCM-256） ---------- */

@@ -217,6 +217,17 @@ ${sel(FLOAT)} {
   box-shadow: var(--lg-inset), var(--lg-hair), var(--lg-shadow) !important;
 }
 
+/* 搜索栏本身就是一整块玻璃：里面的输入框保持透明，不要再套一层框；栏的底色更实一点，免得后面的卡片透出来显得乱 */
+${G} #searchBar input#searchInput, ${G} #page-gallery .searchpill input {
+  background: transparent !important; box-shadow: none !important; border-color: transparent !important;
+}
+${G} .search-bar {
+  background: var(--lg-spec), linear-gradient(160deg, rgba(255,255,255,.80), rgba(255,255,255,.58)) !important;
+}
+${D} .search-bar {
+  background: var(--lg-spec), linear-gradient(160deg, rgba(72,72,78,.78), rgba(44,44,48,.66)) !important;
+}
+
 /* 底部弹层 */
 ${sel(SHEET)} {
   background: var(--lg-spec), linear-gradient(180deg, rgba(252,252,254,.70), rgba(244,244,248,.56)) !important;

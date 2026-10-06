@@ -1165,6 +1165,12 @@ html[data-theme="dark"] .page.active { box-shadow: -18px 0 48px rgba(0,0,0,.55);
 body.page-open .home { transform: translate3d(-28%,0,0); opacity: .5; transition-duration: var(--dur-push); }
 .search-bar { transition: bottom .2s ease, transform var(--dur-pop) var(--ease-ios), opacity var(--dur-pop) var(--ease-ios); }
 body.page-open .search-bar { transform: translate3d(-28%,0,0); opacity: 0; transition-duration: .2s, var(--dur-push), var(--dur-push); }
+/* 右滑返回过程中：让主页 / 搜索栏 / 当前页各自固定成独立图层，并把页面左侧的大范围模糊阴影换成小的。
+   iOS 在「透明度 + 位移 + 大模糊阴影」叠在一起时，偶尔会在页面左边缘留下一条没刷新的旧画面（残页） */
+body.swiping .home, body.swiping .search-bar, body.swiping .page.active { will-change: transform; }
+body.swiping .home { will-change: transform, opacity; }
+body.swiping .page.active { box-shadow: -6px 0 14px rgba(0,0,0,.08); }
+html[data-theme="dark"] body.swiping .page.active { box-shadow: -6px 0 14px rgba(0,0,0,.4); }
 .search-bar[inert] { visibility: visible; } /* 子页面会盖住它，这里不再瞬间消失，转场才连贯 */
 
 /* 底部弹层 / 对话框：背景淡入淡出，面板弹簧式升起并带退场动画 */
@@ -2697,6 +2703,7 @@ document.addEventListener('pointermove', e => {
         if (Math.abs(dx) < LOCK_DIST && Math.abs(dy) < LOCK_DIST) return;
         if (Math.abs(dy) > Math.abs(dx) || dx < 0) { drag = null; return; }
         drag.locked = true;
+        document.body.classList.add('swiping');
         drag.p.style.transition = 'none';
         parallaxEls().forEach(el => { el.style.transition = 'none'; });
         try { drag.p.setPointerCapture(e.pointerId); } catch (_) {}
@@ -2730,6 +2737,7 @@ function endDrag(e) {
         parallaxEls().forEach(el => { el.style.transition = 'none'; });
         if (shouldClose) setPanel(p, false);
         p.style.transform = '';
+        document.body.classList.remove('swiping');
         parallaxEls().forEach(el => { el.style.transform = ''; el.style.opacity = ''; });
         p.offsetWidth;
         p.style.transition = '';

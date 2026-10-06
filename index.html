@@ -1151,14 +1151,16 @@ html[data-theme="dark"] #page-gallery > .card {
 /* 子页面：整页从右侧推入，不再淡入淡出；退出时同样滑出 */
 .page {
     opacity: 1; transform: translate3d(100%,0,0);
-    box-shadow: -.5px 0 0 rgba(0,0,0,0);   /* 不用大范围模糊阴影：iOS 滑动返回时会把它画成一块错位的灰色残影 */
-    transition: transform var(--dur-pop) var(--ease-ios), box-shadow var(--dur-pop) var(--ease-ios), visibility 0s linear var(--dur-pop);
+    /* 边缘细线固定不变、不参与过渡（box-shadow 动画不能走 GPU，会让整页每帧重绘）；未打开时 visibility:hidden，看不到它 */
+    box-shadow: -.5px 0 0 rgba(0,0,0,.12);
+    transition: transform var(--dur-pop) var(--ease-ios), visibility 0s linear var(--dur-pop);
 }
 .page.active {
-    transform: translate3d(0,0,0); box-shadow: -.5px 0 0 rgba(0,0,0,.12);
-    transition: transform var(--dur-push) var(--ease-ios), box-shadow var(--dur-push) var(--ease-ios), visibility 0s linear 0s;
+    transform: translate3d(0,0,0);
+    will-change: transform;
+    transition: transform var(--dur-push) var(--ease-ios), visibility 0s linear 0s;
 }
-html[data-theme="dark"] .page.active { box-shadow: -.5px 0 0 rgba(255,255,255,.12); }
+html[data-theme="dark"] .page { box-shadow: -.5px 0 0 rgba(255,255,255,.12); }
 .page.no-anim, .page.no-anim.active { transition: none !important; }
 
 /* 主页：保持不动，子页面直接从右侧滑过来盖住它（不做视差：iOS 上主页同时位移 + 变透明，滑动返回时会出现残影） */
@@ -1293,8 +1295,8 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 #page-update .pref-ico svg * { vector-effect: non-scaling-stroke; }
 #page-update .pref-card:active .pref-ico { transform: scale(.9); }
 @media (prefers-reduced-motion: reduce) { #page-update .pref-ico { transition: none; } }
-/* 三张卡片之间的间距与主页一致（页面 gap 18px + 14px = 32px） */
-#page-update .pref-group + .pref-group { margin-top: 14px; }
+/* 卡片之间的间距与主页一致（主页 .cards 的 gap 是 32px） */
+#page-update .pref-group + .pref-group { margin-top: 32px; }
 #page-update .pref-val { flex: none; font-size: 15px; letter-spacing: -.1px; color: #8E8E93; }
 #page-update .pref-val.new { color: var(--text-main); font-weight: 600; }
 .plug-note { margin: 14px 6px 0; line-height: 19px; }
@@ -2617,6 +2619,12 @@ let histDepth = 0, skipPop = 0, inPop = false;
 // 想恢复安卓式返回键支持，把它改成 false 即可。
 const NO_HISTORY = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 function topPanel() { return document.querySelector('.page.active'); }
+// renderAccountUI 会重写本地存储里的账号数据并重新解码头像，放在转场里会掉帧；等转场结束再做
+let accUiT = 0;
+function scheduleAccountUI() {
+    clearTimeout(accUiT);
+    accUiT = setTimeout(() => { try { renderAccountUI(); } catch (_) {} }, 520);
+}
 function setPanel(panel, open) {
     const was = panel.classList.contains('active');
     if (open) document.querySelectorAll('.page.active').forEach(o => {
@@ -2625,7 +2633,7 @@ function setPanel(panel, open) {
     panel.classList.toggle('active', open);
     panel.setAttribute('aria-hidden', String(!open));
     panel.inert = !open;
-    try { renderAccountUI(); } catch (_) {}
+    scheduleAccountUI();   // 不在转场中途同步刷新，避免卡一下
     document.body.classList.toggle('page-open', !!topPanel());
     const sb = document.getElementById('searchBar');
     if (sb) sb.inert = !!topPanel();                 // 子页面打开时，底部搜索栏不可聚焦
@@ -2694,7 +2702,7 @@ document.querySelectorAll('.page').forEach(p => {
 });
 
 /* ---------- 左边缘右滑返回（跟手） ---------- */
-const EDGE = 24, LOCK_DIST = 8, DURATION = 380, PARALLAX = -28;
+const EDGE = 24, LOCK_DIST = 5, DURATION = 380, PARALLAX = -28;
 const EASE_IOS = 'cubic-bezier(.32,.72,0,1)';
 function parallaxEls() { return []; }   // 主页不再跟着移动；保留这个钩子，下面的逻辑自然变成空操作
 let drag = null, animating = false;
@@ -2717,13 +2725,19 @@ document.addEventListener('pointermove', e => {
         if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     }
     drag.dx = Math.max(0, dx);
+    if (!dragRaf) dragRaf = requestAnimationFrame(applyDrag);   // 一帧只写一次样式
+});
+let dragRaf = 0;
+function applyDrag() {
+    dragRaf = 0;
+    if (!drag || !drag.locked) return;
     drag.p.style.transform = `translate3d(${drag.dx}px,0,0)`;
     const prog = Math.min(1, drag.dx / window.innerWidth);
     parallaxEls().forEach((el, i) => {
         el.style.transform = `translate3d(${PARALLAX * (1 - prog)}%,0,0)`;
         if (i === 0) el.style.opacity = String(.5 + .5 * prog);
     });
-});
+}
 function endDrag(e) {
     if (!drag || e.pointerId !== drag.id) return;
     const { p, dx, locked, t } = drag;
@@ -2732,10 +2746,20 @@ function endDrag(e) {
     const elapsed = Math.max(1, performance.now() - t);
     const shouldClose = e.type === 'pointerup' && (dx > window.innerWidth * 0.33 || dx / elapsed > 0.5);
     animating = true;
-    p.style.transition = `transform ${DURATION}ms ${EASE_IOS}`;
+    if (dragRaf) { cancelAnimationFrame(dragRaf); dragRaf = 0; }
+    // 先把页面定在手指松开的位置，再开始动画，避免从上一帧的旧位置起步
+    p.style.transition = 'none';
+    p.style.transform = `translate3d(${dx}px,0,0)`;
+    void p.offsetWidth;
+    // 时长跟剩余距离走：滑得越远、甩得越快，收尾越短
+    const W = window.innerWidth, remain = shouldClose ? Math.max(0, W - dx) : dx;
+    let dur = 140 + 240 * Math.min(1, remain / W);
+    if (shouldClose && dx / elapsed > 0.5) dur = Math.min(dur, Math.max(180, remain / (dx / elapsed) * 1.1));
+    dur = Math.round(Math.max(160, Math.min(DURATION, dur)));
+    p.style.transition = `transform ${dur}ms ${EASE_IOS}`;
     p.style.transform = shouldClose ? 'translate3d(100%,0,0)' : 'translate3d(0,0,0)';
     parallaxEls().forEach((el, i) => {
-        el.style.transition = `transform ${DURATION}ms ${EASE_IOS}, opacity ${DURATION}ms ${EASE_IOS}`;
+        el.style.transition = `transform ${dur}ms ${EASE_IOS}, opacity ${dur}ms ${EASE_IOS}`;
         el.style.transform = shouldClose ? 'translate3d(0,0,0)' : `translate3d(${PARALLAX}%,0,0)`;
         if (i === 0) el.style.opacity = shouldClose ? '1' : '.5';
     });
@@ -2749,7 +2773,7 @@ function endDrag(e) {
         p.style.transition = '';
         parallaxEls().forEach(el => { el.style.transition = ''; });
         animating = false;
-    }, DURATION);
+    }, dur + 30);
 }
 document.addEventListener('pointerup', endDrag);
 document.addEventListener('pointercancel', endDrag);
@@ -7592,7 +7616,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '2.9.2';
+const APP_VERSION = '2.9.3';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}

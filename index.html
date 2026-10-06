@@ -43,8 +43,6 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
         -webkit-font-smoothing: antialiased;
     }
     .container { width: 100%; max-width: 500px; }
-    .page { display: none; flex-direction: column; gap: 18px; }
-    .page.active { display: flex; }
 
     .card { background: var(--card-bg); border-radius: 26px; padding: 28px 26px; box-shadow: 0 8px 30px rgba(0,0,0,0.03); border: 1px solid var(--border); }
     .title { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--primary); letter-spacing: -0.4px; }
@@ -880,10 +878,9 @@ html[data-theme="dark"] .search-bar input, html[data-theme="dark"] .sb-ico, html
     overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y;
     padding: var(--s-top) max(var(--s-side), calc((100% - 500px) / 2)) var(--s-bottom);
     background: var(--bg);
-    opacity: 0; visibility: hidden; pointer-events: none; transform: translateX(28px);
-    transition: opacity .24s ease, transform .28s cubic-bezier(.22,.8,.2,1), visibility 0s linear .28s;
+    visibility: hidden; pointer-events: none;
 }
-.page.active { opacity: 1; visibility: visible; pointer-events: auto; transform: none; transition-delay: 0s; }
+.page.active { visibility: visible; pointer-events: auto; }
 .panel-head { margin-bottom: 10px; }
 .panel-title { font-size: 24px; font-weight: 700; letter-spacing: -.6px; line-height: 30px; margin-left: -.5px; }
 .panel-subtitle { margin-top: 6px; font-size: 13px; color: #999; line-height: 20px; }
@@ -901,7 +898,6 @@ html[data-theme="dark"] .search-bar input, html[data-theme="dark"] .sb-ico, html
 #page-gallery[data-seg="library"] #card-repo,
 #page-gallery[data-seg="repo"] #card-library { display: none; }
 
-@media (prefers-reduced-motion: reduce) { .page { transition: none; } }
 
 /* 偏好设置：每项一张独立的胶囊卡片 + 开关 */
 .pref-group { background: var(--card-bg); border-radius: 26px; overflow: hidden; }
@@ -2280,7 +2276,7 @@ async function fetchMyRepos() {
         const batch = await githubRequest('/user/repos?per_page=100&sort=pushed&direction=desc&affiliation=owner&page=' + page, { method: 'GET' }, s.token, s.proxy);
         if (!Array.isArray(batch)) break;
         batch.forEach(r => {
-            if (r.owner && r.owner.login) localStorage.setItem('kb_standalone_owner', r.owner.login);
+            if (r.owner && r.owner.login) lsSet('kb_standalone_owner', r.owner.login);
             all.push({ name: r.name, private: !!r.private, archived: !!r.archived });
         });
         if (batch.length < 100) break;
@@ -2361,7 +2357,7 @@ function chooseRepo(r) {
     const name = typeof r === 'string' ? r : r.name;
     const isPrivate = typeof r === 'object' && r.private;
     $('gh-repo').value = name;
-    localStorage.setItem('kb_standalone_repo', name);
+    lsSet('kb_standalone_repo', name);
     // 换了仓库：旧仓库的文件列表、选择状态、当前文件夹都作废
     invalidateRepoLoad();
     repoLiveLoaded = false;
@@ -2507,7 +2503,7 @@ async function renameRepoFromSheet(r) {
     rewriteLocalRecordsForRename(owner, oldName, newName);
     if (wasCurrent) {
         $('gh-repo').value = newName;
-        localStorage.setItem('kb_standalone_repo', newName);
+        lsSet('kb_standalone_repo', newName);
         invalidateRepoLoad();
         repoLiveLoaded = false;
         repoLiveLoadedAt = 0;
@@ -2554,7 +2550,7 @@ async function deleteRepoFromSheet(r) {
     if (wasCurrent) {
         // 不自动改选别的仓库，避免之后的上传悄悄落到不想要的地方
         $('gh-repo').value = '';
-        localStorage.setItem('kb_standalone_repo', '');
+        lsSet('kb_standalone_repo', '');
         invalidateRepoLoad();
         repoLiveLoaded = false;
         repoLiveLoadedAt = 0;
@@ -2606,7 +2602,7 @@ async function createRepoFromSheet() {
             method: 'POST',
             body: JSON.stringify({ name, private: !isPublic, auto_init: true, description: 'Image host' })
         }, s.token, s.proxy);
-        if (created && created.owner && created.owner.login) localStorage.setItem('kb_standalone_owner', created.owner.login);
+        if (created && created.owner && created.owner.login) lsSet('kb_standalone_owner', created.owner.login);
         myRepos.unshift({ name: created.name || name, private: !isPublic, archived: false });
         chooseRepo({ name: created.name || name, private: !isPublic });
     } catch (e) {
@@ -2670,17 +2666,29 @@ document.addEventListener('keydown', e => {
     const p = topPanel(); if (p) setPanel(p, false);
 });
 
+// 滑入动画期间主线程要全力出帧；列表渲染 / 网络请求放到动画基本结束后再做（页面已被关掉或切走则跳过）
+let pushQ = [], pushT = 0;
+function afterPush(p, fn) {
+    pushQ.push([p, fn]);
+    clearTimeout(pushT);
+    pushT = setTimeout(() => {
+        const q = pushQ; pushQ = [];
+        q.forEach(([pp, f]) => { if (pp.classList.contains('active')) { try { f(); } catch (e) { console.error(e); } } });
+    }, 300);
+}
 function openPage(name) {
     const el = $('page-' + name);
     if (!el) return;
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     el.scrollTop = 0;
     setPanel(el, true);
-    if (name === 'gallery') { renderGallery(); loadRepoLiveFiles(false); }
-    if (name === 'storage') loadStorage(false);
-    if (name === 'prefs') renderPlugins();
-    if (name === 'about') { renderAboutPlugins(); try { offlineStatusRefresh(); } catch (_) {} }
-    if (name === 'update' && typeof aboutOnOpen === 'function') aboutOnOpen();
+    afterPush(el, () => {
+        if (name === 'gallery') { renderGallery(); loadRepoLiveFiles(false); }
+        if (name === 'storage') loadStorage(false);
+        if (name === 'prefs') renderPlugins();
+        if (name === 'about') { renderAboutPlugins(); try { offlineStatusRefresh(); } catch (_) {} }
+        if (name === 'update' && typeof aboutOnOpen === 'function') aboutOnOpen();
+    });
 }
 function openGallery(seg) {
     seg = seg === 'repo' ? 'repo' : 'library';
@@ -2689,7 +2697,7 @@ function openGallery(seg) {
     const head = document.querySelector('#page-gallery > .panel-head');
     if (head) { head.querySelector('.panel-title').textContent = t[0]; head.querySelector('.panel-subtitle').textContent = t[1]; }
     openPage('gallery');
-    if (seg === 'library') maybeAutoLinkCheck();
+    if (seg === 'library') afterPush($('page-gallery'), maybeAutoLinkCheck);
 }
 function closePage() { const p = topPanel(); if (p) setPanel(p, false); }
 // 兼容旧代码里的 switchTab('upload' | 'gallery' | 'settings')
@@ -2917,10 +2925,12 @@ function accReadLive() {
     return { token: g('token') || '', repo: g('repo') || '', proxy: g('proxy') || '', imgProxy: g('imgProxy') || '', pin: g('pin') === '1', owner: g('owner') || '' };
 }
 function accWriteLive(a) {
-    const set = (k, v) => localStorage.setItem(ACC_LIVE[k], v);
+    let lsFail = false;
+    const set = (k, v) => { try { localStorage.setItem(ACC_LIVE[k], v); } catch (_) { lsFail = true; } };
     set('token', a.token || ''); set('repo', a.repo || ''); set('proxy', a.proxy || '');
     set('imgProxy', a.imgProxy || ''); set('pin', a.pin ? '1' : '0');
-    if (a.owner) set('owner', a.owner); else localStorage.removeItem(ACC_LIVE.owner);
+    if (a.owner) set('owner', a.owner); else { try { localStorage.removeItem(ACC_LIVE.owner); } catch (_) {} }
+    if (lsFail) toast('保存失败，存储空间可能不足');
     $('gh-token').value = a.token || ''; $('gh-repo').value = a.repo || '';
     $('gh-proxy').value = a.proxy || ''; $('gh-imgproxy').value = a.imgProxy || '';
     $('gh-pin').checked = !!a.pin;
@@ -2940,7 +2950,7 @@ function accSnapshot() {
 function initAccounts() {
     let list = accLoad();
     if (!list.length) list = [Object.assign({ id: 'a' + Date.now().toString(36), avatar: '' }, accReadLive())];
-    if (!list.some(x => x.id === accActiveId())) localStorage.setItem(ACC_ACTIVE, list[0].id);
+    if (!list.some(x => x.id === accActiveId())) lsSet(ACC_ACTIVE, list[0].id);
     accSave(list);
     renderAccountUI();
 }
@@ -2999,7 +3009,7 @@ function switchAccount(id) {
     accSnapshot();
     const a = accLoad().find(x => x.id === id);
     if (!a) return;
-    localStorage.setItem(ACC_ACTIVE, id);
+    lsSet(ACC_ACTIVE, id);
     accWriteLive(a);
     renderAccountUI();
     toast('已切换到 ' + accLabel(a), 'ok');
@@ -3010,7 +3020,7 @@ function addAccount() {
     const a = { id: 'a' + Date.now().toString(36), avatar: '', token: '', repo: '', proxy: cur.proxy, imgProxy: cur.imgProxy, pin: false, owner: '' };
     list.push(a);
     if (!accSave(list)) return;
-    localStorage.setItem(ACC_ACTIVE, a.id);
+    lsSet(ACC_ACTIVE, a.id);
     accWriteLive(a);
     renderAccountUI();
     toast('已新建账号，填写 Token 后保存', 'info');
@@ -3386,20 +3396,22 @@ async function initStore() {
 }
 function flushHistory() {
     historyTimer = null;
-    dlDB.put('kv', 'history', historyCache)
+    return dlDB.put('kv', 'history', historyCache)
         .then(() => { if (storeChannel) storeChannel.postMessage('history'); })
         .catch(e => { console.warn('资源库记录保存失败：', e); toast('保存失败，存储空间可能不足'); });
 }
 function flushOrder() {
     orderTimer = null;
-    dlDB.put('kv', 'upload_order', orderCache)
+    return dlDB.put('kv', 'upload_order', orderCache)
         .then(() => { if (storeChannel) storeChannel.postMessage('order'); })
         .catch(e => console.warn('上传顺序保存失败：', e));
 }
 // 页面进入后台 / 关闭前，把还没落盘的改动立即提交
 function flushStoreNow() {
-    if (historyTimer) { clearTimeout(historyTimer); flushHistory(); }
-    if (orderTimer) { clearTimeout(orderTimer); flushOrder(); }
+    const ps = [];
+    if (historyTimer) { clearTimeout(historyTimer); ps.push(flushHistory()); }
+    if (orderTimer) { clearTimeout(orderTimer); ps.push(flushOrder()); }
+    return Promise.all(ps);   // 导入备份这类"写完马上刷新"的场景要等它
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushStoreNow(); });
 window.addEventListener('pagehide', flushStoreNow);
@@ -3776,7 +3788,7 @@ async function deleteRepoFiles(files) {
                     await deleteGithubAsset({ githubOwner: file.owner, githubRepo: file.repo, githubBranch: file.branch, githubPath: file.path, name: file.name });
                 } catch (e) {
                     if (e && e.status === 404) continue; // 文件已经不在仓库里（之前删过 / 在别处删了）：视为删除成功
-                    failures.push({ path: file.path, name: file.name, message: e.message || '未知错误' });
+                    failures.push({ owner: file.owner, repo: file.repo, branch: file.branch, path: file.path, name: file.name, message: e.message || '未知错误' });
                 }
             }
         }
@@ -3806,7 +3818,6 @@ async function confirmDeleteSelected() {
     if (progress) progress.classList.add('show');
     const deleteFailures = [];
     const keepIds = new Set();   // 仓库文件没删成的记录：本地先保留，方便重试
-    const total = selected.length;
     try {
         if (deleteCloud) {
             // 批量：所有仓库文件一次提交删完（原来每个文件 2 个请求 + 1 次提交，慢而且容易互相冲突）
@@ -3831,7 +3842,7 @@ async function confirmDeleteSelected() {
                 const fails = await deleteRepoFiles(files);
                 fails.forEach(f => {
                     deleteFailures.push({ name: f.name, message: f.message });
-                    files.filter(x => x.path === f.path).forEach(x => (idsByKey.get(x.key) || []).forEach(id => keepIds.add(id)));
+                    files.filter(x => x.path === f.path && x.owner === f.owner && x.repo === f.repo && x.branch === f.branch).forEach(x => (idsByKey.get(x.key) || []).forEach(id => keepIds.add(id)));
                 });
             } catch (e) {
                 files.forEach(f => { deleteFailures.push({ name: f.name, message: (e && e.message) || '未知错误' }); (idsByKey.get(f.key) || []).forEach(id => keepIds.add(id)); });
@@ -4613,6 +4624,7 @@ async function loadRepoLiveFiles(force = false) {
     const s = getSettings();
     if (!container || !status) return;
     if (!s.token) {
+        repoLoadSeq++; repoLiveLoading = false; if (btn) btn.disabled = false;   // 让还在路上的旧读取作废，否则它回来会把旧账号的文件列表盖上来
         repoLiveFiles = [];
         repoLiveLoaded = false;
         repoMultiMode = false;
@@ -4624,6 +4636,7 @@ async function loadRepoLiveFiles(force = false) {
         return;
     }
     if (!s.repo) {
+        repoLoadSeq++; repoLiveLoading = false; if (btn) btn.disabled = false;
         repoLiveFiles = [];
         repoLiveLoaded = false;
         repoMultiMode = false;
@@ -5056,7 +5069,7 @@ function clearCurrentUploadAtNewDay() {
         const progress = $('batch-progress');
         if (progress) progress.classList.remove('show');
     }
-    localStorage.setItem(key, today);
+    lsSet(key, today);
     return cleared;
 }
 
@@ -5138,7 +5151,6 @@ function readAllEntries(dirEntry) {
 }
 async function collectEntryFiles(entries) {
     const files = [];
-    let skipped = 0;
     async function walk(entry) {
         if (entry.isFile) {
             const file = await new Promise((res, rej) => entry.file(res, rej));
@@ -7194,10 +7206,10 @@ async function doRename(ref, newName) {
         if (!owner) owner = (await resolveGithubContext()).owner;
         const contentsUrl = p => '/repos/' + owner + '/' + repo + '/contents/' + p.split('/').map(encodeURIComponent).join('/') + '?ref=' + encodeURIComponent(branch);
         // 目标名字已被占用就不继续，绝不覆盖
+        // 本地列表里有就肯定重名；没有也不一定安全（列表可能是旧的，别处刚传了同名文件），所以再向 GitHub 确认一次
         const listKnown = repoLiveLoaded && String(repo).toLowerCase() === String(s.repo).toLowerCase();
-        let exists = false;
-        if (listKnown) exists = repoLiveFiles.some(f => f.path === newPath);
-        else {
+        let exists = listKnown && repoLiveFiles.some(f => f.path === newPath);
+        if (!exists) {
             try { await githubRequest(contentsUrl(newPath), { method: 'GET' }, s.token, s.proxy); exists = true; }
             catch (e) { if (!/404/.test(String(e && e.message))) throw e; }
         }
@@ -7653,7 +7665,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '2.9.4';
+const APP_VERSION = '2.9.6';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -7695,6 +7707,7 @@ async function pullLatest() {
     let rv = '';
     try { rv = await fetchRemoteVersion(); }
     catch (_) { return toast('拉取失败：连不上线上文件，请检查网络', 'error'); }
+    if (!rv) return toast('拉取失败：读不到线上版本号（网络可能需要登录），页面和缓存都没有动', 'error');
     if (rv && rv === APP_VERSION) {
         hideToast();   // 先收起「正在拉取…」，否则点取消后它会一直挂着
         const again = await showConfirm({ title: '已是最新版 v' + APP_VERSION, message: '线上版本和当前一致。如果你觉得页面内容不对，可以强制重新加载一次。Token、偏好和上传记录不会被清除。', confirmText: '强制重新加载', cancelText: '关闭' });
@@ -8111,6 +8124,7 @@ async function importBackup(file) {
             if (add.length && !saveHistory(cur.concat(add))) return toast('导入失败：存储空间不足', 'error');
         }
     } catch (e) { return toast('导入失败：' + (e && e.message || '未知错误'), 'error'); }
+    try { await flushStoreNow(); } catch (_) {}   // 记录是延迟写入的，等写完再刷新，否则记录多时会被刷新打断
     toast('导入完成，正在刷新…', 'ok');
     setTimeout(() => location.reload(), 700);
 }

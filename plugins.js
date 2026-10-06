@@ -64,6 +64,8 @@
       0x00, orient, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00                   // 值 + 没有下一个 IFD
     ]);
   }
+  // 白名单：只保留显示图像必需的段（JFIF、ICC 色彩配置、Adobe 色彩变换），其余应用段全部丢掉。
+  // 图像数据之后（EOI 之后）的尾部数据也丢掉：手机的预览图 / HDR 增益图 / 动态照片视频都接在那里，自带 EXIF。
   function stripJpeg(u) {
     const out = [u.subarray(0, 2)];
     let p = 2, dropped = false, orient = 1, insertAt = 1;
@@ -71,16 +73,31 @@
       if (u[p] !== 0xFF) return null;                        // 结构异常，放弃处理
       const m = u[p + 1];
       if (m === 0xFF) { p++; continue; }                     // 填充字节
-      if (m === 0xDA || m === 0xD9) { out.push(u.subarray(p)); p = u.length; break; }   // 图像数据开始，其余原样
+      if (m === 0xD9) {                                      // EOI：之后的内容不要
+        out.push(u.subarray(p, p + 2));
+        if (p + 2 < u.length) dropped = true;
+        p = u.length; break;
+      }
       if ((m >= 0xD0 && m <= 0xD7) || m === 0x01) { out.push(u.subarray(p, p + 2)); p += 2; continue; }
       if (p + 4 > u.length) return null;
       const len = (u[p + 2] << 8) | u[p + 3];
       if (len < 2 || p + 2 + len > u.length) return null;
+      if (m === 0xDA) {                                      // SOS：带头部 + 熵编码数据，扫到下一个真正的标记为止
+        let q = p + 2 + len;
+        while (q + 1 < u.length) {
+          if (u[q] === 0xFF && u[q + 1] !== 0x00 && u[q + 1] !== 0xFF && !(u[q + 1] >= 0xD0 && u[q + 1] <= 0xD7)) break;
+          q++;
+        }
+        if (q + 1 >= u.length) q = u.length;
+        out.push(u.subarray(p, q)); p = q; continue;
+      }
       const seg = u.subarray(p, p + 2 + len), body = u.subarray(p + 4, p + 2 + len);
       let drop = false;
       if (m === 0xE1) { const o = readOrientation(body); if (o > 1) orient = o; drop = true; }   // EXIF / XMP
-      else if (m === 0xED || m === 0xFE) drop = true;                                    // Photoshop/IPTC、注释
-      else if (m === 0xE2 && ascii(body, 0, 'MPF\0')) drop = true;                       // 多图索引，偏移会失效
+      else if (m === 0xE0) drop = ascii(body, 0, 'JFXX');                                // JFIF 扩展缩略图
+      else if (m === 0xE2) drop = !ascii(body, 0, 'ICC_PROFILE');                        // 只留 ICC；MPF 等丢掉
+      else if (m === 0xEE) drop = !ascii(body, 0, 'Adobe');
+      else if ((m >= 0xE3 && m <= 0xEF) || m === 0xFE) drop = true;                      // 厂商私有段、Photoshop/IPTC、注释
       if (drop) dropped = true;
       else { out.push(seg); if (m === 0xE0 && out.length === 2) insertAt = 2; }
       p += 2 + len;
@@ -94,7 +111,7 @@
   function stripPng(u) {
     const DROP = ['tEXt', 'iTXt', 'zTXt', 'eXIf', 'tIME'];
     const out = [u.subarray(0, 8)];
-    let p = 8, dropped = false;
+    let p = 8, dropped = false, sawEnd = false;
     const dv = new DataView(u.buffer, u.byteOffset, u.byteLength);
     while (p + 12 <= u.length) {
       const len = dv.getUint32(p), end = p + 12 + len;
@@ -102,21 +119,24 @@
       const type = String.fromCharCode(u[p + 4], u[p + 5], u[p + 6], u[p + 7]);
       if (DROP.indexOf(type) >= 0) dropped = true; else out.push(u.subarray(p, end));
       p = end;
-      if (type === 'IEND') break;
+      if (type === 'IEND') { sawEnd = true; break; }
     }
+    if (sawEnd && p < u.length) dropped = true;               // IEND 之后的尾部数据不要
     return dropped ? concat(out) : null;
   }
 
   /* ---------- WebP ---------- */
   function stripWebp(u) {
     const dv = new DataView(u.buffer, u.byteOffset, u.byteLength);
+    const limit = Math.min(u.length, dv.getUint32(4, true) + 8);      // 只处理 RIFF 声明的范围
+    if (limit < 20) return null;
     const out = [u.slice(0, 12)];
-    let p = 12, dropped = false;
-    while (p + 8 <= u.length) {
+    let p = 12, dropped = limit < u.length;                            // 声明范围之外的尾部数据不要
+    while (p + 8 <= limit) {
       const id = String.fromCharCode(u[p], u[p + 1], u[p + 2], u[p + 3]);
       const size = dv.getUint32(p + 4, true), end = p + 8 + size + (size & 1);
-      if (p + 8 + size > u.length) return null;
-      const chunk = u.subarray(p, Math.min(end, u.length));
+      if (p + 8 + size > limit) return null;
+      const chunk = u.subarray(p, Math.min(end, limit));
       if (id === 'EXIF' || id === 'XMP ') dropped = true;
       else if (id === 'VP8X' && size >= 1) { const c = chunk.slice(); c[8] &= ~0x0C; if (c[8] !== chunk[8]) dropped = true; out.push(c); }   // 清掉 EXIF / XMP 标志位
       else out.push(chunk);
@@ -128,10 +148,16 @@
     return res;
   }
 
+  /* HEIC / AVIF：暂时不处理，但要让人知道，别以为已经去掉了 */
+  function isHeifLike(head) {
+    if (!ascii(head, 4, 'ftyp')) return false;
+    return ['heic', 'heix', 'hevc', 'hevx', 'heim', 'heis', 'mif1', 'msf1', 'avif', 'avis'].some(b => ascii(head, 8, b));
+  }
+
   DL.register({
     id: 'strip-exif',
     name: '去除照片隐私信息',
-    desc: '上传前删掉 GPS 位置、拍摄时间、相机型号等。JPEG / PNG / WebP 无损处理，不重新压缩，照片方向会保留。',
+    desc: '上传前删掉 GPS 位置、拍摄时间、相机型号、预览图等。JPEG / PNG / WebP 无损处理，不重新压缩，照片方向会保留。HEIC / AVIF 暂不支持，会在结果里提示。',
     default: true,
     async beforeUpload(file) {
       if (!file || file.size < 64 || file.size > MAX_SIZE) return file;
@@ -139,9 +165,13 @@
       const jpeg = head[0] === 0xFF && head[1] === 0xD8;
       const png = ascii(head, 1, 'PNG') && head[0] === 0x89;
       const webp = ascii(head, 0, 'RIFF') && ascii(head, 8, 'WEBP');
-      if (!jpeg && !png && !webp) return file;
+      if (!jpeg && !png && !webp) {
+        if (isHeifLike(head)) file._saveNote = (file._saveNote ? file._saveNote + ' · ' : '') + '未去隐私信息（暂不支持 HEIC / AVIF）';
+        return file;
+      }
       const u = new Uint8Array(await file.arrayBuffer());
-      const res = jpeg ? stripJpeg(u) : png ? stripPng(u) : stripWebp(u);
+      let res = null;
+      try { res = jpeg ? stripJpeg(u) : png ? stripPng(u) : stripWebp(u); } catch (_) { res = null; }
       if (!res) return file;                                  // 本来就没有隐私信息，或结构看不懂：保持原样
       const out = new File([res], file.name, { type: file.type, lastModified: file.lastModified });
       out._saveNote = (file._saveNote ? file._saveNote + ' · ' : '') + '已去隐私信息';
@@ -150,185 +180,76 @@
   });
 })();
 
-/* ========== 插件 2：液态玻璃 ========== */
+/* ========== 插件 2：磨砂玻璃 ========== */
+/* 把原来纯色的板块换成和底部搜索栏一样的磨砂玻璃：半透明底 + 背景模糊 + 细白边 + 轻投影。
+ * 只改颜色、模糊和阴影，不动任何布局。id 保持 liquid-glass，已保存的开关状态继续有效。
+ * 换了壁纸后效果最明显；纯色背景下主要看到半透明、边缘高光和阴影。 */
 (function () {
   'use strict';
-  const STYLE_ID = 'dl-liquid-glass';
-  const G = 'html.dl-glass:root';
-  const D = 'html.dl-glass:root[data-theme="dark"]';
+  const STYLE_ID = 'dl-frosted-glass';
 
-  // 列表的外框：不再画成一整条玻璃，只负责把里面的条目排开
-  const GROUPS = ['.home .group:not([hidden])', '.pref-group', '.acct-group', '.st-group', '.about-box'];
-  // 列表里的每一条：各自是一块独立的玻璃
-  const ROWS = ['.home .row', '.pref-card', '.acct-row', '.st-row', '.about-item'];
-  // 本来就是单独一块的卡片
-  const CARDS = ['.acct-card', '.result-item'];
-  const SURFACE = [].concat(ROWS, CARDS);
-  // 悬浮层：底部搜索栏、多选坞、菜单、剪贴板提示条
-  const FLOAT = ['.search-bar', '.sel-dock', '.more-menu', '.clip-banner'];
-  // 底部弹层
-  const SHEET = ['.delete-sheet', '.upload-error-panel', '.save-sheet'];
-  // 小按钮
-  const BTN = ['.small-btn', '.ghost-btn', '.delete-cancel', '.cloud-delete-option'];
-  const BTN_PRIMARY = ['.ghost-btn.primary', '.small-btn.black', '.delete-confirm'];
-  const FIELD = ['input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file])', 'textarea', 'select', '.url-input', '.dropzone'];
+  // 给一组选择器统一加前缀
+  const S = (list, pre) => list.split(',').map(x => pre + ' ' + x.trim()).join(',\n');
 
-  const sel = (list, pre) => list.map(x => (pre || G) + ' ' + x).join(',\n');
+  // 大板块：卡片、结果项、首页分组、设置分组、筛选条、多选条、「…」按钮 —— 带背景模糊
+  const PANELS = '.card, .home .group, .pref-group, .filter-group, .gallery-select-bar, .repo-select-bar, .more-btn, .result-item';
+  // 板块里面的小控件：只做半透明，不再叠一层模糊（嵌套模糊又费电又发灰）
+  const INNER = '.url-input, .small-btn, .ghost-btn:not(.primary), .dropzone';
+  const BTNS = '.small-btn, .ghost-btn:not(.primary)';
 
-  const CSS = `
-${G} {
-  --lg-blur: blur(16px) saturate(165%) brightness(1.06);
-  --lg-blur-strong: blur(26px) saturate(180%) brightness(1.05);
-  --lg-fill: linear-gradient(160deg, rgba(255,255,255,.26), rgba(255,255,255,.10));
-  --lg-spec: radial-gradient(70% 45% at 12% 0%, rgba(255,255,255,.30), rgba(255,255,255,0) 70%);
-  --lg-edge: rgba(255,255,255,.38);
-  --lg-inset: inset 0 1px 1px rgba(255,255,255,.65), inset 0 -1px 1px rgba(255,255,255,.20), inset 0 0 0 .5px rgba(255,255,255,.35);
-  --lg-hair: 0 0 0 .5px rgba(0,0,0,.06);
-  --lg-shadow: 0 8px 26px rgba(0,0,0,.12);
-  --lg-chip: linear-gradient(160deg, rgba(255,255,255,.55), rgba(255,255,255,.18));
-  --lg-trough: rgba(120,120,128,.16);
-  --lg-field: rgba(255,255,255,.28);
+  function css() {
+    const L = 'html.kb-glass', D = 'html.kb-glass[data-theme="dark"]';
+    return `
+${S(PANELS, L)} {
+  background: rgba(255,255,255,.52) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important; backdrop-filter: blur(24px) saturate(180%) !important;
+  border-color: rgba(255,255,255,.75) !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,.10), 0 1px 3px rgba(0,0,0,.06), inset 0 1px 0 rgba(255,255,255,.85) !important;
 }
-${D} {
-  --lg-fill: linear-gradient(160deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
-  --lg-spec: radial-gradient(70% 45% at 12% 0%, rgba(255,255,255,.12), rgba(255,255,255,0) 70%);
-  --lg-edge: rgba(255,255,255,.16);
-  --lg-inset: inset 0 1px 1px rgba(255,255,255,.30), inset 0 -1px 1px rgba(255,255,255,.05), inset 0 0 0 .5px rgba(255,255,255,.12);
-  --lg-hair: 0 0 0 .5px rgba(255,255,255,.08);
-  --lg-shadow: 0 10px 30px rgba(0,0,0,.40);
-  --lg-chip: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
-  --lg-trough: rgba(255,255,255,.08);
-  --lg-field: rgba(255,255,255,.07);
+${S('.card .result-item, .card .filter-group, .card .more-btn', L)} {
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  background: rgba(255,255,255,.4) !important; box-shadow: none !important;
 }
+${S(INNER, L)} { background: rgba(255,255,255,.45) !important; }
+${S('.url-input:focus, .dropzone.dragover', L)} { background: rgba(255,255,255,.72) !important; }
+${S(BTNS, L)} { border-color: rgba(255,255,255,.7) !important; }
+${S(BTNS.split(',').map(x => x.trim() + ':active').join(','), L)} { background: rgba(255,255,255,.75) !important; }
 
-/* 列表外框：去掉整条玻璃，条目之间留出缝隙 */
-${sel(GROUPS)} {
-  background: none !important; box-shadow: none !important; border-color: transparent !important;
-  -webkit-backdrop-filter: none; backdrop-filter: none;
-  overflow: visible !important; border-radius: 0 !important;
+${S(PANELS, D)} {
+  background: rgba(44,44,46,.5) !important;
+  border-color: rgba(255,255,255,.12) !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,.30), 0 1px 3px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.08) !important;
 }
-/* 页面里的大卡片只是个容器，也不再画玻璃；里面的控件各自是玻璃 */
-${G} .card {
-  background: none !important; box-shadow: none !important; border-color: transparent !important;
-  -webkit-backdrop-filter: none; backdrop-filter: none;
+${S('.card .result-item, .card .filter-group, .card .more-btn', D)} {
+  background: rgba(255,255,255,.07) !important; box-shadow: none !important;
 }
-/* 每一条各自一块玻璃 */
-${sel(SURFACE)} {
-  background: var(--lg-spec), var(--lg-fill) !important;
-  -webkit-backdrop-filter: var(--lg-blur); backdrop-filter: var(--lg-blur);
-  border-color: var(--lg-edge) !important;
-  box-shadow: var(--lg-inset), var(--lg-hair), var(--lg-shadow) !important;
-}
-${sel(ROWS)} { border-radius: 22px !important; }
-${sel(SURFACE.map(x => x + ':not(:last-child)'))} { margin-bottom: 8px; }
-${sel(SURFACE.map(x => x + ':active'))} { filter: brightness(.94); }
-/* 原来条目之间的细分隔线不要了 */
-${sel(['.home .row + .row .row-body::before', '.pref-card + .pref-card::before', '.acct-row + .acct-row::before', '.st-row + .st-row::before', '.about-item + .about-item::before'])} { display: none !important; }
+${S(INNER, D)} { background: rgba(255,255,255,.08) !important; }
+${S('.url-input:focus, .dropzone.dragover', D)} { background: rgba(255,255,255,.14) !important; }
+${S(BTNS, D)} { border-color: rgba(255,255,255,.14) !important; }
+${S(BTNS.split(',').map(x => x.trim() + ':active').join(','), D)} { background: rgba(255,255,255,.18) !important; }
 
-/* 资源库 / 仓库页的卡片本来就是透明的（网格直接铺在背景上），保持原样 */
-${G} #page-gallery > .card {
-  background: transparent !important; border: 0 !important; box-shadow: none !important;
-  -webkit-backdrop-filter: none; backdrop-filter: none;
-}
-
-/* 悬浮层 */
-${sel(FLOAT)} {
-  background: var(--lg-spec), var(--lg-fill) !important;
-  -webkit-backdrop-filter: var(--lg-blur-strong); backdrop-filter: var(--lg-blur-strong);
-  border-color: var(--lg-edge) !important;
-  box-shadow: var(--lg-inset), var(--lg-hair), var(--lg-shadow) !important;
-}
-
-/* 搜索栏本身就是一整块玻璃：里面的输入框保持透明，不要再套一层框；栏的底色更实一点，免得后面的卡片透出来显得乱 */
-${G} #searchBar input#searchInput, ${G} #page-gallery .searchpill input {
-  background: transparent !important; box-shadow: none !important; border-color: transparent !important;
-}
-${G} .search-bar {
-  background: var(--lg-spec), linear-gradient(160deg, rgba(255,255,255,.62), rgba(255,255,255,.42)) !important;
-}
-${D} .search-bar {
-  background: var(--lg-spec), linear-gradient(160deg, rgba(72,72,78,.58), rgba(44,44,48,.44)) !important;
-}
-
-/* 底部弹层 */
-${sel(SHEET)} {
-  background: var(--lg-spec), linear-gradient(180deg, rgba(252,252,254,.58), rgba(244,244,248,.44)) !important;
-  -webkit-backdrop-filter: var(--lg-blur-strong); backdrop-filter: var(--lg-blur-strong);
-  border-color: var(--lg-edge) !important;
-  box-shadow: var(--lg-inset), 0 -18px 55px rgba(0,0,0,.14) !important;
-}
-${sel(SHEET, D)} {
-  background: var(--lg-spec), linear-gradient(180deg, rgba(60,60,66,.52), rgba(36,36,40,.42)) !important;
-  box-shadow: var(--lg-inset), 0 -18px 55px rgba(0,0,0,.5) !important;
-}
-
-/* 按钮：玻璃小胶囊 */
-${sel(BTN)} {
-  background: var(--lg-chip) !important;
-  border-color: var(--lg-edge) !important;
-  box-shadow: var(--lg-inset), var(--lg-hair), 0 4px 12px rgba(20,24,60,.06) !important;
-}
-${sel(BTN_PRIMARY)} {
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 16px rgba(0,0,0,.18) !important;
-}
-${sel(BTN_PRIMARY, D)} {
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 6px 16px rgba(0,0,0,.35) !important;
-}
-
-/* 输入框 / 拖放区：凹进去的玻璃 */
-${sel(FIELD)} {
-  background: var(--lg-field) !important;
-  border-color: var(--lg-edge) !important;
-  box-shadow: inset 0 1px 3px rgba(20,24,60,.10), inset 0 -1px 0 rgba(255,255,255,.5) !important;
-}
-${sel(FIELD, D)} {
-  box-shadow: inset 0 1px 3px rgba(0,0,0,.45), inset 0 -1px 0 rgba(255,255,255,.06) !important;
-}
-
-/* 分段选择器：凹槽 + 玻璃滑块 */
-/* 资源库页的筛选按钮是一颗颗独立的小药丸，不套凹槽，保持原样 */
-${G} .page:not(#page-gallery) .filter-group, ${G} .gallery-select-bar {
-  background: var(--lg-trough) !important;
-  border-color: var(--lg-edge) !important;
-  box-shadow: inset 0 1px 3px rgba(20,24,60,.10) !important;
-}
-${G} .page:not(#page-gallery) .filter-btn.active {
-  background: var(--lg-chip) !important;
-  box-shadow: var(--lg-inset), 0 3px 10px rgba(20,24,60,.12) !important;
-}
-${D} .page:not(#page-gallery) .filter-btn.active { box-shadow: var(--lg-inset), 0 3px 10px rgba(0,0,0,.4) !important; }
-
-/* 首页每一行的小图标：玻璃方块 */
-${G} .home .row-icon {
-  background: var(--lg-chip);
-  box-shadow: var(--lg-inset), var(--lg-hair);
-}
-
-/* 系统要求「降低透明度」时，去掉模糊、加大不透明度 */
+/* 系统开了「降低透明度」，或浏览器不支持背景模糊：去掉模糊，改成几乎不透明 */
 @media (prefers-reduced-transparency: reduce) {
-  ${sel([].concat(SURFACE, FLOAT, SHEET))} {
-    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
-    background: var(--card-bg) !important;
-  }
+  ${S(PANELS, L)} { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: rgba(255,255,255,.94) !important; }
+  ${S(PANELS, D)} { background: rgba(44,44,46,.96) !important; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  ${S(PANELS, L)} { background: rgba(255,255,255,.9) !important; }
+  ${S(PANELS, D)} { background: rgba(44,44,46,.94) !important; }
 }
 `;
+  }
 
   DL.register({
     id: 'liquid-glass',
-    name: '液态玻璃',
-    desc: '卡片、底栏、弹窗、按钮改成苹果液态玻璃质感：半透明、高光边缘、柔和投影。不改背景，背景透出多少取决于页面的背景。',
+    name: '磨砂玻璃',
+    desc: '卡片、列表分组、按钮、输入框、筛选条变成和底部搜索栏一样的磨砂玻璃。换了壁纸后效果最明显。',
     default: false,
     onToggle(on) {
       const root = document.documentElement;
       let el = document.getElementById(STYLE_ID);
-      if (on) {
-        if (!el) { el = document.createElement('style'); el.id = STYLE_ID; document.head.appendChild(el); }
-        el.textContent = CSS;
-        root.classList.add('dl-glass');
-      } else {
-        root.classList.remove('dl-glass');
-        if (el) el.remove();
-      }
+      if (on && !el) { el = document.createElement('style'); el.id = STYLE_ID; el.textContent = css(); document.head.appendChild(el); }
+      root.classList.toggle('kb-glass', !!on);
     }
   });
 })();

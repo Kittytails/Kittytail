@@ -2715,7 +2715,7 @@ document.querySelectorAll('.page').forEach(p => {
    1) 浏览器不会再拿这根手指去判断滚动，所以不会中途 pointercancel，也就不会"回弹"；
    2) pointermove 一开始就按满帧率送达，起步不再卡一下；
    3) 松手速度只看最后 ~100ms，而不是"从按下到现在的平均值"，快甩一下就能关。 */
-const EDGE = 28, LOCK_DIST = 4, DURATION = 360;
+const LOCK_DIST = 4, DURATION = 360;   // 感应条宽度在 CSS 的 #edge-swipe 里
 const EASE_IOS = 'cubic-bezier(.32,.72,0,1)';
 let drag = null, animating = false, dragRaf = 0;
 const edgeStrip = document.getElementById('edge-swipe');
@@ -2800,10 +2800,8 @@ if (edgeStrip) {
                 drag.p.scrollTop -= e.clientY - drag.ly; drag.ly = e.clientY; return;
             }
             if (Math.abs(dx) < LOCK_DIST && Math.abs(dy) < LOCK_DIST) return;
-            if (dx < 0 || Math.abs(dy) > Math.abs(dx) * 1.2) {
-                if (dx >= 0 || Math.abs(dy) > Math.abs(dx)) { drag.mode = 'scroll'; drag.p.scrollTop -= e.clientY - drag.ly; drag.ly = e.clientY; }
-                return;
-            }
+            if (Math.abs(dy) > Math.abs(dx)) { drag.mode = 'scroll'; drag.p.scrollTop -= e.clientY - drag.ly; drag.ly = e.clientY; return; }
+            if (dx < 0) return;
             drag.locked = true;
             drag.p.style.transition = 'none';
             document.documentElement.classList.add('swiping');

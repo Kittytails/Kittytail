@@ -1159,6 +1159,7 @@ html[data-theme="dark"] #page-gallery > .card {
     transition: transform var(--dur-push) var(--ease-ios), box-shadow var(--dur-push) var(--ease-ios), visibility 0s linear 0s;
 }
 html[data-theme="dark"] .page.active { box-shadow: -.5px 0 0 rgba(255,255,255,.12); }
+.page.no-anim, .page.no-anim.active { transition: none !important; }
 
 /* 主页：保持不动，子页面直接从右侧滑过来盖住它（不做视差：iOS 上主页同时位移 + 变透明，滑动返回时会出现残影） */
 .search-bar { transition: bottom .2s ease; }
@@ -2605,6 +2606,10 @@ async function createRepoFromSheet() {
 // --- 页面切换（照搬设置页的面板逻辑）：主页常驻，子页面全屏滑入，无顶栏 ---
 const PAGE_TITLES = { gallery: ['Library', '你上传过的文件'], repo: ['Repository', '仓库里的全部文件'] };
 let histDepth = 0, skipPop = 0, inPop = false;
+// iOS 上不压历史记录：否则系统自带的边缘滑动返回会和下面自写的跟手返回同时触发，
+// 系统会垫一层主页截图（两层主界面），手势结束后还会再滑出一次。
+// 想恢复安卓式返回键支持，把它改成 false 即可。
+const NO_HISTORY = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 function topPanel() { return document.querySelector('.page.active'); }
 function setPanel(panel, open) {
     const was = panel.classList.contains('active');
@@ -2619,7 +2624,8 @@ function setPanel(panel, open) {
     const sb = document.getElementById('searchBar');
     if (sb) sb.inert = !!topPanel();                 // 子页面打开时，底部搜索栏不可聚焦
     /* 打开面板时压入一条历史记录，这样安卓返回键 / 浏览器返回是关面板而不是退出页面 */
-    if (open && !was) {
+    if (NO_HISTORY) { /* iOS：只用自写手势，不碰历史记录 */ }
+    else if (open && !was) {
         if (histDepth === 0) { try { history.pushState({ panel: 1 }, ''); histDepth++; } catch (e) {} }
     } else if (!open && was && histDepth > 0) {
         histDepth--;
@@ -2629,7 +2635,12 @@ function setPanel(panel, open) {
 window.addEventListener('popstate', () => {
     if (skipPop > 0) { skipPop--; return; }
     const p = topPanel();
-    if (p) { inPop = true; setPanel(p, false); inPop = false; }
+    if (p) {
+        // 返回键 / 系统手势已经表示过"返回"，这里直接收起，不再重播一遍滑出动画
+        p.classList.add('no-anim');
+        inPop = true; setPanel(p, false); inPop = false;
+        requestAnimationFrame(() => requestAnimationFrame(() => p.classList.remove('no-anim')));
+    }
 });
 document.addEventListener('keydown', e => {
     if (e.key !== 'Escape' || e._kbEsc) return;

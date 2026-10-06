@@ -1301,10 +1301,6 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 #page-update .pref-val.new { color: var(--text-main); font-weight: 600; }
 .plug-note { margin: 14px 6px 0; line-height: 19px; }
 
-
-/* 隐藏所有滚动条（右侧那根细黑条）：页面和各个子页面照常能滚动，只是不显示指示条 */
-html, body, * { scrollbar-width: none; -ms-overflow-style: none; }
-html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar { display: none; width: 0; height: 0; background: transparent; }
 </style>
 </head>
 <body>
@@ -7620,7 +7616,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '2.9.4';
+const APP_VERSION = '2.9.3';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}

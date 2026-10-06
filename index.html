@@ -1302,6 +1302,14 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 .plug-note { margin: 14px 6px 0; line-height: 19px; }
 
 </style>
+<style id="swipe-fix">
+/* 左边缘返回感应条：只在子页面打开时存在；touch-action:none 让浏览器不抢这根手指 */
+#edge-swipe { position: fixed; left: 0; top: 0; bottom: 0; width: 28px; z-index: 25; display: none; touch-action: none; -webkit-tap-highlight-color: transparent; }
+body.page-open #edge-swipe { display: block; }
+/* 拖动中：禁选中/长按菜单，页面单独提升成合成层，主线程不用跟着重绘 */
+html.swiping, html.swiping * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+html.swiping .page.active { will-change: transform; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+</style>
 </head>
 <body>
 
@@ -1370,6 +1378,7 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
     <div class="search-empty" id="searchEmpty" hidden>No results</div>
 </main>
 
+<div id="edge-swipe" aria-hidden="true"></div>
 <div class="search-bar" id="searchBar">
   <svg class="sb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.9-4.9"/></svg>
   <input id="searchInput" type="search" placeholder="Search" aria-label="Search" enterkeyhint="search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
@@ -2701,82 +2710,112 @@ document.querySelectorAll('.page').forEach(p => {
     p.insertBefore(head, p.firstChild);
 });
 
-/* ---------- 左边缘右滑返回（跟手） ---------- */
-const EDGE = 24, LOCK_DIST = 5, DURATION = 380, PARALLAX = -28;
+/* ---------- 左边缘右滑返回（跟手） ----------
+   手势只绑在左边缘的专用感应条 #edge-swipe 上（touch-action:none）：
+   1) 浏览器不会再拿这根手指去判断滚动，所以不会中途 pointercancel，也就不会"回弹"；
+   2) pointermove 一开始就按满帧率送达，起步不再卡一下；
+   3) 松手速度只看最后 ~100ms，而不是"从按下到现在的平均值"，快甩一下就能关。 */
+const EDGE = 28, LOCK_DIST = 4, DURATION = 360;
 const EASE_IOS = 'cubic-bezier(.32,.72,0,1)';
-function parallaxEls() { return []; }   // 主页不再跟着移动；保留这个钩子，下面的逻辑自然变成空操作
-let drag = null, animating = false;
-document.addEventListener('pointerdown', e => {
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    const p = topPanel();
-    if (animating || !p || e.clientX > EDGE) return;
-    drag = { p, id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, locked: false, t: performance.now() };
-});
-document.addEventListener('pointermove', e => {
-    if (!drag || e.pointerId !== drag.id) return;
-    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    if (!drag.locked) {
-        if (Math.abs(dx) < LOCK_DIST && Math.abs(dy) < LOCK_DIST) return;
-        if (Math.abs(dy) > Math.abs(dx) || dx < 0) { drag = null; return; }
-        drag.locked = true;
-        drag.p.style.transition = 'none';
-        parallaxEls().forEach(el => { el.style.transition = 'none'; });
-        try { drag.p.setPointerCapture(e.pointerId); } catch (_) {}
-        if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-    }
-    drag.dx = Math.max(0, dx);
-    if (!dragRaf) dragRaf = requestAnimationFrame(applyDrag);   // 一帧只写一次样式
-});
-let dragRaf = 0;
+let drag = null, animating = false, dragRaf = 0;
+const edgeStrip = document.getElementById('edge-swipe');
+
+function dragVelocity(d) {           // px/ms，只看最近 100ms
+    const s = d.s, last = s[s.length - 1];
+    let i = s.length - 1;
+    while (i > 0 && last.t - s[i - 1].t < 100) i--;
+    const dt = last.t - s[i].t;
+    return dt > 0 ? (last.x - s[i].x) / dt : 0;
+}
 function applyDrag() {
     dragRaf = 0;
     if (!drag || !drag.locked) return;
     drag.p.style.transform = `translate3d(${drag.dx}px,0,0)`;
-    const prog = Math.min(1, drag.dx / window.innerWidth);
-    parallaxEls().forEach((el, i) => {
-        el.style.transform = `translate3d(${PARALLAX * (1 - prog)}%,0,0)`;
-        if (i === 0) el.style.opacity = String(.5 + .5 * prog);
-    });
+}
+function finishSwipe(p, close) {
+    p.style.transition = 'none';
+    if (close) setPanel(p, false);
+    p.style.transform = '';
+    void p.offsetWidth;
+    p.style.transition = '';
+    document.documentElement.classList.remove('swiping');
+    animating = false;
 }
 function endDrag(e) {
     if (!drag || e.pointerId !== drag.id) return;
-    const { p, dx, locked, t } = drag;
-    drag = null;
-    if (!locked) return;
-    const elapsed = Math.max(1, performance.now() - t);
-    const shouldClose = e.type === 'pointerup' && (dx > window.innerWidth * 0.33 || dx / elapsed > 0.5);
-    animating = true;
+    const d = drag; drag = null;
     if (dragRaf) { cancelAnimationFrame(dragRaf); dragRaf = 0; }
-    // 先把页面定在手指松开的位置，再开始动画，避免从上一帧的旧位置起步
+    if (!d.locked) {
+        document.documentElement.classList.remove('swiping');
+        // 没有形成滑动：当作一次点击，转发给被感应条挡住的元素
+        if (d.mode !== 'scroll' && e.type === 'pointerup' && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 8) {
+            edgeStrip.style.pointerEvents = 'none';
+            const t = document.elementFromPoint(e.clientX, e.clientY);
+            edgeStrip.style.pointerEvents = '';
+            if (t && t !== edgeStrip && typeof t.click === 'function') t.click();
+        }
+        return;
+    }
+    const W = window.innerWidth, dx = d.dx, p = d.p;
+    // pointercancel 多半是系统/浏览器打断，不代表用户想取消：和松手一样按位置和速度判断，不再无脑弹回去
+    const v = dragVelocity(d);
+    let close;
+    if (v > 0.3) close = true;
+    else if (v < -0.3) close = false;
+    else close = dx > W * 0.35;
+    animating = true;
+    // 先把页面定在手指松开的位置，再开始动画
     p.style.transition = 'none';
     p.style.transform = `translate3d(${dx}px,0,0)`;
     void p.offsetWidth;
-    // 时长跟剩余距离走：滑得越远、甩得越快，收尾越短
-    const W = window.innerWidth, remain = shouldClose ? Math.max(0, W - dx) : dx;
-    let dur = 140 + 240 * Math.min(1, remain / W);
-    if (shouldClose && dx / elapsed > 0.5) dur = Math.min(dur, Math.max(180, remain / (dx / elapsed) * 1.1));
-    dur = Math.round(Math.max(160, Math.min(DURATION, dur)));
+    const remain = close ? Math.max(0, W - dx) : dx;
+    let dur = 150 + 230 * Math.min(1, remain / W);
+    if (close && v > 0.3) dur = Math.min(dur, Math.max(150, remain / v * 1.15));
+    dur = Math.round(Math.max(140, Math.min(DURATION, dur)));
     p.style.transition = `transform ${dur}ms ${EASE_IOS}`;
-    p.style.transform = shouldClose ? 'translate3d(100%,0,0)' : 'translate3d(0,0,0)';
-    parallaxEls().forEach((el, i) => {
-        el.style.transition = `transform ${dur}ms ${EASE_IOS}, opacity ${dur}ms ${EASE_IOS}`;
-        el.style.transform = shouldClose ? 'translate3d(0,0,0)' : `translate3d(${PARALLAX}%,0,0)`;
-        if (i === 0) el.style.opacity = shouldClose ? '1' : '.5';
-    });
-    setTimeout(() => {
-        p.style.transition = 'none';
-        parallaxEls().forEach(el => { el.style.transition = 'none'; });
-        if (shouldClose) setPanel(p, false);
-        p.style.transform = '';
-        parallaxEls().forEach(el => { el.style.transform = ''; el.style.opacity = ''; });
-        p.offsetWidth;
-        p.style.transition = '';
-        parallaxEls().forEach(el => { el.style.transition = ''; });
-        animating = false;
-    }, dur + 30);
+    p.style.transform = close ? 'translate3d(100%,0,0)' : 'translate3d(0,0,0)';
+    let done = false, tm = 0;
+    const fin = () => {
+        if (done) return; done = true;
+        clearTimeout(tm); p.removeEventListener('transitionend', onEnd);
+        finishSwipe(p, close);
+    };
+    const onEnd = ev => { if (ev.target === p && ev.propertyName === 'transform') fin(); };
+    p.addEventListener('transitionend', onEnd);
+    tm = setTimeout(fin, dur + 80);   // 兜底：transitionend 没触发（后台标签页等）也能收尾
 }
-document.addEventListener('pointerup', endDrag);
-document.addEventListener('pointercancel', endDrag);
+if (edgeStrip) {
+    edgeStrip.addEventListener('pointerdown', e => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        const p = topPanel();
+        if (animating || !p) return;
+        drag = { p, id: e.pointerId, x: e.clientX, y: e.clientY, ly: e.clientY, dx: 0, locked: false, mode: '', s: [{ t: e.timeStamp, x: e.clientX }] };
+        try { edgeStrip.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    edgeStrip.addEventListener('pointermove', e => {
+        if (!drag || e.pointerId !== drag.id) return;
+        const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+        if (!drag.locked) {
+            if (drag.mode === 'scroll') {            // 竖着划：感应条替页面接管滚动，免得边缘一小条划不动
+                drag.p.scrollTop -= e.clientY - drag.ly; drag.ly = e.clientY; return;
+            }
+            if (Math.abs(dx) < LOCK_DIST && Math.abs(dy) < LOCK_DIST) return;
+            if (dx < 0 || Math.abs(dy) > Math.abs(dx) * 1.2) {
+                if (dx >= 0 || Math.abs(dy) > Math.abs(dx)) { drag.mode = 'scroll'; drag.p.scrollTop -= e.clientY - drag.ly; drag.ly = e.clientY; }
+                return;
+            }
+            drag.locked = true;
+            drag.p.style.transition = 'none';
+            document.documentElement.classList.add('swiping');
+            if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+        }
+        drag.dx = Math.max(0, dx);
+        const sm = drag.s; sm.push({ t: e.timeStamp, x: e.clientX }); if (sm.length > 10) sm.shift();
+        if (!dragRaf) dragRaf = requestAnimationFrame(applyDrag);   // 一帧只写一次样式
+    });
+    edgeStrip.addEventListener('pointerup', endDrag);
+    edgeStrip.addEventListener('pointercancel', endDrag);
+}
 
 /* ---------- 底部搜索栏：过滤主页入口 ---------- */
 (function () {
@@ -7616,7 +7655,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '2.9.3';
+const APP_VERSION = '2.9.4';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}

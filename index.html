@@ -1160,11 +1160,8 @@ html[data-theme="dark"] #page-gallery > .card {
 }
 html[data-theme="dark"] .page.active { box-shadow: -.5px 0 0 rgba(255,255,255,.12); }
 
-/* 主页：子页面推入时轻微左移 + 变暗（视差），退出时回位 */
-.home { transition: transform var(--dur-pop) var(--ease-ios), opacity var(--dur-pop) var(--ease-ios); }
-body.page-open .home { transform: translate3d(-28%,0,0); opacity: .5; transition-duration: var(--dur-push); }
-.search-bar { transition: bottom .2s ease, transform var(--dur-pop) var(--ease-ios), opacity var(--dur-pop) var(--ease-ios); }
-body.page-open .search-bar { transform: translate3d(-28%,0,0); opacity: 0; transition-duration: .2s, var(--dur-push), var(--dur-push); }
+/* 主页：保持不动，子页面直接从右侧滑过来盖住它（不做视差：iOS 上主页同时位移 + 变透明，滑动返回时会出现残影） */
+.search-bar { transition: bottom .2s ease; }
 .search-bar[inert] { visibility: visible; } /* 子页面会盖住它，这里不再瞬间消失，转场才连贯 */
 
 /* 底部弹层 / 对话框：背景淡入淡出，面板弹簧式升起并带退场动画 */
@@ -2682,7 +2679,7 @@ document.querySelectorAll('.page').forEach(p => {
 /* ---------- 左边缘右滑返回（跟手） ---------- */
 const EDGE = 24, LOCK_DIST = 8, DURATION = 380, PARALLAX = -28;
 const EASE_IOS = 'cubic-bezier(.32,.72,0,1)';
-function parallaxEls() { return ['home', 'searchBar'].map(id => document.getElementById(id)).filter(Boolean); }
+function parallaxEls() { return []; }   // 主页不再跟着移动；保留这个钩子，下面的逻辑自然变成空操作
 let drag = null, animating = false;
 document.addEventListener('pointerdown', e => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -7578,7 +7575,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '2.8';
+const APP_VERSION = '2.9.1';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}

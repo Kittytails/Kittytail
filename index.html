@@ -1272,7 +1272,6 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 .about-d { margin-top: 4px; font-size: 13.5px; line-height: 20px; color: #8E8E93; }
 .about-d b { font-weight: 600; color: var(--text-main); }
 .about-sub { display: block; margin-top: 2px; font-size: 12.5px; line-height: 17px; font-weight: 400; letter-spacing: 0; color: #8E8E93; }
-#about-ver { font-weight: 500; color: #8E8E93; }
 
 /* ===== v1.9：标签 / 收藏 / 滚动 / 性能 ===== */
 .gallery-tile .tile-fav { position:absolute; z-index:3; top:7px; left:7px; width:20px; height:20px; border-radius:50%; background:rgba(17,17,17,.55); color:#FFD60A; font-size:12px; line-height:20px; text-align:center; pointer-events:none; }
@@ -1294,6 +1293,10 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 #page-update .pref-ico svg * { vector-effect: non-scaling-stroke; }
 #page-update .pref-card:active .pref-ico { transform: scale(.9); }
 @media (prefers-reduced-motion: reduce) { #page-update .pref-ico { transition: none; } }
+/* 三张卡片之间的间距与主页一致（页面 gap 18px + 14px = 32px） */
+#page-update .pref-group + .pref-group { margin-top: 14px; }
+#page-update .pref-val { flex: none; font-size: 15px; letter-spacing: -.1px; color: #8E8E93; }
+#page-update .pref-val.new { color: var(--text-main); font-weight: 600; }
 .plug-note { margin: 14px 6px 0; line-height: 19px; }
 
 </style>
@@ -1672,7 +1675,6 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
             <div class="about-box">
             <div class="about-item"><div class="about-t">Direct Link</div><div class="about-d">把图片、字体、ZIP 上传到你自己的 GitHub 仓库，并自动生成可直接使用的直链。文件存在你自己的仓库里，不经过第三方服务器。</div></div>
             <div class="about-item"><div class="about-t">数据只存在本机</div><div class="about-d">GitHub Token、仓库设置、偏好和上传记录都只保存在这台设备的浏览器里。清除网站数据、删除主屏幕 App 或换设备后，需要重新填写 Token 并设置偏好。</div></div>
-            <div class="about-item"><div class="about-t">版本 <span id="about-ver"></span></div></div>
             <div class="about-item"><div class="about-t">离线使用</div><div class="about-d" id="about-offline-status">检查中…</div></div>
             </div>
         </div>
@@ -1754,16 +1756,20 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
                     <span class="pref-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M8 11.5l4 3.5 4-3.5"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></span><span class="pref-text">导入设置备份</span>
                     <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
                 </div>
+            </div>
+            <div class="pref-group">
                 <div class="pref-card" role="button" tabindex="0" onclick="pullLatest()">
                     <span class="pref-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M13.8 6.7h3.5V3.2"/></svg></span><span class="pref-text">拉取最新版</span>
+                    <span class="pref-val" id="update-ver"></span>
                     <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
                 </div>
+            </div>
+            <div class="pref-group">
                 <div class="pref-card" role="button" tabindex="0" onclick="offlineInfo()">
                     <span class="pref-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v7M8.8 12.2l3.2 3.2 3.2-3.2"/></svg></span><span class="pref-text">离线使用</span>
                     <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
                 </div>
             </div>
-            <div class="about-d" id="about-update-status" style="margin:10px 20px 0"></div>
             <input type="file" id="backup-input" accept=".json,application/json" style="display:none" onchange="importBackup(this.files[0]); this.value=''">
         </div>
     </div>
@@ -7586,11 +7592,11 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '2.9.1';
+const APP_VERSION = '2.9.2';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
-    const v = document.getElementById('about-ver'); if (v) v.textContent = 'v' + APP_VERSION;
+    const v = document.getElementById('update-ver'); if (v) v.textContent = 'v' + APP_VERSION;
 })();
 function appBaseUrl() { return location.href.split('#')[0].split('?')[0]; }
 function isWebOrigin() { return /^https?:$/.test(location.protocol); }
@@ -7601,18 +7607,25 @@ async function fetchRemoteVersion() {
     const m = txt.match(/APP_VERSION\s*=\s*'([^']+)'/);
     return m ? m[1] : '';
 }
+function verNewer(a, b) {   // b 比 a 新？
+    const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number);
+    for (let i = 0; i < Math.max(x.length, y.length); i++) {
+        const p = x[i] || 0, q = y[i] || 0;
+        if (q !== p) return q > p;
+    }
+    return false;
+}
 async function aboutOnOpen() {
     try { offlineStatusRefresh(); } catch (_) {}
-    const el = document.getElementById('about-update-status');
+    const el = document.getElementById('update-ver');
     if (!el) return;
-    if (!isWebOrigin()) { el.textContent = '当前是本地文件，无法在线更新'; return; }
-    el.textContent = '检查中…';
+    el.classList.remove('new');
+    el.textContent = 'v' + APP_VERSION;
+    if (!isWebOrigin()) return;
     try {
         const rv = await fetchRemoteVersion();
-        if (!rv) el.textContent = '无法识别线上版本，可以直接点这里强制刷新';
-        else if (rv === APP_VERSION) el.textContent = '已是最新版 v' + APP_VERSION + '。如果内容不对，点这里强制刷新';
-        else el.textContent = '发现新版本 v' + rv + '（当前 v' + APP_VERSION + '），点这里更新';
-    } catch (_) { el.textContent = '检查失败，可能没网或线上文件不可访问'; }
+        if (rv && verNewer(APP_VERSION, rv)) { el.textContent = '有新版 v' + rv; el.classList.add('new'); }
+    } catch (_) {}
 }
 async function pullLatest() {
     if (typeof isBatchUploading !== 'undefined' && isBatchUploading) return toast('正在上传，等上传完再更新', 'info');
@@ -7622,7 +7635,8 @@ async function pullLatest() {
     try { rv = await fetchRemoteVersion(); }
     catch (_) { return toast('拉取失败：连不上线上文件，请检查网络', 'error'); }
     if (rv && rv === APP_VERSION) {
-        const again = await showConfirm({ title: '已是最新版 v' + APP_VERSION, message: '线上版本和当前一致。如果你觉得页面内容不对，可以强制重新加载一次。Token、偏好和上传记录不会被清除。', confirmText: '强制重新加载' });
+        hideToast();   // 先收起「正在拉取…」，否则点取消后它会一直挂着
+        const again = await showConfirm({ title: '已是最新版 v' + APP_VERSION, message: '线上版本和当前一致。如果你觉得页面内容不对，可以强制重新加载一次。Token、偏好和上传记录不会被清除。', confirmText: '强制重新加载', cancelText: '关闭' });
         if (!again) return;
         toast('正在刷新…', 'loading');
     }

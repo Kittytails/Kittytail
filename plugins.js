@@ -3,10 +3,10 @@
  * 加一个插件 = 在下面追加一段 DL.register({...})。写法：
  *
  *   DL.register({
- *     id: 'my-plugin',            // 唯一，不要改（开关状态按它记）
- *     name: '插件名',             // 显示在「插件」页
+ *     id: 'my-plugin',              // 唯一，不要改（开关状态按它记）
+ *     name: '插件名',                // 显示在「插件」页
  *     desc: '一句话说明',
- *     default: false,             // 第一次是否默认开启
+ *     default: false,               // 第一次是否默认开启
  *
  *     // 上传前：返回新的 File 就替换原文件；不返回或原样返回就不改。可以是 async。
  *     // 想在结果行显示一句提示：out._saveNote = '文字'
@@ -15,167 +15,202 @@
  *     // 上传成功后（不等它跑完）。info: { name, url, size, isImage, deduped, owner, repo, branch, path }
  *     afterUpload(info, DL) { },
  *
- *     // 外观类插件用：页面加载完插件后、以及在「设置」里开关时调用。on = 现在是否开启。
- *     // 需要页面 v1.11 及以上（DL.apiVersion >= 3）。
+ *     // 可选：页面加载完插件后、以及在「设置」里开关时调用。on 为 true/false
  *     onToggle(on, DL) { },
  *   });
  *
- * 注意：
- *  - 某个插件运行时出错，只会在控制台警告，不影响上传和其他插件。
- *  - 但整个文件有语法错误（少个括号之类）会导致全部插件失效，改完先在电脑上用 node --check plugins.js 检查。
- *  - 插件能读到 Token，只放自己写的或信得过的代码。
- */
+ * DL 上能用的：DL.toast(文字, 类型)、DL.isImage(file)。
+ * 插件和页面同源，能读到 Token，只启用自己写的或信得过的脚本。 */
 
-/* ========== 插件 1：去除照片隐私信息 ========== */
-(function () {
-  'use strict';
-  const MAX_SIZE = 40 * 1024 * 1024;       // 超过 40MB 的不处理，避免撑爆内存
+/* ---------- 小工具 ---------- */
+function dlLoadImage(file) {
+    return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('图片解码失败')); };
+        img.src = url;
+    });
+}
+function dlCanvasBlob(canvas, type, quality) {
+    return new Promise(resolve => canvas.toBlob(resolve, type, quality));
+}
+function dlFreeCanvas(canvas) { canvas.width = canvas.height = 0; }   // iOS Safari 不会主动回收画布，批量处理时要手动释放
 
-  const ascii = (u, o, s) => { for (let i = 0; i < s.length; i++) if (u[o + i] !== s.charCodeAt(i)) return false; return true; };
-  const concat = parts => {
-    let n = 0; parts.forEach(p => n += p.length);
-    const out = new Uint8Array(n); let o = 0;
-    parts.forEach(p => { out.set(p, o); o += p.length; });
-    return out;
-  };
+/* =====================================================================
+ * 插件 1：去除照片里的位置 / 拍摄信息（EXIF、XMP 等）
+ *  - JPEG：直接删掉元数据段，不重新压缩，画质不变；颜色配置（ICC）保留
+ *  - 照片带"旋转"标记时，删掉标记会让图片横过来，所以这种图会先转正再重新编码
+ *  - PNG：删掉文字块和 EXIF 块
+ * ===================================================================== */
+DL.register({
+    id: 'exif-strip',
+    name: '去除位置信息（EXIF）',
+    desc: '上传前删掉照片里的 GPS 位置、拍摄设备、时间等信息，JPEG 不重新压缩，画质不变。',
+    default: false,
 
-  /* ---------- JPEG ---------- */
-  function readOrientation(body) {            // body: APP1 内容，以 "Exif\0\0" 开头
-    if (body.length < 20 || !ascii(body, 0, 'Exif')) return 1;
-    const dv = new DataView(body.buffer, body.byteOffset, body.byteLength);
-    const t = 6, le = body[t] === 0x49 && body[t + 1] === 0x49;
-    if (!le && !(body[t] === 0x4D && body[t + 1] === 0x4D)) return 1;
-    if (dv.getUint16(t + 2, le) !== 42) return 1;
-    const ifd = t + dv.getUint32(t + 4, le);
-    if (ifd + 2 > body.length) return 1;
-    const n = dv.getUint16(ifd, le);
-    for (let i = 0; i < n; i++) {
-      const e = ifd + 2 + i * 12;
-      if (e + 12 > body.length) break;
-      if (dv.getUint16(e, le) === 0x0112) { const v = dv.getUint16(e + 8, le); return v >= 1 && v <= 8 ? v : 1; }
+    async beforeUpload(file, DL) {
+        if (!DL.isImage(file) || file.size < 12) return file;
+        const bytes = new Uint8Array(await file.arrayBuffer());
+
+        if (bytes[0] === 0xFF && bytes[1] === 0xD8) return stripJpeg(file, bytes, DL);
+        if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47) return stripPng(file, bytes);
+        return file;   // GIF / WebP / HEIC 等：不处理
     }
-    return 1;
-  }
-  function minimalExif(orient) {              // 只含旋转信息的最小 EXIF 段
-    return new Uint8Array([
-      0xFF, 0xE1, 0x00, 0x22, 0x45, 0x78, 0x69, 0x66, 0x00, 0x00,        // 段头 + "Exif\0\0"
-      0x4D, 0x4D, 0x00, 0x2A, 0x00, 0x00, 0x00, 0x08,                    // TIFF 头（大端）
-      0x00, 0x01, 0x01, 0x12, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01,        // 1 个条目：Orientation, SHORT
-      0x00, orient, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00                   // 值 + 没有下一个 IFD
-    ]);
-  }
-  // 白名单：只保留显示图像必需的段（JFIF、ICC 色彩配置、Adobe 色彩变换），其余应用段全部丢掉。
-  // 图像数据之后（EOI 之后）的尾部数据也丢掉：手机的预览图 / HDR 增益图 / 动态照片视频都接在那里，自带 EXIF。
-  function stripJpeg(u) {
-    const out = [u.subarray(0, 2)];
-    let p = 2, dropped = false, orient = 1, insertAt = 1;
-    while (p + 2 <= u.length) {
-      if (u[p] !== 0xFF) return null;                        // 结构异常，放弃处理
-      const m = u[p + 1];
-      if (m === 0xFF) { p++; continue; }                     // 填充字节
-      if (m === 0xD9) {                                      // EOI：之后的内容不要
-        out.push(u.subarray(p, p + 2));
-        if (p + 2 < u.length) dropped = true;
-        p = u.length; break;
-      }
-      if ((m >= 0xD0 && m <= 0xD7) || m === 0x01) { out.push(u.subarray(p, p + 2)); p += 2; continue; }
-      if (p + 4 > u.length) return null;
-      const len = (u[p + 2] << 8) | u[p + 3];
-      if (len < 2 || p + 2 + len > u.length) return null;
-      if (m === 0xDA) {                                      // SOS：带头部 + 熵编码数据，扫到下一个真正的标记为止
-        let q = p + 2 + len;
-        while (q + 1 < u.length) {
-          if (u[q] === 0xFF && u[q + 1] !== 0x00 && u[q + 1] !== 0xFF && !(u[q + 1] >= 0xD0 && u[q + 1] <= 0xD7)) break;
-          q++;
+});
+
+function exifU16(b, o, le) { return le ? (b[o] | (b[o + 1] << 8)) : ((b[o] << 8) | b[o + 1]); }
+function exifU32(b, o, le) {
+    return le ? (b[o] | (b[o + 1] << 8) | (b[o + 2] << 16) | (b[o + 3] << 24)) >>> 0
+              : ((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0;
+}
+// 读 EXIF 里的旋转标记（1 = 正常）。seg 是 APP1 段数据（不含 FF E1 和长度）
+function exifOrientation(b, start, end) {
+    try {
+        const t = start + 6;                         // 跳过 "Exif\0\0"
+        const le = b[t] === 0x49;                    // 'II' = 小端，'MM' = 大端
+        const ifd = t + exifU32(b, t + 4, le);
+        const n = exifU16(b, ifd, le);
+        for (let i = 0; i < n; i++) {
+            const e = ifd + 2 + i * 12;
+            if (e + 12 > end) break;
+            if (exifU16(b, e, le) === 0x0112) return exifU16(b, e + 8, le) || 1;
         }
-        if (q + 1 >= u.length) q = u.length;
-        out.push(u.subarray(p, q)); p = q; continue;
-      }
-      const seg = u.subarray(p, p + 2 + len), body = u.subarray(p + 4, p + 2 + len);
-      let drop = false;
-      if (m === 0xE1) { const o = readOrientation(body); if (o > 1) orient = o; drop = true; }   // EXIF / XMP
-      else if (m === 0xE0) drop = ascii(body, 0, 'JFXX');                                // JFIF 扩展缩略图
-      else if (m === 0xE2) drop = !ascii(body, 0, 'ICC_PROFILE');                        // 只留 ICC；MPF 等丢掉
-      else if (m === 0xEE) drop = !ascii(body, 0, 'Adobe');
-      else if ((m >= 0xE3 && m <= 0xEF) || m === 0xFE) drop = true;                      // 厂商私有段、Photoshop/IPTC、注释
-      if (drop) dropped = true;
-      else { out.push(seg); if (m === 0xE0 && out.length === 2) insertAt = 2; }
-      p += 2 + len;
-    }
-    if (!dropped) return null;
-    if (orient > 1) out.splice(insertAt, 0, minimalExif(orient));
-    return concat(out);
-  }
+    } catch (_) {}
+    return 1;
+}
+function isHeader(b, o, str) {
+    for (let i = 0; i < str.length; i++) if (b[o + i] !== str.charCodeAt(i)) return false;
+    return true;
+}
 
-  /* ---------- PNG ---------- */
-  function stripPng(u) {
-    const DROP = ['tEXt', 'iTXt', 'zTXt', 'eXIf', 'tIME'];
-    const out = [u.subarray(0, 8)];
-    let p = 8, dropped = false, sawEnd = false;
-    const dv = new DataView(u.buffer, u.byteOffset, u.byteLength);
-    while (p + 12 <= u.length) {
-      const len = dv.getUint32(p), end = p + 12 + len;
-      if (end > u.length) return null;
-      const type = String.fromCharCode(u[p + 4], u[p + 5], u[p + 6], u[p + 7]);
-      if (DROP.indexOf(type) >= 0) dropped = true; else out.push(u.subarray(p, end));
-      p = end;
-      if (type === 'IEND') { sawEnd = true; break; }
+async function stripJpeg(file, b, DL) {
+    const parts = [b.subarray(0, 2)];
+    let i = 2, removed = 0, orient = 1;
+    while (i < b.length) {
+        let j = i;
+        if (b[j] !== 0xFF) return file;              // 结构不对：不动它
+        while (b[j] === 0xFF) j++;                   // 跳过填充字节
+        const m = b[j], segStart = j - 1;
+        i = j + 1;
+        if (m === 0xD9) { parts.push(b.subarray(segStart, i)); break; }                 // EOI
+        if (m === 0xDA) { parts.push(b.subarray(segStart)); break; }                    // SOS：后面是图像数据，原样保留
+        if (m === 0x01 || (m >= 0xD0 && m <= 0xD8)) { parts.push(b.subarray(segStart, i)); continue; }   // 没有长度的标记
+        const len = exifU16(b, i, false), segEnd = i + len;
+        if (len < 2 || segEnd > b.length) return file;
+        const data = i + 2;
+        let drop = false;
+        if (m === 0xE1) {                            // APP1：EXIF / XMP
+            drop = true;
+            if (isHeader(b, data, 'Exif\0\0')) orient = exifOrientation(b, data, segEnd);
+        } else if (m === 0xED || m === 0xFE) {       // APP13（Photoshop / IPTC）、注释
+            drop = true;
+        } else if (m === 0xE2 && !isHeader(b, data, 'ICC_PROFILE')) {   // APP2：除颜色配置外都删（如 MPF）
+            drop = true;
+        }
+        if (drop) removed += segEnd - segStart; else parts.push(b.subarray(segStart, segEnd));
+        i = segEnd;
     }
-    if (sawEnd && p < u.length) dropped = true;               // IEND 之后的尾部数据不要
-    return dropped ? concat(out) : null;
-  }
+    if (!removed) return file;                       // 本来就没有元数据
 
-  /* ---------- WebP ---------- */
-  function stripWebp(u) {
-    const dv = new DataView(u.buffer, u.byteOffset, u.byteLength);
-    const limit = Math.min(u.length, dv.getUint32(4, true) + 8);      // 只处理 RIFF 声明的范围
-    if (limit < 20) return null;
-    const out = [u.slice(0, 12)];
-    let p = 12, dropped = limit < u.length;                            // 声明范围之外的尾部数据不要
-    while (p + 8 <= limit) {
-      const id = String.fromCharCode(u[p], u[p + 1], u[p + 2], u[p + 3]);
-      const size = dv.getUint32(p + 4, true), end = p + 8 + size + (size & 1);
-      if (p + 8 + size > limit) return null;
-      const chunk = u.subarray(p, Math.min(end, limit));
-      if (id === 'EXIF' || id === 'XMP ') dropped = true;
-      else if (id === 'VP8X' && size >= 1) { const c = chunk.slice(); c[8] &= ~0x0C; if (c[8] !== chunk[8]) dropped = true; out.push(c); }   // 清掉 EXIF / XMP 标志位
-      else out.push(chunk);
-      p = end;
+    if (orient > 1) {
+        // 有旋转标记：先让浏览器按标记转正再重新编码，这样不会横过来；重新编码出来的文件本身就不带任何元数据
+        try {
+            const img = await dlLoadImage(file);
+            const c = document.createElement('canvas');
+            c.width = img.naturalWidth; c.height = img.naturalHeight;
+            c.getContext('2d').drawImage(img, 0, 0);
+            const blob = await dlCanvasBlob(c, 'image/jpeg', 0.95);
+            dlFreeCanvas(c);
+            if (!blob || blob.type !== 'image/jpeg') throw new Error('编码失败');
+            const out = new File([blob], file.name, { type: 'image/jpeg', lastModified: file.lastModified });
+            out._saveNote = '已去除位置信息';
+            return out;
+        } catch (e) {
+            DL.toast('去除位置信息失败，这张图按原图上传', 'info');
+            return file;
+        }
     }
-    if (!dropped) return null;
-    const res = concat(out);
-    new DataView(res.buffer).setUint32(4, res.length - 8, true);          // 重写 RIFF 总长度
-    return res;
-  }
+    const out = new File(parts, file.name, { type: file.type || 'image/jpeg', lastModified: file.lastModified });
+    out._saveNote = '已去除位置信息';
+    return out;
+}
 
-  /* HEIC / AVIF：暂时不处理，但要让人知道，别以为已经去掉了 */
-  function isHeifLike(head) {
-    if (!ascii(head, 4, 'ftyp')) return false;
-    return ['heic', 'heix', 'hevc', 'hevx', 'heim', 'heis', 'mif1', 'msf1', 'avif', 'avis'].some(b => ascii(head, 8, b));
-  }
-
-  DL.register({
-    id: 'strip-exif',
-    name: '去除照片隐私信息',
-    desc: '上传前删掉 GPS 位置、拍摄时间、相机型号、预览图等。JPEG / PNG / WebP 无损处理，不重新压缩，照片方向会保留。HEIC / AVIF 暂不支持，会在结果里提示。',
-    default: true,
-    async beforeUpload(file) {
-      if (!file || file.size < 64 || file.size > MAX_SIZE) return file;
-      const head = new Uint8Array(await file.slice(0, 12).arrayBuffer());
-      const jpeg = head[0] === 0xFF && head[1] === 0xD8;
-      const png = ascii(head, 1, 'PNG') && head[0] === 0x89;
-      const webp = ascii(head, 0, 'RIFF') && ascii(head, 8, 'WEBP');
-      if (!jpeg && !png && !webp) {
-        if (isHeifLike(head)) file._saveNote = (file._saveNote ? file._saveNote + ' · ' : '') + '未去隐私信息（暂不支持 HEIC / AVIF）';
-        return file;
-      }
-      const u = new Uint8Array(await file.arrayBuffer());
-      let res = null;
-      try { res = jpeg ? stripJpeg(u) : png ? stripPng(u) : stripWebp(u); } catch (_) { res = null; }
-      if (!res) return file;                                  // 本来就没有隐私信息，或结构看不懂：保持原样
-      const out = new File([res], file.name, { type: file.type, lastModified: file.lastModified });
-      out._saveNote = (file._saveNote ? file._saveNote + ' · ' : '') + '已去隐私信息';
-      return out;
+const PNG_DROP = { tEXt: 1, zTXt: 1, iTXt: 1, eXIf: 1, tIME: 1 };
+function stripPng(file, b) {
+    const parts = [b.subarray(0, 8)];
+    let i = 8, removed = 0;
+    while (i + 12 <= b.length) {
+        const len = exifU32(b, i, false), end = i + 12 + len;
+        if (end > b.length) return file;
+        const type = String.fromCharCode(b[i + 4], b[i + 5], b[i + 6], b[i + 7]);
+        if (PNG_DROP[type]) removed += end - i; else parts.push(b.subarray(i, end));
+        i = end;
+        if (type === 'IEND') break;
     }
-  });
-})();
+    if (!removed) return file;
+    const out = new File(parts, file.name, { type: file.type || 'image/png', lastModified: file.lastModified });
+    out._saveNote = '已去除元数据';
+    return out;
+}
+
+/* =====================================================================
+ * 插件 2：给图片加文字水印（右下角）
+ *  - 只处理 JPEG / PNG / WebP；GIF、SVG、动图 WebP 保持原样
+ *  - 水印文字、大小、透明度在下面 WATERMARK 里改
+ * ===================================================================== */
+const WATERMARK = {
+    text: '© Direct Link',   // 水印文字
+    scale: 0.035,            // 字号 = 图片短边 × 这个比例
+    opacity: 0.6,            // 文字不透明度 0~1
+    margin: 0.02,            // 距右下角的边距 = 图片短边 × 这个比例
+    quality: 0.92            // JPEG / WebP 重新编码的质量
+};
+
+DL.register({
+    id: 'watermark',
+    name: '图片水印',
+    desc: '上传前在图片右下角加一行文字水印。文字和大小在 plugins.js 顶部的 WATERMARK 里改。GIF、SVG、动图不处理。',
+    default: false,
+
+    async beforeUpload(file, DL) {
+        if (!DL.isImage(file) || !/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
+        if (file.type === 'image/webp' && await isAnimatedWebp(file)) return file;
+
+        const img = await dlLoadImage(file);
+        const w = img.naturalWidth, h = img.naturalHeight;
+        if (!w || !h) return file;
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        const g = c.getContext('2d');
+        g.drawImage(img, 0, 0, w, h);
+
+        const short = Math.min(w, h);
+        const fs = Math.max(14, Math.round(short * WATERMARK.scale));
+        const pad = Math.round(short * WATERMARK.margin);
+        g.font = '600 ' + fs + 'px -apple-system, "PingFang SC", "Helvetica Neue", sans-serif';
+        g.textAlign = 'right';
+        g.textBaseline = 'bottom';
+        g.lineJoin = 'round';
+        g.lineWidth = Math.max(2, fs / 8);
+        g.strokeStyle = 'rgba(0,0,0,' + (WATERMARK.opacity * 0.5) + ')';   // 描一圈深色边，浅色背景上也看得清
+        g.fillStyle = 'rgba(255,255,255,' + WATERMARK.opacity + ')';
+        g.strokeText(WATERMARK.text, w - pad, h - pad);
+        g.fillText(WATERMARK.text, w - pad, h - pad);
+
+        const blob = await dlCanvasBlob(c, file.type, WATERMARK.quality);
+        dlFreeCanvas(c);
+        if (!blob || blob.type !== file.type) return file;
+        const out = new File([blob], file.name, { type: file.type, lastModified: file.lastModified });
+        out._saveNote = file._saveNote ? file._saveNote + ' · 已加水印' : '已加水印';   // 前一个插件写过提示就接在后面
+        return out;
+    }
+});
+
+async function isAnimatedWebp(file) {
+    try {
+        const b = new Uint8Array(await file.slice(0, 32).arrayBuffer());
+        // RIFF....WEBPVP8X：第 21 个字节的第 2 位是"含动画"标记
+        return isHeader(b, 0, 'RIFF') && isHeader(b, 8, 'WEBP') && isHeader(b, 12, 'VP8X') && (b[20] & 0x02) !== 0;
+    } catch (_) { return false; }
+}

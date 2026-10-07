@@ -1070,7 +1070,7 @@ html[data-theme="dark"] .sk {
     .sel-dock .dk-close:active { background: rgba(60,60,67,.14); transform: scale(.9); }
     .sel-dock .dk-info { flex: none; min-width: 24px; display: flex; align-items: center; justify-content: center; line-height: 1; color: #111; padding: 0 6px; white-space: nowrap; }
     .sel-dock .dk-info b { font-size: 20px; font-weight: 700; letter-spacing: -.5px; font-variant-numeric: tabular-nums; }
-    .sel-dock .dk-actions { flex: none; display: flex; align-items: center; gap: 5px; }
+    .sel-dock .dk-actions { flex: none; display: grid; grid-template-columns: repeat(4, auto); align-items: center; justify-items: center; gap: 2px 5px; }
     .sel-dock .dk-btn { flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: #111; display: grid; place-items: center; padding: 0; cursor: pointer; transition: background .15s, transform .15s; }
     .sel-dock .dk-btn svg { width: 23px; height: 23px; }
     .sel-dock .dk-btn:active { background: rgba(60,60,67,.14); transform: scale(.9); }
@@ -1274,7 +1274,7 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 /* ===== v1.9：标签 / 收藏 / 滚动 / 性能 ===== */
 .gallery-tile .tile-fav { position:absolute; z-index:3; top:7px; left:7px; width:20px; height:20px; border-radius:50%; background:rgba(17,17,17,.55); color:#FFD60A; font-size:12px; line-height:20px; text-align:center; pointer-events:none; }
 .gallery-tile .tile-badge + .tile-fav { top:29px; }
-.gallery-multi-mode .gallery-tile .tile-fav { display:none; }
+.gallery-multi-mode .gallery-tile .tile-fav, .repo-multi-mode .gallery-tile .tile-fav { display:none; }
 .gallery-sentinel { height:1px; width:100%; }
 #page-gallery .gallery-filter-group { overflow-x:auto; max-width:100%; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
 #page-gallery .gallery-filter-group::-webkit-scrollbar { display:none; }
@@ -1522,6 +1522,8 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
                     <button class="filter-btn" data-rf="image" onclick="setRepoFilter('image')">图片</button>
                     <button class="filter-btn" data-rf="font" onclick="setRepoFilter('font')">字体</button>
                     <button class="filter-btn" data-rf="file" onclick="setRepoFilter('file')">其他</button>
+                    <button class="filter-btn" id="repo-fav-chip" data-rf="fav" onclick="setRepoFilter('fav')" hidden>收藏</button>
+                    <button class="filter-btn" id="repo-tag-chip" onclick="openRepoTagFilterMenu(this)" hidden>标签</button>
                 </div>
             </div>
             <div id="repo-live-container"></div>
@@ -1874,6 +1876,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
         <div class="dk-actions">
             <button type="button" class="dk-btn" id="gallery-select-all-btn" onclick="toggleGallerySelectAll()" aria-label="全选" title="全选"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.4l2.7 2.7L16 9.6"/></svg></button>
             <button type="button" class="dk-btn" onclick="copySelectedGallery()" aria-label="复制所选" title="复制所选"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11.5" height="11.5" rx="3.5"/><path d="M5.5 15V7.5A2.5 2.5 0 0 1 8 5h7.5"/></svg></button>
+            <button type="button" class="dk-btn" onclick="openMoveSheet('gallery')" aria-label="移动" title="移动"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8A2.5 2.5 0 0 1 6 5.5h3l2 2h7A2.5 2.5 0 0 1 20.5 10v7a2.5 2.5 0 0 1-2.5 2.5H6A2.5 2.5 0 0 1 3.5 17z"/><path d="M9.5 13.5h5M12.5 11.5l2 2-2 2"/></svg></button>
             <button type="button" class="dk-btn" onclick="renameSelectedGallery()" aria-label="重命名" title="重命名"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19.5l.9-3.9L16.6 4.4a2.1 2.1 0 0 1 3 3L8.4 18.6z"/><path d="M14.5 6.5l3 3"/></svg></button>
             <button type="button" class="dk-btn" id="gallery-save-photos-btn" onclick="saveSelectedGalleryEntries('photos')" aria-label="存到相册" title="存到相册"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></svg></button>
             <button type="button" class="dk-btn" id="gallery-save-files-btn" onclick="openSaveSheet('gallery')" aria-label="存到文件" title="存到文件"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v10"/><path d="M8 10.5l4 4 4-4"/><path d="M5 15v2.5A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5V15"/></svg></button>
@@ -1891,6 +1894,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <button type="button" class="dk-btn" onclick="renameSelectedRepo()" aria-label="重命名" title="重命名"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19.5l.9-3.9L16.6 4.4a2.1 2.1 0 0 1 3 3L8.4 18.6z"/><path d="M14.5 6.5l3 3"/></svg></button>
             <button type="button" class="dk-btn" id="repo-save-photos-btn" onclick="saveSelectedRepoFiles('photos')" aria-label="存到相册" title="存到相册"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></svg></button>
             <button type="button" class="dk-btn" id="repo-save-files-btn" onclick="openSaveSheet('repo')" aria-label="存到文件" title="存到文件"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v10"/><path d="M8 10.5l4 4 4-4"/><path d="M5 15v2.5A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5V15"/></svg></button>
+            <button type="button" class="dk-btn" id="repo-tag-btn" data-menu-btn onclick="openRepoTagActionMenu(this)" aria-label="标签与收藏" title="标签与收藏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.2V5.5a2 2 0 0 1 2-2h6.7a2 2 0 0 1 1.4.6l6.8 6.8a2 2 0 0 1 0 2.8l-6.7 6.7a2 2 0 0 1-2.8 0L4.1 13.6a2 2 0 0 1-.6-1.4z"/><circle cx="8.5" cy="8.5" r="1.2"/></svg></button>
             <button type="button" class="dk-btn dk-danger" onclick="deleteSelectedRepoFiles()" aria-label="删除" title="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15"/><path d="M9.5 7V5.2c0-.7.5-1.2 1.2-1.2h2.6c.7 0 1.2.5 1.2 1.2V7"/><path d="M6.5 7l.8 11.2A2 2 0 0 0 9.3 20h5.4a2 2 0 0 0 2-1.8L17.5 7"/></svg></button>
         </div>
     </div>
@@ -3938,6 +3942,44 @@ function setGalleryFilter(f) {
 let repoFilter = 'all';
 let repoSearch = ''; // 非空时在整个仓库里按路径搜索，忽略当前所在文件夹
 let repoSearchTimer = null;
+
+// ---- 仓库文件的收藏 / 标签（与资源库功能一致；存在本机，按 账号/仓库/路径 记录）----
+const REPO_META_KEY = 'kb_repo_meta';
+let repoTag = '';
+let repoMetaCache = null;
+function loadRepoMeta() {
+    if (repoMetaCache) return repoMetaCache;
+    let o = null;
+    try { o = JSON.parse(localStorage.getItem(REPO_META_KEY) || 'null'); } catch (_) {}
+    repoMetaCache = (o && typeof o === 'object' && !Array.isArray(o)) ? o : {};
+    return repoMetaCache;
+}
+function saveRepoMeta() {
+    try { localStorage.setItem(REPO_META_KEY, JSON.stringify(loadRepoMeta())); } catch (_) { toast('保存失败，存储空间可能不足'); }
+}
+function repoMetaOf(f) { return f ? (loadRepoMeta()[uploadKey(f.owner, f.repo, f.path)] || null) : null; }
+function repoMetaTags(f) { const m = repoMetaOf(f); return m && Array.isArray(m.tags) ? m.tags : []; }
+function repoMetaIsFav(f) { const m = repoMetaOf(f); return !!(m && m.fav); }
+function editRepoMeta(f, fn) {
+    const all = loadRepoMeta(), k = uploadKey(f.owner, f.repo, f.path);
+    const m = Object.assign({}, all[k] || {});
+    fn(m);
+    if (m.fav || (Array.isArray(m.tags) && m.tags.length)) all[k] = m; else delete all[k];
+}
+// 文件被移动 / 重命名后，收藏和标签跟着走
+function moveRepoMeta(owner, repo, from, to) {
+    const all = loadRepoMeta(), a = uploadKey(owner, repo, from);
+    if (all[a] === undefined) return;
+    all[uploadKey(owner, repo, to)] = all[a];
+    delete all[a];
+    saveRepoMeta();
+}
+function pruneRepoMeta(files) {
+    const all = loadRepoMeta();
+    let changed = false;
+    files.forEach(f => { const k = uploadKey(f.owner, f.repo, f.path); if (k in all) { delete all[k]; changed = true; } });
+    if (changed) saveRepoMeta();
+}
 function onRepoSearchInput() {
     const cur = (($('repo-search') && $('repo-search').value) || '');
     const pill = $('repo-searchpill');
@@ -4076,8 +4118,35 @@ async function createRepoFolder() {
 
 
 // --- 移动文件到文件夹 ---
-function openMoveSheet() {
-    if (!repoSelected.size) return toast('请先选择要移动的文件');
+let moveScope = 'repo', moveGalleryPaths = [], moveGallerySkipped = 0;
+async function openMoveSheet(scope) {
+    moveScope = scope === 'gallery' ? 'gallery' : 'repo';
+    if (moveScope === 'gallery') {
+        // 资源库的记录对应仓库里的真实文件：把选中记录换算成仓库路径，再复用仓库的移动逻辑
+        if (!gallerySelected.size) return toast('请先选择要移动的文件');
+        if (!getSettings().token) return toast('请先配置 Token');
+        if (!repoLiveLoaded) {
+            toast('正在读取仓库…', 'loading');
+            await loadRepoLiveFiles(true);
+            hideToast();
+        }
+        if (!repoLiveLoaded) return toast('读取仓库失败，暂时无法移动', 'error');
+        const same = (a, b) => String(a || '').toLowerCase() === String(b || '').toLowerCase();
+        const byPath = new Map(repoLiveFiles.map(f => [f.path, f]));
+        const paths = new Set();
+        let skipped = 0;
+        selectedGalleryEntries().forEach(e => {
+            const p = historyAssetRef(e);
+            const f = p && p.path ? byPath.get(p.path) : null;
+            if (f && (!p.owner || same(p.owner, f.owner)) && (!p.repo || same(p.repo, f.repo))) paths.add(f.path);
+            else skipped++;
+        });
+        if (!paths.size) return toast('所选项目不在当前仓库里，无法移动', 'info');
+        moveGalleryPaths = Array.from(paths);
+        moveGallerySkipped = skipped;
+    } else if (!repoSelected.size) {
+        return toast('请先选择要移动的文件');
+    }
     moveTargetFolder = '';
     const list = $('move-folder-list');
     list.innerHTML = '';
@@ -4118,6 +4187,17 @@ async function confirmMoveSheet() {
         target = target ? target + '/' + newName : newName;
     }
     closeMoveSheet();
+    if (moveScope === 'gallery') {
+        repoSelected.clear();
+        moveGalleryPaths.forEach(p => repoSelected.add(p));
+        const ok = await moveSelectedRepoFiles(target);
+        repoSelected.clear();
+        if (ok) {
+            exitGalleryMultiMode();
+            if (moveGallerySkipped) setTimeout(() => toast('另有 ' + moveGallerySkipped + ' 项不在当前仓库，未移动', 'info'), 1800);
+        }
+        return;
+    }
     await moveSelectedRepoFiles(target);
 }
 
@@ -4156,7 +4236,7 @@ async function moveSelectedRepoFiles(targetFolder) {
             treeChanges.push({ path: newPath, mode: '100644', type: 'blob', sha: f.sha });
             moves.push({ from: f.path, to: newPath });
         });
-        if (!treeChanges.length) { toast('所选文件已在目标位置', 'info'); exitRepoMultiMode(); return; }
+        if (!treeChanges.length) { toast('所选文件已在目标位置', 'info'); exitRepoMultiMode(); return true; }
 
         await commitTreeChanges(ctx.owner, s.repo, ctx.branch, treeChanges,
             '移动 ' + moves.length + ' 个文件到 ' + (targetFolder || '根目录'), s);
@@ -4165,6 +4245,7 @@ async function moveSelectedRepoFiles(targetFolder) {
         const order = loadUploadOrder();
         let historyChanged = false;
         moves.forEach(m => {
+            moveRepoMeta(ctx.owner, s.repo, m.from, m.to);
             const f = repoLiveFiles.find(x => x.path === m.from);
             if (f) {
                 f.path = m.to;
@@ -4194,8 +4275,10 @@ async function moveSelectedRepoFiles(targetFolder) {
         exitRepoMultiMode();
         renderRepoLiveFiles();
         toast('已移动 ' + moves.length + ' 个文件' + (renamedCount ? '（' + renamedCount + ' 个重名已自动改名）' : ''));
+        return true;
     } catch (e) {
         toast('移动失败：' + (e.message || '未知错误'));
+        return false;
     }
 }
 
@@ -4209,10 +4292,14 @@ function setRepoFilter(f) {
 
 function getRepoVisibleList() {
     const prefix = repoCurrentPath ? repoCurrentPath + '/' : '';
+    const globalView = repoFilter === 'fav' || !!repoTag; // 收藏 / 标签筛选：跨文件夹，在整个仓库里找
     const list = repoLiveFiles.filter(f => {
         if (f.name === '.gitkeep') return false;
-        if (repoFilter !== 'all' && f.type !== repoFilter) return false;
-        if (repoSearch) return f.path.toLowerCase().includes(repoSearch); // 搜索：整个仓库
+        if (repoFilter === 'fav') { if (!repoMetaIsFav(f)) return false; }
+        else if (repoFilter !== 'all' && f.type !== repoFilter) return false;
+        if (repoTag && !repoMetaTags(f).includes(repoTag)) return false;
+        if (repoSearch) return f.path.toLowerCase().includes(repoSearch) || repoMetaTags(f).join(' ').toLowerCase().includes(repoSearch); // 搜索：整个仓库（含标签）
+        if (globalView) return true;
         if (!f.path.startsWith(prefix)) return false;
         const rest = f.path.slice(prefix.length);
         return rest.length > 0 && rest.indexOf('/') === -1;
@@ -4584,6 +4671,7 @@ async function deleteSelectedRepoFiles() {
                 .map(f => keyOf(f.owner, f.repo, f.branch, f.path))
         );
         pruneOrderOnly(selected.filter(f => !failedPaths.has(f.path)));
+        pruneRepoMeta(selected.filter(f => !failedPaths.has(f.path)));
         repoLiveFiles = repoLiveFiles.filter(f => !deletedKeys.has(keyOf(f.owner, f.repo, f.branch, f.path)));
         const history = loadHistory();
         const next = history.filter(e => { const p = historyAssetRef(e); return !(p && p.path && deletedKeys.has(keyOf(p.owner, p.repo, '', p.path))); });
@@ -4705,8 +4793,9 @@ function renderRepoLiveFiles() {
             repoCurrentPath = i > 0 ? repoCurrentPath.slice(0, i) : '';
         }
     }
+    if (repoLiveLoaded) refreshRepoTagChips();
     renderRepoBreadcrumb();
-    const folders = repoSearch ? [] : getRepoSubfolders();
+    const folders = (repoSearch || repoFilter === 'fav' || repoTag) ? [] : getRepoSubfolders();
     const visible = getRepoVisibleList();
     container.innerHTML = '';
     updateRepoSelectionUI();
@@ -4801,6 +4890,7 @@ function renderRepoLiveFiles() {
         mark.className = 'repo-live-select-mark';
         mark.textContent = repoSelected.has(file.path) ? '✓' : '';
         item.appendChild(mark);
+        if (repoMetaIsFav(file)) { const st = document.createElement('div'); st.className = 'tile-fav'; st.textContent = '★'; item.appendChild(st); }
 
         const preview = document.createElement('div');
         preview.className = 'repo-live-preview icon-tile';
@@ -7175,6 +7265,7 @@ function applyLocalRename(owner, repo, branch, from, to) {
     const order = loadUploadOrder();
     const oldK = uploadKey(owner, repo, from);
     if (order[oldK] !== undefined) { order[uploadKey(owner, repo, to)] = order[oldK]; delete order[oldK]; saveUploadOrder(order); }
+    moveRepoMeta(owner, repo, from, to);
     const history = loadHistory();
     let changed = false;
     history.forEach(e => {
@@ -7665,7 +7756,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '2.9.6';
+const APP_VERSION = '2.9.7';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -7807,6 +7898,90 @@ function removeTagFromSelected(x) {
     const sel = selectedGalleryEntries();
     sel.forEach(e => { const left = entryTags(e).filter(y => y !== x); if (left.length) e.tags = left; else delete e.tags; });
     commitGalleryMeta('已移除 #' + x);
+}
+
+/* ---------- 标签 / 收藏（仓库文件，与资源库同款） ---------- */
+function selectedRepoFiles() { return repoLiveFiles.filter(f => repoSelected.has(f.path)); }
+function commitRepoMeta(msg) {
+    saveRepoMeta();
+    renderRepoLiveFiles();
+    updateRepoSelectionUI();
+    if (msg) toast(msg, 'ok');
+}
+function refreshRepoTagChips() {
+    const fc = $('repo-fav-chip'), tc = $('repo-tag-chip');
+    const all = loadRepoMeta();
+    let nf = 0;
+    const tags = new Set();
+    repoLiveFiles.forEach(f => {
+        const m = all[uploadKey(f.owner, f.repo, f.path)];
+        if (!m) return;
+        if (m.fav) nf++;
+        (Array.isArray(m.tags) ? m.tags : []).forEach(x => tags.add(x));
+    });
+    if (fc) fc.hidden = nf === 0;
+    if (repoTag && !tags.has(repoTag)) repoTag = '';
+    if (tc) { tc.hidden = tags.size === 0; tc.textContent = repoTag ? '#' + repoTag : '标签'; tc.classList.toggle('active', !!repoTag); }
+    if (!nf && repoFilter === 'fav') {
+        repoFilter = 'all';
+        document.querySelectorAll('.filter-btn[data-rf]').forEach(b => b.classList.toggle('active', b.dataset.rf === 'all'));
+    }
+}
+function setRepoTag(x) {
+    repoTag = x || '';
+    repoSelected.clear();
+    updateRepoSelectionUI();
+    renderRepoLiveFiles();
+}
+function openRepoTagFilterMenu(btn) {
+    const counts = new Map();
+    repoLiveFiles.forEach(f => repoMetaTags(f).forEach(x => counts.set(x, (counts.get(x) || 0) + 1)));
+    const arr = Array.from(counts.entries()).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh'));
+    const items = arr.map(([x, n]) => ({ label: (x === repoTag ? '✓ ' : '') + '#' + x + '  ' + n, onClick: () => setRepoTag(x === repoTag ? '' : x) }));
+    if (repoTag) items.unshift({ label: '清除标签筛选', onClick: () => setRepoTag('') });
+    if (items.length) openMoreMenu(btn, items);
+}
+function openRepoTagActionMenu(btn) {
+    const sel = selectedRepoFiles();
+    if (!sel.length) return toast('先选择项目', 'info');
+    const allFav = sel.every(repoMetaIsFav);
+    const tagSet = new Set();
+    sel.forEach(f => repoMetaTags(f).forEach(x => tagSet.add(x)));
+    const items = [
+        { label: allFav ? '取消收藏' : '收藏', icon: ICON_STAR, onClick: () => setRepoFavSelected(!allFav) },
+        { label: '添加标签…', icon: ICON_TAG, onClick: addTagsToRepoSelected }
+    ];
+    if (tagSet.size) items.push({ label: '移除标签…', icon: ICON_TAG, onClick: () => openRepoRemoveTagMenu(btn, Array.from(tagSet).slice(0, 12)) });
+    openMoreMenu(btn, items, { up: true });
+}
+function openRepoRemoveTagMenu(btn, tags) {
+    openMoreMenu(btn, tags.map(x => ({ label: '移除 #' + x, onClick: () => removeTagFromRepoSelected(x) })), { up: true });
+}
+function setRepoFavSelected(on) {
+    const sel = selectedRepoFiles();
+    if (!sel.length) return;
+    sel.forEach(f => editRepoMeta(f, m => { if (on) m.fav = true; else delete m.fav; }));
+    commitRepoMeta((on ? '已收藏 ' : '已取消收藏 ') + sel.length + ' 项');
+}
+async function addTagsToRepoSelected() {
+    const sel = selectedRepoFiles();
+    if (!sel.length) return;
+    const v = await showPrompt({
+        title: '添加标签',
+        message: '给 ' + sel.length + ' 个项目添加标签，多个用空格或逗号隔开。',
+        placeholder: '例如：头像 素材',
+        confirmText: '添加',
+        validate: s => parseTagInput(s).length ? '' : '请输入至少一个标签'
+    });
+    if (v === null) return;
+    const add = parseTagInput(v);
+    if (!add.length) return;
+    sel.forEach(f => editRepoMeta(f, m => { const set = new Set(Array.isArray(m.tags) ? m.tags : []); add.forEach(x => set.add(x)); m.tags = Array.from(set).slice(0, 20); }));
+    commitRepoMeta('已添加标签 ' + add.map(x => '#' + x).join(' '));
+}
+function removeTagFromRepoSelected(x) {
+    selectedRepoFiles().forEach(f => editRepoMeta(f, m => { const left = (Array.isArray(m.tags) ? m.tags : []).filter(y => y !== x); if (left.length) m.tags = left; else delete m.tags; }));
+    commitRepoMeta('已移除 #' + x);
 }
 
 /* ---------- CDN 未同步：一键改用 raw 直链 ---------- */

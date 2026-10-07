@@ -106,9 +106,6 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .repo-filter-group { margin: 0 0 18px; width: fit-content; }
     .repo-filter-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 15px; }
     .repo-filter-row .repo-filter-group { margin:0 !important; flex-shrink:0; }
-    .repo-filter-row .repo-select-info { margin-left:auto; padding-right:4px; flex-shrink:0; }
-    .repo-multi-mode .repo-filter-row .filter-btn { padding:6px 11px; }
-    .repo-multi-mode .repo-filter-row .repo-filter-group { gap:2px; }
     /* 仓库文件：与上方图库保持完全相同的三列、间距、缩略图与文件名规格 */
     .repo-live-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px 16px; }
     .repo-live-item { position:relative; min-width:0; display:flex; flex-direction:column; gap:6px; cursor:pointer; touch-action:manipulation; transition:transform .2s cubic-bezier(.34,1.56,.64,1); }
@@ -117,17 +114,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .repo-live-preview img { width:100%; height:100%; object-fit:cover; display:block; }
     .repo-live-icon { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; }
     .repo-live-name { margin-top:0; padding:0 2px; font-size:11px; line-height:normal; color:var(--text-secondary); font-weight:500; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .repo-select-bar {
-        display:none; align-items:center; justify-content:space-between; gap:10px;
-        margin:-2px 0 14px; padding:10px 12px; border-radius:16px;
-        background:#F3F3F3; border:1px solid #E4E4E4;
-    }
-    .repo-multi-mode .repo-select-bar { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; align-items:center; padding:8px; }
-    .repo-select-info { display:none; flex-shrink:0; font-size:12px; font-weight:700; color:#222; white-space:nowrap; }
-    .repo-multi-mode .repo-select-info { display:block; }
     .repo-crumb-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:-4px 0 14px; min-height:22px; }
-    html[data-theme="dark"] .repo-select-info { color:#F5F5F7; }
-    @media (max-width:350px) {  }
 
     .repo-live-item.selected { transform:scale(.965); }
     .repo-live-select-mark {
@@ -192,14 +179,6 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .gallery-multi-mode .gallery-tile .select-mark { display: flex; }
     .gallery-tile.selected .select-mark { background: #111111; color: #FFFFFF; border-color: #111111; }
     .gallery-multi-mode .gallery-tile .tile-del { display: none; }
-
-    .gallery-select-bar {
-        display: none; align-items: center; justify-content: space-between; gap: 10px;
-        margin: -2px 0 14px; padding: 10px 12px; border-radius: 16px;
-        background: #F3F3F3; border: 1px solid #E4E4E4;
-    }
-    .gallery-multi-mode .gallery-select-bar { display: flex; }
-    .gallery-select-info { font-size: 12px; font-weight: 700; color: #222; white-space: nowrap; }
 
     .small-btn.black { background: #111111; color: #FFFFFF; border-color: #111111; }
 
@@ -445,11 +424,6 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
             box-shadow:0 4px 10px rgba(0,0,0,.14);
         }
         .repo-live-name, .repo-live-sub, .repo-live-empty { color:#98989F; }
-        .repo-select-bar {
-            background:#2C2C2E;
-            border-color:#48484A;
-        }
-        .repo-select-info { color:#F5F5F7; }
         .repo-live-select-mark {
             background:rgba(44,44,46,.90);
             color:#F5F5F7;
@@ -481,11 +455,6 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
             border-color: #F5F5F7;
         }
 
-        .gallery-select-bar {
-            background: #2C2C2E;
-            border-color: #48484A;
-        }
-        .gallery-select-info { color: #F5F5F7; }
         .small-btn.black {
             background: #F5F5F7;
             color: #111113;
@@ -543,7 +512,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
             color: #F5F5F7 !important;
             border-color: #38383A !important;
         }
-        .title, .label, .result-name, .gallery-select-info {
+        .title, .label, .result-name {
             color: #F5F5F7 !important;
         }
         .sub, .result-status, .filter-btn:not(.active) {
@@ -568,7 +537,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
             color: #111113 !important;
             border-color: #F5F5F7 !important;
         }
-        .filter-group, .gallery-select-bar {
+        .filter-group {
             background: #2C2C2E !important;
             border-color: #48484A !important;
         }
@@ -630,9 +599,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
         background:#F5F5F7 !important;
         color:#111113 !important;
     }
-    html[data-theme="dark"] .filter-group,
-    html[data-theme="dark"] .gallery-select-bar,
-    html[data-theme="dark"] .repo-select-bar {
+    html[data-theme="dark"] .filter-group {
         background:#2C2C2E !important;
         border-color:#48484A !important;
     }
@@ -755,15 +722,6 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .gallery-tile .repo-live-name { font-size:12px; color:#6A6A6F; }
     html[data-theme="dark"] .gallery-tile .tile-name,
     html[data-theme="dark"] .gallery-tile .repo-live-name { color:#B4B4BA !important; }
-
-    /* 多选操作栏吸顶：图多时不用滑回顶部才能点删除 */
-    .gallery-multi-mode .gallery-select-bar,
-    .repo-multi-mode .repo-select-bar {
-        position:sticky; top:50px; z-index:950;
-        box-shadow:0 6px 18px rgba(0,0,0,.08);
-    }
-    html[data-theme="dark"] .gallery-multi-mode .gallery-select-bar,
-    html[data-theme="dark"] .repo-multi-mode .repo-select-bar { box-shadow:0 6px 18px rgba(0,0,0,.35); }
 
     /* ===== 顶部 / 底部雾化渐变 ===== */
     :root { --fog: 247,247,249; }
@@ -1056,14 +1014,14 @@ html[data-theme="dark"] .sk {
     .sel-dock {
         display: none; position: fixed; z-index: 1000;
         left: 0; right: 0; margin: 0 auto; width: max-content; max-width: calc(100% - 28px);
-        bottom: calc(env(safe-area-inset-bottom) + 14px);
+        bottom: calc(env(safe-area-inset-bottom) + 11px);
         align-items: center; justify-content: center; gap: 5px; padding: 6px; border-radius: 30px;
         background: rgba(243,243,246,.74); color: #111;
         -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%);
         box-shadow: 0 10px 32px rgba(0,0,0,.14), 0 1px 3px rgba(0,0,0,.06), inset 0 0 0 .5px rgba(255,255,255,.85);
     }
     body.gallery-multi-mode:has(#page-gallery.active[data-seg="library"]) #gallery-select-bar,
-    body.repo-multi-mode:has(#page-gallery.active[data-seg="repo"]) #repo-select-bar { display: flex; animation: dock-in .28s cubic-bezier(.22,.9,.3,1.05); }
+    body.repo-multi-mode:has(#page-gallery.active[data-seg="repo"]) #repo-select-bar { display: grid; animation: dock-in .28s cubic-bezier(.22,.9,.3,1.05); }
     @keyframes dock-in { from { opacity: 0; transform: translateY(26px) scale(.96); } to { opacity: 1; transform: none; } }
     .sel-dock .dk-close { flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: #8E8E93; display: grid; place-items: center; cursor: pointer; padding: 0; transition: background .15s, transform .15s; }
     .sel-dock .dk-close svg { width: 19px; height: 19px; }
@@ -1269,7 +1227,6 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 .about-t { font-size: 16px; font-weight: 600; line-height: 22px; color: var(--text-main); }
 .about-d { margin-top: 4px; font-size: 13.5px; line-height: 20px; color: #8E8E93; }
 .about-d b { font-weight: 600; color: var(--text-main); }
-.about-sub { display: block; margin-top: 2px; font-size: 12.5px; line-height: 17px; font-weight: 400; letter-spacing: 0; color: #8E8E93; }
 
 /* ===== v1.9：标签 / 收藏 / 滚动 / 性能 ===== */
 .gallery-tile .tile-fav { position:absolute; z-index:3; top:7px; left:7px; width:20px; height:20px; border-radius:50%; background:rgba(17,17,17,.55); color:#FFD60A; font-size:12px; line-height:20px; text-align:center; pointer-events:none; }
@@ -1282,6 +1239,18 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 /* 多选时每个格子一个毛玻璃层会很吃力：改成实色底，肉眼几乎看不出区别 */
 .gallery-tile .select-mark { -webkit-backdrop-filter:none; backdrop-filter:none; }
 @media (max-width: 360px) { .sel-dock .dk-close, .sel-dock .dk-btn { width:34px; height:34px; } .sel-dock .dk-btn svg { width:20px; height:20px; } }
+/* 多选悬浮坞：左列「数字在上、叉在下」，右侧 2×4 功能键。
+   所有格子在同一个网格里、行高固定，数字 / 叉和两排按钮严格上下对齐 */
+.sel-dock { --dk: 48px; --gx: 18px; --gy: 2px;
+    grid-template-columns: auto repeat(4, var(--dk)); grid-template-rows: var(--dk) var(--dk);
+    column-gap: var(--gx); row-gap: var(--gy); padding: 7px 20px; border-radius: 34px; align-items: center; justify-items: center; justify-content: center; }
+.sel-dock .dk-actions { display: contents; }
+.sel-dock .dk-info { grid-column: 1; grid-row: 1; padding: 0; min-width: 0; height: var(--dk); }
+.sel-dock .dk-close { grid-column: 1; grid-row: 2; }
+.sel-dock .dk-close, .sel-dock .dk-btn { width: var(--dk); height: var(--dk); }
+.sel-dock .dk-btn svg { width: 24px; height: 24px; }
+@media (max-width: 430px) { .sel-dock { --dk: 46px; --gx: 14px; padding: 7px 16px; } }
+@media (max-width: 360px) { .sel-dock { --dk: 40px; --gx: 10px; padding: 6px 12px; } .sel-dock .dk-btn svg { width: 21px; height: 21px; } }
 
 /* 备份与更新页：行首图标（和主界面一致） */
 #page-update .pref-card { padding-left: 16px; gap: 14px; }
@@ -1811,6 +1780,19 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
     </div>
 </div>
 
+<!-- 标签与收藏：底部磨砂面板（和「存到文件」同款） -->
+<div class="delete-sheet-backdrop" id="tag-sheet-backdrop" onclick="if(event.target===this) closeTagSheet()">
+    <div class="save-sheet" role="dialog" aria-modal="true" aria-labelledby="tag-sheet-title">
+        <div class="save-grab"></div>
+        <div class="save-head">
+            <div class="save-title" id="tag-sheet-title">标签与收藏</div>
+            <div class="save-sub" id="tag-sheet-sub"></div>
+        </div>
+        <div class="save-opts" id="tag-sheet-opts"></div>
+        <button type="button" class="save-cancel" onclick="closeTagSheet()">取消</button>
+    </div>
+</div>
+
 <!-- 多选删除确认层 -->
 <div class="delete-sheet-backdrop" id="delete-sheet-backdrop" onclick="handleDeleteBackdropClick(event)">
     <div class="delete-sheet">
@@ -2250,6 +2232,7 @@ document.addEventListener('keydown', e => {
     if (open('upload-error-modal')) { e._kbEsc = true; return closeUploadErrorModal(); }
     if (open('repo-sheet-backdrop')) { e._kbEsc = true; return closeRepoSheet(); }
     if (open('move-sheet-backdrop')) { e._kbEsc = true; return closeMoveSheet(); }
+    if (open('tag-sheet-backdrop')) { e._kbEsc = true; return closeTagSheet(); }
     if (open('save-sheet-backdrop')) { e._kbEsc = true; return closeSaveSheet(); }
     if (open('delete-sheet-backdrop')) { e._kbEsc = true; closeDeleteSheet(); }
 });
@@ -3844,6 +3827,8 @@ async function confirmDeleteSelected() {
             if (percent) percent.textContent = '35%';
             try {
                 const fails = await deleteRepoFiles(files);
+                const failedKeys = new Set(fails.map(f => uploadKey(f.owner, f.repo, f.path)));
+                pruneRepoMeta(files.filter(f => !failedKeys.has(uploadKey(f.owner, f.repo, f.path))));
                 fails.forEach(f => {
                     deleteFailures.push({ name: f.name, message: f.message });
                     files.filter(x => x.path === f.path && x.owner === f.owner && x.repo === f.repo && x.branch === f.branch).forEach(x => (idsByKey.get(x.key) || []).forEach(id => keepIds.add(id)));
@@ -4917,7 +4902,7 @@ function renderRepoLiveFiles() {
         item.appendChild(preview);
         const name = document.createElement('div');
         name.className = 'repo-live-name tile-name';
-        name.textContent = repoSearch ? file.path : file.name; // 搜索结果带上文件夹路径，方便区分同名文件
+        name.textContent = (repoSearch || repoFilter === 'fav' || repoTag) ? file.path : file.name; // 搜索结果带上文件夹路径，方便区分同名文件
         item.appendChild(name);
         const ts = uploadRank.get(uploadKey(file.owner, file.repo, file.path));
         const meta = makeTileMeta([formatBytes(file.size), ts ? formatDate(ts).slice(5) : ''].filter(Boolean).join(' · '));
@@ -7756,7 +7741,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '2.9.7';
+const APP_VERSION = '3.0.2';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -7856,21 +7841,58 @@ function openTagFilterMenu(btn) {
     if (galleryTag) items.unshift({ label: '清除标签筛选', onClick: () => setGalleryTag('') });
     if (items.length) openMoreMenu(btn, items);
 }
+/* ---------- 标签与收藏：底部磨砂面板 ---------- */
+function openTagSheet(title, sub, items) {
+    $('tag-sheet-title').textContent = title;
+    $('tag-sheet-sub').textContent = sub || '';
+    const box = $('tag-sheet-opts');
+    box.innerHTML = '';
+    items.forEach(it => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'save-opt';
+        const ico = document.createElement('span');
+        ico.className = 'save-ico';
+        ico.innerHTML = it.icon || '';
+        const txt = document.createElement('span');
+        txt.className = 'save-txt';
+        const t = document.createElement('b');
+        t.textContent = it.label;
+        txt.appendChild(t);
+        if (it.desc) { const d = document.createElement('span'); d.textContent = it.desc; txt.appendChild(d); }
+        b.appendChild(ico);
+        b.appendChild(txt);
+        b.onclick = () => { if (!it.keepOpen) closeTagSheet(); it.onClick(); };
+        box.appendChild(b);
+    });
+    $('tag-sheet-backdrop').classList.add('show');
+}
+function closeTagSheet() {
+    const el = $('tag-sheet-backdrop');
+    if (el) el.classList.remove('show');
+}
+function showTagActionSheet(n, allFav, tagSet, handlers) {
+    const items = [
+        { label: allFav ? '取消收藏' : '收藏', desc: allFav ? '把所选项目移出收藏' : '加星标，之后可按「收藏」筛选', icon: ICON_STAR, onClick: handlers.fav },
+        { label: '添加标签…', desc: '给所选项目加上标签，方便分类查找', icon: ICON_TAG, onClick: handlers.add }
+    ];
+    if (tagSet.size) items.push({
+        label: '移除标签…', desc: '所选项目里共有 ' + tagSet.size + ' 个标签', icon: ICON_TAG, keepOpen: true,
+        onClick: () => openTagSheet('移除标签', '已选 ' + n + ' 项 · 点一个标签移除',
+            Array.from(tagSet).slice(0, 12).map(x => ({ label: '#' + x, desc: '从所选项目中移除', icon: ICON_TAG, onClick: () => handlers.remove(x) })))
+    });
+    openTagSheet('标签与收藏', '已选 ' + n + ' 项', items);
+}
 function openTagActionMenu(btn) {
     const sel = selectedGalleryEntries();
     if (!sel.length) return toast('先选择项目', 'info');
-    const allFav = sel.every(e => e.fav);
     const tagSet = new Set();
     sel.forEach(e => entryTags(e).forEach(x => tagSet.add(x)));
-    const items = [
-        { label: allFav ? '取消收藏' : '收藏', icon: ICON_STAR, onClick: () => setFavSelected(!allFav) },
-        { label: '添加标签…', icon: ICON_TAG, onClick: addTagsToSelected }
-    ];
-    if (tagSet.size) items.push({ label: '移除标签…', icon: ICON_TAG, onClick: () => openRemoveTagMenu(btn, Array.from(tagSet).slice(0, 12)) });
-    openMoreMenu(btn, items, { up: true });
-}
-function openRemoveTagMenu(btn, tags) {
-    openMoreMenu(btn, tags.map(x => ({ label: '移除 #' + x, onClick: () => removeTagFromSelected(x) })), { up: true });
+    showTagActionSheet(sel.length, sel.every(e => e.fav), tagSet, {
+        fav: () => setFavSelected(!sel.every(e => e.fav)),
+        add: addTagsToSelected,
+        remove: removeTagFromSelected
+    });
 }
 function setFavSelected(on) {
     const sel = selectedGalleryEntries();
@@ -7944,18 +7966,13 @@ function openRepoTagFilterMenu(btn) {
 function openRepoTagActionMenu(btn) {
     const sel = selectedRepoFiles();
     if (!sel.length) return toast('先选择项目', 'info');
-    const allFav = sel.every(repoMetaIsFav);
     const tagSet = new Set();
     sel.forEach(f => repoMetaTags(f).forEach(x => tagSet.add(x)));
-    const items = [
-        { label: allFav ? '取消收藏' : '收藏', icon: ICON_STAR, onClick: () => setRepoFavSelected(!allFav) },
-        { label: '添加标签…', icon: ICON_TAG, onClick: addTagsToRepoSelected }
-    ];
-    if (tagSet.size) items.push({ label: '移除标签…', icon: ICON_TAG, onClick: () => openRepoRemoveTagMenu(btn, Array.from(tagSet).slice(0, 12)) });
-    openMoreMenu(btn, items, { up: true });
-}
-function openRepoRemoveTagMenu(btn, tags) {
-    openMoreMenu(btn, tags.map(x => ({ label: '移除 #' + x, onClick: () => removeTagFromRepoSelected(x) })), { up: true });
+    showTagActionSheet(sel.length, sel.every(repoMetaIsFav), tagSet, {
+        fav: () => setRepoFavSelected(!sel.every(repoMetaIsFav)),
+        add: addTagsToRepoSelected,
+        remove: removeTagFromRepoSelected
+    });
 }
 function setRepoFavSelected(on) {
     const sel = selectedRepoFiles();
@@ -8211,7 +8228,7 @@ async function askDecryptBackup(env) {
     return null;
 }
 
-const BACKUP_KEYS_EXTRA = ['kb_gallery_sort', 'kb_repo_sort', 'kb_gallery_seg', 'kb_storage_sort'];
+const BACKUP_KEYS_EXTRA = ['kb_gallery_sort', 'kb_repo_sort', 'kb_gallery_seg', 'kb_storage_sort', 'kb_repo_meta'];
 async function exportBackup() {
     const go = await showConfirm({
         title: '导出备份（含 Token）',

@@ -1265,6 +1265,11 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 #page-update .pref-val { flex: none; font-size: 15px; letter-spacing: -.1px; color: #8E8E93; }
 #page-update .pref-val.new { color: var(--text-main); font-weight: 600; }
 .plug-note { margin: 14px 6px 0; line-height: 19px; }
+/* v3.0.3：仓库文件「未入库」角标 + 定位后的高亮闪烁 */
+.repo-live-item .tile-lib { position:absolute; z-index:3; top:7px; right:7px; padding:2px 7px; border-radius:999px; font-size:10px; font-weight:700; line-height:14px; color:#fff; background:rgba(120,120,128,.92); pointer-events:none; }
+.repo-multi-mode .repo-live-item .tile-lib { display:none; }
+@keyframes locFlash { 0%,100% { box-shadow: 0 0 0 0 rgba(10,132,255,0); } 20%,70% { box-shadow: 0 0 0 4px rgba(10,132,255,.6); } }
+.gallery-tile.loc-flash { animation: locFlash 2.2s ease-out 1; border-radius: 14px; }
 
 </style>
 <style id="swipe-fix">
@@ -1493,6 +1498,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
                     <button class="filter-btn" data-rf="file" onclick="setRepoFilter('file')">其他</button>
                     <button class="filter-btn" id="repo-fav-chip" data-rf="fav" onclick="setRepoFilter('fav')" hidden>收藏</button>
                     <button class="filter-btn" id="repo-tag-chip" onclick="openRepoTagFilterMenu(this)" hidden>标签</button>
+                    <button class="filter-btn" id="repo-unlinked-chip" onclick="toggleRepoUnlinked()" hidden>未入库</button>
                 </div>
             </div>
             <div id="repo-live-container"></div>
@@ -1622,6 +1628,10 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
                 <span class="pref-text">自动检测失效链接</span>
                 <input type="checkbox" class="switch" id="pref-linkcheck" onchange="savePrefs()">
             </label>
+            <label class="pref-card">
+                <span class="pref-text">同步标签到仓库</span>
+                <input type="checkbox" class="switch" id="pref-metasync" onchange="savePrefs(); onMetaSyncPrefChange()">
+            </label>
         </div>
         <div class="pref-group">
             <label class="pref-card">
@@ -1652,7 +1662,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div class="about-cap">这是什么</div>
             <div class="about-box">
             <div class="about-item"><div class="about-t">Direct Link</div><div class="about-d">把图片、字体、ZIP 上传到你自己的 GitHub 仓库，并自动生成可直接使用的直链。文件存在你自己的仓库里，不经过第三方服务器。</div></div>
-            <div class="about-item"><div class="about-t">数据只存在本机</div><div class="about-d">GitHub Token、仓库设置、偏好和上传记录都只保存在这台设备的浏览器里。清除网站数据、删除主屏幕 App 或换设备后，需要重新填写 Token 并设置偏好。</div></div>
+            <div class="about-item"><div class="about-t">数据只存在本机</div><div class="about-d">GitHub Token、仓库设置、偏好和上传记录都只保存在这台设备的浏览器里。清除网站数据、删除主屏幕 App 或换设备后，需要重新填写 Token 并设置偏好。仓库文件的收藏和标签可以同步到仓库里，见「同步标签到仓库」。</div></div>
             <div class="about-item"><div class="about-t">离线使用</div><div class="about-d" id="about-offline-status">检查中…</div></div>
             </div>
         </div>
@@ -1683,6 +1693,15 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div class="about-item"><div class="about-t">文件名 / 文件夹</div><div class="about-d">文件名：原名保持原文件名；随机会生成一串随机字符，避免重名和暴露原名。文件夹：不分是全部放在同一层；按月会按上传月份归档，例如 2026-10。这两项只作用于图片。</div></div>
             <div class="about-item"><div class="about-t">复制格式 / 自动复制</div><div class="about-d">复制格式可选直链、Markdown、HTML。开启「上传后自动复制」后，上传成功会自动按所选格式复制到剪贴板。</div></div>
             <div class="about-item"><div class="about-t">上传后跳到资源库</div><div class="about-d">只有全部文件都上传成功才会跳转；有失败时会留在当前页，方便查看失败原因并重试。</div></div>
+            <div class="about-item"><div class="about-t">同步标签到仓库</div><div class="about-d">开启后，仓库文件的收藏和标签会在修改几秒后自动保存到仓库里的 <b>.directlink/meta.json</b>，换手机或浏览器后打开仓库页就能看到同样的标签，不用靠备份。每次同步会在仓库里多一条提交记录；这个文件不会出现在文件列表里，也不影响直链。两台设备同时改过时，标签取并集，所以在别处刚删掉的标签可能被带回来。仓库页「…」菜单里可以手动「同步标签与收藏」。关闭后只存在这台设备上。</div></div>
+            </div>
+        </div>
+        <div class="about-sec">
+            <div class="about-cap">资源库与仓库</div>
+            <div class="about-box">
+            <div class="about-item"><div class="about-t">按标签全选</div><div class="about-d">先点「标签」选一个标签，再点一次「标签」，菜单第一项就是「全选此标签」。会选中当前筛选下看得到的全部项目，之后可以直接批量移动、下载、删除。仓库页的标签筛选会跨文件夹，整个仓库里带这个标签的文件都会被选中。</div></div>
+            <div class="about-item"><div class="about-t">在仓库里定位</div><div class="about-d">在资源库里只选中一张图，点「标签」按钮，面板里有「在仓库里定位」，会切到仓库页、进入它所在的文件夹并高亮。只能定位当前仓库里的文件。</div></div>
+            <div class="about-item"><div class="about-t">未入库</div><div class="about-d">仓库页的「未入库」表示这台设备的资源库里没有这个文件的记录，比如在别处上传的，或者换了设备。它不影响文件本身和直链。点筛选栏的「未入库」可以只看这些文件；在仓库页只选中一个文件，面板里可以跳到它在资源库里的记录。资源库是空的时不显示这个标记。</div></div>
             </div>
         </div>
         <div class="about-sec">
@@ -3166,6 +3185,7 @@ function openRepoMenu(btn) {
         { label: '排序', icon: ICON_SORT, onClick: () => openRepoSortMenu(btn) },
         { label: '新建文件夹', icon: ICON_FOLDER_PLUS, onClick: createRepoFolder },
         { label: '复制格式：' + COPY_FORMATS[prefCopyFormat()], icon: ICON_COPY, onClick: cycleCopyFormat },
+        ...(prefMetaSync() ? [{ label: '同步标签与收藏', icon: ICON_REFRESH, onClick: () => syncRepoMetaNow() }] : []),
         { label: '刷新', icon: ICON_REFRESH, onClick: () => loadRepoLiveFiles(true) }
     ]);
 }
@@ -3190,6 +3210,7 @@ function savePrefs() {
         localStorage.setItem(PREF_AUTOCOPY_KEY, $('pref-autocopy').checked ? '1' : '0');
         localStorage.setItem(PREF_CLIPWATCH_KEY, $('pref-clipwatch').checked ? '1' : '0');
         localStorage.setItem(PREF_LINKCHECK_KEY, $('pref-linkcheck').checked ? '1' : '0');
+        localStorage.setItem(PREF_METASYNC_KEY, $('pref-metasync').checked ? '1' : '0');
     } catch (_) {}
     applyKeepModes(false); // 开关一改立即生效，不分页面、不分是否在上传
 }
@@ -3931,6 +3952,8 @@ let repoSearchTimer = null;
 // ---- 仓库文件的收藏 / 标签（与资源库功能一致；存在本机，按 账号/仓库/路径 记录）----
 const REPO_META_KEY = 'kb_repo_meta';
 let repoTag = '';
+let repoOnlyUnlinked = false; // 只看资源库里没有记录的文件
+let libIdxCache = null;      // 资源库 ↔ 仓库对照表的缓存
 let repoMetaCache = null;
 function loadRepoMeta() {
     if (repoMetaCache) return repoMetaCache;
@@ -3939,8 +3962,9 @@ function loadRepoMeta() {
     repoMetaCache = (o && typeof o === 'object' && !Array.isArray(o)) ? o : {};
     return repoMetaCache;
 }
-function saveRepoMeta() {
+function saveRepoMeta(opts) {
     try { localStorage.setItem(REPO_META_KEY, JSON.stringify(loadRepoMeta())); } catch (_) { toast('保存失败，存储空间可能不足'); }
+    if (!(opts && opts.noSync)) metaSyncMarkDirty(opts);   // 本机改动 → 稍后同步到仓库
 }
 function repoMetaOf(f) { return f ? (loadRepoMeta()[uploadKey(f.owner, f.repo, f.path)] || null) : null; }
 function repoMetaTags(f) { const m = repoMetaOf(f); return m && Array.isArray(m.tags) ? m.tags : []; }
@@ -3957,14 +3981,184 @@ function moveRepoMeta(owner, repo, from, to) {
     if (all[a] === undefined) return;
     all[uploadKey(owner, repo, to)] = all[a];
     delete all[a];
-    saveRepoMeta();
+    saveRepoMeta({ owner, repo });
 }
 function pruneRepoMeta(files) {
     const all = loadRepoMeta();
     let changed = false;
     files.forEach(f => { const k = uploadKey(f.owner, f.repo, f.path); if (k in all) { delete all[k]; changed = true; } });
-    if (changed) saveRepoMeta();
+    if (changed) saveRepoMeta(files[0] ? { owner: files[0].owner, repo: files[0].repo } : undefined);
 }
+
+/* ---- 仓库文件的收藏 / 标签同步到仓库（.directlink/meta.json），多设备共用 ---- */
+const PREF_METASYNC_KEY = 'kb_pref_metasync';
+const META_SYNC_STATE_KEY = 'kb_repo_meta_sync';        // 每个仓库：上次同步到的远端版本 t、本机是否有未同步的改动
+const META_SYNC_FORCE_KEY = 'kb_repo_meta_sync_force';  // 导入备份后置 1：下次同步一定按「合并」处理，避免备份里的标签被远端盖掉
+const META_SYNC_PATH = '.directlink/meta.json';
+let repoMetaCtx = null;          // { owner, repo, branch, complete }：当前文件列表属于哪个仓库
+let metaSyncTimer = null, metaSyncBusy = false, metaSyncRerun = false, metaSyncSeq = 0, metaSyncPending = false;
+let metaSyncWarned = false, metaSyncLastErr = '';
+function prefMetaSync() { return lsGet(PREF_METASYNC_KEY) !== '0'; }   // 默认开启
+function metaSyncRepoKey(owner, repo) { return String(owner || '').toLowerCase() + '/' + String(repo || '').toLowerCase(); }
+function metaSyncState() {
+    let o = null;
+    try { o = JSON.parse(localStorage.getItem(META_SYNC_STATE_KEY) || 'null'); } catch (_) {}
+    return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {};
+}
+function metaSyncSetState(k, patch) {
+    const all = metaSyncState();
+    all[k] = Object.assign({}, all[k] || {}, patch);
+    try { localStorage.setItem(META_SYNC_STATE_KEY, JSON.stringify(all)); } catch (_) {}
+}
+function metaSyncMarkDirty(opts) {
+    if (!prefMetaSync()) return;
+    const c = repoMetaCtx;
+    const owner = (opts && opts.owner) || (c && c.owner), repo = (opts && opts.repo) || (c && c.repo);
+    if (!owner || !repo) return;
+    metaSyncSeq++;
+    metaSyncSetState(metaSyncRepoKey(owner, repo), { dirty: true });
+    if (c && metaSyncRepoKey(c.owner, c.repo) === metaSyncRepoKey(owner, repo)) {
+        metaSyncPending = true;
+        clearTimeout(metaSyncTimer);
+        metaSyncTimer = setTimeout(() => syncRepoMeta(false), 2500);
+    }
+}
+function metaNorm(m) {
+    if (!m || typeof m !== 'object') return null;
+    const fav = !!m.fav;
+    const tags = Array.from(new Set((Array.isArray(m.tags) ? m.tags : []).map(x => String(x).trim().slice(0, 20)).filter(Boolean))).slice(0, 20);
+    if (!fav && !tags.length) return null;
+    const o = {};
+    if (fav) o.fav = true;
+    if (tags.length) o.tags = tags;
+    return o;
+}
+function metaSig(m) { return (m && m.fav ? '1' : '0') + '|' + ((m && m.tags) || []).slice().sort().join('\u0001'); }
+function metaSigAll(files) { return Object.keys(files).sort().map(p => p + '\u0002' + metaSig(files[p])).join('\u0003'); }
+function metaLocalEntries(owner, repo) {
+    const prefix = uploadKey(owner, repo, ''), all = loadRepoMeta(), out = {};
+    Object.keys(all).forEach(k => { if (k.startsWith(prefix)) { const n = metaNorm(all[k]); if (n) out[k.slice(prefix.length)] = n; } });
+    return out;
+}
+function metaUnion(a, b) {
+    const out = {};
+    new Set(Object.keys(a).concat(Object.keys(b))).forEach(p => {
+        const x = a[p] || {}, y = b[p] || {};
+        const n = metaNorm({ fav: !!(x.fav || y.fav), tags: (x.tags || []).concat(y.tags || []) });
+        if (n) out[p] = n;
+    });
+    return out;
+}
+function metaApplyLocal(owner, repo, files) {
+    const all = loadRepoMeta(), prefix = uploadKey(owner, repo, '');
+    let changed = false;
+    Object.keys(all).forEach(k => { if (k.startsWith(prefix) && !files[k.slice(prefix.length)]) { delete all[k]; changed = true; } });
+    Object.keys(files).forEach(p => { const k = prefix + p; if (metaSig(all[k]) !== metaSig(files[p])) { all[k] = files[p]; changed = true; } });
+    if (changed) saveRepoMeta({ noSync: true });
+    return changed;
+}
+function metaB64Decode(b64) {
+    const bin = atob(String(b64 || '').replace(/\s/g, ''));
+    const u = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(u);
+}
+function metaB64Encode(str) {
+    const u = new TextEncoder().encode(str);
+    let bin = '';
+    for (let i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+    return btoa(bin);
+}
+function metaContentsPath(c) { return '/repos/' + c.owner + '/' + c.repo + '/contents/' + META_SYNC_PATH.split('/').map(encodeURIComponent).join('/'); }
+async function metaRemoteRead(c, s) {
+    let r;
+    try { r = await githubRequest(metaContentsPath(c) + '?ref=' + encodeURIComponent(c.branch), { method: 'GET' }, s.token, s.proxy); }
+    catch (e) { if (e && e.status === 404) return null; throw e; }
+    let text = '';
+    if (r && r.content) text = metaB64Decode(r.content);
+    else if (r && r.sha) { const b = await githubRequest('/repos/' + c.owner + '/' + c.repo + '/git/blobs/' + r.sha, { method: 'GET' }, s.token, s.proxy); text = metaB64Decode(b.content); }
+    let data = null;
+    try { data = JSON.parse(text); } catch (_) {}
+    const files = {};
+    if (data && data.files && typeof data.files === 'object') Object.keys(data.files).forEach(p => { const n = metaNorm(data.files[p]); if (n) files[p] = n; });
+    return { sha: r && r.sha, t: Number(data && data.t) || 0, files };
+}
+async function metaRemoteWrite(c, s, files, t, sha) {
+    const lines = Object.keys(files).sort().map(p => '  ' + JSON.stringify(p) + ': ' + JSON.stringify(files[p]));
+    const text = '{\n "app": "direct-link",\n "kind": "repo-meta",\n "v": 1,\n "t": ' + t + ',\n "files": {\n' + lines.join(',\n') + (lines.length ? '\n' : '') + ' }\n}\n';
+    const payload = { message: '同步标签与收藏', content: metaB64Encode(text), branch: c.branch };
+    if (sha) payload.sha = sha;
+    await githubRequest(metaContentsPath(c), { method: 'PUT', body: JSON.stringify(payload) }, s.token, s.proxy);
+}
+// 返回 'ok' | 'err' | 'skip' | 'busy'
+async function syncRepoMeta(manual) {
+    metaSyncPending = false;
+    if (!prefMetaSync()) return 'skip';
+    const c = repoMetaCtx;
+    if (!c || !c.owner || !c.repo) return 'skip';
+    const s = getSettings();
+    if (!s.token) return 'skip';
+    if (metaSyncBusy) { metaSyncRerun = true; return 'busy'; }
+    metaSyncBusy = true;
+    clearTimeout(metaSyncTimer);
+    const rk = metaSyncRepoKey(c.owner, c.repo);
+    const seq0 = metaSyncSeq;
+    let result = 'ok';
+    try {
+        const remote = await metaRemoteRead(c, s);
+        if (repoMetaCtx !== c) return 'skip';                                   // 期间换了仓库
+        if (metaSyncSeq !== seq0) { metaSyncRerun = true; return 'busy'; }     // 读取期间本机又改了：稍后再来一轮
+        const st = metaSyncState()[rk] || {};
+        const local = metaLocalEntries(c.owner, c.repo);
+        const forced = lsGet(META_SYNC_FORCE_KEY) === '1';
+        const dirty = !!st.dirty || forced || (st.t === undefined && Object.keys(local).length > 0);
+        const exist = c.complete ? new Set(repoLiveFiles.map(f => f.path)) : null;
+        const prune = files => { if (!exist) return files; const o = {}; Object.keys(files).forEach(p => { if (exist.has(p)) o[p] = files[p]; }); return o; };
+        let merged, needPush = false;
+        if (!remote) {
+            merged = prune(local);
+            needPush = Object.keys(merged).length > 0;
+        } else if (dirty) {
+            const sameBase = !forced && st.t !== undefined && remote.t === st.t;   // 远端自上次同步后没人动过：以本机为准（删除才能传上去）
+            merged = prune(sameBase ? local : metaUnion(remote.files, local));    // 别处也改过：取并集，不丢任何一边
+            needPush = metaSigAll(merged) !== metaSigAll(remote.files);
+        } else {
+            merged = prune(remote.files);                                          // 本机没有未同步的改动：直接用远端的
+        }
+        const changedLocal = metaApplyLocal(c.owner, c.repo, merged);
+        let newT = remote ? remote.t : 0;
+        if (needPush) { newT = Date.now(); await metaRemoteWrite(c, s, merged, newT, remote && remote.sha); }
+        metaSyncSetState(rk, { dirty: metaSyncSeq !== seq0, t: newT });
+        if (forced) lsSet(META_SYNC_FORCE_KEY, '0');
+        if (changedLocal && repoMetaCtx === c) renderRepoLiveFiles();
+        metaSyncLastErr = '';
+    } catch (e) {
+        result = 'err';
+        metaSyncLastErr = (e && e.message) || '未知错误';
+        console.warn('标签同步失败：', e);
+        if (!manual && !metaSyncWarned) { metaSyncWarned = true; toast('标签暂时没同步上，之后会自动重试', 'info'); }
+    } finally {
+        metaSyncBusy = false;
+        if (metaSyncRerun) { metaSyncRerun = false; setTimeout(() => syncRepoMeta(false), 400); }
+    }
+    return result;
+}
+async function syncRepoMetaNow() {
+    if (!prefMetaSync()) return toast('同步已关闭，可以在设置里打开', 'info');
+    if (!repoMetaCtx) return toast('等仓库文件读取完再试', 'info');
+    toast('正在同步…', 'loading');
+    const r = await syncRepoMeta(true);
+    if (r === 'ok') toast('标签与收藏已同步', 'ok');
+    else if (r === 'err') toast('同步失败：' + metaSyncLastErr, 'error');
+    else hideToast();
+}
+function onMetaSyncPrefChange() {
+    if (!prefMetaSync()) { clearTimeout(metaSyncTimer); metaSyncPending = false; return; }
+    if (repoMetaCtx) { metaSyncMarkDirty(); syncRepoMeta(false); }   // 刚打开：把本机已有的标签也合并上去
+}
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && metaSyncPending) { clearTimeout(metaSyncTimer); syncRepoMeta(false); }
+});
 function onRepoSearchInput() {
     const cur = (($('repo-search') && $('repo-search').value) || '');
     const pill = $('repo-searchpill');
@@ -4277,9 +4471,11 @@ function setRepoFilter(f) {
 
 function getRepoVisibleList() {
     const prefix = repoCurrentPath ? repoCurrentPath + '/' : '';
-    const globalView = repoFilter === 'fav' || !!repoTag; // 收藏 / 标签筛选：跨文件夹，在整个仓库里找
+    const globalView = repoFilter === 'fav' || !!repoTag || repoOnlyUnlinked; // 收藏 / 标签 / 未入库筛选：跨文件夹，在整个仓库里找
+    const libIdx = repoOnlyUnlinked ? libraryIndex() : null;
     const list = repoLiveFiles.filter(f => {
         if (f.name === '.gitkeep') return false;
+        if (libIdx && libIdx.has(uploadKey(f.owner, f.repo, f.path))) return false;
         if (repoFilter === 'fav') { if (!repoMetaIsFav(f)) return false; }
         else if (repoFilter !== 'all' && f.type !== repoFilter) return false;
         if (repoTag && !repoMetaTags(f).includes(repoTag)) return false;
@@ -4698,6 +4894,7 @@ async function loadRepoLiveFiles(force = false) {
     if (!container || !status) return;
     if (!s.token) {
         repoLoadSeq++; repoLiveLoading = false; if (btn) btn.disabled = false;   // 让还在路上的旧读取作废，否则它回来会把旧账号的文件列表盖上来
+        repoMetaCtx = null;
         repoLiveFiles = [];
         repoLiveLoaded = false;
         repoMultiMode = false;
@@ -4710,6 +4907,7 @@ async function loadRepoLiveFiles(force = false) {
     }
     if (!s.repo) {
         repoLoadSeq++; repoLiveLoading = false; if (btn) btn.disabled = false;
+        repoMetaCtx = null;
         repoLiveFiles = [];
         repoLiveLoaded = false;
         repoMultiMode = false;
@@ -4731,7 +4929,7 @@ async function loadRepoLiveFiles(force = false) {
         const tree = await fetchRepoTree(ctx.owner, s.repo, ctx.branch, s);
         if (seq !== repoLoadSeq) return; // 期间已发起更新的读取（比如换了仓库），这次结果作废
         repoLiveFiles = (tree.tree || [])
-            .filter(x => x.type === 'blob')
+            .filter(x => x.type === 'blob' && !x.path.startsWith('.directlink/'))   // 同步用的 meta 文件不显示
             .map(x => ({
                 path: x.path,
                 name: x.path.split('/').pop(),
@@ -4751,8 +4949,11 @@ async function loadRepoLiveFiles(force = false) {
         repoLiveLoadedAt = Date.now();
         renderRepoLiveFiles();
         status.textContent = (tree.truncated ? '仓库文件太多，部分目录未能读全 · ' : '实时仓库 · ') + repoLiveFiles.length + ' 个文件 · ' + ctx.owner + '/' + s.repo;
+        repoMetaCtx = { owner: ctx.owner, repo: s.repo, branch: ctx.branch, complete: !tree.truncated };
+        setTimeout(() => syncRepoMeta(false), 0);   // 不阻塞列表显示，后台对一下仓库里的标签
     } catch (e) {
         if (seq !== repoLoadSeq) return;
+        repoMetaCtx = null;
         repoLiveLoaded = false;
         repoLiveFiles = [];
         repoSelected.clear();
@@ -4772,6 +4973,7 @@ async function loadRepoLiveFiles(force = false) {
 function renderRepoLiveFiles() {
     const container = $('repo-live-container');
     if (!container) return;
+    libIdxCache = null; // 记录或文件可能刚变过，重新建一次「资源库 ↔ 仓库」对照
     if (repoLiveLoaded) {
         while (repoCurrentPath && !repoLiveFiles.some(f => f.path.startsWith(repoCurrentPath + '/'))) {
             const i = repoCurrentPath.lastIndexOf('/');
@@ -4780,17 +4982,18 @@ function renderRepoLiveFiles() {
     }
     if (repoLiveLoaded) refreshRepoTagChips();
     renderRepoBreadcrumb();
-    const folders = (repoSearch || repoFilter === 'fav' || repoTag) ? [] : getRepoSubfolders();
+    const folders = (repoSearch || repoFilter === 'fav' || repoTag || repoOnlyUnlinked) ? [] : getRepoSubfolders();
     const visible = getRepoVisibleList();
     container.innerHTML = '';
     updateRepoSelectionUI();
     if (!folders.length && !visible.length) {
-        container.innerHTML = '<div class="repo-live-empty">' + (repoSearch ? '没有匹配的文件' : '暂无内容') + '</div>';
+        container.innerHTML = '<div class="repo-live-empty">' + (repoSearch ? '没有匹配的文件' : (repoOnlyUnlinked ? '没有未入库的文件' : '暂无内容')) + '</div>';
         return;
     }
     const list = document.createElement('div');
     list.className = 'repo-live-list';
     const uploadRank = buildUploadRank();
+    const libIdx = libraryIndex();
 
     folders.forEach(name => {
         const folderPath = (repoCurrentPath ? repoCurrentPath + '/' : '') + name;
@@ -4876,6 +5079,7 @@ function renderRepoLiveFiles() {
         mark.textContent = repoSelected.has(file.path) ? '✓' : '';
         item.appendChild(mark);
         if (repoMetaIsFav(file)) { const st = document.createElement('div'); st.className = 'tile-fav'; st.textContent = '★'; item.appendChild(st); }
+        if (libIdx.size && !libIdx.has(uploadKey(file.owner, file.repo, file.path))) { const lb = document.createElement('div'); lb.className = 'tile-lib'; lb.textContent = '未入库'; lb.title = '这台设备的资源库里没有它的记录'; item.appendChild(lb); }
 
         const preview = document.createElement('div');
         preview.className = 'repo-live-preview icon-tile';
@@ -4902,7 +5106,7 @@ function renderRepoLiveFiles() {
         item.appendChild(preview);
         const name = document.createElement('div');
         name.className = 'repo-live-name tile-name';
-        name.textContent = (repoSearch || repoFilter === 'fav' || repoTag) ? file.path : file.name; // 搜索结果带上文件夹路径，方便区分同名文件
+        name.textContent = (repoSearch || repoFilter === 'fav' || repoTag || repoOnlyUnlinked) ? file.path : file.name; // 搜索结果带上文件夹路径，方便区分同名文件
         item.appendChild(name);
         const ts = uploadRank.get(uploadKey(file.owner, file.repo, file.path));
         const meta = makeTileMeta([formatBytes(file.size), ts ? formatDate(ts).slice(5) : ''].filter(Boolean).join(' · '));
@@ -7697,6 +7901,7 @@ function initV13Prefs() {
     $('pref-autocopy').checked = prefAutoCopy();
     $('pref-clipwatch').checked = prefClipWatch();
     $('pref-linkcheck').checked = prefLinkCheck();
+    $('pref-metasync').checked = prefMetaSync();
     refreshCopyFormatUI();
     refreshCompressUI();
     refreshUploadPrefUI();
@@ -7741,7 +7946,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '3.0.2';
+const APP_VERSION = '3.0.3';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -7838,7 +8043,10 @@ function openTagFilterMenu(btn) {
     loadHistory().forEach(e => entryTags(e).forEach(x => counts.set(x, (counts.get(x) || 0) + 1)));
     const arr = Array.from(counts.entries()).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh'));
     const items = arr.map(([x, n]) => ({ label: (x === galleryTag ? '✓ ' : '') + '#' + x + '  ' + n, onClick: () => setGalleryTag(x === galleryTag ? '' : x) }));
-    if (galleryTag) items.unshift({ label: '清除标签筛选', onClick: () => setGalleryTag('') });
+    if (galleryTag) {
+        items.unshift({ label: '清除标签筛选', onClick: () => setGalleryTag('') });
+        items.unshift({ label: '全选此标签（' + getGalleryVisibleList().length + '）', icon: ICON_SELECT, onClick: selectAllByGalleryTag });
+    }
     if (items.length) openMoreMenu(btn, items);
 }
 /* ---------- 标签与收藏：底部磨砂面板 ---------- */
@@ -7873,6 +8081,7 @@ function closeTagSheet() {
 }
 function showTagActionSheet(n, allFav, tagSet, handlers) {
     const items = [
+        ...(handlers.extra || []),
         { label: allFav ? '取消收藏' : '收藏', desc: allFav ? '把所选项目移出收藏' : '加星标，之后可按「收藏」筛选', icon: ICON_STAR, onClick: handlers.fav },
         { label: '添加标签…', desc: '给所选项目加上标签，方便分类查找', icon: ICON_TAG, onClick: handlers.add }
     ];
@@ -7881,14 +8090,18 @@ function showTagActionSheet(n, allFav, tagSet, handlers) {
         onClick: () => openTagSheet('移除标签', '已选 ' + n + ' 项 · 点一个标签移除',
             Array.from(tagSet).slice(0, 12).map(x => ({ label: '#' + x, desc: '从所选项目中移除', icon: ICON_TAG, onClick: () => handlers.remove(x) })))
     });
-    openTagSheet('标签与收藏', '已选 ' + n + ' 项', items);
+    const ttl = handlers.title ? (handlers.title.length > 24 ? handlers.title.slice(0, 23) + '…' : handlers.title) : '标签与收藏';
+    openTagSheet(ttl, '已选 ' + n + ' 项', items);
 }
 function openTagActionMenu(btn) {
     const sel = selectedGalleryEntries();
     if (!sel.length) return toast('先选择项目', 'info');
     const tagSet = new Set();
     sel.forEach(e => entryTags(e).forEach(x => tagSet.add(x)));
+    const one = sel.length === 1 ? sel[0] : null;
     showTagActionSheet(sel.length, sel.every(e => e.fav), tagSet, {
+        title: one ? (one.name || '') : '',
+        extra: one ? [{ label: '在仓库里定位', desc: '切到仓库页，找到并高亮这个文件', icon: ICON_LOCATE, onClick: () => locateInRepo(one) }] : [],
         fav: () => setFavSelected(!sel.every(e => e.fav)),
         add: addTagsToSelected,
         remove: removeTagFromSelected
@@ -7942,6 +8155,15 @@ function refreshRepoTagChips() {
         (Array.isArray(m.tags) ? m.tags : []).forEach(x => tags.add(x));
     });
     if (fc) fc.hidden = nf === 0;
+    const uc = $('repo-unlinked-chip');
+    if (uc) {
+        const idx = libraryIndex();
+        let nu = 0;
+        if (idx.size) repoLiveFiles.forEach(f => { if (f.name !== '.gitkeep' && !idx.has(uploadKey(f.owner, f.repo, f.path))) nu++; });
+        if (!nu) repoOnlyUnlinked = false;
+        uc.hidden = nu === 0;
+        uc.classList.toggle('active', repoOnlyUnlinked);
+    }
     if (repoTag && !tags.has(repoTag)) repoTag = '';
     if (tc) { tc.hidden = tags.size === 0; tc.textContent = repoTag ? '#' + repoTag : '标签'; tc.classList.toggle('active', !!repoTag); }
     if (!nf && repoFilter === 'fav') {
@@ -7960,7 +8182,10 @@ function openRepoTagFilterMenu(btn) {
     repoLiveFiles.forEach(f => repoMetaTags(f).forEach(x => counts.set(x, (counts.get(x) || 0) + 1)));
     const arr = Array.from(counts.entries()).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh'));
     const items = arr.map(([x, n]) => ({ label: (x === repoTag ? '✓ ' : '') + '#' + x + '  ' + n, onClick: () => setRepoTag(x === repoTag ? '' : x) }));
-    if (repoTag) items.unshift({ label: '清除标签筛选', onClick: () => setRepoTag('') });
+    if (repoTag) {
+        items.unshift({ label: '清除标签筛选', onClick: () => setRepoTag('') });
+        items.unshift({ label: '全选此标签（' + getRepoVisibleList().length + '）', icon: ICON_SELECT, onClick: selectAllByRepoTag });
+    }
     if (items.length) openMoreMenu(btn, items);
 }
 function openRepoTagActionMenu(btn) {
@@ -7968,7 +8193,17 @@ function openRepoTagActionMenu(btn) {
     if (!sel.length) return toast('先选择项目', 'info');
     const tagSet = new Set();
     sel.forEach(f => repoMetaTags(f).forEach(x => tagSet.add(x)));
+    const one = sel.length === 1 ? sel[0] : null;
+    let extra = [];
+    if (one) {
+        const has = libraryIndex().has(uploadKey(one.owner, one.repo, one.path));
+        extra = [has
+            ? { label: '在资源库里查看', desc: '切到资源库，找到并高亮它的记录', icon: ICON_LIBRARY, onClick: () => locateInLibrary(one) }
+            : { label: '未入库', desc: '这台设备的资源库里没有它的记录', icon: ICON_LIBRARY, onClick: () => toast('资源库里没有这个文件的记录，不影响使用', 'info') }];
+    }
     showTagActionSheet(sel.length, sel.every(repoMetaIsFav), tagSet, {
+        title: one ? one.name : '',
+        extra,
         fav: () => setRepoFavSelected(!sel.every(repoMetaIsFav)),
         add: addTagsToRepoSelected,
         remove: removeTagFromRepoSelected
@@ -7999,6 +8234,110 @@ async function addTagsToRepoSelected() {
 function removeTagFromRepoSelected(x) {
     selectedRepoFiles().forEach(f => editRepoMeta(f, m => { const left = (Array.isArray(m.tags) ? m.tags : []).filter(y => y !== x); if (left.length) m.tags = left; else delete m.tags; }));
     commitRepoMeta('已移除 #' + x);
+}
+
+/* ---------- v3.0.3：按标签全选 ---------- */
+function selectAllByGalleryTag() {
+    const list = getGalleryVisibleList();
+    if (!list.length) return toast('这个标签下没有项目', 'info');
+    if (!galleryMultiMode) enterGalleryMultiMode();
+    list.forEach(e => gallerySelected.add(e.id));
+    updateGallerySelectionUI();
+    syncGallerySelectionDom();
+    toast('已选中 ' + list.length + ' 项', 'ok');
+}
+function selectAllByRepoTag() {
+    const list = getRepoVisibleList();
+    if (!list.length) return toast('这个标签下没有文件', 'info');
+    if (!repoMultiMode) enterRepoMultiMode();
+    list.forEach(f => repoSelected.add(f.path));
+    updateRepoSelectionUI();
+    syncRepoSelectionDom();
+    toast('已选中 ' + list.length + ' 个文件', 'ok');
+}
+
+/* ---------- v3.0.3：资源库 ↔ 仓库联动 ---------- */
+const ICON_LOCATE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="2.6"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3"/></svg>';
+const ICON_LIBRARY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>';
+// 资源库记录按 账号/仓库/路径 建的对照表（uploadKey → 记录数组）
+function libraryIndex() {
+    const hist = loadHistory();
+    if (libIdxCache && libIdxCache.hist === hist && libIdxCache.n === hist.length && libIdxCache.files === repoLiveFiles) return libIdxCache.map;
+    const defOwner = (repoMetaCtx && repoMetaCtx.owner) || (repoLiveFiles[0] && repoLiveFiles[0].owner) || '';
+    const defRepo = getSettings().repo || '';
+    const map = new Map();
+    hist.forEach(e => {
+        const r = historyAssetRef(e);
+        if (!r || !r.path) return;
+        const k = uploadKey(r.owner || defOwner, r.repo || defRepo, r.path);
+        const a = map.get(k);
+        if (a) a.push(e); else map.set(k, [e]);
+    });
+    libIdxCache = { hist, n: hist.length, files: repoLiveFiles, map };
+    return map;
+}
+function toggleRepoUnlinked() {
+    repoOnlyUnlinked = !repoOnlyUnlinked;
+    repoSelected.clear();
+    updateRepoSelectionUI();
+    renderRepoLiveFiles();
+}
+function resetRepoView() {
+    repoFilter = 'all'; repoTag = ''; repoSearch = ''; repoOnlyUnlinked = false;
+    const inp = $('repo-search'); if (inp) inp.value = '';
+    const pill = $('repo-searchpill'); if (pill) pill.classList.remove('has-text');
+    document.querySelectorAll('.filter-btn[data-rf]').forEach(b => b.classList.toggle('active', b.dataset.rf === 'all'));
+}
+function flashTile(el) {
+    if (!el) return;
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    el.classList.remove('loc-flash');
+    void el.offsetWidth;
+    el.classList.add('loc-flash');
+    setTimeout(() => el.classList.remove('loc-flash'), 2400);
+}
+function findRepoFileForRef(ref) {
+    const ow = String(ref.owner || '').toLowerCase();
+    return repoLiveFiles.find(x => x.path === ref.path && (!ow || String(x.owner || '').toLowerCase() === ow)) || null;
+}
+// 资源库 → 仓库：切到仓库页、进入所在文件夹并高亮
+async function locateInRepo(entry) {
+    const ref = historyAssetRef(entry);
+    if (!ref || !ref.path) return toast('这条记录没有仓库路径，无法定位', 'info');
+    const s = getSettings();
+    if (!s.token || !s.repo) return toast('请先配置 Token 并选择仓库', 'info');
+    if (ref.repo && String(ref.repo).toLowerCase() !== String(s.repo).toLowerCase()) return toast('它在仓库 ' + ref.repo + ' 里，当前仓库是 ' + s.repo + '，先切换仓库', 'info');
+    if (galleryMultiMode) exitGalleryMultiMode();
+    setGallerySeg('repo');
+    toast('正在定位…', 'loading');
+    let guard = 0;
+    while (repoLiveLoading && guard++ < 400) await sleep(150);
+    let f = findRepoFileForRef(ref);
+    if (!f) { await loadRepoLiveFiles(true); f = findRepoFileForRef(ref); }   // 列表可能是旧的，刷新一次再找
+    if (!f) { hideToast(); return toast('仓库里没有找到这个文件，可能已被删除或改名', 'error'); }
+    resetRepoView();
+    const i = f.path.lastIndexOf('/');
+    repoCurrentPath = i > 0 ? f.path.slice(0, i) : '';
+    repoMultiMode = false;
+    repoSelected.clear();
+    renderRepoLiveFiles();
+    toast('已定位：' + f.name, 'ok');
+    requestAnimationFrame(() => flashTile(Array.from(document.querySelectorAll('#repo-live-container .repo-live-item[data-path]')).find(x => x.dataset.path === f.path)));
+}
+// 仓库 → 资源库：切到资源库并高亮对应记录
+function locateInLibrary(file) {
+    const recs = libraryIndex().get(uploadKey(file.owner, file.repo, file.path));
+    if (!recs || !recs.length) return toast('资源库里没有这个文件的记录', 'info');
+    const e = recs[0];
+    if (repoMultiMode) exitRepoMultiMode();
+    setGallerySeg('library');
+    galleryTag = ''; gallerySearch = '';
+    const inp = $('gallery-search'); if (inp) inp.value = '';
+    const pill = $('gallery-searchpill'); if (pill) pill.classList.remove('has-text');
+    setGalleryFilter('all');
+    renderGallery({ all: true });   // 记录多时是分批画的，这里一次画全，才能找到目标
+    toast('已定位：' + (e.name || file.name), 'ok');
+    requestAnimationFrame(() => flashTile(Array.from(document.querySelectorAll('#gallery-container .gallery-tile')).find(x => x._entryId === e.id)));
 }
 
 /* ---------- CDN 未同步：一键改用 raw 直链 ---------- */
@@ -8298,6 +8637,7 @@ async function importBackup(file) {
         Object.keys(data.prefs).forEach(k => {
             if ((/^kb_pref_/.test(k) || BACKUP_KEYS_EXTRA.indexOf(k) >= 0) && typeof data.prefs[k] === 'string') localStorage.setItem(k, data.prefs[k]);
         });
+        if (typeof data.prefs.kb_repo_meta === 'string') lsSet(META_SYNC_FORCE_KEY, '1');   // 备份里的仓库标签：下次同步时和仓库里的合并
         const st = data.settings || {};
         const fill = (liveKey, val) => { if (val && !localStorage.getItem(liveKey)) localStorage.setItem(liveKey, val); };
         fill(ACC_LIVE.token, st.token); fill(ACC_LIVE.repo, st.repo); fill(ACC_LIVE.proxy, st.proxy); fill(ACC_LIVE.imgProxy, st.imgProxy); fill(ACC_LIVE.owner, st.owner);

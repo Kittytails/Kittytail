@@ -1270,6 +1270,35 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 .repo-multi-mode .repo-live-item .tile-lib { display:none; }
 @keyframes locFlash { 0%,100% { box-shadow: 0 0 0 0 rgba(10,132,255,0); } 20%,70% { box-shadow: 0 0 0 4px rgba(10,132,255,.6); } }
 .gallery-tile.loc-flash { animation: locFlash 2.2s ease-out 1; border-radius: 14px; }
+/* v3.0.4：底部「撤销」条 + 滑动多选 */
+#kb-undo {
+    position: fixed; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: calc(100% - 28px);
+    bottom: calc(env(safe-area-inset-bottom) + 16px); z-index: 20000;
+    display: none; pointer-events: none; transition: bottom .3s cubic-bezier(.22,.9,.3,1);
+}
+body.gallery-multi-mode #kb-undo, body.repo-multi-mode #kb-undo { bottom: calc(env(safe-area-inset-bottom) + 80px); }   /* 多选操作坞出现时，撤销条让到它上面 */
+#kb-undo .undo-sheet {
+    box-sizing: border-box; display: flex; align-items: center; gap: 6px; min-height: 46px; padding: 6px 6px 6px 18px;
+    background: #1D1D1F; color: #F5F5F7; border-radius: 23px;
+    box-shadow: 0 10px 32px rgba(0,0,0,.28), 0 2px 6px rgba(0,0,0,.14);
+    font-size: 13px; font-weight: 700; letter-spacing: -.2px;
+    opacity: 0; transform: translateY(26px) scale(.96); pointer-events: none;
+    transition: transform .4s cubic-bezier(.16,1,.3,1), opacity .2s ease-out;
+}
+#kb-undo.show .undo-sheet { opacity: 1; transform: none; pointer-events: auto; }
+#kb-undo .undo-msg { min-width: 0; line-height: 20px; padding-right: 6px; overflow-wrap: anywhere; word-break: break-word; }
+#kb-undo .undo-btn {
+    flex: none; height: 34px; padding: 0 16px; border: 0; border-radius: 17px; cursor: pointer;
+    background: rgba(255,255,255,.16); color: #fff; font: inherit; font-weight: 800; -webkit-tap-highlight-color: transparent;
+    transition: transform .15s, background .15s;
+}
+#kb-undo .undo-btn:active { transform: scale(.94); }
+#kb-undo .undo-btn:disabled { opacity: .55; cursor: default; }
+html[data-theme="dark"] #kb-undo .undo-sheet { background: #F5F5F7; color: #1D1D1F; box-shadow: 0 12px 40px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.25); }
+html[data-theme="dark"] #kb-undo .undo-btn { background: rgba(0,0,0,.09); color: #1D1D1F; }
+@media (prefers-reduced-motion: reduce) { #kb-undo .undo-sheet { transition: opacity .15s linear; transform: none; } }
+/* 滑动选择进行中：禁选中 / 长按菜单 */
+body.drag-selecting, body.drag-selecting * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
 </style>
 <style id="swipe-fix">
@@ -1912,6 +1941,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
     <button class="cb-x" type="button" aria-label="关闭" onclick="hideClipBanner(true)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
 </div>
 <div id="kb-toast" role="status" aria-live="polite"></div>
+<div id="kb-undo" role="status" aria-live="polite"></div>
 
 <div class="upload-error-modal" id="upload-error-modal" onclick="if(event.target===this) closeUploadErrorModal()">
     <div class="upload-error-panel" role="alertdialog" aria-modal="true" aria-labelledby="upload-error-title" aria-describedby="upload-error-sub">
@@ -2094,6 +2124,190 @@ function toast(msg, type) {
     el.classList.add('show');
     clearTimeout(el._t);
     if (type !== 'loading') el._t = setTimeout(hideToast, Math.min(9000, TOAST_MS[type] + Math.max(0, String(msg).length - 14) * 90)); // 长文案多停一会儿
+}
+
+// --- 撤销（v3.0.4）---
+// 移动 / 重命名 / 删除成功后，底部弹出「撤销」条（约 9 秒）。只记住最近一次操作，新的操作会顶掉旧的。
+// 仓库里的撤销 = 再提交一次反向的 Git 变更（历史照样保留）；本地的收藏、标签、排序、资源库记录一并还原。
+let undoJob = null;   // { run, timer, busy }
+const UNDO_MS = 9000;
+function undoErr(msg) { const e = new Error(msg); e.final = true; return e; }   // final：重试也没用，直接收起撤销条
+function hideUndo() {
+    const el = $('kb-undo');
+    if (undoJob) { clearTimeout(undoJob.timer); undoJob = null; }
+    if (!el) return;
+    el.classList.remove('show');
+    clearTimeout(el._d);
+    el._d = setTimeout(() => { if (!el.classList.contains('show')) el.style.display = 'none'; }, 450);
+}
+function offerUndo(msg, run) {
+    hideToast();   // 先收起顶部的「正在…」提示，成功信息由撤销条自己显示
+    const el = $('kb-undo');
+    if (!el || typeof run !== 'function') { toast(msg); return; }
+    if (undoJob) clearTimeout(undoJob.timer);
+    const job = { run, busy: false, timer: 0 };
+    undoJob = job;
+    clearTimeout(el._d);
+    el.style.display = 'flex';
+    el.innerHTML = '<div class="undo-sheet"><span class="undo-msg"></span><button type="button" class="undo-btn">撤销</button></div>';
+    el.querySelector('.undo-msg').textContent = msg;
+    const btn = el.querySelector('.undo-btn');
+    btn.onclick = () => runUndo(job, btn);
+    void el.offsetHeight;   // 强制回流：保证滑入动画一定会播放
+    el.classList.add('show');
+    job.timer = setTimeout(() => { if (undoJob === job && !job.busy) hideUndo(); }, UNDO_MS);
+}
+async function runUndo(job, btn) {
+    if (!job || undoJob !== job || job.busy) return;
+    job.busy = true;
+    clearTimeout(job.timer);
+    if (btn) { btn.disabled = true; btn.textContent = '撤销中…'; }
+    try {
+        const msg = await job.run();
+        if (undoJob === job) hideUndo();
+        toast(msg || '已撤销', 'ok');
+    } catch (e) {
+        job.busy = false;
+        toast('撤销失败：' + ((e && e.message) || '未知错误'), 'error');
+        if (undoJob !== job) return;
+        if (e && e.final) { hideUndo(); return; }
+        if (btn) { btn.disabled = false; btn.textContent = '重试'; }
+        job.timer = setTimeout(() => { if (undoJob === job && !job.busy) hideUndo(); }, UNDO_MS);
+    }
+}
+// 把资源库记录按原来的位置放回去
+function restoreHistoryEntries(items) {
+    if (!items || !items.length) return;
+    const hist = loadHistory().slice();
+    const have = new Set(hist.map(e => e && e.id));
+    items.slice().sort((a, b) => a.idx - b.idx).forEach(it => {
+        if (!it || !it.entry || have.has(it.entry.id)) return;
+        hist.splice(Math.min(it.idx, hist.length), 0, it.entry);
+        have.add(it.entry.id);
+    });
+    saveHistory(hist);
+}
+// 删除前记下这些文件在本地的排序时间、收藏 / 标签，撤销时放回去
+function snapshotRepoLocal(files) {
+    const order = loadUploadOrder(), meta = loadRepoMeta();
+    const snap = { order: {}, meta: {}, owner: files[0] ? files[0].owner : '', repo: files[0] ? files[0].repo : '' };
+    files.forEach(f => {
+        const k = uploadKey(f.owner, f.repo, f.path);
+        if (k in order) snap.order[k] = order[k];
+        if (meta[k] !== undefined) snap.meta[k] = JSON.parse(JSON.stringify(meta[k]));
+    });
+    return snap;
+}
+function restoreRepoLocal(snap) {
+    if (!snap) return;
+    const ok = Object.keys(snap.order || {});
+    if (ok.length) { const o = loadUploadOrder(); ok.forEach(k => { o[k] = snap.order[k]; }); saveUploadOrder(o); }
+    const mk = Object.keys(snap.meta || {});
+    if (mk.length) { const m = loadRepoMeta(); mk.forEach(k => { m[k] = snap.meta[k]; }); saveRepoMeta(snap.owner ? { owner: snap.owner, repo: snap.repo } : undefined); }
+}
+// 给要删除的文件补上 blob sha（撤销时靠它把文件原样放回仓库）：先用已读到的列表，缺的再读一次文件树
+async function attachBlobShas(files) {
+    const s = getSettings();
+    if (repoLiveLoaded) {
+        const idx = new Map(repoLiveFiles.map(x => [uploadKey(x.owner, x.repo, x.path), x]));
+        files.forEach(f => { if (f.sha) return; const x = idx.get(uploadKey(f.owner, f.repo, f.path)); if (x) { f.sha = x.sha; f.size = x.size; } });
+    }
+    const missing = files.filter(f => !f.sha);
+    if (!missing.length) return;
+    const groups = new Map();
+    missing.forEach(f => { const k = [f.owner, f.repo, f.branch].join('\u0000'); (groups.get(k) || groups.set(k, []).get(k)).push(f); });
+    for (const g of groups.values()) {
+        try {
+            const tree = await fetchRepoTree(g[0].owner, g[0].repo, g[0].branch, s);
+            const m = new Map((tree.tree || []).map(x => [x.path, x]));
+            g.forEach(f => { const x = m.get(f.path); if (x) { f.sha = x.sha; f.size = x.size || 0; } });
+        } catch (_) { /* 读不到就算了：这几个文件删除后无法撤销，其余不受影响 */ }
+    }
+}
+// 撤销「删除」：仓库文件按原 sha 提交回去，再还原本地记录 / 排序 / 标签
+// b = { files: [{owner, repo, branch, path, name, sha, size}], snap, removedHist: [{idx, entry}] }
+async function undoDeleteBundle(b) {
+    const s = getSettings();
+    let restoredFiles = [];
+    if (b.files && b.files.length) {
+        if (!s.token) throw undoErr('未配置 GitHub Token');
+        const groups = new Map();
+        b.files.forEach(f => { const k = [f.owner, f.repo, f.branch].join('\u0000'); (groups.get(k) || groups.set(k, []).get(k)).push(f); });
+        for (const g of groups.values()) {
+            let list = g;
+            if (repoLiveLoaded && String(g[0].repo).toLowerCase() === String(s.repo).toLowerCase()) {
+                const occ = new Set(repoLiveFiles.map(x => x.path));
+                list = g.filter(f => !occ.has(f.path));   // 原位置已经被新文件占了就不覆盖
+            }
+            if (!list.length) continue;
+            await commitTreeChanges(g[0].owner, g[0].repo, g[0].branch,
+                list.map(f => ({ path: f.path, mode: '100644', type: 'blob', sha: f.sha })),
+                '撤销删除 ' + list.length + ' 个文件', s);
+            restoredFiles = restoredFiles.concat(list);
+        }
+        if (!restoredFiles.length) throw undoErr('原位置已经有同名文件，没法恢复');
+        restoreRepoLocal(b.snap);
+        const first = restoredFiles[0];
+        if (repoLiveLoaded && String(first.repo).toLowerCase() === String(s.repo).toLowerCase()) {
+            const have = new Set(repoLiveFiles.map(x => x.path));
+            restoredFiles.forEach(f => {
+                if (have.has(f.path)) return;
+                repoLiveFiles.push({
+                    path: f.path, name: f.path.split('/').pop(), sha: f.sha, size: f.size || 0, type: repoFileType(f.path),
+                    url: repoCdnUrl(f.owner, f.repo, f.branch, f.path), rawUrl: repoRawUrl(f.owner, f.repo, f.branch, f.path),
+                    owner: f.owner, repo: f.repo, branch: f.branch
+                });
+            });
+            const st = $('repo-live-status');
+            if (st) st.textContent = '实时仓库 · ' + repoLiveFiles.length + ' 个文件 · ' + first.owner + '/' + first.repo;
+        } else if (s.token && s.repo) {
+            repoLiveLoaded = false; loadRepoLiveFiles(true);   // 当前列表对不上了，重新读一遍
+        }
+    }
+    if (b.removedHist && b.removedHist.length) restoreHistoryEntries(b.removedHist);
+    renderRepoLiveFiles();
+    renderGallery();
+    const n = (b.files && b.files.length) ? restoredFiles.length : b.removedHist.length;
+    return '已恢复 ' + n + (b.files && b.files.length ? ' 个文件' : ' 项记录');
+}
+// 撤销「移动」：反向再移一次
+async function undoRepoMoves(owner, repo, branch, moves) {
+    const s = getSettings();
+    if (!s.token) throw undoErr('未配置 GitHub Token');
+    let list = moves, shaNow = new Map();
+    if (repoLiveLoaded && String(repo).toLowerCase() === String(s.repo).toLowerCase()) {
+        const cur = new Map(repoLiveFiles.map(f => [f.path, f]));
+        list = moves.filter(m => cur.has(m.to) && !cur.has(m.from));   // 已经又被动过、或原位置被占了的，跳过
+        list.forEach(m => shaNow.set(m.to, cur.get(m.to).sha));
+        if (!list.length) throw undoErr('这些文件之后又被改动过，没法撤销');
+    }
+    const changes = [];
+    list.forEach(m => {
+        changes.push({ path: m.to, mode: '100644', type: 'blob', sha: null });
+        changes.push({ path: m.from, mode: '100644', type: 'blob', sha: shaNow.get(m.to) || m.sha });
+    });
+    await commitTreeChanges(owner, repo, branch, changes, '撤销移动 ' + list.length + ' 个文件', s);
+    applyLocalMoves(owner, repo, branch, list.map(m => ({ from: m.to, to: m.from })));
+    renderRepoLiveFiles();
+    return '已撤销移动' + (list.length < moves.length ? '（' + (moves.length - list.length) + ' 个已被改动，未还原）' : '');
+}
+// 撤销「重命名」
+async function undoRepoRename(owner, repo, branch, oldPath, newPath, sha) {
+    const s = getSettings();
+    if (!s.token) throw undoErr('未配置 GitHub Token');
+    if (repoLiveLoaded && String(repo).toLowerCase() === String(s.repo).toLowerCase()) {
+        if (repoLiveFiles.some(f => f.path === oldPath)) throw undoErr('原来的文件名已经被占用，没法撤销');
+        const cur = repoLiveFiles.find(f => f.path === newPath);
+        if (!cur) throw undoErr('这个文件之后又被改动过，没法撤销');
+        sha = cur.sha || sha;
+    }
+    await commitTreeChanges(owner, repo, branch, [
+        { path: newPath, mode: '100644', type: 'blob', sha: null },
+        { path: oldPath, mode: '100644', type: 'blob', sha }
+    ], '撤销重命名 → ' + pathBasename(oldPath), s);
+    applyLocalRename(owner, repo, branch, newPath, oldPath);
+    renderRepoLiveFiles();
+    return '已恢复为 ' + pathBasename(oldPath);
 }
 
 // --- 失败详情弹窗（上传 / 转换 / 删除失败共用） ---
@@ -3507,9 +3721,13 @@ function scheduleRenderGallery() {
     galleryRenderTimer = setTimeout(() => { galleryRenderTimer = null; renderGallery(); }, 400);
 }
 function removeHistoryItem(id) {
-    const list = loadHistory().filter(e => e.id !== id);
+    const hist = loadHistory();
+    const idx = hist.findIndex(e => e.id === id);
+    const entry = idx >= 0 ? hist[idx] : null;
+    const list = hist.filter(e => e.id !== id);
     saveHistory(list);
     renderGallery();
+    if (entry) offerUndo('已移除 1 条记录', async () => { restoreHistoryEntries([{ idx, entry }]); renderGallery(); return '已恢复这条记录'; });
 }
 
 // --- 上传顺序（实时仓库按此排序）---
@@ -3683,6 +3901,7 @@ function enterGalleryMultiMode(id) {
     if (id) gallerySelected.add(id);
     updateGallerySelectionUI();
     syncGallerySelectionDom();
+    dragSelectOnEnter('gallery', id);   // v3.0.4：长按进入多选后不松手直接拖，就是滑动选择
 }
 
 function exitGalleryMultiMode() {
@@ -3826,6 +4045,7 @@ async function confirmDeleteSelected() {
     if (progress) progress.classList.add('show');
     const deleteFailures = [];
     const keepIds = new Set();   // 仓库文件没删成的记录：本地先保留，方便重试
+    let undoFiles = [], undoSnap = null;   // v3.0.4：给「撤销」用的快照
     try {
         if (deleteCloud) {
             // 批量：所有仓库文件一次提交删完（原来每个文件 2 个请求 + 1 次提交，慢而且容易互相冲突）
@@ -3843,12 +4063,15 @@ async function confirmDeleteSelected() {
                 seen.add(key);
                 files.push({ owner: parsed.owner, repo: repoName, branch: br, path: parsed.path, name: entry.name, key });
             });
+            if (text) text.textContent = '正在记录文件，方便撤销…';
+            try { await attachBlobShas(files); undoSnap = snapshotRepoLocal(files); } catch (_) {}
             if (text) text.textContent = '正在删除 ' + files.length + ' 个仓库文件…';
             if (fill) fill.style.width = '35%';
             if (percent) percent.textContent = '35%';
             try {
                 const fails = await deleteRepoFiles(files);
                 const failedKeys = new Set(fails.map(f => uploadKey(f.owner, f.repo, f.path)));
+                undoFiles = files.filter(f => f.sha && !failedKeys.has(uploadKey(f.owner, f.repo, f.path))).map(f => ({ owner: f.owner, repo: f.repo, branch: f.branch, path: f.path, name: f.name, sha: f.sha, size: f.size || 0 }));
                 pruneRepoMeta(files.filter(f => !failedKeys.has(uploadKey(f.owner, f.repo, f.path))));
                 fails.forEach(f => {
                     deleteFailures.push({ name: f.name, message: f.message });
@@ -3867,7 +4090,9 @@ async function confirmDeleteSelected() {
     }
 
     // 重新读取最新记录再保存：删除期间可能有新的上传记录写入，不能用开头的旧快照覆盖。
-    saveHistory(loadHistory().filter(e => !ids.includes(e.id) || keepIds.has(e.id)));
+    const idSet = new Set(ids), removedHist = [], nextHist = [];
+    loadHistory().forEach((e, idx) => { if (idSet.has(e.id) && !keepIds.has(e.id)) removedHist.push({ idx, entry: e }); else nextHist.push(e); });
+    saveHistory(nextHist);
     gallerySelected.clear();
     galleryMultiMode = false;
     updateGallerySelectionUI();
@@ -3883,7 +4108,7 @@ async function confirmDeleteSelected() {
         closeDeleteSheet();
         showUploadErrorModal(deleteFailures, { title: '仓库文件删除失败', sub: '以下 ' + failed + ' 个仓库文件未能删除，对应的本地记录已保留，可以稍后再试' });
     } else {
-        toast('已删除 ' + selected.length + ' 项');
+        offerUndo('已删除 ' + selected.length + ' 项', () => undoDeleteBundle({ files: undoFiles, snap: undoSnap, removedHist }));
         setTimeout(() => { if (progress) progress.classList.remove('show'); closeDeleteSheet(); }, 900);
     }
 }
@@ -4381,6 +4606,41 @@ async function confirmMoveSheet() {
 }
 
 // 用一次 Git 提交（blob 复用原 sha，无需重新读取文件内容）批量把选中文件挪到目标文件夹
+// 移动成功后同步本地：文件列表、上传顺序、收藏 / 标签、资源库记录里的直链（撤销移动时反向再调用一次）
+function applyLocalMoves(owner, repo, branch, moves) {
+    const history = loadHistory();
+    const order = loadUploadOrder();
+    let historyChanged = false;
+    moves.forEach(m => {
+        moveRepoMeta(owner, repo, m.from, m.to);
+        const f = repoLiveFiles.find(x => x.path === m.from);
+        if (f) {
+            f.path = m.to;
+            f.name = m.to.split('/').pop();
+            f.url = repoCdnUrl(f.owner, f.repo, f.branch, f.path);
+            f.rawUrl = repoRawUrl(f.owner, f.repo, f.branch, f.path);
+        }
+        // 上传顺序跟着文件走
+        const oldK = uploadKey(owner, repo, m.from);
+        if (order[oldK] !== undefined) { order[uploadKey(owner, repo, m.to)] = order[oldK]; delete order[oldK]; }
+        // 图库记录里的直链也要同步，否则旧链接 404、之后「同时删除仓库文件」也找不到文件
+        history.forEach(e => {
+            const p = historyAssetRef(e);
+            if (!p || p.path !== m.from) return;
+            if (p.owner && p.owner.toLowerCase() !== String(owner).toLowerCase()) return;
+            if (p.repo && p.repo.toLowerCase() !== String(repo).toLowerCase()) return;
+            const viaRaw = /raw\.githubusercontent\.com/.test(e.url || '');
+            e.githubOwner = owner; e.githubRepo = repo; e.githubBranch = e.githubBranch || branch; e.githubPath = m.to;
+            // 固定到提交的直链：旧提交里的旧路径依然有效，保持不变
+            const pinned = /[@/][0-9a-f]{40}\//i.test(e.url || '');
+            if (!pinned) e.url = viaRaw ? repoRawUrl(owner, repo, branch, m.to) : repoCdnUrl(owner, repo, branch, m.to);
+            historyChanged = true;
+        });
+    });
+    saveUploadOrder(order);
+    if (historyChanged) { saveHistory(history); renderGallery(); }
+}
+
 async function moveSelectedRepoFiles(targetFolder) {
     const paths = Array.from(repoSelected);
     if (!paths.length) return;
@@ -4413,47 +4673,18 @@ async function moveSelectedRepoFiles(targetFolder) {
             occupied.add(newPath);
             treeChanges.push({ path: f.path, mode: '100644', type: 'blob', sha: null });
             treeChanges.push({ path: newPath, mode: '100644', type: 'blob', sha: f.sha });
-            moves.push({ from: f.path, to: newPath });
+            moves.push({ from: f.path, to: newPath, sha: f.sha });
         });
         if (!treeChanges.length) { toast('所选文件已在目标位置', 'info'); exitRepoMultiMode(); return true; }
 
         await commitTreeChanges(ctx.owner, s.repo, ctx.branch, treeChanges,
             '移动 ' + moves.length + ' 个文件到 ' + (targetFolder || '根目录'), s);
 
-        const history = loadHistory();
-        const order = loadUploadOrder();
-        let historyChanged = false;
-        moves.forEach(m => {
-            moveRepoMeta(ctx.owner, s.repo, m.from, m.to);
-            const f = repoLiveFiles.find(x => x.path === m.from);
-            if (f) {
-                f.path = m.to;
-                f.name = m.to.split('/').pop();
-                f.url = repoCdnUrl(f.owner, f.repo, f.branch, f.path);
-                f.rawUrl = repoRawUrl(f.owner, f.repo, f.branch, f.path);
-            }
-            // 上传顺序跟着文件走
-            const oldK = uploadKey(ctx.owner, s.repo, m.from);
-            if (order[oldK] !== undefined) { order[uploadKey(ctx.owner, s.repo, m.to)] = order[oldK]; delete order[oldK]; }
-            // 图库记录里的直链也要同步，否则旧链接 404、之后「同时删除仓库文件」也找不到文件
-            history.forEach(e => {
-                const p = historyAssetRef(e);
-                if (!p || p.path !== m.from) return;
-                if (p.owner && p.owner.toLowerCase() !== String(ctx.owner).toLowerCase()) return;
-                if (p.repo && p.repo.toLowerCase() !== String(s.repo).toLowerCase()) return;
-                const viaRaw = /raw\.githubusercontent\.com/.test(e.url || '');
-                e.githubOwner = ctx.owner; e.githubRepo = s.repo; e.githubBranch = e.githubBranch || ctx.branch; e.githubPath = m.to;
-                // 固定到提交的直链：旧提交里的旧路径依然有效，保持不变
-                const pinned = /[@/][0-9a-f]{40}\//i.test(e.url || '');
-                if (!pinned) e.url = viaRaw ? repoRawUrl(ctx.owner, s.repo, ctx.branch, m.to) : repoCdnUrl(ctx.owner, s.repo, ctx.branch, m.to);
-                historyChanged = true;
-            });
-        });
-        saveUploadOrder(order);
-        if (historyChanged) { saveHistory(history); renderGallery(); }
+        applyLocalMoves(ctx.owner, s.repo, ctx.branch, moves);
         exitRepoMultiMode();
         renderRepoLiveFiles();
-        toast('已移动 ' + moves.length + ' 个文件' + (renamedCount ? '（' + renamedCount + ' 个重名已自动改名）' : ''));
+        const mvOwner = ctx.owner, mvRepo = s.repo, mvBranch = ctx.branch;
+        offerUndo('已移动 ' + moves.length + ' 个文件' + (renamedCount ? '（' + renamedCount + ' 个重名已自动改名）' : ''), () => undoRepoMoves(mvOwner, mvRepo, mvBranch, moves));
         return true;
     } catch (e) {
         toast('移动失败：' + (e.message || '未知错误'));
@@ -4529,6 +4760,7 @@ function enterRepoMultiMode(path) {
     if (path) repoSelected.add(path);
     updateRepoSelectionUI();
     syncRepoSelectionDom();
+    dragSelectOnEnter('repo', path);
 }
 
 function exitRepoMultiMode() {
@@ -4840,6 +5072,7 @@ async function deleteSelectedRepoFiles() {
     if (deleteBtn) deleteBtn.disabled = true;
     if (btn) btn.disabled = true;
     const failures = [];
+    const undoSnap = snapshotRepoLocal(selected);   // v3.0.4：给「撤销」用的快照
     try {
         toast('正在删除 ' + selected.length + ' 个文件…', 'loading');
         failures.push(...await deleteRepoFiles(selected));
@@ -4855,7 +5088,8 @@ async function deleteSelectedRepoFiles() {
         pruneRepoMeta(selected.filter(f => !failedPaths.has(f.path)));
         repoLiveFiles = repoLiveFiles.filter(f => !deletedKeys.has(keyOf(f.owner, f.repo, f.branch, f.path)));
         const history = loadHistory();
-        const next = history.filter(e => { const p = historyAssetRef(e); return !(p && p.path && deletedKeys.has(keyOf(p.owner, p.repo, '', p.path))); });
+        const removedHist = [];
+        const next = history.filter((e, idx) => { const p = historyAssetRef(e); const hit = !!(p && p.path && deletedKeys.has(keyOf(p.owner, p.repo, '', p.path))); if (hit) removedHist.push({ idx, entry: e }); return !hit; });
         if (next.length !== history.length) saveHistory(next);
         repoSelected.clear();
         repoMultiMode = false;
@@ -4866,7 +5100,8 @@ async function deleteSelectedRepoFiles() {
         if (failures.length) {
             showUploadErrorModal(failures, { title: '部分文件删除失败', sub: '已删除 ' + deletedKeys.size + ' 个，' + failures.length + ' 个失败' });
         } else {
-            toast('已删除 ' + selected.length + ' 个仓库文件');
+            const okFiles = selected.map(f => Object.assign({}, f));
+            offerUndo('已删除 ' + selected.length + ' 个仓库文件', () => undoDeleteBundle({ files: okFiles, snap: undoSnap, removedHist }));
         }
     } finally {
         if (deleteBtn) deleteBtn.disabled = false;
@@ -7502,7 +7737,8 @@ async function doRename(ref, newName) {
         ], '重命名 ' + pathBasename(ref.path) + ' → ' + newName, s);
         applyLocalRename(owner, repo, branch, ref.path, newPath);
         renderRepoLiveFiles();
-        toast('已重命名为 ' + newName);
+        const rnOld = ref.path, rnSha = meta.sha;
+        offerUndo('已重命名为 ' + newName, () => undoRepoRename(owner, repo, branch, rnOld, newPath, rnSha));
         return true;
     } catch (e) {
         toast('重命名失败：' + ((e && e.message) || '未知错误'), 'error');
@@ -7946,7 +8182,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '3.0.3';
+const APP_VERSION = '3.0.4';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -8660,6 +8896,174 @@ async function importBackup(file) {
     toast('导入完成，正在刷新…', 'ok');
     setTimeout(() => location.reload(), 700);
 }
+/* ---------- v3.0.4：多选时滑动选择 ---------- */
+// 两种用法：①已经在多选里，手指横着在图上划一下就开始（竖着划仍然是滚动）；②长按一张图进入多选后不松手，直接拖。
+// 选中范围 = 起点到手指所在位置之间（按页面上的先后顺序）的所有图；往回拖会收缩。起点原本就是选中的，则整片取消选择。
+// 手指拖到屏幕上 / 下边缘会自动滚动。
+let dsState = null;              // 当前这根手指（或鼠标）的状态；没有在操作时为 null
+let dsSuppressClickUntil = 0;    // 滑动结束后的一小段时间内吞掉紧跟着的 click，免得最后一张被点回去
+let dsLastTouchAt = 0;
+const DS_KINDS = {
+    gallery: {
+        tileSel: '#gallery-container .gallery-tile',
+        isTile: el => el._entryId !== undefined,
+        key: el => el._entryId,
+        multi: () => galleryMultiMode,
+        set: () => gallerySelected,
+        refresh: () => { updateGallerySelectionUI(); syncGallerySelectionDom(); }
+    },
+    repo: {
+        tileSel: '#repo-live-container .repo-live-item[data-path]',
+        isTile: el => !!el.dataset.path,
+        key: el => el.dataset.path,
+        multi: () => repoMultiMode,
+        set: () => repoSelected,
+        refresh: () => { updateRepoSelectionUI(); syncRepoSelectionDom(); }
+    }
+};
+function dragSelectOnEnter(kind, key) {
+    const st = dsState;
+    if (st && !st.engaged && !st.multiAtStart && st.kind === kind && key !== undefined && st.key === key) st.armed = true;
+}
+function dsCollect(st) {
+    st.list = Array.from(document.querySelectorAll(st.cfg.tileSel)).filter(st.cfg.isTile);
+    st.index = new Map(st.list.map((el, i) => [el, i]));
+    if (st.index.has(st.el)) st.anchor = st.index.get(st.el);
+    st.last = -2;
+}
+function dsStart(target, x, y) {
+    dsState = null;
+    if (!target || !target.closest || target.closest('button, a, input, textarea')) return;
+    for (const kind of Object.keys(DS_KINDS)) {
+        const cfg = DS_KINDS[kind];
+        const el = target.closest(cfg.tileSel);
+        if (el && cfg.isTile(el)) {
+            const key = cfg.key(el);
+            dsState = { kind, cfg, el, key, x0: x, y0: y, x, y, multiAtStart: cfg.multi(), wasSel: cfg.set().has(key),
+                        armed: false, engaged: false, list: null, index: null, anchor: -1, mode: 'add', base: null, last: -2, raf: 0 };
+            return;
+        }
+    }
+}
+function dsEngage() {
+    const st = dsState;
+    if (!st || st.engaged) return;
+    dsCollect(st);
+    if (!st.index.has(st.el)) { dsState = null; return; }
+    st.engaged = true;
+    st.base = new Set(st.cfg.set());
+    st.mode = st.armed ? 'add' : (st.wasSel ? 'remove' : 'add');
+    document.body.classList.add('drag-selecting');
+    try { const g = window.getSelection && window.getSelection(); if (g) g.removeAllRanges(); } catch (_) {}
+    dsApply(st.anchor);
+    st.raf = requestAnimationFrame(dsLoop);
+}
+function dsApply(i) {
+    const st = dsState;
+    if (!st || !st.engaged || i === st.last) return;
+    st.last = i;
+    const lo = Math.min(st.anchor, i), hi = Math.max(st.anchor, i);
+    const set = st.cfg.set();
+    let changed = false;
+    st.list.forEach((el, j) => {
+        const k = st.cfg.key(el);
+        const want = (j >= lo && j <= hi) ? (st.mode === 'add') : st.base.has(k);
+        if (set.has(k) !== want) { if (want) set.add(k); else set.delete(k); changed = true; }
+    });
+    if (changed) st.cfg.refresh();
+}
+function dsHit(x, y) {
+    const st = dsState;
+    if (!st || !st.engaged) return;
+    // 用 elementsFromPoint 穿透上面的悬浮层（底部操作坞、顶部雾化渐变），否则手指拖到屏幕边缘时会被它们挡住
+    let el = null;
+    const stack = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [document.elementFromPoint(x, y)];
+    for (const n of stack) { const t = n && n.closest ? n.closest(st.cfg.tileSel) : null; if (t) { el = t; break; } }
+    if (!el) return;   // 手指在格子之间的空隙里：保持上一次的范围
+    let i = st.index.get(el);
+    if (i === undefined) { dsCollect(st); i = st.index.get(el); }   // 懒加载又渲染出了新的格子
+    if (i !== undefined) dsApply(i);
+}
+function dsMove(e, x, y, isTouch) {
+    const st = dsState;
+    if (!st) return;
+    st.x = x; st.y = y;
+    if (!st.engaged) {
+        const adx = Math.abs(x - st.x0), ady = Math.abs(y - st.y0);
+        if (st.armed) {
+            if (adx + ady <= 6) return;
+        } else if (st.multiAtStart) {
+            if (isTouch) {
+                if (ady >= 8 && !(adx >= 8 && adx > ady * 0.75)) { dsState = null; return; }   // 竖着划：交给页面滚动
+                if (!(adx >= 8 && adx > ady * 0.75)) return;
+            } else if (adx + ady <= 6) return;
+        } else {
+            if (adx + ady > 10) dsState = null;   // 还没进多选就移动了：这是长按被取消 / 普通滚动，和我们无关
+            return;
+        }
+        dsEngage();
+        if (!dsState || !dsState.engaged) return;
+    }
+    if (e.cancelable) e.preventDefault();   // 滑动选择期间不让页面跟着滚
+    dsHit(x, y);
+}
+function dsLoop() {
+    const st = dsState;
+    if (!st || !st.engaged) return;
+    const page = document.getElementById('page-gallery');
+    const H = window.innerHeight, EDGE = 110;
+    let v = 0;
+    if (st.y < EDGE) v = -Math.min(18, Math.ceil((EDGE - st.y) / EDGE * 18));
+    else if (st.y > H - EDGE) v = Math.min(18, Math.ceil((st.y - (H - EDGE)) / EDGE * 18));
+    if (v && page) {
+        const before = page.scrollTop;
+        page.scrollTop = before + v;
+        if (page.scrollTop !== before) dsHit(st.x, st.y);   // 页面动了，手指下面换成了别的格子
+    }
+    st.raf = requestAnimationFrame(dsLoop);
+}
+function dsEnd() {
+    const st = dsState;
+    dsState = null;
+    if (!st) return;
+    if (st.raf) cancelAnimationFrame(st.raf);
+    if (st.engaged) {
+        dsSuppressClickUntil = Date.now() + 450;
+        document.body.classList.remove('drag-selecting');
+    }
+}
+(function initDragSelect() {
+    const page = document.getElementById('page-gallery');
+    if (!page) return;
+    page.addEventListener('touchstart', e => {
+        dsLastTouchAt = Date.now();
+        if (e.touches.length !== 1) { dsEnd(); return; }
+        dsStart(e.target, e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true, capture: true });
+    page.addEventListener('touchmove', e => {
+        if (!dsState) return;
+        const t = e.touches[0];
+        if (t) dsMove(e, t.clientX, t.clientY, true);
+    }, { passive: false });
+    const endTouch = () => { dsLastTouchAt = Date.now(); dsEnd(); };
+    document.addEventListener('touchend', endTouch, { passive: true, capture: true });
+    document.addEventListener('touchcancel', endTouch, { passive: true, capture: true });
+    // 电脑上用鼠标：多选里按住左键拖过去；或者长按进入多选后不松手继续拖
+    page.addEventListener('mousedown', e => {
+        if (e.button !== 0 || Date.now() - dsLastTouchAt < 800) return;   // 触屏点按后浏览器会补发鼠标事件，忽略
+        dsStart(e.target, e.clientX, e.clientY);
+    }, true);
+    document.addEventListener('mousemove', e => {
+        if (!dsState || Date.now() - dsLastTouchAt < 800) return;
+        if (!(e.buttons & 1)) { dsEnd(); return; }
+        dsMove(e, e.clientX, e.clientY, false);
+    });
+    document.addEventListener('mouseup', () => { if (Date.now() - dsLastTouchAt >= 800) dsEnd(); }, true);
+    page.addEventListener('click', e => {
+        if (Date.now() < dsSuppressClickUntil) { e.stopPropagation(); e.preventDefault(); }
+    }, true);
+})();
+
 </script>
 
 </body>

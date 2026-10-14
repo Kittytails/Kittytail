@@ -263,6 +263,17 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .dlg-error { display: none; margin: -6px 2px 12px; font-size: 12px; line-height: 1.5; color: #D93025; }
     .dlg-error.show { display: block; }
     html[data-theme="dark"] .dlg-error { color: #FF6B60; }
+#dlg-extra { margin: 0 0 14px; }
+.dlg-seg { width: 100%; margin-bottom: 12px; }
+.dlg-seg button { flex: 1; padding: 0; }
+.dlg-cap { font-size: 12px; color: #888; margin: 0 2px 6px; }
+#dlg-extra .move-new-folder-row { margin-bottom: 10px; }
+.dlg-prev { font-size: 12px; line-height: 1.7; color: #8E8E93; background: rgba(120,120,128,.1); border-radius: 10px; padding: 8px 10px; word-break: break-all; max-height: 120px; overflow: auto; }
+#page-prefs .pref-val { flex: 1 1 auto; min-width: 0; text-align: right; margin: 0 8px 0 14px; font-size: 15px; color: #8E8E93; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#page-prefs .pref-val.on { color: var(--text-main); }
+.rb-row { cursor: pointer; }
+.rb-row:active { background: rgba(60,60,67,.08); }
+.rb-sub { margin-top: 5px; font-size: 12px; line-height: 1.5; color: #8E8E93; word-break: break-all; }
 
     /* 顶部提示（Toast）：悬浮的磨砂玻璃圆角矩形，从上方滑下；本身不拦截页面点击，点提示条可立即收起。 */
     /* ===== 提示栏配色（改颜色只需改这一组变量；夜间那组在下方） =====
@@ -1097,6 +1108,42 @@ html[data-theme="dark"] #page-gallery > .card {
     html[data-theme="dark"] .save-opt + .save-opt::before { background: rgba(255,255,255,.14); }
     html[data-theme="dark"] .save-opt:active, html[data-theme="dark"] .save-cancel:active { background: rgba(255,255,255,.16); }
 
+    /* ===== 表情包导入预览 ===== */
+    .sticker-sheet { max-height: 90vh; max-height: 90dvh; display: flex; flex-direction: column; }
+    .stk-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 4px 10px; }
+    .stk-chip { flex: none; border: 0; border-radius: 14px; padding: 8px 14px; background: rgba(60,60,67,.1); font: inherit; font-size: 14px; font-weight: 600; color: #111; cursor: pointer; }
+    .stk-chip:active { background: rgba(60,60,67,.18); }
+    .stk-fmt-wrap { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .stk-fmt-wrap[hidden], .stk-tpl-wrap[hidden] { display: none; }
+    .stk-lbl { flex: none; font-size: 13px; color: #8E8E93; }
+    .stk-sel { min-width: 0; max-width: 100%; border: 0; border-radius: 12px; padding: 8px 10px; background: rgba(60,60,67,.1); font: inherit; font-size: 14px; color: #111; }
+    .stk-tpl-wrap { padding: 0 4px 10px; }
+    .stk-tpl { width: 100%; box-sizing: border-box; border: 0; border-radius: 12px; padding: 10px 12px; background: rgba(255,255,255,.66); font: inherit; font-size: 16px; color: #111; }
+    .stk-tpl-hint { margin-top: 6px; padding: 0 4px; font-size: 12px; color: #8E8E93; }
+    .stk-tpl-hint.bad { color: #E5484D; }
+    .stk-list { flex: 1; min-height: 120px; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; background: rgba(255,255,255,.66); border-radius: 22px; }
+    .stk-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-bottom: .5px solid rgba(60,60,67,.16); transition: opacity .15s; }
+    .stk-row:last-child { border-bottom: 0; }
+    .stk-row.off { opacity: .4; }
+    .stk-cb { flex: none; width: 22px; height: 22px; margin: 0; accent-color: #111; }
+    .stk-th { flex: none; width: 56px; height: 56px; border-radius: 13px; overflow: hidden; background: rgba(60,60,67,.1); display: grid; place-items: center; font-size: 18px; font-weight: 700; color: #8E8E93; cursor: pointer; }
+    .stk-th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .stk-fields { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+    .stk-fields input { width: 100%; box-sizing: border-box; border: 0; border-radius: 9px; padding: 7px 10px; background: rgba(60,60,67,.08); font: inherit; font-size: 16px; color: #111; }
+    .stk-note { font-size: 11px; color: #8E8E93; padding: 0 2px; }
+    .stk-actions { display: flex; gap: 10px; margin-top: 10px; }
+    .stk-cancel { flex: 1; margin-top: 0; }
+    .stk-go { flex: 1.6; border: 0; border-radius: 20px; padding: 15px; background: #111; color: #fff; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .15s; }
+    .stk-go:active { opacity: .8; }
+    .stk-go:disabled { opacity: .35; cursor: default; }
+    html[data-theme="dark"] .stk-chip, html[data-theme="dark"] .stk-sel { background: rgba(255,255,255,.14); color: #F5F5F7; }
+    html[data-theme="dark"] .stk-tpl, html[data-theme="dark"] .stk-list { background: rgba(255,255,255,.1); color: #F5F5F7; }
+    html[data-theme="dark"] .stk-row { border-bottom-color: rgba(255,255,255,.14); }
+    html[data-theme="dark"] .stk-th { background: rgba(255,255,255,.12); }
+    html[data-theme="dark"] .stk-fields input { background: rgba(255,255,255,.12); color: #F5F5F7; }
+    html[data-theme="dark"] .stk-cb { accent-color: #F5F5F7; }
+    html[data-theme="dark"] .stk-go { background: #F5F5F7; color: #111; }
+
     .pref-chev { flex: none; width: 8px; height: 14px; color: #B5B5BA; }
 
 /* ================= 丝滑转场（iOS 风格） ================= */
@@ -1264,12 +1311,10 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 #page-update .pref-val { flex: none; font-size: 15px; letter-spacing: -.1px; color: #8E8E93; }
 #page-update .pref-val.new { color: var(--text-main); font-weight: 600; }
 .plug-note { margin: 14px 6px 0; line-height: 19px; }
-/* v3.0.3：仓库文件「未入库」角标 + 定位后的高亮闪烁 */
-.repo-live-item .tile-lib { position:absolute; z-index:3; top:7px; right:7px; padding:2px 7px; border-radius:999px; font-size:10px; font-weight:700; line-height:14px; color:#fff; background:rgba(120,120,128,.92); pointer-events:none; }
-.repo-multi-mode .repo-live-item .tile-lib { display:none; }
+/* 定位后的高亮闪烁 */
 @keyframes locFlash { 0%,100% { box-shadow: 0 0 0 0 rgba(10,132,255,0); } 20%,70% { box-shadow: 0 0 0 4px rgba(10,132,255,.6); } }
 .gallery-tile.loc-flash { animation: locFlash 2.2s ease-out 1; border-radius: 14px; }
-/* v3.0.4：底部「撤销」条 + 滑动多选 */
+/* 底部「撤销」条 + 滑动多选 */
 #kb-undo {
     position: fixed; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: calc(100% - 28px);
     bottom: calc(env(safe-area-inset-bottom) + 16px); z-index: 20000;
@@ -1299,8 +1344,6 @@ html[data-theme="dark"] #kb-undo .undo-btn { background: rgba(0,0,0,.09); color:
 /* 滑动选择进行中：禁选中 / 长按菜单 */
 body.drag-selecting, body.drag-selecting * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
-</style>
-<style id="swipe-fix">
 /* 左边缘返回感应条：只在子页面打开时存在；touch-action:none 让浏览器不抢这根手指 */
 #edge-swipe { position: fixed; left: 0; top: 0; bottom: 0; width: 28px; z-index: 25; display: none; touch-action: none; -webkit-tap-highlight-color: transparent; }
 body.page-open #edge-swipe { display: block; }
@@ -1354,7 +1397,13 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
           <span class="row-body"><span class="row-title">存储</span><span class="row-arrow"></span></span>
         </button>
       </div>
-            <div class="group single">
+      <div class="group single">
+        <button class="row" type="button" data-keywords="recycle trash deleted 最近删除 回收站 恢复 删除 撤销" onclick="openPage('recycle')">
+          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15"/><path d="M9.5 7V4.8h5V7"/><path d="M6.8 7l.8 12.2a1.2 1.2 0 0 0 1.2 1.1h6.4a1.2 1.2 0 0 0 1.2-1.1L17.2 7"/><path d="M10 11v5.5M14 11v5.5"/></svg></span>
+          <span class="row-body"><span class="row-title">最近删除</span><span class="row-arrow"></span></span>
+        </button>
+      </div>
+      <div class="group single">
         <button class="row" type="button" data-keywords="settings preferences 设置 偏好 自动跳转 heic jpg plugin plugins 插件 扩展 脚本 js exif 隐私" onclick="openPage('prefs')">
           <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h8M17 8h3M4 16h3M12 16h8"/><circle cx="14.5" cy="8" r="2.5"/><circle cx="9.5" cy="16" r="2.5"/></svg></span>
           <span class="row-body"><span class="row-title">设置</span><span class="row-arrow"></span></span>
@@ -1424,6 +1473,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
                     <button type="button" class="filter-btn" data-cf="url" onclick="setCopyFormat('url')">直链</button>
                     <button type="button" class="filter-btn" data-cf="md" onclick="setCopyFormat('md')">Markdown</button>
                     <button type="button" class="filter-btn" data-cf="html" onclick="setCopyFormat('html')">HTML</button>
+                    <button type="button" class="filter-btn" data-cf="custom" onclick="setCopyFormat('custom')">自定义</button>
                 </div>
             </div>
             <div class="batch-progress" id="batch-progress">
@@ -1462,8 +1512,6 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div class="sub">替换文本文件里的图床链接，并下载新文件。</div>
             <input type="file" id="replace-file-input" style="display:none" onchange="handleReplaceFile(this.files[0])">
             <button class="ghost-btn primary" id="replace-file-btn" onclick="document.getElementById('replace-file-input').click()">选择文件并替换</button>
-            <input type="file" id="sticker-json-input" accept=".json,application/json" style="display:none" onchange="handleStickerJson(this.files[0])">
-            <button class="ghost-btn" id="sticker-json-btn" style="margin-top:10px;" onclick="document.getElementById('sticker-json-input').click()">表情包 JSON：按分类和含义整理后转存</button>
             <div id="replace-result" style="display:none; margin-top:14px;">
                 <div class="sub" id="replace-result-text" style="margin-bottom:10px;"></div>
                 <button class="ghost-btn primary" id="replace-download-btn" onclick="downloadReplaceOutput()">下载替换后的文件</button>
@@ -1533,7 +1581,6 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
                     <button class="filter-btn dead-chip" id="repo-orphan-chip" data-rf="orphan" onclick="setRepoFilter('orphan')" hidden>未引用</button>
                     <button class="filter-btn" id="repo-fav-chip" data-rf="fav" onclick="setRepoFilter('fav')" hidden>收藏</button>
                     <button class="filter-btn" id="repo-tag-chip" onclick="openRepoTagFilterMenu(this)" hidden>标签</button>
-                    <button class="filter-btn" id="repo-unlinked-chip" onclick="toggleRepoUnlinked()" hidden>未入库</button>
                 </div>
             </div>
             <div id="repo-live-container"></div>
@@ -1603,6 +1650,22 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
         <div id="st-list"></div>
     </div>
 
+    <div class="page" id="page-recycle" data-title="Recently Deleted" data-sub="删掉的仓库文件，30 天内可以恢复">
+        <div class="card st-summary">
+            <div class="st-total-row">
+                <div>
+                    <div class="st-total" id="rb-total">—</div>
+                    <div class="st-meta" id="rb-meta"></div>
+                </div>
+                <div class="card-head-actions">
+                    <button class="small-btn" type="button" onclick="recycleRestoreAll()">全部恢复</button>
+                    <button class="small-btn danger" type="button" onclick="recycleClear()">清空</button>
+                </div>
+            </div>
+        </div>
+        <div id="rb-list"></div>
+    </div>
+
     <div class="page" id="page-prefs" data-title="Settings" data-sub="改完即生效">
         <div class="pref-group">
             <label class="pref-card">
@@ -1622,6 +1685,11 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
                     <button type="button" data-v="md" onclick="setCopyFormat('md')">Markdown</button>
                     <button type="button" data-v="html" onclick="setCopyFormat('html')">HTML</button>
                 </div>
+            </div>
+            <div class="pref-card" role="button" tabindex="0" onclick="editCopyTemplate()">
+                <span class="pref-text">自定义模板</span>
+                <span class="pref-val" id="pref-copytpl-val">未启用</span>
+                <svg class="pref-chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg>
             </div>
             <label class="pref-card">
                 <span class="pref-text">上传后自动复制</span>
@@ -1699,6 +1767,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div class="about-item"><div class="about-t">Direct Link</div><div class="about-d">把图片、字体、ZIP 上传到你自己的 GitHub 仓库，并自动生成可直接使用的直链。文件存在你自己的仓库里，不经过第三方服务器。</div></div>
             <div class="about-item"><div class="about-t">数据只存在本机</div><div class="about-d">GitHub Token、仓库设置、偏好和上传记录都只保存在这台设备的浏览器里。清除网站数据、删除主屏幕 App 或换设备后，需要重新填写 Token 并设置偏好。仓库文件的收藏和标签可以同步到仓库里，见「同步标签到仓库」。</div></div>
             <div class="about-item"><div class="about-t">离线使用</div><div class="about-d" id="about-offline-status">检查中…</div></div>
+            <div class="about-item"><div class="about-t">本地数据保护</div><div class="about-d" id="about-storage-status">检查中…</div></div>
             </div>
         </div>
         <div class="about-sec">
@@ -1736,7 +1805,10 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div class="about-box">
             <div class="about-item"><div class="about-t">按标签全选</div><div class="about-d">先点「标签」选一个标签，再点一次「标签」，菜单第一项就是「全选此标签」。会选中当前筛选下看得到的全部项目，之后可以直接批量移动、下载、删除。仓库页的标签筛选会跨文件夹，整个仓库里带这个标签的文件都会被选中。</div></div>
             <div class="about-item"><div class="about-t">在仓库里定位</div><div class="about-d">在资源库里只选中一张图，点「标签」按钮，面板里有「在仓库里定位」，会切到仓库页、进入它所在的文件夹并高亮。只能定位当前仓库里的文件。</div></div>
-            <div class="about-item"><div class="about-t">未入库</div><div class="about-d">仓库页的「未入库」表示这台设备的资源库里没有这个文件的记录，比如在别处上传的，或者换了设备。它不影响文件本身和直链。点筛选栏的「未入库」可以只看这些文件；在仓库页只选中一个文件，面板里可以跳到它在资源库里的记录。资源库是空的时不显示这个标记。</div></div>
+            <div class="about-item"><div class="about-t">最近删除</div><div class="about-d">在仓库页或资源库删掉的仓库文件，会记在首页的「最近删除」里，30 天内可以恢复：点一条选「恢复」，或点右上角「全部恢复」。恢复会把文件放回原来的位置，收藏、标签和资源库记录一起还原；原位置已经有同名文件的会跳过，不会被覆盖。「清空」只清这份列表，不会动仓库。这份列表只存在这台设备上。</div></div>
+            <div class="about-item"><div class="about-t">批量重命名</div><div class="about-d">在仓库页或资源库选中 2 个以上的文件，点「重命名」，可以按规则加前缀、加后缀、按序号命名或查找替换。扩展名保持不变，弹窗里会先预览结果，一次提交完成，改完可以撤销。改名后原来的直链会失效。</div></div>
+            <div class="about-item"><div class="about-t">自定义复制格式</div><div class="about-d">设置里的「自定义模板」可以写自己的复制格式：{url} 是直链，{name} 是文件名，{stem} 是不带扩展名的文件名，{ext} 是扩展名。例如 url("{url}")。保存后复制格式会切到「自定义」，换回直链、Markdown 或 HTML 就恢复原样。</div></div>
+            <div class="about-item"><div class="about-t">导出链接清单</div><div class="about-d">仓库页的「更多工具」和资源库的菜单里都有「导出链接清单」，可以按选中、当前列表或全部，导出成纯链接、按当前复制格式、JSON 或 CSV 文件，方便备份、搬家和批量替换。</div></div>
             </div>
         </div>
         <div class="about-sec">
@@ -1745,7 +1817,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div class="about-item"><div class="about-t">检测剪贴板图片</div><div class="about-d">打开 App 时检查剪贴板里有没有图片，有的话提示你直接上传。系统可能会弹出「允许粘贴」的确认，这是系统的隐私保护，选允许即可。</div></div>
             <div class="about-item"><div class="about-t">仓库页检测失效链接</div><div class="about-d">仓库页「…」菜单里的「检测失效链接」，会逐个打开仓库文件的直链，打不开的标红「失效」，只有 jsDelivr 没同步的标灰「CDN 未同步」。检测结果只保存在本次打开期间。打开「自动检测失效链接」后，每个仓库读取完文件会隔 7 天自动检测一次，只有发现失效时才提示。文件在仓库里不代表直链一定能用，私有仓库、特殊字符的文件名都可能打不开。</div></div>
             <div class="about-item"><div class="about-t">仓库页查找重复文件</div><div class="about-d">仓库页「…」菜单里的「查找重复文件」，按文件内容找出完全相同的文件（不用下载任何文件）。每组保留路径最短的一份，其余标灰「重复」，可以一键选中后删除。删除副本后，用那些路径的直链会失效，先确认没有地方在用。检测失效链接也可以只检测当前文件夹，或多选后只检测选中的文件。</div></div>
-            <div class="about-item"><div class="about-t">仓库页更多工具</div><div class="about-d">仓库页「…」→「更多工具」里有四个：查找相似图片（在手机上算图片指纹，第一次要下载图片，结果会缓存）；扫描未被引用的文件（导入你的 HTML、JSON 等文件，找出仓库里没被用到的图片）；导出表情包 JSON（含义取自文件名，分类取自文件夹）；CDN 线路（测速，之后复制的链接会换成选定的线路，不会改动已有的记录）。另外，替换文件那页有「表情包 JSON」入口：按分类建文件夹、用含义当文件名转存，并输出替换好链接的新 JSON。</div></div>
+            <div class="about-item"><div class="about-t">仓库页更多工具</div><div class="about-d">仓库页「…」→「更多工具」里有四个：查找相似图片（在手机上算图片指纹，第一次要下载图片，结果会缓存）；扫描未被引用的文件（导入你的 HTML、JSON 等文件，找出仓库里没被用到的图片）；导出表情包 JSON（含义取自文件名，分类取自文件夹）；CDN 线路（测速，之后复制的链接会换成选定的线路，不会改动已有的记录）。另外，替换文件那页选文件时会自动识别表情包，不用另外点按钮：Word（.docx，每段一条「含义：链接」，需要 iOS 16.4 及以上）、带含义或分类的 JSON（里面是链接，或直接内嵌的 base64 图片都行，也认 {"含义": "链接"} 的写法）、几乎每行都是「含义：链接」的文本（.txt / .md / .csv，也认 Markdown 图片写法）。识别为表情包后，按分类建文件夹、用含义当文件名转存；JSON 输出换好直链的新 JSON，Word 和文本输出整理好的新 JSON，分类取自单独成行的标题，没有标题就用文件名。其他文件照旧原样替换链接。</div></div>
             <div class="about-item"><div class="about-t">自动检测失效链接</div><div class="about-d">打开资源库时自动检查已上传的链接是否还能访问，仓库页也会按同样的间隔检查仓库文件的直链，会产生额外的网络请求。不需要时可以关闭。</div></div>
             <div class="about-item"><div class="about-t">后台保活</div><div class="about-d">开启后会循环播放无声音频，让 iOS 不要把页面挂起，锁屏或切到其他 App 时上传也能继续。开启期间可能会打断其他 App 正在播放的音乐或播客。控制中心会出现「后台保活中」的播放卡片，这是正常现象；会增加耗电。如果提示「点一下屏幕即可启用后台保活」，点一下屏幕即可。</div></div>
             <div class="about-item"><div class="about-t">屏幕常亮</div><div class="about-d">上传时阻止屏幕自动锁定。只在页面处于前台时有效，同样会增加耗电。据我所知，较旧的 iOS 版本在主屏幕网页里可能不生效。</div></div>
@@ -1850,6 +1922,33 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
     </div>
 </div>
 
+<!-- 表情包导入预览：缩略图网格 + 可改含义 / 分类 + 输出格式 -->
+<div class="delete-sheet-backdrop" id="sticker-sheet-backdrop" onclick="if(event.target===this) stickerPreviewCancel()">
+    <div class="save-sheet sticker-sheet" role="dialog" aria-modal="true" aria-labelledby="sticker-sheet-title">
+        <div class="save-grab"></div>
+        <div class="save-head">
+            <div class="save-title" id="sticker-sheet-title">确认要转存的表情</div>
+            <div class="save-sub" id="sticker-sheet-sub"></div>
+        </div>
+        <div class="stk-bar">
+            <button type="button" class="stk-chip" id="stk-all" onclick="stickerPreviewToggleAll()">全不选</button>
+            <span class="stk-fmt-wrap" id="stk-fmt-wrap">
+                <span class="stk-lbl">输出</span>
+                <select class="stk-sel" id="stk-fmt" onchange="stickerPreviewFmtChange()"></select>
+            </span>
+        </div>
+        <div class="stk-tpl-wrap" id="stk-tpl-wrap" hidden>
+            <input type="text" class="stk-tpl" id="stk-tpl" autocomplete="off" spellcheck="false" oninput="$('stk-tpl-hint').classList.remove('bad')">
+            <div class="stk-tpl-hint" id="stk-tpl-hint">每行一条。可用 {url} {meaning} {category}，必须包含 {url}</div>
+        </div>
+        <div class="stk-list" id="stk-list"></div>
+        <div class="stk-actions">
+            <button type="button" class="save-cancel stk-cancel" onclick="stickerPreviewCancel()">取消</button>
+            <button type="button" class="stk-go" id="stk-go" onclick="stickerPreviewConfirm()">转存</button>
+        </div>
+    </div>
+</div>
+
 <!-- 多选删除确认层 -->
 <div class="delete-sheet-backdrop" id="delete-sheet-backdrop" onclick="handleDeleteBackdropClick(event)">
     <div class="delete-sheet">
@@ -1919,7 +2018,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <button type="button" class="dk-btn" onclick="renameSelectedGallery()" aria-label="重命名" title="重命名"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19.5l.9-3.9L16.6 4.4a2.1 2.1 0 0 1 3 3L8.4 18.6z"/><path d="M14.5 6.5l3 3"/></svg></button>
             <button type="button" class="dk-btn" id="gallery-save-photos-btn" onclick="saveSelectedGalleryEntries('photos')" aria-label="存到相册" title="存到相册"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></svg></button>
             <button type="button" class="dk-btn" id="gallery-save-files-btn" onclick="openSaveSheet('gallery')" aria-label="存到文件" title="存到文件"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v10"/><path d="M8 10.5l4 4 4-4"/><path d="M5 15v2.5A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5V15"/></svg></button>
-            <button type="button" class="dk-btn" id="gallery-tag-btn" data-menu-btn onclick="openTagActionMenu(this)" aria-label="标签与收藏" title="标签与收藏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.2V5.5a2 2 0 0 1 2-2h6.7a2 2 0 0 1 1.4.6l6.8 6.8a2 2 0 0 1 0 2.8l-6.7 6.7a2 2 0 0 1-2.8 0L4.1 13.6a2 2 0 0 1-.6-1.4z"/><circle cx="8.5" cy="8.5" r="1.2"/></svg></button>
+            <button type="button" class="dk-btn" id="gallery-tag-btn" data-menu-btn onclick="openTagActionMenu()" aria-label="标签与收藏" title="标签与收藏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.2V5.5a2 2 0 0 1 2-2h6.7a2 2 0 0 1 1.4.6l6.8 6.8a2 2 0 0 1 0 2.8l-6.7 6.7a2 2 0 0 1-2.8 0L4.1 13.6a2 2 0 0 1-.6-1.4z"/><circle cx="8.5" cy="8.5" r="1.2"/></svg></button>
             <button type="button" class="dk-btn dk-danger" onclick="openDeleteSheet()" aria-label="删除" title="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15"/><path d="M9.5 7V5.2c0-.7.5-1.2 1.2-1.2h2.6c.7 0 1.2.5 1.2 1.2V7"/><path d="M6.5 7l.8 11.2A2 2 0 0 0 9.3 20h5.4a2 2 0 0 0 2-1.8L17.5 7"/></svg></button>
         </div>
     </div>
@@ -1933,7 +2032,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <button type="button" class="dk-btn" onclick="renameSelectedRepo()" aria-label="重命名" title="重命名"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19.5l.9-3.9L16.6 4.4a2.1 2.1 0 0 1 3 3L8.4 18.6z"/><path d="M14.5 6.5l3 3"/></svg></button>
             <button type="button" class="dk-btn" id="repo-save-photos-btn" onclick="saveSelectedRepoFiles('photos')" aria-label="存到相册" title="存到相册"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></svg></button>
             <button type="button" class="dk-btn" id="repo-save-files-btn" onclick="openSaveSheet('repo')" aria-label="存到文件" title="存到文件"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v10"/><path d="M8 10.5l4 4 4-4"/><path d="M5 15v2.5A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5V15"/></svg></button>
-            <button type="button" class="dk-btn" id="repo-tag-btn" data-menu-btn onclick="openRepoTagActionMenu(this)" aria-label="标签与收藏" title="标签与收藏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.2V5.5a2 2 0 0 1 2-2h6.7a2 2 0 0 1 1.4.6l6.8 6.8a2 2 0 0 1 0 2.8l-6.7 6.7a2 2 0 0 1-2.8 0L4.1 13.6a2 2 0 0 1-.6-1.4z"/><circle cx="8.5" cy="8.5" r="1.2"/></svg></button>
+            <button type="button" class="dk-btn" id="repo-tag-btn" data-menu-btn onclick="openRepoTagActionMenu()" aria-label="标签与收藏" title="标签与收藏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.2V5.5a2 2 0 0 1 2-2h6.7a2 2 0 0 1 1.4.6l6.8 6.8a2 2 0 0 1 0 2.8l-6.7 6.7a2 2 0 0 1-2.8 0L4.1 13.6a2 2 0 0 1-.6-1.4z"/><circle cx="8.5" cy="8.5" r="1.2"/></svg></button>
             <button type="button" class="dk-btn dk-danger" onclick="deleteSelectedRepoFiles()" aria-label="删除" title="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15"/><path d="M9.5 7V5.2c0-.7.5-1.2 1.2-1.2h2.6c.7 0 1.2.5 1.2 1.2V7"/><path d="M6.5 7l.8 11.2A2 2 0 0 0 9.3 20h5.4a2 2 0 0 0 2-1.8L17.5 7"/></svg></button>
         </div>
     </div>
@@ -1969,6 +2068,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
     <div class="delete-sheet" role="alertdialog" aria-modal="true" aria-labelledby="dlg-title" aria-describedby="dlg-msg">
         <div class="delete-sheet-title" id="dlg-title"></div>
         <div class="delete-sheet-sub" id="dlg-msg"></div>
+        <div id="dlg-extra" style="display:none;"></div>
         <div class="move-new-folder-row" id="dlg-input-row" style="display:none;">
             <input type="text" id="dlg-input" autocomplete="off" autocapitalize="off" spellcheck="false">
         </div>
@@ -2251,11 +2351,12 @@ async function undoDeleteBundle(b) {
             if (!list.length) continue;
             await commitTreeChanges(g[0].owner, g[0].repo, g[0].branch,
                 list.map(f => ({ path: f.path, mode: '100644', type: 'blob', sha: f.sha })),
-                '撤销删除 ' + list.length + ' 个文件', s);
+                b.commitMsg || ('撤销删除 ' + list.length + ' 个文件'), s);
             restoredFiles = restoredFiles.concat(list);
         }
         if (!restoredFiles.length) throw undoErr('原位置已经有同名文件，没法恢复');
         restoreRepoLocal(b.snap);
+        recycleRemoveFiles(restoredFiles);   // 已经恢复的，从「最近删除」里拿掉
         const first = restoredFiles[0];
         if (repoLiveLoaded && String(first.repo).toLowerCase() === String(s.repo).toLowerCase()) {
             const have = new Set(repoLiveFiles.map(x => x.path));
@@ -2408,6 +2509,9 @@ function openDialog(o) {
     const msg = $('dlg-msg');
     msg.textContent = o.message || '';
     msg.style.display = o.message ? '' : 'none';
+    const ex = $('dlg-extra');
+    ex.innerHTML = '';
+    if (o.extra) { ex.appendChild(o.extra); ex.style.display = ''; } else ex.style.display = 'none';
     $('dlg-ok').textContent = o.confirmText || '确定';
     $('dlg-cancel').textContent = o.cancelText || '取消';
     dlgMode = o.input ? 'prompt' : 'confirm';
@@ -2440,7 +2544,11 @@ function showPrompt(o) {
 
 function submitDialog() {
     if (!dlgResolve) return;
-    if (dlgMode !== 'prompt') return finishDialog(true);
+    if (dlgMode !== 'prompt') {
+        const bad = dlgValidate ? dlgValidate('') : '';
+        if (bad) { const er = $('dlg-error'); er.textContent = bad; er.classList.add('show'); return; }
+        return finishDialog(true);
+    }
     const input = $('dlg-input');
     const value = input.value.trim();
     const problem = dlgValidate ? dlgValidate(value) : '';
@@ -2485,6 +2593,7 @@ document.addEventListener('keydown', e => {
     if (open('upload-error-modal')) { e._kbEsc = true; return closeUploadErrorModal(); }
     if (open('repo-sheet-backdrop')) { e._kbEsc = true; return closeRepoSheet(); }
     if (open('move-sheet-backdrop')) { e._kbEsc = true; return closeMoveSheet(); }
+    if (open('sticker-sheet-backdrop')) { e._kbEsc = true; return stickerPreviewCancel(); }
     if (open('tag-sheet-backdrop')) { e._kbEsc = true; return closeTagSheet(); }
     if (open('save-sheet-backdrop')) { e._kbEsc = true; return closeSaveSheet(); }
     if (open('delete-sheet-backdrop')) { e._kbEsc = true; closeDeleteSheet(); }
@@ -2665,6 +2774,7 @@ function purgeLocalRecordsForRepo(owner, repo) {
     let changed = false;
     Object.keys(order).forEach(k => { if (k.startsWith(prefix)) { delete order[k]; changed = true; } });
     if (changed) saveUploadOrder(order);
+    recycleRemove(x => String(x.repo || '').toLowerCase() === rr && (!x.owner || String(x.owner).toLowerCase() === ro));
     renderGallery();
 }
 
@@ -2698,6 +2808,9 @@ function rewriteLocalRecordsForRename(owner, oldName, newName) {
         orderChanged = true;
     });
     if (orderChanged) saveUploadOrder(order);
+    let rbChanged = false;
+    recycleLoad().forEach(x => { if (String(x.repo || '').toLowerCase() === oo && String(x.owner || '').toLowerCase() === ro) { x.repo = newName; rbChanged = true; } });
+    if (rbChanged) recycleSave();
     renderGallery();
 }
 
@@ -2925,8 +3038,9 @@ function openPage(name) {
     afterPush(el, () => {
         if (name === 'gallery') { renderGallery(); loadRepoLiveFiles(false); }
         if (name === 'storage') loadStorage(false);
+        if (name === 'recycle') recycleRender();
         if (name === 'prefs') renderPlugins();
-        if (name === 'about') { renderAboutPlugins(); try { offlineStatusRefresh(); } catch (_) {} }
+        if (name === 'about') { renderAboutPlugins(); try { offlineStatusRefresh(); } catch (_) {} try { storageStatusRefresh(); } catch (_) {} }
         if (name === 'update' && typeof aboutOnOpen === 'function') aboutOnOpen();
     });
 }
@@ -3402,6 +3516,7 @@ function openLibraryMenu(btn) {
         } },
         { label: '排序', icon: ICON_SORT, onClick: () => openGallerySortMenu(btn) },
         { label: '复制全部', icon: ICON_COPY, onClick: copyAllLinks },
+        { label: '导出链接清单', icon: ICON_COPY, onClick: () => exportLinkList('library') },
         { label: '复制格式：' + COPY_FORMATS[prefCopyFormat()], icon: ICON_COPY, onClick: cycleCopyFormat },
         { label: linkCheckRunning ? '停止检测' : '检测失效链接', icon: ICON_LINKCHK, onClick: () => runLinkCheck() },
         ...(nCdn ? [{ label: '修复 CDN 未同步（' + nCdn + '）', icon: ICON_REFRESH, onClick: () => fixCdnLinks() }] : []),
@@ -3561,6 +3676,39 @@ async function saveSettings() {
     }
 }
 
+/* ---------- 跨窗口锁（navigator.locks）：两个窗口 / 标签页同时写同一份东西时，排队一个一个来 ----------
+   不支持锁、环境不让用（比如本地 file://）、或者等锁超时，都退回没有锁时的老做法，不会因此卡住。 */
+async function withCrossTabLock(name, fn, waitMs) {
+    const lm = (typeof navigator !== 'undefined') && navigator.locks;
+    if (!lm || typeof lm.request !== 'function') return fn();
+    let acquired = false, timer = 0;
+    const opts = {};
+    if (waitMs && typeof AbortController === 'function') {
+        const ac = new AbortController();
+        opts.signal = ac.signal;
+        timer = setTimeout(() => ac.abort(), waitMs);
+    }
+    try {
+        return await lm.request(name, opts, async () => { acquired = true; clearTimeout(timer); return fn(); });
+    } catch (e) {
+        clearTimeout(timer);
+        if (acquired) throw e;   // 是 fn 自己出的错，照常往外抛
+        return fn();             // 等锁超时 / 锁不可用
+    }
+}
+// 锁被别的窗口占着就直接跳过（返回 undefined），不排队
+async function runIfLockFree(name, fn) {
+    const lm = (typeof navigator !== 'undefined') && navigator.locks;
+    if (!lm || typeof lm.request !== 'function') return fn();
+    let ran = false;
+    try {
+        return await lm.request(name, { ifAvailable: true }, async lock => { if (!lock) return undefined; ran = true; return fn(); });
+    } catch (e) {
+        if (ran) throw e;
+        return fn();
+    }
+}
+
 // --- 本地数据库（IndexedDB）---
 // 资源库记录、上传顺序、失败上传队列都放这里。读写走内存缓存（启动时读一次），
 // 不再每次从 localStorage 整份 JSON.parse / stringify；落盘在后台防抖进行，也没有 5MB 的上限。
@@ -3605,6 +3753,10 @@ const dlDB = (() => {
 })();
 let storeReady = false, storeUsesIDB = false;
 let historyCache = [], orderCache = {};
+let repoViewEpoch = 0, repoVisCache = null;   // 仓库「当前可见文件列表」的缓存；数据变了（重画、改标签 / 收藏）就 +1
+let rankEpoch = 0, rankCache = null;   // 上传时间排名表的缓存；每次写记录 / 写排序就 +1，缓存作废
+// 「上次和数据库对过账」的版本：写盘时拿它判断本窗口改了什么、别的窗口改了什么，两边的改动都保留
+let historyBase = null, orderBase = null;
 let historyTimer = null, orderTimer = null;
 let storeChannel = null;
 function readLegacyJSON(key, fallback) {
@@ -3632,28 +3784,109 @@ async function initStore() {
         storeUsesIDB = false;
     }
     storeReady = true;
+    historyBase = historySnapshot(historyCache);
+    orderBase = Object.assign({}, orderCache);
     try {
         if (storeUsesIDB && typeof BroadcastChannel !== 'undefined') {
             storeChannel = new BroadcastChannel('direct-link-store');
             // 其他标签页改了记录：重新读一次再刷新
             storeChannel.onmessage = ev => {
-                if (ev.data === 'history') dlDB.get('kv', 'history').then(h => { if (Array.isArray(h)) { historyCache = h; renderGallery(); } }).catch(() => {});
-                else if (ev.data === 'order') dlDB.get('kv', 'upload_order').then(o => { if (isPlainObj(o)) orderCache = o; }).catch(() => {});
+                if (ev.data === 'history') storeReloadHistory();
+                else if (ev.data === 'order') storeReloadOrder();
             };
         }
     } catch (_) {}
 }
+function historySnapshot(list) {
+    const m = new Map();
+    (list || []).forEach(e => { if (e && e.id !== undefined) m.set(e.id, JSON.stringify(e)); });
+    return m;
+}
+// 三方合并：base = 上次对账时的样子，local = 本窗口现在的样子，db = 数据库里现在的样子。
+// 本窗口新增 / 改过 / 删掉的，以本窗口为准；别的窗口新增 / 改过 / 删掉的，只要本窗口没碰过，就跟着它。
+function mergeHistory(base, local, db) {
+    const dbById = new Map();
+    db.forEach(e => { if (e && e.id !== undefined) dbById.set(e.id, e); });
+    const out = [], seen = new Set();
+    let changed = false;
+    local.forEach(e => {
+        if (!e || e.id === undefined) { out.push(e); return; }
+        seen.add(e.id);
+        const b = base.get(e.id);
+        if (b === undefined) { out.push(e); return; }                      // 本窗口新增的
+        const mine = JSON.stringify(e) !== b;                              // 本窗口改过
+        const d = dbById.get(e.id);
+        if (!d) { if (mine) out.push(e); else changed = true; return; }    // 别处删掉了：本窗口没动过就跟着删
+        if (mine) { out.push(e); return; }
+        const dj = JSON.stringify(d);
+        if (dj !== b) { changed = true; out.push(d); } else out.push(e);   // 别处改过：用它的
+    });
+    const extra = [];
+    db.forEach(e => { if (e && e.id !== undefined && !seen.has(e.id) && !base.has(e.id)) extra.push(e); });   // 别处新增的（base 里有而本窗口没有的 = 本窗口删的，不加回来）
+    if (extra.length) changed = true;
+    return { list: extra.concat(out), changed };
+}
+function mergeOrder(base, local, db) {
+    const out = Object.assign({}, db);
+    Object.keys(base).forEach(k => { if (!(k in local)) delete out[k]; });
+    Object.keys(local).forEach(k => { if (base[k] !== local[k]) out[k] = local[k]; });
+    return out;
+}
+async function storeReloadHistory() {
+    if (!storeUsesIDB) return;
+    try {
+        const h = await dlDB.get('kv', 'history');
+        if (!Array.isArray(h)) return;
+        const snap = historySnapshot(h);
+        let same = !!historyBase && snap.size === historyBase.size;
+        if (same) for (const [k, v] of snap) { if (historyBase.get(k) !== v) { same = false; break; } }
+        if (same) return;   // 数据库里和上次对账时一样：没有别人的改动
+        historyCache = (historyTimer && historyBase) ? mergeHistory(historyBase, historyCache, h).list : h;   // 本窗口还有没写盘的改动：并进去，不能被盖掉
+        historyBase = snap;
+        renderGallery();
+    } catch (_) {}
+}
+async function storeReloadOrder() {
+    if (!storeUsesIDB) return;
+    try {
+        const o = await dlDB.get('kv', 'upload_order');
+        if (!isPlainObj(o)) return;
+        orderCache = (orderTimer && orderBase) ? mergeOrder(orderBase, orderCache, o) : o;
+        orderBase = Object.assign({}, o);
+    } catch (_) {}
+}
 function flushHistory() {
     historyTimer = null;
-    return dlDB.put('kv', 'history', historyCache)
-        .then(() => { if (storeChannel) storeChannel.postMessage('history'); })
-        .catch(e => { console.warn('资源库记录保存失败：', e); toast('保存失败，存储空间可能不足'); });
+    return withCrossTabLock('dl-store', async () => {
+        let list = historyCache, merged = false;
+        try {
+            const db = await dlDB.get('kv', 'history');
+            if (Array.isArray(db) && historyBase) {
+                const r = mergeHistory(historyBase, historyCache, db);   // 注意：等待读取期间 historyCache 可能又变了，所以在这里才取
+                list = r.list; merged = r.changed;
+                historyCache = list;
+            }
+        } catch (_) { /* 读不到就按本窗口的写 */ }
+        const snap = historySnapshot(list);
+        await dlDB.put('kv', 'history', list);
+        historyBase = snap;
+        if (storeChannel) storeChannel.postMessage('history');
+        if (merged) { try { renderGallery(); } catch (_) {} }
+    }, 20000).catch(e => { console.warn('资源库记录保存失败：', e); toast('保存失败，存储空间可能不足'); });
 }
 function flushOrder() {
     orderTimer = null;
-    return dlDB.put('kv', 'upload_order', orderCache)
-        .then(() => { if (storeChannel) storeChannel.postMessage('order'); })
-        .catch(e => console.warn('上传顺序保存失败：', e));
+    return withCrossTabLock('dl-store', async () => {
+        let o = orderCache;
+        try {
+            const db = await dlDB.get('kv', 'upload_order');
+            if (isPlainObj(db) && orderBase) { o = mergeOrder(orderBase, orderCache, db); orderCache = o; }
+        } catch (_) {}
+        const snap = Object.assign({}, o);
+        await dlDB.put('kv', 'upload_order', o);
+        orderBase = snap;
+        if (storeChannel) storeChannel.postMessage('order');
+    }, 20000).catch(e => console.warn('上传顺序保存失败：', e));
 }
 // 页面进入后台 / 关闭前，把还没落盘的改动立即提交
 function flushStoreNow() {
@@ -3664,11 +3897,16 @@ function flushStoreNow() {
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushStoreNow(); });
 window.addEventListener('pagehide', flushStoreNow);
+// 从后台切回来：这个窗口在后台时可能错过了别的窗口的通知（iOS 会冻结后台页面），回来先对一遍账，再接着改
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && storeReady && storeUsesIDB) { storeReloadHistory(); storeReloadOrder(); }
+});
 
 // --- 历史记录（不限量，全部保存） ---
 // loadHistory() 返回内存里的同一个数组：要改就改完调用 saveHistory(list)；只读用 filter/map 即可。
 function loadHistory() { return historyCache; }
 function saveHistory(list) {
+    rankEpoch++;
     if (!storeReady) { console.warn('存储尚未就绪，忽略写入'); return false; }
     historyCache = Array.isArray(list) ? list : [];
     if (!storeUsesIDB) {
@@ -3694,6 +3932,7 @@ async function persistFailedUpload(file, ctx, message) {
             relPath: file._relPath || '', forceImage: !!file._forceImage, sniffExt: file._sniffExt || '',
             owner: (ctx && ctx.owner) || '', repo: getSettings().repo, message: String(message || ''), time: Date.now()
         });
+        if (storagePersisted !== true) requestPersistentStorage(false);
     } catch (_) { /* 存不下就算了：当前页面里的「重试」按钮照常可用 */ }
 }
 function forgetFailedUpload(file) {
@@ -3701,6 +3940,10 @@ function forgetFailedUpload(file) {
 }
 async function offerFailedUploads() {
     if (!storeUsesIDB || isBatchUploading) return;
+    // 两个窗口同时打开时，都会提示「继续上传」，各传一遍就重复了：谁先拿到锁谁处理，另一个跳过
+    return runIfLockFree('dl-failed-offer', offerFailedUploadsCore);
+}
+async function offerFailedUploadsCore() {
     let recs;
     try { recs = await dlDB.all('failed'); } catch (_) { return; }
     const now = Date.now();
@@ -3766,6 +4009,7 @@ function uploadKey(owner, repo, path) {
 }
 function loadUploadOrder() { return orderCache; }
 function saveUploadOrder(o) {
+    rankEpoch++;
     orderCache = isPlainObj(o) ? o : {};
     if (!storeReady) return;
     if (!storeUsesIDB) { try { localStorage.setItem(UPLOAD_ORDER_KEY, JSON.stringify(orderCache)); } catch (_) {} return; }
@@ -3779,19 +4023,22 @@ function recordUploadOrder(owner, repo, path, time) {
 }
 function historyAssetRef(e) {
     if (!e) return null;
-    if (e.githubPath) return { owner: e.githubOwner || '', repo: e.githubRepo || '', path: e.githubPath };
+    if (e.githubPath) return { owner: e.githubOwner || '', repo: e.githubRepo || '', branch: e.githubBranch || '', path: e.githubPath };
     return parseGithubAssetFromUrl(e.url);
 }
 function buildUploadRank() {
+    const hist = loadHistory(), ord = loadUploadOrder();
+    const c = rankCache;
+    if (c && c.hist === hist && c.ord === ord && c.n === hist.length && c.epoch === rankEpoch) return c.rank;
     const rank = new Map();
-    loadHistory().forEach(e => { // 旧版本留下的图库记录也能用来排序
+    hist.forEach(e => { // 旧版本留下的图库记录也能用来排序
         const p = historyAssetRef(e);
         if (!p) return;
         const k = uploadKey(p.owner, p.repo, p.path);
         rank.set(k, Math.max(rank.get(k) || 0, e.time || 0));
     });
-    const order = loadUploadOrder();
-    Object.keys(order).forEach(k => rank.set(k, order[k]));
+    Object.keys(ord).forEach(k => rank.set(k, ord[k]));
+    rankCache = { hist, ord, n: hist.length, epoch: rankEpoch, rank };
     return rank;
 }
 function pruneOrderOnly(files) {
@@ -3928,7 +4175,7 @@ function enterGalleryMultiMode(id) {
     if (id) gallerySelected.add(id);
     updateGallerySelectionUI();
     syncGallerySelectionDom();
-    dragSelectOnEnter('gallery', id);   // v3.0.4：长按进入多选后不松手直接拖，就是滑动选择
+    dragSelectOnEnter('gallery', id);   // 长按进入多选后不松手直接拖，就是滑动选择
 }
 
 function exitGalleryMultiMode() {
@@ -4072,7 +4319,7 @@ async function confirmDeleteSelected() {
     if (progress) progress.classList.add('show');
     const deleteFailures = [];
     const keepIds = new Set();   // 仓库文件没删成的记录：本地先保留，方便重试
-    let undoFiles = [], undoSnap = null;   // v3.0.4：给「撤销」用的快照
+    let undoFiles = [], undoSnap = null;   // 给「撤销」用的快照
     try {
         if (deleteCloud) {
             // 批量：所有仓库文件一次提交删完（原来每个文件 2 个请求 + 1 次提交，慢而且容易互相冲突）
@@ -4120,6 +4367,7 @@ async function confirmDeleteSelected() {
     const idSet = new Set(ids), removedHist = [], nextHist = [];
     loadHistory().forEach((e, idx) => { if (idSet.has(e.id) && !keepIds.has(e.id)) removedHist.push({ idx, entry: e }); else nextHist.push(e); });
     saveHistory(nextHist);
+    if (undoFiles.length) recycleAdd(undoFiles, undoSnap, removedHist);   // 记进「最近删除」
     gallerySelected.clear();
     galleryMultiMode = false;
     updateGallerySelectionUI();
@@ -4204,8 +4452,6 @@ let repoSearchTimer = null;
 // ---- 仓库文件的收藏 / 标签（与资源库功能一致；存在本机，按 账号/仓库/路径 记录）----
 const REPO_META_KEY = 'kb_repo_meta';
 let repoTag = '';
-let repoOnlyUnlinked = false; // 只看资源库里没有记录的文件
-let libIdxCache = null;      // 资源库 ↔ 仓库对照表的缓存
 let repoMetaCache = null;
 function loadRepoMeta() {
     if (repoMetaCache) return repoMetaCache;
@@ -4215,6 +4461,7 @@ function loadRepoMeta() {
     return repoMetaCache;
 }
 function saveRepoMeta(opts) {
+    repoViewEpoch++;
     try { localStorage.setItem(REPO_META_KEY, JSON.stringify(loadRepoMeta())); } catch (_) { toast('保存失败，存储空间可能不足'); }
     if (!(opts && opts.noSync)) metaSyncMarkDirty(opts);   // 本机改动 → 稍后同步到仓库
 }
@@ -4222,6 +4469,7 @@ function repoMetaOf(f) { return f ? (loadRepoMeta()[uploadKey(f.owner, f.repo, f
 function repoMetaTags(f) { const m = repoMetaOf(f); return m && Array.isArray(m.tags) ? m.tags : []; }
 function repoMetaIsFav(f) { const m = repoMetaOf(f); return !!(m && m.fav); }
 function editRepoMeta(f, fn) {
+    repoViewEpoch++;
     const all = loadRepoMeta(), k = uploadKey(f.owner, f.repo, f.path);
     const m = Object.assign({}, all[k] || {});
     fn(m);
@@ -4344,6 +4592,13 @@ async function metaRemoteWrite(c, s, files, t, sha) {
 }
 // 返回 'ok' | 'err' | 'skip' | 'busy'
 async function syncRepoMeta(manual) {
+    const c0 = repoMetaCtx;
+    // 这些情况下面直接就返回了，不需要锁
+    if (!c0 || !c0.owner || !c0.repo || !prefMetaSync() || metaSyncBusy) return syncRepoMetaCore(manual);
+    // 读远端 → 合并 → 写回是一个整体：两个窗口同时做，后写的会撞上「版本不对」报错；加锁后一个一个来
+    return withCrossTabLock('dl-meta:' + metaSyncRepoKey(c0.owner, c0.repo), () => syncRepoMetaCore(manual), 120000);
+}
+async function syncRepoMetaCore(manual) {
     metaSyncPending = false;
     if (!prefMetaSync()) return 'skip';
     const c = repoMetaCtx;
@@ -4426,7 +4681,7 @@ function onRepoSearchInput() {
     }, 150);
 }
 let repoLiveFiles = [];
-// v3.0.5：仓库文件的直链检测结果（只在本次打开期间有效；文件内容变了 sha 对不上就作废）
+// 仓库文件的直链检测结果（只在本次打开期间有效；文件内容变了 sha 对不上就作废）
 const repoLinkStatus = new Map();   // uploadKey → { s: 'ok'|'dead'|'cdn', sha, t }
 let repoLinkCheckRunning = false, repoLinkCheckStop = false;
 function repoFolderFiles() {
@@ -4439,10 +4694,10 @@ function repoLinkStatusOf(f) {
     const v = repoLinkStatus.get(uploadKey(f.owner, f.repo, f.path));
     return (v && v.sha === f.sha) ? v.s : '';
 }
-// v3.0.9：重复文件（内容 sha 相同）。path → { sha, extra }，extra=true 的是建议删除的多余副本
+// 重复文件（内容 sha 相同）。path → { sha, extra }，extra=true 的是建议删除的多余副本
 let repoDupInfo = new Map();
 function repoDupOf(f) { const v = repoDupInfo.get(f.path); return (v && v.sha === f.sha) ? v : null; }
-// v3.0.10：仓库工具箱的结果（同样只在本次打开期间有效，靠 sha 判断文件有没有变）
+// 仓库工具箱的结果（同样只在本次打开期间有效，靠 sha 判断文件有没有变）
 const REPO_SPECIAL_FILTERS = new Set(['fav', 'dead', 'dup', 'orphan', 'sim']);   // 这些筛选跨文件夹，在整个仓库里找
 let repoOrphanInfo = new Map();   // path → sha：没被导入的文件引用的图片 / 字体
 let repoSimInfo = new Map();      // path → { sha, g, extra }：相似图分组，extra=true 是建议删除的那份
@@ -4750,12 +5005,18 @@ function setRepoFilter(f) {
 }
 
 function getRepoVisibleList() {
+    const key = [repoViewEpoch, rankEpoch, repoLiveFiles.length, repoCurrentPath, repoFilter, repoTag, repoSearch, prefRepoSort()].join('\u0001');
+    const c = repoVisCache;
+    if (c && c.key === key && c.files === repoLiveFiles && c.dup === repoDupInfo && c.sim === repoSimInfo && c.orph === repoOrphanInfo) return c.list;
+    const list = computeRepoVisibleList();
+    repoVisCache = { key, files: repoLiveFiles, dup: repoDupInfo, sim: repoSimInfo, orph: repoOrphanInfo, list };
+    return list;
+}
+function computeRepoVisibleList() {
     const prefix = repoCurrentPath ? repoCurrentPath + '/' : '';
-    const globalView = REPO_SPECIAL_FILTERS.has(repoFilter) || !!repoTag || repoOnlyUnlinked; // 收藏 / 标签 / 未入库筛选：跨文件夹，在整个仓库里找
-    const libIdx = repoOnlyUnlinked ? libraryIndex() : null;
+    const globalView = REPO_SPECIAL_FILTERS.has(repoFilter) || !!repoTag; // 收藏 / 标签筛选：跨文件夹，在整个仓库里找
     const list = repoLiveFiles.filter(f => {
         if (f.name === '.gitkeep') return false;
-        if (libIdx && libIdx.has(uploadKey(f.owner, f.repo, f.path))) return false;
         if (repoFilter === 'fav') { if (!repoMetaIsFav(f)) return false; }
         else if (repoFilter === 'dead') { if (repoLinkStatusOf(f) !== 'dead') return false; }
         else if (repoFilter === 'dup') { if (!repoDupOf(f)) return false; }
@@ -5121,7 +5382,7 @@ async function deleteSelectedRepoFiles() {
     if (!selected.length) return exitRepoMultiMode();
     const ok = await showConfirm({
         title: '删除仓库文件',
-        message: '确定删除选中的 ' + selected.length + ' 个仓库文件？删除会直接提交到仓库。',
+        message: '确定删除选中的 ' + selected.length + ' 个仓库文件？删除会直接提交到仓库，之后可以在首页的「最近删除」里恢复。',
         confirmText: '删除'
     });
     if (!ok) return;
@@ -5131,25 +5392,30 @@ async function deleteSelectedRepoFiles() {
     if (deleteBtn) deleteBtn.disabled = true;
     if (btn) btn.disabled = true;
     const failures = [];
-    const undoSnap = snapshotRepoLocal(selected);   // v3.0.4：给「撤销」用的快照
+    const undoSnap = snapshotRepoLocal(selected);   // 给「撤销」用的快照
     try {
         toast('正在删除 ' + selected.length + ' 个文件…', 'loading');
         failures.push(...await deleteRepoFiles(selected));
         const failedPaths = new Set(failures.map(x => x.path).filter(Boolean));
-        // 用 owner/repo/branch/path 一起做 key：只按 path 匹配会误删「换过仓库/账号后恰好同路径」的历史记录。
-        const keyOf = (o, r, b, p) => uploadKey(o, r, p);   // 不带分支：默认分支不是 main、旧记录没有分支信息时也能匹配
-        const deletedKeys = new Set(
-            selected
-                .filter(f => !failedPaths.has(f.path))
-                .map(f => keyOf(f.owner, f.repo, f.branch, f.path))
-        );
+        // 按 owner/repo/path + 分支匹配：别的分支上同路径的文件和记录不受影响。
+        // 记录里查不到分支（旧记录）时，只要 owner/repo/path 对得上就算命中。
+        const okFiles = selected.filter(f => !failedPaths.has(f.path));
+        const pathKeys = new Set(okFiles.map(f => uploadKey(f.owner, f.repo, f.path)));
+        const exactKeys = new Set(okFiles.filter(f => f.branch).map(f => uploadKey(f.owner, f.repo, f.path) + '\u0001' + f.branch));
+        const noBranchKeys = new Set(okFiles.filter(f => !f.branch).map(f => uploadKey(f.owner, f.repo, f.path)));
+        const wasDeleted = (o, r, p, br) => {
+            const k = uploadKey(o, r, p);
+            if (!pathKeys.has(k)) return false;
+            return !br || noBranchKeys.has(k) || exactKeys.has(k + '\u0001' + br);
+        };
         pruneOrderOnly(selected.filter(f => !failedPaths.has(f.path)));
         pruneRepoMeta(selected.filter(f => !failedPaths.has(f.path)));
-        repoLiveFiles = repoLiveFiles.filter(f => !deletedKeys.has(keyOf(f.owner, f.repo, f.branch, f.path)));
+        repoLiveFiles = repoLiveFiles.filter(f => !wasDeleted(f.owner, f.repo, f.path, f.branch));
         const history = loadHistory();
         const removedHist = [];
-        const next = history.filter((e, idx) => { const p = historyAssetRef(e); const hit = !!(p && p.path && deletedKeys.has(keyOf(p.owner, p.repo, '', p.path))); if (hit) removedHist.push({ idx, entry: e }); return !hit; });
+        const next = history.filter((e, idx) => { const p = historyAssetRef(e); const hit = !!(p && p.path && wasDeleted(p.owner, p.repo, p.path, p.branch)); if (hit) removedHist.push({ idx, entry: e }); return !hit; });
         if (next.length !== history.length) saveHistory(next);
+        recycleAdd(okFiles, undoSnap, removedHist);   // 记进「最近删除」
         repoSelected.clear();
         repoMultiMode = false;
         updateRepoSelectionUI();
@@ -5157,7 +5423,7 @@ async function deleteSelectedRepoFiles() {
         renderGallery();
         $('repo-live-status').textContent = '实时仓库 · ' + repoLiveFiles.length + ' 个文件';
         if (failures.length) {
-            showUploadErrorModal(failures, { title: '部分文件删除失败', sub: '已删除 ' + deletedKeys.size + ' 个，' + failures.length + ' 个失败' });
+            showUploadErrorModal(failures, { title: '部分文件删除失败', sub: '已删除 ' + pathKeys.size + ' 个，' + failures.length + ' 个失败' });
         } else {
             const okFiles = selected.map(f => Object.assign({}, f));
             offerUndo('已删除 ' + selected.length + ' 个仓库文件', () => undoDeleteBundle({ files: okFiles, snap: undoSnap, removedHist }));
@@ -5242,7 +5508,7 @@ async function loadRepoLiveFiles(force = false) {
         repoLiveLoaded = true;
         repoLiveLoadedAt = Date.now();
         renderRepoLiveFiles();
-        status.textContent = (tree.truncated ? '仓库文件太多，部分目录未能读全 · ' : '实时仓库 · ') + repoLiveFiles.length + ' 个文件 · ' + ctx.owner + '/' + s.repo;
+        status.textContent = (tree.truncated ? '仓库文件太多，部分目录未能读全 · ' : '实时仓库 · ') + repoLiveFiles.length + ' 个文件 · ' + ctx.owner + '/' + s.repo + (tree.notModified ? ' · 没有变化' : '');
         repoMetaCtx = { owner: ctx.owner, repo: s.repo, branch: ctx.branch, complete: !tree.truncated };
         setTimeout(() => syncRepoMeta(false), 0);   // 不阻塞列表显示，后台对一下仓库里的标签
         try { maybeAutoRepoLinkCheck(); } catch (_) {}
@@ -5265,10 +5531,33 @@ async function loadRepoLiveFiles(force = false) {
     }
 }
 
+/* ---------- 大列表缩略图内存管理 ----------
+   仓库里的缩略图是原图（jsDelivr 不能缩小），一张 4000×3000 的照片解码后要几十 MB。
+   列表超过 THUMB_KEEP_MIN 张时，只让屏幕上下各约 3 屏范围内的图保持加载，滑远了就释放，滑回来再加载（走 HTTP / 离线缓存，很快）。
+   少于这个数量的列表完全不受影响。 */
+const THUMB_KEEP_MIN = 120;
+function makeThumbKeeper() {
+    if (!('IntersectionObserver' in window)) return null;
+    const io = new IntersectionObserver(es => {
+        es.forEach(e => {
+            const img = e.target, st = img._thumb;
+            if (!st) return;
+            if (e.isIntersecting) {
+                if (st.released) { st.released = false; img.src = st.get(); }
+            } else if (!st.released && img.complete && img.getAttribute('src')) {
+                st.released = true;
+                img.removeAttribute('src');   // 释放解码后的位图
+            }
+        });
+    }, { rootMargin: '2400px 0px' });
+    return { watch(img, get) { img._thumb = { get, released: false }; io.observe(img); }, stop() { io.disconnect(); } };
+}
+let repoThumbKeeper = null, galleryThumbKeeper = null;
 function renderRepoLiveFiles() {
     const container = $('repo-live-container');
     if (!container) return;
-    libIdxCache = null; // 记录或文件可能刚变过，重新建一次「资源库 ↔ 仓库」对照
+    repoViewEpoch++;   // 重画前先让缓存作废，下面只会算一遍
+    if (repoThumbKeeper) { repoThumbKeeper.stop(); repoThumbKeeper = null; }   // 旧的格子马上要被清掉，别让观察器一直引用它们
     if (repoLiveLoaded) {
         while (repoCurrentPath && !repoLiveFiles.some(f => f.path.startsWith(repoCurrentPath + '/'))) {
             const i = repoCurrentPath.lastIndexOf('/');
@@ -5277,18 +5566,19 @@ function renderRepoLiveFiles() {
     }
     if (repoLiveLoaded) refreshRepoTagChips();
     renderRepoBreadcrumb();
-    const folders = (repoSearch || REPO_SPECIAL_FILTERS.has(repoFilter) || repoTag || repoOnlyUnlinked) ? [] : getRepoSubfolders();
+    const folders = (repoSearch || REPO_SPECIAL_FILTERS.has(repoFilter) || repoTag) ? [] : getRepoSubfolders();
     const visible = getRepoVisibleList();
     container.innerHTML = '';
     updateRepoSelectionUI();
     if (!folders.length && !visible.length) {
-        container.innerHTML = '<div class="repo-live-empty">' + (repoSearch ? '没有匹配的文件' : (repoOnlyUnlinked ? '没有未入库的文件' : (repoFilter === 'dead' ? '没有失效的文件' : (repoFilter === 'dup' ? '没有重复的文件' : repoFilter === 'orphan' ? '没有未引用的文件' : repoFilter === 'sim' ? '没有相似的图片' : '暂无内容')))) + '</div>';
+        container.innerHTML = '<div class="repo-live-empty">' + (repoSearch ? '没有匹配的文件' : (repoFilter === 'dead' ? '没有失效的文件' : (repoFilter === 'dup' ? '没有重复的文件' : repoFilter === 'orphan' ? '没有未引用的文件' : repoFilter === 'sim' ? '没有相似的图片' : '暂无内容'))) + '</div>';
         return;
     }
     const list = document.createElement('div');
     list.className = 'repo-live-list';
+    if (visible.length >= THUMB_KEEP_MIN) repoThumbKeeper = makeThumbKeeper();
+    const keeper = repoThumbKeeper;
     const uploadRank = buildUploadRank();
-    const libIdx = libraryIndex();
 
     folders.forEach(name => {
         const folderPath = (repoCurrentPath ? repoCurrentPath + '/' : '') + name;
@@ -5401,13 +5691,12 @@ function renderRepoLiveFiles() {
             }
         }
         if (repoMetaIsFav(file)) { const st = document.createElement('div'); st.className = 'tile-fav'; st.textContent = '★'; item.appendChild(st); }
-        if (libIdx.size && !libIdx.has(uploadKey(file.owner, file.repo, file.path))) { const lb = document.createElement('div'); lb.className = 'tile-lib'; lb.textContent = '未入库'; lb.title = '这台设备的资源库里没有它的记录'; item.appendChild(lb); }
 
         const preview = document.createElement('div');
         preview.className = 'repo-live-preview icon-tile';
         if (file.type === 'image') {
             const img = document.createElement('img');
-            let triedRaw = false;
+            let triedRaw = false, curSrc = file.url;
             img.draggable = false;
             img.decoding = 'async';
             if (/^https:\/\/(cdn\.jsdelivr\.net|raw\.githubusercontent\.com)\//.test(file.url || '')) img.crossOrigin = 'anonymous';   // 让离线缓存能存下缩略图
@@ -5415,10 +5704,11 @@ function renderRepoLiveFiles() {
             img.loading = 'lazy';
             img.onerror = () => {
                 // jsDelivr 打不开时再回退到 raw 地址
-                if (!triedRaw && file.rawUrl && file.rawUrl !== file.url) { triedRaw = true; img.src = file.rawUrl; return; }
+                if (!triedRaw && file.rawUrl && file.rawUrl !== file.url) { triedRaw = true; curSrc = file.rawUrl; img.src = file.rawUrl; return; }
                 preview.innerHTML = '<div class="repo-live-icon">IMG</div>';
             };
             preview.appendChild(img);
+            if (keeper) keeper.watch(img, () => curSrc);
         } else {
             const icon = document.createElement('div');
             icon.className = 'repo-live-icon';
@@ -5428,7 +5718,7 @@ function renderRepoLiveFiles() {
         item.appendChild(preview);
         const name = document.createElement('div');
         name.className = 'repo-live-name tile-name';
-        name.textContent = (repoSearch || REPO_SPECIAL_FILTERS.has(repoFilter) || repoTag || repoOnlyUnlinked) ? file.path : file.name; // 搜索结果带上文件夹路径，方便区分同名文件
+        name.textContent = (repoSearch || REPO_SPECIAL_FILTERS.has(repoFilter) || repoTag) ? file.path : file.name; // 搜索结果带上文件夹路径，方便区分同名文件
         item.appendChild(name);
         const ts = uploadRank.get(uploadKey(file.owner, file.repo, file.path));
         const meta = makeTileMeta([formatBytes(file.size), ts ? formatDate(ts).slice(5) : ''].filter(Boolean).join(' · '));
@@ -5482,6 +5772,7 @@ function refreshDeadChip() {
 }
 function renderGallery(opts) {
     if (galleryIO) { galleryIO.disconnect(); galleryIO = null; }
+    if (galleryThumbKeeper) { galleryThumbKeeper.stop(); galleryThumbKeeper = null; }
     try { refreshDeadChip(); } catch (_) {}
     const container = $('gallery-container');
     const list = getGalleryVisibleList();
@@ -5516,6 +5807,8 @@ function renderGallery(opts) {
     dates.forEach(dateStr => groups[dateStr].forEach(entry => queue.push({ dateStr, entry })));
     const gridOf = {};
     let rendered = 0;
+    if (queue.length >= THUMB_KEEP_MIN) galleryThumbKeeper = makeThumbKeeper();
+    const keeper = galleryThumbKeeper;
     const buildTile = (entry) => {
             const tile = document.createElement('div');
             tile.className = 'gallery-tile' + (gallerySelected.has(entry.id) ? ' selected' : '');
@@ -5565,16 +5858,17 @@ function renderGallery(opts) {
                 const ref = historyAssetRef(entry);
                 const rawFallback = (ref && ref.owner && ref.repo && ref.path)
                     ? repoRawUrl(ref.owner, ref.repo, entry.githubBranch || ref.branch || 'main', ref.path) : '';
-                let triedRaw = false;
+                let triedRaw = false, curSrc = entry.url;
                 img.onerror = () => {
                     // jsDelivr 打不开时回退到 raw；仍失败则显示占位，不留空白格
-                    if (!triedRaw && rawFallback && rawFallback !== entry.url) { triedRaw = true; img.src = rawFallback; return; }
+                    if (!triedRaw && rawFallback && rawFallback !== entry.url) { triedRaw = true; curSrc = rawFallback; img.src = rawFallback; return; }
                     const ph = document.createElement('div');
                     ph.className = 'icon-tile';
                     ph.textContent = 'IMG';
                     img.replaceWith(ph);
                 };
                 tile.appendChild(img);
+                if (keeper) keeper.watch(img, () => curSrc);
             } else {
                 const icon = document.createElement('div');
                 icon.className = 'icon-tile';
@@ -5675,11 +5969,18 @@ function clearCurrentUploadAtNewDay() {
 }
 
 function scheduleMidnightClear() {
+    const check = () => {
+        if (clearCurrentUploadAtNewDay()) toast('已清空上次上传');
+    };
+    const arm = () => {
+        const n = new Date();
+        const next = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1, 0, 0, 1);
+        setTimeout(() => { check(); arm(); }, Math.max(1000, next - n));
+    };
     clearCurrentUploadAtNewDay();
-    setInterval(() => {
-        const last = localStorage.getItem('kb_current_upload_date');
-        if (last !== formatDate(Date.now()) && clearCurrentUploadAtNewDay()) toast('已清空上次上传');
-    }, 30000);
+    arm();
+    // 后台标签页的定时器会被冻结，切回来时补查一次
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
 }
 
 window.onload = async () => {
@@ -5811,8 +6112,13 @@ async function handleFolderInput(input) {
     finishFolderPick(await classifyFolderFiles(all));
 }
 function safeDirName(name) {
-    const s = String(name || '').replace(/[^\w.\-\u4e00-\u9fff]+/g, '-').replace(/^[-.]+|[-.]+$/g, '');
-    return s || 'folder';
+    const raw = String(name || '');
+    const s = raw.replace(/[^\w.\-\u4e00-\u9fff]+/g, '-').replace(/^[-.]+|[-.]+$/g, '');
+    if (s) return s;
+    // 纯假名 / 韩文 / emoji 等会被清空：按原名算一个固定的短后缀，不同名字不会混进同一个文件夹，同名永远落在同一个文件夹
+    let h = 5381;
+    for (let i = 0; i < raw.length; i++) h = ((h * 33) ^ raw.charCodeAt(i)) >>> 0;
+    return 'folder-' + h.toString(36).slice(0, 6);
 }
 
 // --- 本次结果卡片跟随当前使用的获取直链方式 ---
@@ -5832,10 +6138,31 @@ function moveResultCardAfter(cardId) {
 // --- GitHub API 核心 ---
 // 读取仓库文件树。recursive=1 在文件特别多（约 10 万条 / 7MB）时会被 GitHub 截断，
 // 这时改成按目录逐层读取，把被截断的部分补全；个别目录读不到才会降级为「只显示部分」。
+// 同一个分支的文件树没变化时，GitHub 对带 If-None-Match 的请求回 304：不占 API 额度，也不用重新下载几 MB 的列表。
+// 只在内存里缓存最近 3 个分支（页面关掉就没了）；ETag 对不上就当普通请求处理。
+const repoTreeCache = new Map();
+function repoTreeCacheSet(key, etag, result) {
+    repoTreeCache.delete(key);
+    repoTreeCache.set(key, { etag, result });
+    while (repoTreeCache.size > 3) repoTreeCache.delete(repoTreeCache.keys().next().value);
+}
 async function fetchRepoTree(owner, repo, branch, auth) {
     const base = '/repos/' + owner + '/' + repo + '/git/trees/';
-    const first = await githubRequest(base + encodeURIComponent(branch) + '?recursive=1', { method: 'GET' }, auth.token, auth.proxy);
-    if (!first.truncated || !first.sha) return { tree: first.tree || [], truncated: !!first.truncated };
+    const ckey = (owner + '/' + repo + '@' + branch).toLowerCase();
+    const hit = repoTreeCache.get(ckey);
+    let newEtag = '';
+    const firstUrl = base + encodeURIComponent(branch) + '?recursive=1';
+    let first = await githubRequest(firstUrl, { method: 'GET', etag: hit && hit.etag, onEtag: t => { newEtag = t; } }, auth.token, auth.proxy);
+    if (first && first.__notModified) {
+        if (hit) return Object.assign({}, hit.result, { notModified: true });
+        repoTreeCache.delete(ckey);   // 理论上不会发生：没发 ETag 就不该收到 304，保险起见重新读一次
+        first = await githubRequest(firstUrl, { method: 'GET', onEtag: t => { newEtag = t; } }, auth.token, auth.proxy);
+    }
+    if (!first.truncated || !first.sha) {
+        const result = { tree: first.tree || [], truncated: !!first.truncated };
+        if (newEtag) repoTreeCacheSet(ckey, newEtag, result);
+        return result;
+    }
     const out = [], pending = [{ sha: first.sha, prefix: '' }];
     let incomplete = false, active = 0, failed = false;
     const walk = async job => {
@@ -5859,9 +6186,11 @@ async function fetchRepoTree(owner, repo, branch, auth) {
             pump();
         });
     } catch (_) {
-        return { tree: first.tree || [], truncated: true }; // 补读失败：退回被截断的原结果
+        return { tree: first.tree || [], truncated: true }; // 补读失败：退回被截断的原结果（不缓存，下次要重新补读）
     }
-    return { tree: out, truncated: incomplete };
+    const full = { tree: out, truncated: incomplete };
+    if (newEtag) repoTreeCacheSet(ckey, newEtag, full);
+    return full;
 }
 // ---- GitHub 限流：全局冷却（所有请求共用一个倒计时，避免并发请求各自乱撞）+ 额度提示 ----
 const RATE_WAIT_MAX_MS = 90000;
@@ -5899,6 +6228,8 @@ async function githubRequest(path, options = {}, token, proxy) {
     if (!token) throw new Error('未配置 GitHub Token');
     const base = proxy || 'https://api.github.com';
     const url = base + path;
+    // etag / onEtag 是本函数的私有选项，不能原样传给 fetch
+    const { etag: ifNoneMatch, onEtag, ...fetchOpts } = options;
     const maxAttempts = 5;
     let lastError = null;
     // 请求体越大，允许的时间越长（按至少 20KB/s 估算），否则慢网下大请求会被 60 秒误杀
@@ -5918,13 +6249,16 @@ async function githubRequest(path, options = {}, token, proxy) {
                 'Content-Type': 'application/json',
                 'Cache-Control': 'no-cache'
             };
+            // 自建代理的 CORS 白名单里不一定有 If-None-Match，带上会让预检失败，所以只在直连 GitHub 时用条件请求
+            if (ifNoneMatch && !proxy) headers['If-None-Match'] = ifNoneMatch;
             const res = await fetch(url, {
-                ...options,
+                ...fetchOpts,
                 headers: { ...headers, ...(options.headers || {}) },
                 cache: 'no-store',
                 signal: controller.signal
             });
             ghNoteQuota(res);
+            if (res.status === 304) { clearTimeout(timer); return { __notModified: true }; }   // 内容没变：GitHub 不计这次请求的额度
             const text = await res.text(); // 读响应体也在超时保护内
             clearTimeout(timer);
             let data = {};
@@ -5963,6 +6297,7 @@ async function githubRequest(path, options = {}, token, proxy) {
                 if (res.status === 429) throw fail('GitHub API 触发限流（429），已重试多次仍失败，请稍后再试');
                 throw fail('GitHub API ' + res.status + '：' + msg);
             }
+            if (onEtag) { try { const t = res.headers.get('etag'); if (t) onEtag(t); } catch (_) {} }
             return data;
         } catch (e) {
             clearTimeout(timer);
@@ -6161,6 +6496,19 @@ function gateContentRequest(ctx) {
 // 分支在别处被更新（非快进 / 409 / 5xx）时，自动重新取最新提交再来一次，不再直接报「参数错误」。
 // cache：{sha, tree}，连续提交时复用上次提交的结果，省掉每次读取分支头的 2 个请求。
 async function commitTreeChanges(owner, repo, branch, changes, message, s, cache) {
+    const bkey = (owner + '/' + repo + '@' + branch).toLowerCase();
+    const stampKey = 'kb_commit_stamp:' + bkey;
+    return withCrossTabLock('dl-commit:' + bkey, async () => {
+        // 别的窗口在我们排队期间提交过：缓存的分支头已经过期，直接丢掉，省得先撞一次「非快进」
+        if (cache && cache.sha && cache.stamp !== undefined && cache.stamp !== (lsGet(stampKey) || '')) { cache.sha = ''; cache.tree = ''; }
+        const sha = await commitTreeChangesCore(owner, repo, branch, changes, message, s, cache);
+        const stamp = Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+        lsSet(stampKey, stamp);
+        if (cache) cache.stamp = stamp;
+        return sha;
+    }, 180000);
+}
+async function commitTreeChangesCore(owner, repo, branch, changes, message, s, cache) {
     const base = '/repos/' + owner + '/' + repo;
     const rp = refPath(branch);
     let lastErr = null;
@@ -6672,6 +7020,7 @@ function describeFetchStatus(status, hasProxy) {
     return 'HTTP ' + status;
 }
 async function urlToFile(rawUrl) {
+    if (String(rawUrl).indexOf('local-sticker:') === 0) return stickerLocalToFile(rawUrl);   // 表情包 JSON 里内嵌的图片
     let u;
     try { u = new URL(rawUrl); } catch (e) { throw new Error('链接格式不正确'); }
     if (!/^https?:$/.test(u.protocol)) throw new Error('仅支持 http/https 链接');
@@ -6892,11 +7241,11 @@ async function convertUrls(urls, collector, afterFn, namer) {
                 title: '部分链接未能转换或上传', sub: failures.length + ' 项失败，详情如下（上传失败的文件可在结果列表里点「重试」）',
                 onRetry: (f) => {
                     closeUploadErrorModal();
-                    if (/^https?:\/\//i.test(f.name)) convertUrls([f.name], collector, afterFn, namer);
+                    if (/^(?:https?:\/\/|local-sticker:)/i.test(f.name)) convertUrls([f.name], collector, afterFn, namer);
                 },
                 onRetryAll: (list) => {
                     closeUploadErrorModal();
-                    const again = list.map(f => f.name).filter(x => /^https?:\/\//i.test(x));
+                    const again = list.map(f => f.name).filter(x => /^(?:https?:\/\/|local-sticker:)/i.test(x));
                     if (again.length) convertUrls(again, collector, afterFn, namer);
                 }
             });
@@ -7030,6 +7379,7 @@ function buildReplaceOutput(fileName, mime, bom, originalText, map, protoRelativ
 
 async function handleReplaceFile(file) {
     if (!file) return;
+    if (await looksLikeStickerFile(file)) { $('replace-file-input').value = ''; return handleStickerImport(file); }   // 表情包：自动走按分类和含义转存
     if (!getSettings().token) { toast('请先配置 Token'); switchTab('settings'); $('replace-file-input').value = ''; return; }
     if (isBatchUploading) { toast('上传中，请稍候', 'info'); $('replace-file-input').value = ''; return; }
     hideReplaceResult();
@@ -7522,13 +7872,17 @@ function prefClipWatch() { return lsGet(PREF_CLIPWATCH_KEY) === '1'; }
 function prefLinkCheck() { return lsGet(PREF_LINKCHECK_KEY) === '1'; }
 
 /* ---------- 1. 复制格式：直链 / Markdown / HTML ---------- */
-const COPY_FORMATS = { url: '直链', md: 'Markdown', html: 'HTML' };
-const FMT_COPIED_ONE = { url: '已复制直链', md: '已复制 Markdown', html: '已复制 HTML' };
+const COPY_FORMATS = { url: '直链', md: 'Markdown', html: 'HTML', custom: '自定义' };
+const FMT_COPIED_ONE = { url: '已复制直链', md: '已复制 Markdown', html: '已复制 HTML', custom: '已复制（自定义格式）' };
 const FMT_COPIED_MANY = {
     url: n => '已复制 ' + n + ' 条链接',
     md: n => '已复制 ' + n + ' 条 Markdown',
-    html: n => '已复制 ' + n + ' 条 HTML'
+    html: n => '已复制 ' + n + ' 条 HTML',
+    custom: n => '已复制 ' + n + ' 条（自定义格式）'
 };
+const PREF_COPYTPL_KEY = 'kb_pref_copytpl';
+const COPY_TPL_DEFAULT = 'url("{url}")';
+function prefCopyTemplate() { const v = lsGet(PREF_COPYTPL_KEY); return (v && v.indexOf('{url}') >= 0) ? v : COPY_TPL_DEFAULT; }
 function prefCopyFormat() { const v = lsGet(PREF_COPYFMT_KEY); return COPY_FORMATS[v] ? v : 'url'; }
 function linkNameFromUrl(url) {
     try { return decodeURIComponent(String(url).split(/[?#]/)[0].split('/').pop() || ''); } catch (_) { return ''; }
@@ -7543,6 +7897,12 @@ function formatLink(url, name, fmt) {
     if (fmt === 'url') return url;
     const full = String(name || '').trim() || linkNameFromUrl(url);
     const base = full.split('/').pop(); // 文件夹上传时名称带路径，只取文件名
+    if (fmt === 'custom') {   // 自定义模板：{url} {name} {stem} {ext}
+        const em = base.match(/\.[^./]+$/);
+        const ext = em ? em[0] : '';
+        const vals = { url: url, name: base, stem: ext ? base.slice(0, -ext.length) : base, ext: ext };
+        return prefCopyTemplate().replace(/\{(url|name|stem|ext)\}/g, (_, k) => vals[k]);
+    }
     const isImg = IMAGE_EXT_RE.test(base) || IMAGE_EXT_RE.test(String(url).split(/[?#]/)[0]);
     const alt = base.replace(/\.[^./]+$/, '') || base;
     if (fmt === 'md') {
@@ -7557,6 +7917,20 @@ function refreshCopyFormatUI() {
     const v = prefCopyFormat();
     document.querySelectorAll('#pref-copyfmt button').forEach(b => b.classList.toggle('active', b.dataset.v === v));
     document.querySelectorAll('#copy-fmt-group .filter-btn').forEach(b => b.classList.toggle('active', b.dataset.cf === v));
+    const tv = $('pref-copytpl-val');
+    if (tv) { tv.textContent = v === 'custom' ? prefCopyTemplate() : '未启用'; tv.classList.toggle('on', v === 'custom'); }
+}
+async function editCopyTemplate() {
+    const val = await showPrompt({
+        title: '自定义复制格式',
+        message: '用 {url} 代表直链，{name} 文件名，{stem} 不带扩展名的文件名，{ext} 扩展名。例如：url("{url}") 或 "{stem}": "{url}"',
+        value: prefCopyTemplate(), placeholder: 'url("{url}")', confirmText: '启用',
+        validate: v => (String(v || '').indexOf('{url}') < 0 ? '模板里至少要有 {url}' : '')
+    });
+    if (val === null) return;
+    lsSet(PREF_COPYTPL_KEY, val);
+    setCopyFormat('custom');
+    toast('已启用自定义复制格式', 'ok');
 }
 function setCopyFormat(v) {
     if (!COPY_FORMATS[v]) return;
@@ -7564,7 +7938,7 @@ function setCopyFormat(v) {
     refreshCopyFormatUI();
 }
 function cycleCopyFormat() {
-    const order = ['url', 'md', 'html'];
+    const order = ['url', 'md', 'html', 'custom'];
     const next = order[(order.indexOf(prefCopyFormat()) + 1) % order.length];
     setCopyFormat(next);
     toast('复制格式：' + COPY_FORMATS[next]);
@@ -7735,7 +8109,165 @@ function loadImageForCanvas(file) {
 function canvasBlob(c, type, q) {
     return new Promise(r => { try { c.toBlob(r, type, q); } catch (_) { r(null); } });
 }
+/* ---------- 图片后台线程：压缩 / 相似图指纹放进 Worker，批量处理时界面不卡 ----------
+   需要 Worker + createImageBitmap + OffscreenCanvas（iOS 16.4+）。任何一环不可用、自检不过或运行出错，
+   都会自动退回主线程的老做法，结果不变。HEIC 转换仍在主线程（只有 Safari 能解码，Worker 里不一定行）。 */
+// 自检图：4×2 的 JPEG，EXIF 方向 = 6（顺时针转 90°）。方向被正确应用时，解码出来应是 2×4。
+const IMGW_TEST_B64 = '/9j/4AAQSkZJRgABAQAAAQABAAD/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAYAAAAAAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAACAAQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD5i8Vf8h+6/wCA/wDoAooor+yOFf8AkQZf/wBeaX/pETLiT/kd47/r7U/9LZ//2Q==';
+function imgWorkerMain() {
+    let orient = null;   // createImageBitmap 的附加参数，由自检决定
+    const decode = blob => orient ? createImageBitmap(blob, orient) : createImageBitmap(blob);
+    async function selfTest(buf) {
+        const blob = new Blob([buf], { type: 'image/jpeg' });
+        for (const o of [null, { imageOrientation: 'from-image' }]) {
+            try {
+                const b = o ? await createImageBitmap(blob, o) : await createImageBitmap(blob);
+                const ok = b.width === 2 && b.height === 4;
+                b.close();
+                if (ok) { orient = o; return true; }
+            } catch (_) { /* 换下一种参数再试 */ }
+        }
+        return false;   // 这个浏览器的 Worker 不会按 EXIF 转正：不能用，否则竖拍的照片会被压成横的
+    }
+    self.onmessage = async e => {
+        const m = e.data;
+        try {
+            if (m.op === 'init') {
+                self.postMessage({ id: m.id, ok: await selfTest(m.buf) });
+            } else if (m.op === 'compress') {
+                const bmp = await decode(m.blob);
+                const w0 = bmp.width, h0 = bmp.height;
+                const k = Math.min(1, m.maxEdge / Math.max(w0, h0));
+                const w = Math.max(1, Math.round(w0 * k)), h = Math.max(1, Math.round(h0 * k));
+                const c = new OffscreenCanvas(w, h);
+                const g = c.getContext('2d');
+                if (m.bg) { g.fillStyle = '#FFFFFF'; g.fillRect(0, 0, w, h); }   // JPEG 没有透明
+                g.drawImage(bmp, 0, 0, w, h);
+                bmp.close();
+                const blob = await c.convertToBlob({ type: m.type, quality: m.quality });
+                c.width = c.height = 0;   // 立即释放画布内存
+                self.postMessage({ id: m.id, blob, w0, h0 });
+            } else if (m.op === 'hash') {
+                const r = await fetch(m.url, { mode: 'cors', credentials: 'omit' });
+                if (!r.ok) throw new Error('http ' + r.status);
+                const bmp = await decode(await r.blob());
+                const W = 72, H = 72;
+                const c = new OffscreenCanvas(W, H);
+                const g = c.getContext('2d', { willReadFrequently: true });
+                g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+                g.imageSmoothingQuality = 'high';
+                g.drawImage(bmp, 0, 0, W, H);
+                bmp.close();
+                self.postMessage({ id: m.id, hash: dHashFromPixels(g.getImageData(0, 0, W, H).data, W) });
+            }
+        } catch (err) {
+            self.postMessage({ id: m.id, err: String((err && err.message) || err) });
+        }
+    };
+}
+const imgW = { worker: null, ready: null, pending: new Map(), seq: 0, crashes: 0, timeouts: 0, disabled: false };
+function imgWorkerSupported() {
+    return !imgW.disabled && typeof Worker === 'function' && typeof createImageBitmap === 'function'
+        && typeof OffscreenCanvas === 'function' && typeof Blob === 'function' && !!(window.URL && URL.createObjectURL);
+}
+function imgWorkerKill(disable) {
+    try { if (imgW.worker) imgW.worker.terminate(); } catch (_) {}
+    imgW.worker = null; imgW.ready = null;
+    const list = Array.from(imgW.pending.values());
+    imgW.pending.clear();
+    list.forEach(p => p.reject(new Error('worker stopped')));
+    if (disable) imgW.disabled = true;
+}
+function imgWorkerCall(msg, timeoutMs) {
+    return new Promise((resolve, reject) => {
+        const w = imgW.worker;
+        if (!w) return reject(new Error('no worker'));
+        const id = ++imgW.seq;
+        const t = setTimeout(() => {
+            imgW.pending.delete(id);
+            if (++imgW.timeouts >= 3) imgWorkerKill(true);   // 连续超时：这台设备上 Worker 不靠谱，不再用
+            reject(new Error('timeout'));
+        }, timeoutMs);
+        imgW.pending.set(id, {
+            resolve: v => { clearTimeout(t); imgW.timeouts = 0; resolve(v); },
+            reject: e => { clearTimeout(t); reject(e); }
+        });
+        try { w.postMessage(Object.assign({ id }, msg)); }
+        catch (e) { clearTimeout(t); imgW.pending.delete(id); reject(e); }
+    });
+}
+function imgWorkerReady() {
+    if (!imgWorkerSupported()) return Promise.resolve(false);
+    if (imgW.ready) return imgW.ready;
+    imgW.ready = (async () => {
+        let url = '';
+        try {
+            const src = dHashFromPixels.toString() + '\n(' + imgWorkerMain.toString() + ')();';
+            url = URL.createObjectURL(new Blob([src], { type: 'text/javascript' }));
+            const w = new Worker(url);
+            w.onmessage = e => {
+                const m = e.data || {};
+                const p = imgW.pending.get(m.id);
+                if (!p) return;
+                imgW.pending.delete(m.id);
+                if (m.err) p.reject(new Error(m.err)); else p.resolve(m);
+            };
+            w.onerror = ev => {
+                try { ev.preventDefault(); } catch (_) {}
+                if (imgW.worker !== w) return;
+                imgWorkerKill(++imgW.crashes >= 2);   // 崩一次允许重建，两次就放弃
+            };
+            imgW.worker = w;
+            const bin = atob(IMGW_TEST_B64), buf = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+            const r = await imgWorkerCall({ op: 'init', buf }, 8000);
+            if (!r.ok) { imgWorkerKill(true); return false; }
+            return true;
+        } catch (_) { imgWorkerKill(true); return false; }
+        finally { if (url) setTimeout(() => { try { URL.revokeObjectURL(url); } catch (_) {} }, 10000); }
+    })();
+    return imgW.ready;
+}
+// 成功返回 { blob, w0, h0 }；不可用 / 失败返回 null，调用方改走主线程
+async function workerEncodeImage(file, type, bg) {
+    try {
+        if (!(await imgWorkerReady())) return null;
+        const r = await imgWorkerCall({ op: 'compress', blob: file.slice(0, file.size, file.type), type, quality: 0.82, maxEdge: 2560, bg: !!bg }, 60000);
+        return r && r.blob ? r : null;
+    } catch (_) { return null; }
+}
+// 成功返回 34 位指纹；不可用 / 失败返回 null
+async function workerHashUrl(url) {
+    try {
+        if (!(await imgWorkerReady())) return null;
+        const r = await imgWorkerCall({ op: 'hash', url }, 30000);
+        return r && typeof r.hash === 'string' && r.hash.length === 34 ? r.hash : null;
+    } catch (_) { return null; }
+}
 // 返回处理后的 File；不需要 / 不划算 / 出错时原样返回传入的 file
+// 动图检测：APNG（PNG 里有 acTL 块）和动态 WebP（VP8X 的动画标志位）。
+// 压缩会把它们画到画布上重新编码，只剩第一帧，所以要先认出来、原样上传。按文件头判断，不看扩展名和 MIME。
+async function isAnimatedImage(file) {
+    try {
+        const buf = new Uint8Array(await file.slice(0, 512 * 1024).arrayBuffer());
+        const tag = (o, t) => { for (let i = 0; i < t.length; i++) if (buf[o + i] !== t.charCodeAt(i)) return false; return true; };
+        if (buf.length > 30 && tag(0, 'RIFF') && tag(8, 'WEBP')) {
+            if (tag(12, 'VP8X')) return (buf[20] & 0x02) !== 0;
+            return false;
+        }
+        if (buf.length > 16 && buf[0] === 0x89 && tag(1, 'PNG')) {
+            let o = 8;
+            while (o + 8 <= buf.length) {
+                const len = ((buf[o] << 24) | (buf[o + 1] << 16) | (buf[o + 2] << 8) | buf[o + 3]) >>> 0;
+                if (tag(o + 4, 'acTL')) return true;
+                if (tag(o + 4, 'IDAT')) return false;   // acTL 一定在第一个 IDAT 之前
+                o += 12 + len;
+            }
+            return false;
+        }
+    } catch (_) {}
+    return false;
+}
 async function preprocessFile(file) {
     const mode = prefCompress();
     if (mode === 'off' || !isImageFile(file)) return file;
@@ -7743,12 +8275,7 @@ async function preprocessFile(file) {
     const type = (file.type || '').toLowerCase();
     if (/\.(gif|svg|ico)$/i.test(name) || /^image\/(gif|svg\+xml|x-icon|vnd\.microsoft\.icon)$/.test(type)) return file; // 动图 / 矢量 / 图标不动
     if (file.size < 30 * 1024) return file;
-    let img;
-    try { img = await loadImageForCanvas(file); } catch (_) { return file; }
-    const w0 = img.naturalWidth, h0 = img.naturalHeight;
-    if (!w0 || !h0) return file;
-    const k = Math.min(1, 2560 / Math.max(w0, h0));
-    const w = Math.max(1, Math.round(w0 * k)), h = Math.max(1, Math.round(h0 * k));
+    if (await isAnimatedImage(file)) return file;   // 动图压缩后会只剩第一帧：原样上传
     const isJpeg = type === 'image/jpeg' || /\.jpe?g$/i.test(name);
     const isPng = type === 'image/png' || /\.png$/i.test(name);
     const isWebp = type === 'image/webp' || /\.webp$/i.test(name);
@@ -7764,13 +8291,25 @@ async function preprocessFile(file) {
         target = isJpeg ? 'image/jpeg' : isPng ? 'image/png' : isWebp ? 'image/webp' : (webpOk ? 'image/webp' : 'image/jpeg');
     }
     if (target === 'image/webp' && !webpOk) return file; // 读得了 WebP 却编不了：不动它
-    const c = document.createElement('canvas');
-    c.width = w; c.height = h;
-    const g = c.getContext('2d');
-    if (target === 'image/jpeg') { g.fillStyle = '#FFFFFF'; g.fillRect(0, 0, w, h); } // JPEG 没有透明，避免透明处变黑
-    g.drawImage(img, 0, 0, w, h);
-    const blob = await canvasBlob(c, target, 0.82);
-    c.width = c.height = 0; img.src = ''; // 立即释放画布和解码后的位图：iOS Safari 不会主动回收，批量处理容易把页面撑爆
+    // 优先在后台线程解码 + 缩放 + 编码；不可用 / 失败 / 输出格式不对时，退回下面主线程的老做法
+    let blob = null;
+    const wr = await workerEncodeImage(file, target, target === 'image/jpeg');
+    if (wr && wr.blob && wr.blob.type === target) blob = wr.blob;
+    if (!blob) {
+        let img;
+        try { img = await loadImageForCanvas(file); } catch (_) { return file; }
+        const w0 = img.naturalWidth, h0 = img.naturalHeight;
+        if (!w0 || !h0) return file;
+        const k = Math.min(1, 2560 / Math.max(w0, h0));
+        const w = Math.max(1, Math.round(w0 * k)), h = Math.max(1, Math.round(h0 * k));
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        const g = c.getContext('2d');
+        if (target === 'image/jpeg') { g.fillStyle = '#FFFFFF'; g.fillRect(0, 0, w, h); } // JPEG 没有透明，避免透明处变黑
+        g.drawImage(img, 0, 0, w, h);
+        blob = await canvasBlob(c, target, 0.82);
+        c.width = c.height = 0; img.src = ''; // 立即释放画布和解码后的位图：iOS Safari 不会主动回收，批量处理容易把页面撑爆
+    }
     if (!blob || blob.type !== target) return file;
     const sameKind = (target === 'image/jpeg' && isJpeg) || (target === 'image/png' && isPng) || (target === 'image/webp' && isWebp);
     if (blob.size >= file.size * (sameKind ? 0.97 : 1)) return file; // 没省下什么就保留原图
@@ -7836,7 +8375,7 @@ async function doRename(ref, newName) {
         // 目标名字已被占用就不继续，绝不覆盖
         // 本地列表里有就肯定重名；没有也不一定安全（列表可能是旧的，别处刚传了同名文件），所以再向 GitHub 确认一次
         const listKnown = repoLiveLoaded && String(repo).toLowerCase() === String(s.repo).toLowerCase();
-        let exists = listKnown && repoLiveFiles.some(f => f.path === newPath);
+        let exists = listKnown && repoLiveFiles.some(f => f.path === newPath && (!f.branch || f.branch === branch));
         if (!exists) {
             try { await githubRequest(contentsUrl(newPath), { method: 'GET' }, s.token, s.proxy); exists = true; }
             catch (e) { if (!/404/.test(String(e && e.message))) throw e; }
@@ -7867,10 +8406,12 @@ async function renameAsset(ref) {
         title: '重命名文件',
         message: '改名后，原来的直链会失效；已经贴在文章或 README 里的链接需要手动更新。',
         value: oldName, placeholder: '新文件名', confirmText: '重命名',
-        validate: v => {
+        validate: raw => {
+            const v = String(raw || '').trim();
             if (!v) return '请输入文件名';
             if (BAD_FILENAME_RE.test(v)) return '文件名不能包含 / \\ : * ? " < > |';
             if (/^\.+$/.test(v) || v.length > 150) return '文件名不合法';
+            if (oldExt && v.toLowerCase() === oldExt.toLowerCase()) return '文件名不能只有扩展名';
             return '';
         }
     });
@@ -7880,14 +8421,146 @@ async function renameAsset(ref) {
     if (nn === oldName) { toast('名称没有变化', 'info'); return false; }
     return doRename(ref, nn);
 }
+/* ---------- 批量重命名：按规则一次改多个文件（一次 Git 提交，可撤销） ---------- */
+const RENAME_MODES = [['prefix', '加前缀'], ['suffix', '加后缀'], ['seq', '序号'], ['replace', '替换']];
+function splitExt(name) { const m = String(name).match(/\.[^./]+$/); return m ? [name.slice(0, -m[0].length), m[0]] : [name, '']; }
+// 按规则算出每个文件的新名字；扩展名不动。返回 { error } 或 { moves }
+function buildRenamePlan(files, cfg) {
+    const n = files.length;
+    if (cfg.mode !== 'seq' && !cfg.a) return { error: cfg.mode === 'replace' ? '填好要查找的文字后，这里会显示改名效果' : '填好要添加的文字后，这里会显示改名效果' };
+    let start = 1;
+    if (cfg.mode === 'seq') { start = parseInt(cfg.n, 10); if (!(start >= 0)) return { error: '起始序号要填一个数字' }; }
+    const width = Math.max(2, String(start + n - 1).length);
+    const taken = new Set(repoLiveFiles.map(f => f.path));
+    const seen = new Set();
+    const moves = [];
+    for (let i = 0; i < n; i++) {
+        const f = files[i];
+        if (!f.sha) return { error: '「' + f.name + '」缺少文件信息，请刷新仓库后再试' };
+        const parts = splitExt(f.name), stem = parts[0], ext = parts[1];
+        let ns;
+        if (cfg.mode === 'prefix') ns = cfg.a + stem;
+        else if (cfg.mode === 'suffix') ns = stem + cfg.a;
+        else if (cfg.mode === 'seq') ns = cfg.a + String(start + i).padStart(width, '0');
+        else ns = stem.split(cfg.a).join(cfg.b);
+        const nn = ns + ext;
+        if (nn === f.name) continue;
+        if (!ns || BAD_FILENAME_RE.test(nn) || /^\.+$/.test(nn) || nn.length > 150) return { error: '「' + f.name + '」改名后的名字不合法（不能为空，不能含 / \\ : * ? " < > |）' };
+        const dir = pathDirname(f.path);
+        const to = (dir ? dir + '/' : '') + nn;
+        if (taken.has(to) || seen.has(to)) return { error: '「' + nn + '」已经存在或和别的文件重名了，换个规则试试' };
+        seen.add(to);
+        moves.push({ from: f.path, to: to, sha: f.sha, oldName: f.name, newName: nn });
+    }
+    return { moves: moves };
+}
+async function batchRenameFiles(files) {
+    if (files.length < 2) return false;
+    const s = getSettings();
+    if (!s.token) { toast('请先配置 Token'); return false; }
+    const cfg = { mode: 'prefix', a: '', b: '', n: '1' };
+    const box = document.createElement('div');
+    const seg = document.createElement('div'); seg.className = 'pref-seg dlg-seg';
+    const fields = document.createElement('div');
+    const prev = document.createElement('div'); prev.className = 'dlg-prev';
+    box.appendChild(seg); box.appendChild(fields); box.appendChild(prev);
+    const renderPreview = () => {
+        const plan = buildRenamePlan(files, cfg);
+        if (plan.error) { prev.textContent = plan.error; return; }
+        if (!plan.moves.length) { prev.textContent = '按这个规则，没有文件会被改名'; return; }
+        prev.textContent = plan.moves.slice(0, 3).map(m => m.oldName + ' → ' + m.newName).join('\n') + (plan.moves.length > 3 ? '\n…' : '') + '\n共 ' + plan.moves.length + ' 个会改名';
+        prev.style.whiteSpace = 'pre-wrap';
+    };
+    const mkField = (label, key, ph) => {
+        const wrap = document.createElement('div');
+        const cap = document.createElement('div'); cap.className = 'dlg-cap'; cap.textContent = label;
+        const row = document.createElement('div'); row.className = 'move-new-folder-row';
+        const inp = document.createElement('input');
+        inp.type = 'text'; inp.value = cfg[key]; inp.placeholder = ph || '';
+        inp.setAttribute('autocomplete', 'off'); inp.setAttribute('autocapitalize', 'off'); inp.setAttribute('spellcheck', 'false');
+        if (key === 'n') inp.setAttribute('inputmode', 'numeric');
+        inp.oninput = () => { cfg[key] = inp.value; $('dlg-error').classList.remove('show'); renderPreview(); };
+        row.appendChild(inp); wrap.appendChild(cap); wrap.appendChild(row);
+        fields.appendChild(wrap);
+    };
+    const renderFields = () => {
+        fields.innerHTML = '';
+        if (cfg.mode === 'prefix') mkField('加在文件名前面', 'a', '例如 icon-');
+        else if (cfg.mode === 'suffix') mkField('加在扩展名前面', 'a', '例如 -2x');
+        else if (cfg.mode === 'seq') { mkField('名称（可留空）', 'a', '例如 图标-'); mkField('起始序号', 'n', '1'); }
+        else { mkField('查找', 'a', '要被换掉的文字'); mkField('替换为（可留空）', 'b', ''); }
+        seg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === cfg.mode));
+        renderPreview();
+    };
+    RENAME_MODES.forEach(m => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.dataset.v = m[0]; b.textContent = m[1];
+        b.onclick = () => { cfg.mode = m[0]; cfg.a = ''; cfg.b = ''; cfg.n = '1'; renderFields(); };
+        seg.appendChild(b);
+    });
+    renderFields();
+    const ok = await showConfirm({
+        title: '批量重命名 ' + files.length + ' 个文件',
+        message: '扩展名保持不变。改名后，原来的直链会失效；已经贴在别处的链接要手动更新。',
+        extra: box, confirmText: '重命名',
+        validate: () => { const p = buildRenamePlan(files, cfg); return p.error ? p.error.replace(/^填好.*$/, '请先填好规则') : (p.moves.length ? '' : '按这个规则，没有文件会被改名'); }
+    });
+    if (!ok) return false;
+    const plan = buildRenamePlan(files, cfg);
+    if (plan.error || !plan.moves.length) return false;
+    const first = files[0], owner = first.owner, repo = first.repo, branch = first.branch || 'main';
+    toast('正在重命名 ' + plan.moves.length + ' 个文件…', 'loading');
+    try {
+        const changes = [];
+        plan.moves.forEach(m => {
+            changes.push({ path: m.from, mode: '100644', type: 'blob', sha: null });
+            changes.push({ path: m.to, mode: '100644', type: 'blob', sha: m.sha });
+        });
+        await commitTreeChanges(owner, repo, branch, changes, '批量重命名 ' + plan.moves.length + ' 个文件', s);
+        const mv = plan.moves.map(m => ({ from: m.from, to: m.to, sha: m.sha }));
+        applyLocalMoves(owner, repo, branch, mv);
+        renderRepoLiveFiles();
+        offerUndo('已重命名 ' + mv.length + ' 个文件', () => undoRepoMoves(owner, repo, branch, mv));
+        return true;
+    } catch (e) {
+        toast('重命名失败：' + ((e && e.message) || '未知错误'), 'error');
+        return false;
+    }
+}
+async function batchRenameRepo() {
+    const vis = getRepoVisibleList();
+    const rank = new Map(vis.map((f, i) => [f.path, i]));
+    const rk = f => (rank.has(f.path) ? rank.get(f.path) : 1e9);
+    const files = repoLiveFiles.filter(f => repoSelected.has(f.path)).sort((a, b) => rk(a) - rk(b));
+    if (await batchRenameFiles(files)) exitRepoMultiMode();
+}
+async function batchRenameGallery() {
+    if (!repoLiveLoaded) return toast('仓库文件还没读取完，稍后再试', 'info');
+    const s = getSettings();
+    const byPath = new Map();
+    let skipped = 0;
+    selectedGalleryEntries().forEach(e => {
+        const p = historyAssetRef(e);
+        const f = (p && p.path) ? findRepoFileForRef(p) : null;
+        if (f && (!p.repo || String(p.repo).toLowerCase() === String(s.repo).toLowerCase())) byPath.set(f.path, f); else skipped++;
+    });
+    const files = Array.from(byPath.values());
+    if (files.length < 2) return toast('选中的文件里，在当前仓库里的不足 2 个', 'info');
+    if (await batchRenameFiles(files)) {
+        exitGalleryMultiMode();
+        if (skipped) setTimeout(() => toast('另有 ' + skipped + ' 项不在当前仓库，未改名', 'info'), 1800);
+    }
+}
 async function renameSelectedRepo() {
-    if (repoSelected.size !== 1) return toast(repoSelected.size ? '重命名一次只能选一个文件' : '请先选择一个文件', 'info');
+    if (repoSelected.size > 1) { await batchRenameRepo(); return; }
+    if (repoSelected.size !== 1) return toast('请先选择一个文件', 'info');
     const f = repoLiveFiles.find(x => x.path === Array.from(repoSelected)[0]);
     if (!f) return;
     if (await renameAsset({ owner: f.owner, repo: f.repo, branch: f.branch, path: f.path })) exitRepoMultiMode();
 }
 async function renameSelectedGallery() {
-    if (gallerySelected.size !== 1) return toast(gallerySelected.size ? '重命名一次只能选一个文件' : '请先选择一个文件', 'info');
+    if (gallerySelected.size > 1) { await batchRenameGallery(); return; }
+    if (gallerySelected.size !== 1) return toast('请先选择一个文件', 'info');
     const e = loadHistory().find(x => x.id === Array.from(gallerySelected)[0]);
     if (!e) return;
     const p = historyAssetRef(e);
@@ -7896,7 +8569,258 @@ async function renameSelectedGallery() {
     if (ok) exitGalleryMultiMode();
 }
 
+/* ---------- 最近删除：删掉的仓库文件先记在这里，30 天内可以恢复 ---------- */
+// 文件删除后，它的内容仍然留在 Git 历史里；恢复就是把原来的文件（按 sha）重新放回原路径，不用重新上传。
+const RECYCLE_KEY = 'kb_recycle';
+const RECYCLE_DAYS = 30, RECYCLE_MAX = 500;
+let recycleCache = null;
+function recycleSave() {
+    if (!recycleCache) return;
+    if (recycleCache.length > RECYCLE_MAX) recycleCache = recycleCache.slice(0, RECYCLE_MAX);
+    lsSet(RECYCLE_KEY, JSON.stringify(recycleCache));
+}
+function recycleLoad() {
+    if (recycleCache) return recycleCache;
+    let a = null;
+    try { a = JSON.parse(lsGet(RECYCLE_KEY) || 'null'); } catch (_) {}
+    const all = Array.isArray(a) ? a : [];
+    const cutoff = Date.now() - RECYCLE_DAYS * 86400000;
+    recycleCache = all.filter(x => x && x.path && x.sha && x.time > cutoff);
+    if (recycleCache.length !== all.length) recycleSave();   // 过期的顺手清掉
+    return recycleCache;
+}
+function recycleKey(x) { return [x.owner, x.repo, x.branch || 'main', x.path].join('\u0000'); }
+// files: [{ owner, repo, branch, path, name, sha, size }]；snap / removedHist 是撤销用的快照，恢复时一并还原收藏、标签、资源库记录
+function recycleAdd(files, snap, removedHist) {
+    try {
+        const list = recycleLoad();
+        const now = Date.now();
+        const histBy = new Map();
+        (removedHist || []).forEach(h => {
+            const p = h && h.entry ? historyAssetRef(h.entry) : null;
+            if (!p || !p.path) return;
+            const k = uploadKey(p.owner, p.repo, p.path);
+            (histBy.get(k) || histBy.set(k, []).get(k)).push(h);
+        });
+        const added = [];
+        (files || []).forEach(f => {
+            if (!f || !f.path || !f.sha) return;
+            const k = uploadKey(f.owner, f.repo, f.path);
+            const it = { id: now.toString(36) + Math.random().toString(36).slice(2, 7), owner: f.owner, repo: f.repo, branch: f.branch || 'main', path: f.path, name: f.name || pathBasename(f.path), sha: f.sha, size: f.size || 0, time: now };
+            if (snap && snap.order && snap.order[k] !== undefined) it.order = snap.order[k];
+            if (snap && snap.meta && snap.meta[k] !== undefined) it.meta = snap.meta[k];
+            if (histBy.has(k)) it.hist = histBy.get(k);
+            added.push(it);
+        });
+        if (!added.length) return;
+        const keys = new Set(added.map(recycleKey));   // 同一个路径删过多次，只留最新的一条
+        recycleCache = added.concat(list.filter(x => !keys.has(recycleKey(x))));
+        recycleSave();
+        recycleRefreshUI();
+    } catch (e) { console.warn('记录「最近删除」失败：', e); }
+}
+function recycleRemove(pred) {
+    const list = recycleLoad();
+    const next = list.filter(x => !pred(x));
+    if (next.length !== list.length) { recycleCache = next; recycleSave(); recycleRefreshUI(); }
+}
+function recycleRemoveFiles(files) {
+    const keys = new Set((files || []).map(recycleKey));
+    recycleRemove(x => keys.has(recycleKey(x)));
+}
+function recycleRefreshUI() { const pg = $('page-recycle'); if (pg && pg.classList.contains('active')) recycleRender(); }
+function recycleAgo(t) {
+    const m = Math.floor((Date.now() - t) / 60000);
+    return m < 1 ? '刚刚' : m < 60 ? m + ' 分钟前' : m < 1440 ? Math.floor(m / 60) + ' 小时前' : Math.floor(m / 1440) + ' 天前';
+}
+function recycleRender() {
+    const box = $('rb-list');
+    if (!box) return;
+    const list = recycleLoad();
+    const total = list.reduce((n, x) => n + (x.size || 0), 0);
+    $('rb-total').textContent = list.length + ' 个文件';
+    $('rb-meta').textContent = (list.length && total ? fmtSize(total) + ' · ' : '') + '保留 ' + RECYCLE_DAYS + ' 天';
+    box.innerHTML = '';
+    if (!list.length) {
+        const e = document.createElement('div'); e.className = 'st-empty'; e.textContent = '没有最近删除的文件'; box.appendChild(e);
+        return;
+    }
+    const cur = String(getSettings().repo || '').toLowerCase();
+    const group = document.createElement('div'); group.className = 'st-group';
+    list.forEach(it => {
+        const row = document.createElement('div'); row.className = 'st-row rb-row';
+        row.setAttribute('role', 'button'); row.tabIndex = 0;
+        const line = document.createElement('div'); line.className = 'st-line';
+        const nm = document.createElement('span'); nm.className = 'st-name'; nm.textContent = it.name || pathBasename(it.path); line.appendChild(nm);
+        const sz = document.createElement('span'); sz.className = 'st-size'; sz.textContent = fmtSize(it.size) || ''; line.appendChild(sz);
+        row.appendChild(line);
+        const left = Math.max(1, Math.ceil((it.time + RECYCLE_DAYS * 86400000 - Date.now()) / 86400000));
+        const sub = document.createElement('div'); sub.className = 'rb-sub';
+        sub.textContent = (String(it.repo || '').toLowerCase() !== cur ? it.repo + '/' : '') + it.path + ' · ' + recycleAgo(it.time) + '删除 · 还剩 ' + left + ' 天';
+        row.appendChild(sub);
+        row.onclick = () => openMoreMenu(row, [
+            { label: '恢复', icon: ICON_REFRESH, onClick: () => recycleRestore([it]) },
+            { label: '从列表移除', icon: ICON_TRASH, danger: true, onClick: () => recycleDrop(it) }
+        ]);
+        group.appendChild(row);
+    });
+    box.appendChild(group);
+}
+async function recycleDrop(it) {
+    const ok = await showConfirm({ title: '从列表移除？', message: '文件在仓库里已经删除了，移除后就不能再从这里恢复。', confirmText: '移除' });
+    if (ok) recycleRemoveFiles([it]);
+}
+async function recycleClear() {
+    const list = recycleLoad();
+    if (!list.length) return toast('没有可清空的内容', 'info');
+    const ok = await showConfirm({ title: '清空最近删除？', message: '只清空这份列表，不会动仓库。清空后这 ' + list.length + ' 个文件就不能再从这里恢复了。', confirmText: '清空' });
+    if (ok) recycleRemove(() => true);
+}
+async function recycleRestoreAll() {
+    const list = recycleLoad();
+    if (!list.length) return toast('没有可恢复的文件', 'info');
+    const ok = await showConfirm({ title: '全部恢复？', message: '把这 ' + list.length + ' 个文件放回原来的位置。原位置已经有同名文件的会跳过，不会被覆盖。', confirmText: '恢复' });
+    if (ok) recycleRestore(list.slice());
+}
+async function recycleRestore(items) {
+    items = (items || []).filter(Boolean);
+    if (!items.length) return;
+    const s = getSettings();
+    if (!s.token) return toast('请先配置 Token', 'error');
+    toast('正在检查原位置…', 'loading');
+    try {
+        const groups = new Map();
+        items.forEach(it => { const k = [it.owner, it.repo, it.branch].join('\u0000'); (groups.get(k) || groups.set(k, []).get(k)).push(it); });
+        const free = [], already = [], blocked = [];
+        for (const g of groups.values()) {
+            const tree = await fetchRepoTree(g[0].owner, g[0].repo, g[0].branch, s);
+            if (tree && tree.truncated) {   // 仓库太大，文件树被截断：逐个问 GitHub 原位置有没有文件
+                for (const it of g) {
+                    try {
+                        const r = await githubRequest('/repos/' + it.owner + '/' + it.repo + '/contents/' + it.path.split('/').map(encodeURIComponent).join('/') + '?ref=' + encodeURIComponent(it.branch), { method: 'GET' }, s.token, s.proxy);
+                        if (r && r.sha === it.sha) already.push(it); else blocked.push(it);
+                    } catch (e) { if (e && e.status === 404) free.push(it); else throw e; }
+                }
+                continue;
+            }
+            const have = new Map(((tree && tree.tree) || []).filter(x => x.type === 'blob').map(x => [x.path, x.sha]));
+            g.forEach(it => { if (!have.has(it.path)) free.push(it); else if (have.get(it.path) === it.sha) already.push(it); else blocked.push(it); });
+        }
+        if (already.length) recycleRemoveFiles(already);   // 已经在仓库里了（比如刚点过「撤销」）
+        if (!free.length) {
+            hideToast();
+            return toast(blocked.length ? '原位置已经有同名文件，没法恢复' : '这些文件已经在仓库里了', blocked.length ? 'error' : 'info');
+        }
+        const snap = { order: {}, meta: {}, owner: free[0].owner, repo: free[0].repo };
+        const hist = [];
+        free.forEach(it => {
+            const k = uploadKey(it.owner, it.repo, it.path);
+            if (it.order !== undefined) snap.order[k] = it.order;
+            if (it.meta !== undefined) snap.meta[k] = it.meta;
+            (it.hist || []).forEach(h => hist.push(h));
+        });
+        const msg = await undoDeleteBundle({ files: free.map(it => ({ owner: it.owner, repo: it.repo, branch: it.branch, path: it.path, name: it.name, sha: it.sha, size: it.size })), snap: snap, removedHist: hist, commitMsg: '从最近删除恢复 ' + free.length + ' 个文件' });
+        hideToast();
+        toast(msg + (blocked.length ? '；另有 ' + blocked.length + ' 个原位置已有同名文件，没恢复' : ''), blocked.length ? 'info' : 'ok');
+    } catch (e) {
+        toast('恢复失败：' + ((e && e.message) || '未知错误'), 'error');
+    }
+}
+
+/* ---------- 导出链接清单：选中 / 当前列表 / 全部，导出成 txt、JSON 或 CSV ---------- */
+function saveTextFile(name, text, mime) {
+    const blob = new Blob([text], { type: mime || 'text/plain' });
+    const href = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = href; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(href), 30000);
+}
+function csvCell(v) { v = String(v == null ? '' : v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+async function exportLinkList(kind) {
+    const isRepo = kind === 'repo';
+    const scopes = [];   // [key, 标签, 条目数组]
+    if (isRepo) {
+        if (!repoLiveLoaded) return toast('仓库文件还没读取完，稍后再试', 'info');
+        const real = f => f.name !== '.gitkeep';
+        if (repoMultiMode && repoSelected.size) scopes.push(['sel', '选中', repoLiveFiles.filter(f => repoSelected.has(f.path) && real(f))]);
+        scopes.push(['view', '当前列表', getRepoVisibleList().filter(real)]);
+        scopes.push(['all', '整个仓库', repoLiveFiles.filter(real)]);
+    } else {
+        if (galleryMultiMode && gallerySelected.size) scopes.push(['sel', '选中', selectedGalleryEntries()]);
+        scopes.push(['view', '当前列表', getGalleryVisibleList()]);
+        scopes.push(['all', '全部记录', loadHistory()]);
+    }
+    const FORMATS = [['url', '直链'], ['copy', '复制格式'], ['json', 'JSON'], ['csv', 'CSV']];
+    const st = { scope: (scopes.find(x => x[2].length) || scopes[0])[0], fmt: 'url' };   // 默认选第一个有内容的范围（在根目录时「当前列表」可能是空的）
+    const toItems = () => {
+        const src = (scopes.find(x => x[0] === st.scope) || scopes[0])[2];
+        const seen = new Set(), out = [];
+        src.forEach(x => {
+            let it;
+            if (isRepo) { const raw = repoShareUrl(x); it = { name: x.name, path: x.path, raw: raw, size: x.size || 0 }; }
+            else {
+                const ref = historyAssetRef(x);
+                it = { name: x.name || linkNameFromUrl(x.url), path: (ref && ref.path) || '', raw: x.url, size: galleryRepoSize(x) };
+            }
+            if (!it.raw || seen.has(it.raw)) return;   // 同一个链接只导出一次
+            seen.add(it.raw);
+            it.url = applyCdnLine(it.raw);
+            out.push(it);
+        });
+        if (isRepo) out.sort((a, b) => NAME_COLLATOR.compare(a.path, b.path));
+        return out;
+    };
+    const box = document.createElement('div');
+    const mkSeg = (cap, opts, key) => {
+        const c = document.createElement('div'); c.className = 'dlg-cap'; c.textContent = cap; box.appendChild(c);
+        const seg = document.createElement('div'); seg.className = 'pref-seg dlg-seg';
+        opts.forEach(o => {
+            const b = document.createElement('button'); b.type = 'button'; b.dataset.v = o[0]; b.textContent = o[1];
+            b.onclick = () => { st[key] = o[0]; $('dlg-error').classList.remove('show'); sync(); };
+            seg.appendChild(b);
+        });
+        box.appendChild(seg);
+        return seg;
+    };
+    const segScope = mkSeg('范围', scopes.map(x => [x[0], x[1] + '（' + x[2].length + '）']), 'scope');
+    const segFmt = mkSeg('格式', FORMATS, 'fmt');
+    const prev = document.createElement('div'); prev.className = 'dlg-prev'; box.appendChild(prev);
+    const sync = () => {
+        segScope.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === st.scope));
+        segFmt.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === st.fmt));
+        const n = toItems().length;
+        prev.textContent = n ? '将导出 ' + n + ' 个链接' + (st.fmt === 'copy' ? '，按当前的复制格式（' + COPY_FORMATS[prefCopyFormat()] + '）逐行写入' : '') : '这个范围里没有可导出的链接';
+    };
+    sync();
+    const ok = await showConfirm({
+        title: '导出链接清单', message: '把链接导出成文件，方便备份、搬家或批量替换。',
+        extra: box, confirmText: '导出',
+        validate: () => (toItems().length ? '' : '这个范围里没有可导出的链接')
+    });
+    if (!ok) return;
+    const items = toItems();
+    if (!items.length) return;
+    const label = (scopes.find(x => x[0] === st.scope) || scopes[0])[1];
+    const day = new Date().toISOString().slice(0, 10);
+    let text, ext, mime;
+    if (st.fmt === 'json') {
+        text = JSON.stringify(items.map(i => ({ name: i.name, path: i.path, url: i.url, size: i.size })), null, 2); ext = 'json'; mime = 'application/json';
+    } else if (st.fmt === 'csv') {
+        text = '\ufeff' + ['name,path,url,size'].concat(items.map(i => [i.name, i.path, i.url, i.size].map(csvCell).join(','))).join('\r\n'); ext = 'csv'; mime = 'text/csv';
+    } else if (st.fmt === 'copy') {
+        const f = prefCopyFormat();
+        text = items.map(i => formatLink(i.raw, i.name, f)).join('\n'); ext = 'txt'; mime = 'text/plain';
+    } else {
+        text = items.map(i => i.url).join('\n'); ext = 'txt'; mime = 'text/plain';
+    }
+    saveTextFile('链接清单-' + label + '-' + day + '.' + ext, text, mime);
+    toast('已导出 ' + items.length + ' 个链接', 'ok');
+}
+
 /* ---------- 6. 排序 ---------- */
+// 名称排序用同一个 Collator：每次 localeCompare(…, 'zh', {numeric}) 都会重建排序规则，8000 条记录要慢几十倍
+let NAME_COLLATOR; try { NAME_COLLATOR = new Intl.Collator('zh', { numeric: true }); } catch (_) { NAME_COLLATOR = new Intl.Collator(undefined, { numeric: true }); }
 const GALLERY_SORTS = [['new', '时间 · 新到旧'], ['old', '时间 · 旧到新'], ['size-desc', '大小 · 大到小'], ['size-asc', '大小 · 小到大'], ['name', '名称 A–Z']];
 const REPO_SORTS = [['time-asc', '上传时间 · 早到晚'], ['time-desc', '上传时间 · 晚到早'], ['size-desc', '大小 · 大到小'], ['size-asc', '大小 · 小到大'], ['name', '名称 A–Z']];
 function prefGallerySort() { const v = lsGet(GALLERY_SORT_KEY); return GALLERY_SORTS.some(x => x[0] === v) ? v : 'new'; }
@@ -7913,12 +8837,12 @@ function sortGalleryEntries(list) {
     if (m === 'old') a.sort((x, y) => t(x) - t(y));
     else if (m === 'size-desc') a.sort((x, y) => entrySizeForSort(y) - entrySizeForSort(x) || t(y) - t(x));
     else if (m === 'size-asc') a.sort((x, y) => entrySizeForSort(x) - entrySizeForSort(y) || t(y) - t(x));
-    else a.sort((x, y) => String(x.name || '').localeCompare(String(y.name || ''), 'zh', { numeric: true }));
+    else a.sort((x, y) => NAME_COLLATOR.compare(String(x.name || ''), String(y.name || '')));
     return a;
 }
 function sortRepoFiles(list) {
     const m = prefRepoSort();
-    const cmpName = (a, b) => a.path.localeCompare(b.path, 'zh', { numeric: true });
+    const cmpName = (a, b) => NAME_COLLATOR.compare(a.path, b.path);
     const a = list.slice();
     if (m === 'name') return a.sort(cmpName);
     if (m === 'size-desc') return a.sort((x, y) => (y.size || 0) - (x.size || 0) || cmpName(x, y));
@@ -8147,7 +9071,7 @@ async function runLinkCheck(opts) {
     const first = document.querySelector('#gallery-container .gallery-tile .tile-badge:not(.cdn)');
     if (first) first.parentElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
 }
-// v3.0.5：仓库页检测失效链接。仓库里的文件一定存在，所以这里测的是「直链现在能不能打开」
+// 仓库页检测失效链接。仓库里的文件一定存在，所以这里测的是「直链现在能不能打开」
 async function checkRepoFileLink(f) {
     const url = repoShareUrl(f);
     if (!url) return 'net';
@@ -8264,7 +9188,7 @@ async function findRepoDuplicates() {
     updateRepoSelectionUI();
     syncRepoSelectionDom();
 }
-/* ===== v3.0.10：仓库工具箱 ===== */
+/* ===== 仓库工具箱 ===== */
 function syncSpecialChip(id, filter, label, n) {
     const c = $(id);
     if (!c) return;
@@ -8291,6 +9215,7 @@ function openRepoToolsMenu(btn) {
     openMoreMenu(btn, [
         { label: repoSimRunning ? '停止分析相似图片' : '查找相似图片', icon: ICON_COPY, onClick: () => (repoSimRunning ? runSimilarScan(0) : openSimilarityMenu(btn)) },
         { label: '扫描未被引用的文件', icon: ICON_SELECT, onClick: () => { const i = $('orphan-scan-input'); if (i) i.click(); } },
+        { label: '导出链接清单', icon: ICON_COPY, onClick: () => exportLinkList('repo') },
         { label: '导出表情包 JSON', icon: ICON_SORT, onClick: exportStickerJson },
         { label: 'CDN 线路：' + (prefCdnLine() ? cdnLineLabel(prefCdnLine()) : '默认'), icon: ICON_LINKCHK, onClick: () => runCdnSpeedTest(btn) }
     ]);
@@ -8355,7 +9280,7 @@ async function handleOrphanScan(fileList) {
     selectRepoSubset('orphan', orphans);
 }
 
-/* ---- 2. 表情包：导出成 url / meaning / category 的 JSON；导入时按分类建文件夹、用含义命名 ---- */
+/* ---- 2. 表情包导入：JSON（链接或内嵌图片）/ Word / 文本；导出成 url / meaning / category 的 JSON ---- */
 function exportStickerJson() {
     if (!repoLiveLoaded) return toast('仓库文件还没读取完，稍后再试', 'info');
     let files, label;
@@ -8364,7 +9289,7 @@ function exportStickerJson() {
     else { files = repoLiveFiles; label = '全部'; }
     files = files.filter(f => f.name !== '.gitkeep' && f.type === 'image');
     if (!files.length) return toast('没有可导出的图片', 'info');
-    files.sort((a, b) => a.path.localeCompare(b.path, 'zh', { numeric: true }));
+    files.sort((a, b) => NAME_COLLATOR.compare(a.path, b.path));
     const list = files.map(f => {
         const parts = f.path.split('/');
         const name = parts.pop();
@@ -8386,51 +9311,449 @@ function exportStickerJson() {
     setTimeout(() => URL.revokeObjectURL(href), 30000);
     toast('已导出 ' + list.length + ' 条（含义取自文件名，分类取自所在文件夹）');
 }
-async function handleStickerJson(file) {
-    const inp = $('sticker-json-input');
-    if (!file) return;
-    if (!getSettings().token) { if (inp) inp.value = ''; toast('请先配置 Token'); switchTab('settings'); return; }
-    if (isBatchUploading) { if (inp) inp.value = ''; toast('上传中，请稍候', 'info'); return; }
-    hideReplaceResult();
-    let text = '', bom = false;
-    try {
-        text = await file.text();
-        const head = new Uint8Array(await file.slice(0, 3).arrayBuffer());
-        bom = head.length === 3 && head[0] === 0xEF && head[1] === 0xBB && head[2] === 0xBF;
-    } catch (e) {
-        if (inp) inp.value = '';
-        return toast('读取失败：' + (e.message || '未知错误'));
+
+// JSON 里直接内嵌的 base64 图片（data:image/...;base64,...）：换成短的伪链接排队，转存时再解码成文件
+const STICKER_LOCAL = 'local-sticker:';
+const stickerLocal = new Map();      // 伪链接 → { mime, b64, meaning }
+const stickerKeyByData = new Map();  // 同一张内嵌图片只传一次
+const STICKER_DATA_RE = /^data:(image\/[a-z0-9.+-]+);base64,([\s\S]*)$/i;
+const STICKER_MIME_EXT = { 'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png': 'png', 'image/gif': 'gif', 'image/webp': 'webp' };
+function isStickerRef(s) {
+    if (typeof s !== 'string') return false;
+    const t = s.trim();
+    return /^https?:\/\//i.test(t) || (t.length < 40 ? false : STICKER_DATA_RE.test(t));
+}
+function stickerRegisterRef(ref, meaning) {
+    const t = ref.trim();
+    if (/^https?:\/\//i.test(t)) return t;
+    if (stickerKeyByData.has(t)) return stickerKeyByData.get(t);
+    const m = t.match(STICKER_DATA_RE);
+    if (!m) return '';
+    const key = STICKER_LOCAL + (stickerLocal.size + 1);
+    stickerLocal.set(key, { mime: m[1].toLowerCase(), b64: m[2], meaning: meaning || '' });
+    stickerKeyByData.set(t, key);
+    return key;
+}
+function stickerLocalToFile(key) {
+    const it = stickerLocal.get(key);
+    if (!it) throw new Error('内嵌图片已失效，请重新选择文件');
+    const label = it.meaning ? '「' + it.meaning + '」' : '内嵌图片';
+    const ext = STICKER_MIME_EXT[it.mime];
+    if (!ext) throw new Error(label + '的图片格式（' + it.mime + '）暂不支持');
+    let bin;
+    try { bin = atob(it.b64.replace(/\s+/g, '')); } catch (_) { throw new Error(label + '的图片数据损坏'); }
+    if (!bin.length) throw new Error(label + '的图片数据为空');
+    const u8 = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    return new File([u8], 'sticker-' + key.slice(STICKER_LOCAL.length) + '.' + ext, { type: it.mime });
+}
+
+// 读 ZIP 里指定的几个文件（Word 本质上是个 ZIP）
+async function readZipEntries(zip, wanted) {
+    const buf = await zip.arrayBuffer();
+    const dv = new DataView(buf), u8 = new Uint8Array(buf);
+    let eocd = -1;
+    for (let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 22 - 65535); i--) {
+        if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
     }
-    if (inp) inp.value = '';
-    let data;
-    try { data = JSON.parse(text.replace(/^\uFEFF/, '')); }
-    catch (e) { return toast('这不是有效的 JSON：' + (e.message || '解析失败'), 'error'); }
-    const info = new Map();   // 原链接 → { meaning, category }
-    (function walk(n) {
-        if (Array.isArray(n)) { n.forEach(walk); return; }
-        if (!n || typeof n !== 'object') return;
-        if (typeof n.url === 'string' && /^https?:\/\//i.test(n.url.trim())) {
-            const u = n.url.trim();
-            if (!info.has(u)) {
-                const pick = (...ks) => { for (const k of ks) if (typeof n[k] === 'string' && n[k].trim()) return n[k].trim(); return ''; };
-                info.set(u, { meaning: pick('meaning', 'name', 'title', 'desc', 'label'), category: pick('category', 'group', 'pack') });
-            }
+    if (eocd < 0) throw new Error('不是有效的 Word 文档');
+    const count = dv.getUint16(eocd + 10, true);
+    let p = dv.getUint32(eocd + 16, true);
+    const out = new Map();
+    for (let n = 0; n < count; n++) {
+        if (p + 46 > buf.byteLength || dv.getUint32(p, true) !== 0x02014b50) break;
+        const flags = dv.getUint16(p + 8, true), method = dv.getUint16(p + 10, true);
+        const csize = dv.getUint32(p + 20, true);
+        const nlen = dv.getUint16(p + 28, true), elen = dv.getUint16(p + 30, true), clen = dv.getUint16(p + 32, true);
+        const lho = dv.getUint32(p + 42, true);
+        const name = zipDecodeName(u8.subarray(p + 46, p + 46 + nlen), !!(flags & 0x800));
+        p += 46 + nlen + elen + clen;
+        if (!wanted.includes(name)) continue;
+        if ((flags & 1) || csize === 0xFFFFFFFF) throw new Error('这个 Word 文档有密码保护或格式不支持');
+        const ds = lho + 30 + dv.getUint16(lho + 26, true) + dv.getUint16(lho + 28, true);
+        const raw = u8.subarray(ds, ds + csize);
+        if (method === 0) out.set(name, raw);
+        else if (method === 8) out.set(name, await zipInflateRaw(raw));
+    }
+    return out;
+}
+function xmlUnescape(s) {
+    return s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+        .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(+d))
+        .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+        .replace(/&amp;/g, '&');
+}
+// 取出 Word 正文：一段一行；超链接的真实地址（显示文字和地址不一样时）补在行尾
+async function readDocxText(file) {
+    const got = await readZipEntries(file, ['word/document.xml', 'word/_rels/document.xml.rels']);
+    const docBytes = got.get('word/document.xml');
+    if (!docBytes) throw new Error('不是有效的 Word 文档');
+    const dec = new TextDecoder('utf-8');
+    const xml = dec.decode(docBytes);
+    const rels = new Map();
+    const relBytes = got.get('word/_rels/document.xml.rels');
+    if (relBytes) {
+        dec.decode(relBytes).replace(/<Relationship\b[^>]*>/g, tag => {
+            const id = (tag.match(/\bId="([^"]*)"/) || [])[1];
+            const target = (tag.match(/\bTarget="([^"]*)"/) || [])[1];
+            if (id && target && /^https?:\/\//i.test(xmlUnescape(target))) rels.set(id, xmlUnescape(target));
+        });
+    }
+    const lines = [];
+    xml.split(/<\/w:p>/).forEach(p => {
+        let line = '';
+        p.replace(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>|<w:tab\s*\/>|<w:br\s*\/>/g, (m, t) => {
+            line += t !== undefined ? xmlUnescape(t) : (/^<w:tab/.test(m) ? '\t' : '\n');
+        });
+        const extra = [];
+        p.replace(/<w:hyperlink\b[^>]*\br:id="([^"]+)"/g, (m, id) => { if (rels.has(id)) extra.push(rels.get(id)); });
+        p.replace(/<w:instrText[^>]*>([^<]*)<\/w:instrText>/g, (m, t) => {
+            const h = xmlUnescape(t).match(/HYPERLINK\s+"([^"]+)"/i);
+            if (h && /^https?:\/\//i.test(h[1])) extra.push(h[1]);
+        });
+        extra.forEach(u => { if (line.indexOf(u) === -1) line += ' ' + u; });
+        lines.push(line);
+    });
+    return lines.join('\n');
+}
+// 文本 / Word 里按行识别：「含义：链接」「1. 含义 链接」「![含义](链接)」，单独成行的标题当作分类
+function parseStickerLines(text, defaultCategory) {
+    const out = [];
+    const seen = new Set();
+    let cat = defaultCategory || '', lastText = '', lastPrevCat = '', usedLast = true;
+    const cleanMeaning = s => s.replace(/[\s:：\-—–=|,，、\t]+$/, '')
+        .replace(/^\s*(?:\d{1,3}\s*[.、)）:：-]\s*|[-*•·]\s*)/, '').trim();
+    text.split(/\r?\n/).forEach(raw => {
+        const line = raw.trim();
+        if (!line) return;
+        let url = '', meaning = '';
+        let m = line.match(/!?\[([^\]]*)\]\((https?:\/\/[^)\s]+)[^)]*\)/);
+        if (m) { url = m[2]; meaning = m[1]; }
+        else {
+            m = line.match(/https?:\/\/[^\s"'<>）)\]】”’]+/i);
+            if (m) { url = m[0]; meaning = line.slice(0, m.index); }
+        }
+        if (!url) {
+            const h = line.replace(/^#+\s*/, '').replace(/^[【\[]/, '').replace(/[】\]]$/, '').trim();
+            lastText = line; lastPrevCat = cat; usedLast = false;
+            if (h && h.length <= 30) cat = h;
             return;
         }
-        Object.values(n).forEach(walk);
-    })(data);
-    const urls = Array.from(info.keys());
-    if (!urls.length) return toast('JSON 里没有找到带 url 的条目', 'info');
+        url = url.replace(/[.,;，。；]+$/, '');
+        meaning = cleanMeaning(meaning);
+        if (!meaning && lastText && !usedLast) { meaning = cleanMeaning(lastText); cat = lastPrevCat; }
+        usedLast = true;
+        if (seen.has(url)) return;
+        seen.add(url);
+        out.push({ url, meaning, category: cat });
+    });
+    return out;
+}
+
+function buildStickerOutput(outName, text, mime, bom, done, total) {
+    if (!done) { hideReplaceResult(); return; }
+    if (replaceOutput && replaceOutput.url) URL.revokeObjectURL(replaceOutput.url);
+    const blob = new Blob(bom ? [new Uint8Array([0xEF, 0xBB, 0xBF]), text] : [text], { type: mime });
+    replaceOutput = { url: URL.createObjectURL(blob), name: outName };
+    const failed = total - done;
+    $('replace-result-text').textContent = '已转存 ' + done + '/' + total + ' 张表情' +
+        (failed > 0 ? '，' + failed + ' 张失败的保持原样' : '') + '。';
+    $('replace-download-btn').textContent = '下载 ' + outName;
+    $('replace-result').style.display = 'block';
+}
+
+// 选文件时自动判断是不是表情包：Word、带含义/分类（或内嵌图片）的 JSON、几乎每行都是「含义：链接」的文本
+async function looksLikeStickerFile(file) {
+    const name = file.name || '';
+    if (/\.docx$/i.test(name) || /wordprocessingml/i.test(file.type || '')) return true;
+    if (file.size > 60 * 1024 * 1024) return false;
+    let text;
+    try { text = await file.text(); } catch (_) { return false; }
+    text = text.replace(/^\uFEFF/, '');
+    if (/\.json$/i.test(name) || /^\s*[\[{]/.test(text)) {
+        let d;
+        try { d = JSON.parse(text); } catch (_) { return false; }
+        let hit = false;
+        (function walk(n) {
+            if (hit) return;
+            if (Array.isArray(n)) { n.forEach(walk); return; }
+            if (!n || typeof n !== 'object') return;
+            const uk = ['url', 'src', 'image', 'img', 'link'].find(k => isStickerRef(n[k]));
+            if (uk) {
+                if (/^data:/i.test(n[uk].trim()) || ['meaning', 'name', 'title', 'desc', 'label', 'category', 'group', 'pack'].some(k => typeof n[k] === 'string' && n[k].trim())) hit = true;
+                return;
+            }
+            Object.values(n).forEach(walk);
+        })(d);
+        return hit;
+    }
+    const withUrl = text.split(/\r?\n/).filter(l => /https?:\/\//i.test(l));
+    if (withUrl.length < 3) return false;
+    const re = /^\s*(?:\d{1,3}\s*[.、)）]\s*)?[^\s<>"'=()\[\]{}][^<>"=()\[\]{}]*?[\s:：\-—–=|,，、]\s*https?:\/\/\S+\s*$/i;
+    return withUrl.filter(l => re.test(l)).length / withUrl.length >= 0.8;
+}
+
+/* ---- 表情包导入前预览：缩略图网格，可改含义 / 分类、取消勾选；纯文本来源还能选输出格式 ---- */
+const STK_FMT_KEY = 'kb_pref_sticker_fmt', STK_TPL_KEY = 'kb_pref_sticker_tpl';   // kb_pref_ 前缀：会随设置备份一起导出
+const STK_FORMATS = [
+    ['json', 'JSON（url / meaning / category）'],
+    ['lines', '文本（含义：链接，每行一条）'],
+    ['md', 'Markdown 图片（![含义](链接)）'],
+    ['csv', 'CSV（含义,分类,链接）'],
+    ['custom', '自定义模板…']
+];
+const STK_TPL_DEFAULT = '{meaning}：{url}';
+let stickerPrev = null;
+function stickerThumbSrc(key) {
+    if (key.indexOf(STICKER_LOCAL) === 0) {
+        const it = stickerLocal.get(key);
+        return it ? 'data:' + it.mime + ';base64,' + it.b64.replace(/\s+/g, '') : '';
+    }
+    return key;
+}
+function stickerFormatOutput(list, fmt, tpl) {
+    const csv = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    if (fmt === 'lines') return { text: list.map(x => (x.meaning ? x.meaning + '：' : '') + x.url).join('\n') + '\n', ext: 'txt', mime: 'text/plain', bom: false };
+    if (fmt === 'md') return { text: list.map(x => '![' + (x.meaning || '') + '](' + x.url + ')').join('\n') + '\n', ext: 'md', mime: 'text/markdown', bom: false };
+    if (fmt === 'csv') return { text: '含义,分类,链接\n' + list.map(x => [csv(x.meaning), csv(x.category), csv(x.url)].join(',')).join('\n') + '\n', ext: 'csv', mime: 'text/csv', bom: true };   // 带 BOM，Excel 才不会把中文显示成乱码
+    if (fmt === 'custom') {
+        const t = tpl || STK_TPL_DEFAULT;
+        return { text: list.map(x => t.replace(/\{(url|meaning|category)\}/g, (_, k) => x[k] || '')).join('\n') + '\n', ext: 'txt', mime: 'text/plain', bom: false };
+    }
+    return { text: JSON.stringify(list, null, 2), ext: 'json', mime: 'application/json', bom: false };
+}
+// 返回 Promise：取消 → null；确认 → { selected: [key…]（保持原顺序）, edits: Map(key → {meaning, category}), format, tpl }
+function stickerPreview(urls, info, opts) {
+    return new Promise(resolve => {
+        if (stickerPrev) stickerPreviewClose();
+        const jsonMode = !!(opts && opts.jsonMode);
+        const list = $('stk-list');
+        list.innerHTML = '';
+        const io = ('IntersectionObserver' in window) ? new IntersectionObserver(es => es.forEach(e => {
+            if (!e.isIntersecting) return;
+            const im = e.target;
+            if (im._src) { im.src = im._src; im._src = ''; }
+            io.unobserve(im);
+        }), { root: list, rootMargin: '500px 0px' }) : null;
+        const rows = [];
+        const frag = document.createDocumentFragment();
+        urls.forEach(key => {
+            const it = info.get(key) || {};
+            const row = document.createElement('div');
+            row.className = 'stk-row';
+            const cb = document.createElement('input');
+            cb.type = 'checkbox'; cb.checked = true; cb.className = 'stk-cb';
+            cb.onchange = stickerPreviewUpdate;
+            const th = document.createElement('div');
+            th.className = 'stk-th';
+            const img = document.createElement('img');
+            img.alt = ''; img.decoding = 'async'; img.draggable = false; img.referrerPolicy = 'no-referrer';
+            img.onerror = () => { th.textContent = '?'; th.title = '这张图预览不出来（不一定转存不了）'; };
+            const src = stickerThumbSrc(key);
+            if (io) { img._src = src; io.observe(img); } else img.src = src;
+            th.appendChild(img);
+            th.onclick = () => { cb.checked = !cb.checked; stickerPreviewUpdate(); };
+            const fields = document.createElement('div');
+            fields.className = 'stk-fields';
+            const mi = document.createElement('input');
+            mi.type = 'text'; mi.value = it.meaning || ''; mi.placeholder = '含义（用作文件名）'; mi.autocomplete = 'off';
+            const ci = document.createElement('input');
+            ci.type = 'text'; ci.value = it.category || ''; ci.placeholder = '分类（用作文件夹，可留空）'; ci.autocomplete = 'off';
+            fields.appendChild(mi); fields.appendChild(ci);
+            if (isOwnHostUrl(key)) {
+                const note = document.createElement('div');
+                note.className = 'stk-note';
+                note.textContent = '已经是你仓库里的直链，不会重复转存';
+                fields.appendChild(note);
+            }
+            row.appendChild(cb); row.appendChild(th); row.appendChild(fields);
+            frag.appendChild(row);
+            rows.push({ key, row, cb, mi, ci });
+        });
+        list.appendChild(frag);
+        // 输出格式：只有「文本 / Word 来源」才有得选；JSON 来源会保持原来的结构
+        const fmtWrap = $('stk-fmt-wrap');
+        fmtWrap.hidden = jsonMode;
+        const sel = $('stk-fmt');
+        sel.innerHTML = '';
+        STK_FORMATS.forEach(([v, label]) => { const o = document.createElement('option'); o.value = v; o.textContent = label; sel.appendChild(o); });
+        const savedFmt = lsGet(STK_FMT_KEY);
+        sel.value = STK_FORMATS.some(x => x[0] === savedFmt) ? savedFmt : 'json';
+        $('stk-tpl').value = lsGet(STK_TPL_KEY) || STK_TPL_DEFAULT;
+        $('sticker-sheet-sub').textContent = '共识别 ' + urls.length + ' 张 · 点缩略图可取消勾选 · 含义会用作文件名，分类会用作文件夹' + (jsonMode ? ' · 输出保持原 JSON 结构' : '');
+        stickerPrev = { resolve, rows, io, jsonMode };
+        stickerPreviewFmtChange();
+        stickerPreviewUpdate();
+        list.scrollTop = 0;
+        $('sticker-sheet-backdrop').classList.add('show');
+    });
+}
+function stickerPreviewUpdate() {
+    if (!stickerPrev) return;
+    let n = 0;
+    stickerPrev.rows.forEach(r => { r.row.classList.toggle('off', !r.cb.checked); if (r.cb.checked) n++; });
+    const go = $('stk-go');
+    go.textContent = n ? '转存 ' + n + ' 张' : '请先勾选';
+    go.disabled = !n;
+    $('stk-all').textContent = n === stickerPrev.rows.length ? '全不选' : '全选';
+}
+function stickerPreviewToggleAll() {
+    if (!stickerPrev) return;
+    const all = stickerPrev.rows.every(r => r.cb.checked);
+    stickerPrev.rows.forEach(r => { r.cb.checked = !all; });
+    stickerPreviewUpdate();
+}
+function stickerPreviewFmtChange() {
+    const custom = $('stk-fmt').value === 'custom';
+    $('stk-tpl-wrap').hidden = !custom;
+    $('stk-tpl-hint').classList.remove('bad');
+}
+function stickerPreviewClose() {
+    const st = stickerPrev;
+    stickerPrev = null;
+    const el = $('sticker-sheet-backdrop');
+    if (el) el.classList.remove('show');
+    if (st && st.io) st.io.disconnect();
+    setTimeout(() => { if (!stickerPrev) $('stk-list').innerHTML = ''; }, 500);   // 等收起动画走完再清，同时释放缩略图内存
+    return st;
+}
+function stickerPreviewCancel() {
+    const st = stickerPreviewClose();
+    if (st) st.resolve(null);
+}
+function stickerPreviewConfirm() {
+    const st = stickerPrev;
+    if (!st) return;
+    const selected = [], edits = new Map();
+    st.rows.forEach(r => {
+        if (!r.cb.checked) return;
+        selected.push(r.key);
+        edits.set(r.key, { meaning: r.mi.value.trim(), category: r.ci.value.trim() });
+    });
+    if (!selected.length) return;
+    const format = st.jsonMode ? 'json' : $('stk-fmt').value;
+    const tpl = ($('stk-tpl').value || '').trim() || STK_TPL_DEFAULT;
+    if (!st.jsonMode && format === 'custom' && tpl.indexOf('{url}') < 0) {
+        const hint = $('stk-tpl-hint');
+        hint.classList.add('bad');
+        $('stk-tpl').focus({ preventScroll: true });
+        return;
+    }
+    if (!st.jsonMode) { lsSet(STK_FMT_KEY, format); if (format === 'custom') lsSet(STK_TPL_KEY, tpl); }
+    stickerPreviewClose();
+    st.resolve({ selected, edits, format, tpl });
+}
+
+async function handleStickerImport(file) {
+    if (!file) return;
+    if (!getSettings().token) { toast('请先配置 Token'); switchTab('settings'); return; }
+    if (isBatchUploading) { toast('上传中，请稍候', 'info'); return; }
+    hideReplaceResult();
+    stickerLocal.clear();
+    stickerKeyByData.clear();
+    const stem = file.name.replace(/\.[^./]+$/, '');
+    const isDocx = /\.docx$/i.test(file.name) || /wordprocessingml/i.test(file.type || '');
+    if (/\.doc$/i.test(file.name)) { return toast('旧版 .doc 读不了，请在 Word 里另存为 .docx 再导入', 'error'); }
+    let text = '', bom = false;
+    try {
+        if (isDocx) {
+            toast('正在读取 Word…', 'loading');
+            text = await readDocxText(file);
+            hideToast();
+        } else {
+            text = await file.text();
+            const head = new Uint8Array(await file.slice(0, 3).arrayBuffer());
+            bom = head.length === 3 && head[0] === 0xEF && head[1] === 0xBB && head[2] === 0xBF;
+        }
+    } catch (e) {
+        hideToast();
+        return toast('读取失败：' + (e.message || '未知错误'), 'error');
+    }
+    text = text.replace(/^\uFEFF/, '');
+
+    const info = new Map();   // 链接（或伪链接）→ { meaning, category }
+    const nodes = [];         // JSON 模式：记下每个条目，转存后直接改它的 url
+    let data = null, jsonMode = false;
+    if (!isDocx && (/\.json$/i.test(file.name) || /^\s*[\[{]/.test(text))) {
+        try { data = JSON.parse(text); jsonMode = true; }
+        catch (e) { if (/\.json$/i.test(file.name)) return toast('这不是有效的 JSON：' + (e.message || '解析失败'), 'error'); }
+    }
+    if (jsonMode) {
+        const URL_KEYS = ['url', 'src', 'image', 'img', 'link'];
+        const pickKey = (n, ...ks) => ks.find(k => typeof n[k] === 'string' && n[k].trim()) || '';
+        const add = (n, k, ref, meaning, category, mk, ck) => {
+            const key = stickerRegisterRef(ref, meaning);
+            if (!key) return;
+            nodes.push({ n, k, key, mk: mk || '', ck: ck || '', m0: meaning, c0: category });   // mk / ck：含义、分类在条目里叫什么字段（预览里改了要写回去）
+            if (!info.has(key)) info.set(key, { meaning, category });
+        };
+        (function walk(n) {
+            if (Array.isArray(n)) { n.forEach(walk); return; }
+            if (!n || typeof n !== 'object') return;
+            const uk = URL_KEYS.find(k => isStickerRef(n[k]));
+            if (uk) {
+                const mk = pickKey(n, 'meaning', 'name', 'title', 'desc', 'label'), ck = pickKey(n, 'category', 'group', 'pack');
+                add(n, uk, n[uk], mk ? n[mk].trim() : '', ck ? n[ck].trim() : '', mk, ck);
+                return;
+            }
+            Object.keys(n).forEach(k => {
+                if (isStickerRef(n[k])) add(n, k, n[k], k, '');   // {"含义": "链接"} 的写法
+                else walk(n[k]);
+            });
+        })(data);
+    } else {
+        parseStickerLines(text, stem).forEach(it => { if (!info.has(it.url)) info.set(it.url, { meaning: it.meaning, category: it.category }); });
+    }
+    const allUrls = Array.from(info.keys());
+    if (!allUrls.length) return toast(isDocx || !jsonMode ? '没有找到「含义：链接」这样的内容' : 'JSON 里没有找到带链接或图片的条目', 'info');
+    // 先让你看一眼：识别出了什么、含义和分类对不对、哪些不要，确认后才开始转存
+    const pre = await stickerPreview(allUrls, info, { jsonMode });
+    if (!pre) { stickerLocal.clear(); stickerKeyByData.clear(); return toast('已取消导入', 'info'); }
+    const chosen = new Set(pre.selected);
+    pre.edits.forEach((v, k) => { const it = info.get(k); if (it) { it.meaning = v.meaning; it.category = v.category; } });
+    // JSON 来源：把改过的含义 / 分类写回原条目（含义字段只有原来就有才写；原来没有分类字段、这次填了，就新增一个 category）
+    let edited = false;
+    nodes.forEach(x => {
+        if (!chosen.has(x.key)) return;
+        const v = pre.edits.get(x.key);
+        if (!v) return;
+        if (v.meaning !== x.m0 && x.mk) { x.n[x.mk] = v.meaning; edited = true; }
+        if (v.category !== x.c0) {
+            if (x.ck) { x.n[x.ck] = v.category; edited = true; }
+            else if (v.category) { x.n.category = v.category; edited = true; }
+        }
+    });
+    const urls = pre.selected;
     const map = new Map();
     const total = urls.filter(u => !isOwnHostUrl(u)).length;
-    const rebuild = () => buildReplaceOutput(file.name, 'application/json', bom, text, map, new Set(), total, new Map());
-    // 文件放进「图片 / 分类名」文件夹，文件名用含义，这样仓库里一眼能看懂，也能再导出
+    const hasLocal = urls.some(u => u.indexOf(STICKER_LOCAL) === 0);
+    const dot = file.name.lastIndexOf('.');
+    let rebuild;
+    if (jsonMode && !hasLocal && !edited) {
+        rebuild = () => buildReplaceOutput(file.name, 'application/json', bom, text, map, new Set(), total, new Map());
+    } else if (jsonMode) {
+        rebuild = () => {
+            nodes.forEach(x => { if (map.has(x.key)) x.n[x.k] = map.get(x.key); });
+            buildStickerOutput((dot > 0 ? file.name.slice(0, dot) : file.name) + '-replaced.json', JSON.stringify(data, null, 2), 'application/json', false, map.size, total);
+        };
+    } else {
+        rebuild = () => {
+            const list = urls.map(u => ({ url: map.get(u) || u, meaning: info.get(u).meaning, category: info.get(u).category }));
+            const o = stickerFormatOutput(list, pre.format, pre.tpl);
+            buildStickerOutput(stem + '-表情包.' + o.ext, o.text, o.mime, o.bom, map.size, total);
+        };
+    }
+    // 文件放进「分类名」文件夹，文件名用含义，这样仓库里一眼能看懂，也能再导出
+    const used = new Set();
     const namer = (url, f) => {
         const it = info.get(url) || {};
         const ext = (f.name.match(/\.[A-Za-z0-9]+$/) || [''])[0];
-        const stem = (it.meaning || f.name.replace(/\.[A-Za-z0-9]+$/, '')).replace(/[\\/:*?"<>|]+/g, '-').slice(0, 80);
+        const base = (it.meaning || f.name.replace(/\.[A-Za-z0-9]+$/, '')).replace(/[\\/:*?"<>|]+/g, '-').slice(0, 80);
         const dir = it.category ? safeDirName(it.category) + '/' : '';
-        return { name: stem + ext, relPath: dir + stem + ext };
+        let s = base, k = 1;
+        while (used.has((dir + s + ext).toLowerCase())) { k++; s = base + '-' + k; }
+        used.add((dir + s + ext).toLowerCase());
+        return { name: s + ext, relPath: dir + s + ext };
     };
     moveResultCardAfter('card-replace-file');
     await convertUrls(urls, map, rebuild, namer);
@@ -8513,15 +9836,8 @@ function phashSave() {
         lsSet(PHASH_KEY, JSON.stringify(phashCache));
     } catch (_) {}
 }
-function dHashFromImage(img) {
-    const W = 72, H = 72;   // 先缩到 72×72，再按 8×8 的块取平均，比直接缩小抗锯齿
-    const c = document.createElement('canvas');
-    c.width = W; c.height = H;
-    const ctx = c.getContext('2d', { willReadFrequently: true });
-    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);   // 透明背景按白底算
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img, 0, 0, W, H);
-    const d = ctx.getImageData(0, 0, W, H).data;
+// 纯计算：输入 72×72 的 RGBA 像素，输出 34 位十六进制指纹。不引用任何外部变量，因为 Worker 里会原样复制这个函数。
+function dHashFromPixels(d, W) {
     const g = new Array(81);
     let mn = 255, mx = 0;
     for (let gy = 0; gy < 9; gy++) {
@@ -8549,6 +9865,16 @@ function dHashFromImage(img) {
     }
     return w.map(v => (v >>> 0).toString(16).padStart(8, '0')).join('') + Math.min(255, Math.round(mx - mn)).toString(16).padStart(2, '0');
 }
+function dHashFromImage(img) {
+    const W = 72, H = 72;   // 先缩到 72×72，再按 8×8 的块取平均，比直接缩小抗锯齿
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);   // 透明背景按白底算
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, W, H);
+    return dHashFromPixels(ctx.getImageData(0, 0, W, H).data, W);
+}
 function loadImageForHash(url) {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -8560,6 +9886,10 @@ function loadImageForHash(url) {
     });
 }
 async function hashRepoImage(f) {
+    // 优先在后台线程下载 + 解码 + 算指纹；Worker 不可用或这张图失败时，退回主线程原来的做法
+    let h = await workerHashUrl(f.url);
+    if (!h && f.rawUrl && f.rawUrl !== f.url) h = await workerHashUrl(f.rawUrl);
+    if (h) return h;
     let img;
     try { img = await loadImageForHash(f.url); }
     catch (e) { if (f.rawUrl && f.rawUrl !== f.url) img = await loadImageForHash(f.rawUrl); else throw e; }
@@ -8696,6 +10026,7 @@ async function loadStorage(force) {
     if (!accounts.length) { storageData = null; renderStorage(); return; }
     storageLoading = true;
     const seq = ++storageSeq;
+    let discarded = false;
     const btn = $('st-refresh'); if (btn) { btn.disabled = true; btn.textContent = '读取中…'; }
     if (!storageData) $('st-list').innerHTML = skeletonRows(4);
     try {
@@ -8705,13 +10036,15 @@ async function loadStorage(force) {
             catch (e) { g.err = (e && e.message) || '读取失败'; }
             return g;
         }));
-        if (seq !== storageSeq) return;
+        if (seq !== storageSeq) { discarded = true; return; }
         storageData = { at: Date.now(), groups, active: accActiveId() };
         lsSet(ST_CACHE_KEY, JSON.stringify(storageData));
     } finally {
         storageLoading = false;
         if (btn) { btn.disabled = false; btn.textContent = '刷新'; }
         renderStorage();
+        const pg = $('page-storage');
+        if (discarded && pg && pg.classList.contains('active')) loadStorage(true);   // 读取途中数据被作废了，而且正停在这个页面：重新读一次
     }
 }
 function renderStorage() {
@@ -8756,7 +10089,7 @@ function renderStorage() {
         list.appendChild(box);
     });
 }
-function invalidateStorage() { storageData = null; try { localStorage.removeItem(ST_CACHE_KEY); } catch (_) {} }
+function invalidateStorage() { storageSeq++; storageData = null; try { localStorage.removeItem(ST_CACHE_KEY); } catch (_) {} }   // storageSeq++：正在读取的那一轮结果作废，免得旧数据又写回来
 
 /* ---------- 初始化 ---------- */
 function initV13Prefs() {
@@ -8808,7 +10141,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '3.0.11';
+const APP_VERSION = '3.0.25';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -8955,7 +10288,7 @@ function showTagActionSheet(n, allFav, tagSet, handlers) {
     const ttl = handlers.title ? (handlers.title.length > 24 ? handlers.title.slice(0, 23) + '…' : handlers.title) : '标签与收藏';
     openTagSheet(ttl, '已选 ' + n + ' 项', items);
 }
-function openTagActionMenu(btn) {
+function openTagActionMenu() {
     const sel = selectedGalleryEntries();
     if (!sel.length) return toast('先选择项目', 'info');
     const tagSet = new Set();
@@ -9017,15 +10350,6 @@ function refreshRepoTagChips() {
         (Array.isArray(m.tags) ? m.tags : []).forEach(x => tags.add(x));
     });
     if (fc) fc.hidden = nf === 0;
-    const uc = $('repo-unlinked-chip');
-    if (uc) {
-        const idx = libraryIndex();
-        let nu = 0;
-        if (idx.size) repoLiveFiles.forEach(f => { if (f.name !== '.gitkeep' && !idx.has(uploadKey(f.owner, f.repo, f.path))) nu++; });
-        if (!nu) repoOnlyUnlinked = false;
-        uc.hidden = nu === 0;
-        uc.classList.toggle('active', repoOnlyUnlinked);
-    }
     if (repoTag && !tags.has(repoTag)) repoTag = '';
     if (tc) { tc.hidden = tags.size === 0; tc.textContent = repoTag ? '#' + repoTag : '标签'; tc.classList.toggle('active', !!repoTag); }
     syncSpecialChip('repo-dead-chip', 'dead', '失效', repoDeadCount());
@@ -9054,22 +10378,14 @@ function openRepoTagFilterMenu(btn) {
     }
     if (items.length) openMoreMenu(btn, items);
 }
-function openRepoTagActionMenu(btn) {
+function openRepoTagActionMenu() {
     const sel = selectedRepoFiles();
     if (!sel.length) return toast('先选择项目', 'info');
     const tagSet = new Set();
     sel.forEach(f => repoMetaTags(f).forEach(x => tagSet.add(x)));
     const one = sel.length === 1 ? sel[0] : null;
-    let extra = [];
-    if (one) {
-        const has = libraryIndex().has(uploadKey(one.owner, one.repo, one.path));
-        extra = [has
-            ? { label: '在资源库里查看', desc: '切到资源库，找到并高亮它的记录', icon: ICON_LIBRARY, onClick: () => locateInLibrary(one) }
-            : { label: '未入库', desc: '这台设备的资源库里没有它的记录', icon: ICON_LIBRARY, onClick: () => toast('资源库里没有这个文件的记录，不影响使用', 'info') }];
-    }
     showTagActionSheet(sel.length, sel.every(repoMetaIsFav), tagSet, {
         title: one ? one.name : '',
-        extra,
         fav: () => setRepoFavSelected(!sel.every(repoMetaIsFav)),
         add: addTagsToRepoSelected,
         remove: removeTagFromRepoSelected
@@ -9102,7 +10418,7 @@ function removeTagFromRepoSelected(x) {
     commitRepoMeta('已移除 #' + x);
 }
 
-/* ---------- v3.0.3：按标签全选 ---------- */
+/* ---------- 按标签全选 ---------- */
 function selectAllByGalleryTag() {
     const list = getGalleryVisibleList();
     if (!list.length) return toast('这个标签下没有项目', 'info');
@@ -9122,34 +10438,10 @@ function selectAllByRepoTag() {
     toast('已选中 ' + list.length + ' 个文件', 'ok');
 }
 
-/* ---------- v3.0.3：资源库 ↔ 仓库联动 ---------- */
+/* ---------- 资源库 ↔ 仓库联动 ---------- */
 const ICON_LOCATE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="2.6"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3"/></svg>';
-const ICON_LIBRARY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>';
-// 资源库记录按 账号/仓库/路径 建的对照表（uploadKey → 记录数组）
-function libraryIndex() {
-    const hist = loadHistory();
-    if (libIdxCache && libIdxCache.hist === hist && libIdxCache.n === hist.length && libIdxCache.files === repoLiveFiles) return libIdxCache.map;
-    const defOwner = (repoMetaCtx && repoMetaCtx.owner) || (repoLiveFiles[0] && repoLiveFiles[0].owner) || '';
-    const defRepo = getSettings().repo || '';
-    const map = new Map();
-    hist.forEach(e => {
-        const r = historyAssetRef(e);
-        if (!r || !r.path) return;
-        const k = uploadKey(r.owner || defOwner, r.repo || defRepo, r.path);
-        const a = map.get(k);
-        if (a) a.push(e); else map.set(k, [e]);
-    });
-    libIdxCache = { hist, n: hist.length, files: repoLiveFiles, map };
-    return map;
-}
-function toggleRepoUnlinked() {
-    repoOnlyUnlinked = !repoOnlyUnlinked;
-    repoSelected.clear();
-    updateRepoSelectionUI();
-    renderRepoLiveFiles();
-}
 function resetRepoView() {
-    repoFilter = 'all'; repoTag = ''; repoSearch = ''; repoOnlyUnlinked = false;
+    repoFilter = 'all'; repoTag = ''; repoSearch = '';
     const inp = $('repo-search'); if (inp) inp.value = '';
     const pill = $('repo-searchpill'); if (pill) pill.classList.remove('has-text');
     document.querySelectorAll('.filter-btn[data-rf]').forEach(b => b.classList.toggle('active', b.dataset.rf === 'all'));
@@ -9189,21 +10481,6 @@ async function locateInRepo(entry) {
     renderRepoLiveFiles();
     toast('已定位：' + f.name, 'ok');
     requestAnimationFrame(() => flashTile(Array.from(document.querySelectorAll('#repo-live-container .repo-live-item[data-path]')).find(x => x.dataset.path === f.path)));
-}
-// 仓库 → 资源库：切到资源库并高亮对应记录
-function locateInLibrary(file) {
-    const recs = libraryIndex().get(uploadKey(file.owner, file.repo, file.path));
-    if (!recs || !recs.length) return toast('资源库里没有这个文件的记录', 'info');
-    const e = recs[0];
-    if (repoMultiMode) exitRepoMultiMode();
-    setGallerySeg('library');
-    galleryTag = ''; gallerySearch = '';
-    const inp = $('gallery-search'); if (inp) inp.value = '';
-    const pill = $('gallery-searchpill'); if (pill) pill.classList.remove('has-text');
-    setGalleryFilter('all');
-    renderGallery({ all: true });   // 记录多时是分批画的，这里一次画全，才能找到目标
-    toast('已定位：' + (e.name || file.name), 'ok');
-    requestAnimationFrame(() => flashTile(Array.from(document.querySelectorAll('#gallery-container .gallery-tile')).find(x => x._entryId === e.id)));
 }
 
 /* ---------- CDN 未同步：一键改用 raw 直链 ---------- */
@@ -9268,6 +10545,44 @@ async function offlineStatusRefresh() {
     if (el) el.textContent = await offlineStatusText();
 }
 async function offlineInfo() { toast(await offlineStatusText(), 'info'); }
+/* ---------- 申请持久存储：iOS / 浏览器空间紧张时，默认会优先清掉网站数据（上传队列、指纹缓存都在里面） ---------- */
+let storagePersisted = null, storageAskedAt = 0;
+async function requestPersistentStorage(force) {
+    if (!force && Date.now() - storageAskedAt < 10 * 60 * 1000) return storagePersisted;   // 10 分钟内不重复申请
+    storageAskedAt = Date.now();
+    try {
+        const st = navigator.storage;
+        if (!st || typeof st.persist !== 'function') storagePersisted = null;
+        else if (typeof st.persisted === 'function' && await st.persisted()) storagePersisted = true;
+        else storagePersisted = !!(await st.persist());
+    } catch (_) { storagePersisted = null; }
+    try { storageStatusRefresh(); } catch (_) {}
+    return storagePersisted;
+}
+async function storageStatusText() {
+    const st = navigator.storage;
+    if (!st || typeof st.persist !== 'function') return '这个浏览器不支持持久存储';
+    let ok = storagePersisted;
+    try { if (typeof st.persisted === 'function') ok = await st.persisted(); } catch (_) {}
+    let usage = '';
+    try {
+        if (typeof st.estimate === 'function') {
+            const e = await st.estimate();
+            if (e && e.usage >= 0) usage = '（本站已用 ' + fmtSize(e.usage) + '）';
+        }
+    } catch (_) {}
+    return ok
+        ? '已保护：系统空间紧张时，不会自动清理上传队列和缓存' + usage
+        : '未获授权：空间紧张时系统可能清掉本地数据' + usage + '。添加到主屏幕后更容易被允许';
+}
+async function storageStatusRefresh() {
+    const el = $('about-storage-status');
+    if (el) el.textContent = await storageStatusText();
+}
+(function initPersistentStorage() {
+    const go = () => setTimeout(() => { requestPersistentStorage(true); }, 1500);
+    if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });
+})();
 /* 清理旧版「外观」功能留下的背景图（IndexedDB），只做一次 */
 try { if (!lsGet('kb_ap_cleaned')) { indexedDB.deleteDatabase('kb_appearance'); lsSet('kb_ap_cleaned', '1'); } } catch (_) {}
 
@@ -9492,7 +10807,7 @@ async function importBackup(file) {
     let data;
     try { data = JSON.parse(await file.text()); } catch (_) { return toast('这不是有效的备份文件', 'error'); }
     if (data && data.app === 'direct-link' && data.encrypted) { data = await askDecryptBackup(data); if (!data) return; }
-    if (!data || data.app !== 'direct-link' || typeof data.prefs !== 'object') return toast('这不是 Direct Link 的备份文件', 'error');
+    if (!data || data.app !== 'direct-link' || !data.prefs || typeof data.prefs !== 'object') return toast('这不是 Direct Link 的备份文件', 'error');
     const ok = await showConfirm({
         title: '导入这份备份？',
         message: '会恢复偏好设置，补回缺少的上传记录和账号（已有的不会被覆盖），并在当前 Token、仓库、代理为空时填入备份里的值。导入后页面会自动刷新。',
@@ -9512,7 +10827,7 @@ async function importBackup(file) {
             const curAcc = accLoad();
             const accIds = new Set(curAcc.map(a => a && a.id));
             const addAcc = data.accounts.filter(a => a && a.id && !accIds.has(a.id));
-            if (addAcc.length && !accSave(curAcc.concat(addAcc))) return;
+            if (addAcc.length && !accSave(curAcc.concat(addAcc))) return toast('导入失败：账号没能保存，存储空间可能不足', 'error');
             if (data.activeAccount && !accActiveId()) { try { localStorage.setItem(ACC_ACTIVE, data.activeAccount); } catch (_) {} }
         }
         if (Array.isArray(data.history) && data.history.length) {
@@ -9526,7 +10841,7 @@ async function importBackup(file) {
     toast('导入完成，正在刷新…', 'ok');
     setTimeout(() => location.reload(), 700);
 }
-/* ---------- v3.0.4：多选时滑动选择 ---------- */
+/* ---------- 多选时滑动选择 ---------- */
 // 两种用法：①已经在多选里，手指横着在图上划一下就开始（竖着划仍然是滚动）；②长按一张图进入多选后不松手，直接拖。
 // 选中范围 = 起点到手指所在位置之间（按页面上的先后顺序）的所有图；往回拖会收缩。起点原本就是选中的，则整片取消选择。
 // 手指拖到屏幕上 / 下边缘会自动滚动。

@@ -1216,7 +1216,6 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 
 .gallery-tile .tile-badge { position: absolute; z-index: 3; top: 7px; left: 7px; padding: 2px 7px; border-radius: 999px; font-size: 10px; font-weight: 700; line-height: 14px; color: #fff; background: rgba(198,40,40,.92); pointer-events: none; }
 .gallery-tile .tile-badge.cdn { background: rgba(120,120,128,.92); }
-.gallery-grid.flat-sort { margin-top: 14px; }
 
 /* ================= 关于页 ================= */
 #page-about .about-sec + .about-sec { margin-top: 20px; }
@@ -1463,6 +1462,8 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div class="sub">替换文本文件里的图床链接，并下载新文件。</div>
             <input type="file" id="replace-file-input" style="display:none" onchange="handleReplaceFile(this.files[0])">
             <button class="ghost-btn primary" id="replace-file-btn" onclick="document.getElementById('replace-file-input').click()">选择文件并替换</button>
+            <input type="file" id="sticker-json-input" accept=".json,application/json" style="display:none" onchange="handleStickerJson(this.files[0])">
+            <button class="ghost-btn" id="sticker-json-btn" style="margin-top:10px;" onclick="document.getElementById('sticker-json-input').click()">表情包 JSON：按分类和含义整理后转存</button>
             <div id="replace-result" style="display:none; margin-top:14px;">
                 <div class="sub" id="replace-result-text" style="margin-bottom:10px;"></div>
                 <button class="ghost-btn primary" id="replace-download-btn" onclick="downloadReplaceOutput()">下载替换后的文件</button>
@@ -1471,6 +1472,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
 
     </div>
 
+    <input type="file" id="orphan-scan-input" multiple style="display:none" onchange="handleOrphanScan(this.files)">
     <!-- 资源库页 -->
     <div class="page" id="page-gallery" data-seg="library">
         <div class="filter-group gallery-seg-group" id="gallery-seg" role="tablist">
@@ -1525,6 +1527,10 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
                     <button class="filter-btn" data-rf="image" onclick="setRepoFilter('image')">图片</button>
                     <button class="filter-btn" data-rf="font" onclick="setRepoFilter('font')">字体</button>
                     <button class="filter-btn" data-rf="file" onclick="setRepoFilter('file')">其他</button>
+                    <button class="filter-btn dead-chip" id="repo-dead-chip" data-rf="dead" onclick="setRepoFilter('dead')" hidden>失效</button>
+                    <button class="filter-btn dead-chip" id="repo-dup-chip" data-rf="dup" onclick="setRepoFilter('dup')" hidden>重复</button>
+                    <button class="filter-btn dead-chip" id="repo-sim-chip" data-rf="sim" onclick="setRepoFilter('sim')" hidden>相似</button>
+                    <button class="filter-btn dead-chip" id="repo-orphan-chip" data-rf="orphan" onclick="setRepoFilter('orphan')" hidden>未引用</button>
                     <button class="filter-btn" id="repo-fav-chip" data-rf="fav" onclick="setRepoFilter('fav')" hidden>收藏</button>
                     <button class="filter-btn" id="repo-tag-chip" onclick="openRepoTagFilterMenu(this)" hidden>标签</button>
                     <button class="filter-btn" id="repo-unlinked-chip" onclick="toggleRepoUnlinked()" hidden>未入库</button>
@@ -1699,7 +1705,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div class="about-cap">账户与直链</div>
             <div class="about-box">
             <div class="about-item"><div class="about-t">GitHub Token</div><div class="about-d">Token 需要有仓库读写权限。如果要在 App 里删除整个仓库，还需要给 Token 勾选 delete_repo 权限，否则会提示删除失败。请不要把 Token 发给别人。</div></div>
-            <div class="about-item"><div class="about-t">API 代理 / 图片代理（可选）</div><div class="about-d">访问 GitHub 不稳定时可以填写自己的代理地址。不填则直接连接 GitHub 和 jsDelivr。</div></div>
+            <div class="about-item"><div class="about-t">API 代理 / 图片代理（可选）</div><div class="about-d">访问 GitHub 不稳定时可以填写自己的代理地址。不填则直接连接 GitHub 和 jsDelivr。把别人网站的图片转存进来时，如果对方不允许跨域读取或有防盗链，就需要填「图片代理」。</div></div>
             <div class="about-item"><div class="about-t">直链固定到提交版本</div><div class="about-d">开启后，直链里会带上本次提交的版本号，之后覆盖同名文件也不会改变这个链接的内容。关闭则链接跟随分支，覆盖同名文件后，链接指向的内容会更新（CDN 缓存可能有延迟）。</div></div>
             </div>
         </div>
@@ -1737,7 +1743,10 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div class="about-cap">检测与提醒</div>
             <div class="about-box">
             <div class="about-item"><div class="about-t">检测剪贴板图片</div><div class="about-d">打开 App 时检查剪贴板里有没有图片，有的话提示你直接上传。系统可能会弹出「允许粘贴」的确认，这是系统的隐私保护，选允许即可。</div></div>
-            <div class="about-item"><div class="about-t">自动检测失效链接</div><div class="about-d">打开资源库时自动检查已上传的链接是否还能访问，会产生额外的网络请求。不需要时可以关闭。</div></div>
+            <div class="about-item"><div class="about-t">仓库页检测失效链接</div><div class="about-d">仓库页「…」菜单里的「检测失效链接」，会逐个打开仓库文件的直链，打不开的标红「失效」，只有 jsDelivr 没同步的标灰「CDN 未同步」。检测结果只保存在本次打开期间。打开「自动检测失效链接」后，每个仓库读取完文件会隔 7 天自动检测一次，只有发现失效时才提示。文件在仓库里不代表直链一定能用，私有仓库、特殊字符的文件名都可能打不开。</div></div>
+            <div class="about-item"><div class="about-t">仓库页查找重复文件</div><div class="about-d">仓库页「…」菜单里的「查找重复文件」，按文件内容找出完全相同的文件（不用下载任何文件）。每组保留路径最短的一份，其余标灰「重复」，可以一键选中后删除。删除副本后，用那些路径的直链会失效，先确认没有地方在用。检测失效链接也可以只检测当前文件夹，或多选后只检测选中的文件。</div></div>
+            <div class="about-item"><div class="about-t">仓库页更多工具</div><div class="about-d">仓库页「…」→「更多工具」里有四个：查找相似图片（在手机上算图片指纹，第一次要下载图片，结果会缓存）；扫描未被引用的文件（导入你的 HTML、JSON 等文件，找出仓库里没被用到的图片）；导出表情包 JSON（含义取自文件名，分类取自文件夹）；CDN 线路（测速，之后复制的链接会换成选定的线路，不会改动已有的记录）。另外，替换文件那页有「表情包 JSON」入口：按分类建文件夹、用含义当文件名转存，并输出替换好链接的新 JSON。</div></div>
+            <div class="about-item"><div class="about-t">自动检测失效链接</div><div class="about-d">打开资源库时自动检查已上传的链接是否还能访问，仓库页也会按同样的间隔检查仓库文件的直链，会产生额外的网络请求。不需要时可以关闭。</div></div>
             <div class="about-item"><div class="about-t">后台保活</div><div class="about-d">开启后会循环播放无声音频，让 iOS 不要把页面挂起，锁屏或切到其他 App 时上传也能继续。开启期间可能会打断其他 App 正在播放的音乐或播客。控制中心会出现「后台保活中」的播放卡片，这是正常现象；会增加耗电。如果提示「点一下屏幕即可启用后台保活」，点一下屏幕即可。</div></div>
             <div class="about-item"><div class="about-t">屏幕常亮</div><div class="about-d">上传时阻止屏幕自动锁定。只在页面处于前台时有效，同样会增加耗电。据我所知，较旧的 iOS 版本在主屏幕网页里可能不生效。</div></div>
             <div class="about-item"><div class="about-t">上传完成通知</div><div class="about-d">只在 App 不在前台时发送，用来告诉你成功、失败、跳过各多少个。需要先授权通知。iPhone 上需要把本页添加到主屏幕再打开，而且单个 HTML 文件在部分 iOS 环境下发不了系统通知，请以「发送测试通知」的结果为准。可以点「发送测试通知」检查是否正常。</div></div>
@@ -2335,6 +2344,17 @@ function showUploadErrorModal(failures, opts) {
     $('upload-error-sub').textContent = opts.sub || (n === 1 ? '详细原因如下' : n + ' 个文件未能上传，请检查网络或 GitHub 配置');
 
     list.innerHTML = '';
+    if (typeof opts.onRetryAll === 'function' && n > 1) {
+        const allRow = document.createElement('div');
+        allRow.className = 'upload-error-item';
+        const allBtn = document.createElement('button');
+        allBtn.type = 'button';
+        allBtn.className = 'small-btn';
+        allBtn.textContent = '全部重试（' + n + '）';
+        allBtn.onclick = () => opts.onRetryAll(failures);
+        allRow.appendChild(allBtn);
+        list.appendChild(allRow);
+    }
     failures.forEach(f => {
         const item = document.createElement('div');
         item.className = 'upload-error-item';
@@ -3158,6 +3178,7 @@ function accWriteLive(a) {
     invalidateRepoLoad();
     repoLiveLoaded = false; repoLiveLoadedAt = 0; repoLiveFiles = []; repoCurrentPath = '';
     repoMultiMode = false; repoSelected.clear(); myRepos = [];
+    repoDupInfo = new Map(); repoOrphanInfo = new Map(); repoSimInfo = new Map();
     try { updateRepoSelectionUI(); } catch (_) {}
     updateRepoTarget();
 }
@@ -3399,6 +3420,12 @@ function openRepoMenu(btn) {
         { label: '排序', icon: ICON_SORT, onClick: () => openRepoSortMenu(btn) },
         { label: '新建文件夹', icon: ICON_FOLDER_PLUS, onClick: createRepoFolder },
         { label: '复制格式：' + COPY_FORMATS[prefCopyFormat()], icon: ICON_COPY, onClick: cycleCopyFormat },
+        { label: repoLinkCheckRunning ? '停止检测' : '检测失效链接', icon: ICON_LINKCHK, onClick: () => runRepoLinkCheck() },
+        { label: '查找重复文件', icon: ICON_COPY, onClick: findRepoDuplicates },
+        { label: '更多工具', icon: ICON_SELECT, onClick: () => openRepoToolsMenu(btn) },
+        ...((!repoLinkCheckRunning && repoMultiMode && repoSelected.size > 0) ? [{ label: '只检测选中的文件（' + repoSelected.size + '）', icon: ICON_LINKCHK, onClick: () => runRepoLinkCheck({ files: repoLiveFiles.filter(f => repoSelected.has(f.path)) }) }] : []),
+        ...((!repoLinkCheckRunning && repoFolderFiles().length > 0) ? [{ label: '只检测当前文件夹（' + repoFolderFiles().length + '）', icon: ICON_LINKCHK, onClick: () => runRepoLinkCheck({ files: repoFolderFiles() }) }] : []),
+        ...((!repoLinkCheckRunning && repoDeadCount() > 0) ? [{ label: '只重测失效项（' + repoDeadCount() + '）', icon: ICON_LINKCHK, onClick: () => runRepoLinkCheck({ onlyDead: true }) }] : []),
         ...(prefMetaSync() ? [{ label: '同步标签与收藏', icon: ICON_REFRESH, onClick: () => syncRepoMetaNow() }] : []),
         { label: '刷新', icon: ICON_REFRESH, onClick: () => loadRepoLiveFiles(true) }
     ]);
@@ -4399,6 +4426,28 @@ function onRepoSearchInput() {
     }, 150);
 }
 let repoLiveFiles = [];
+// v3.0.5：仓库文件的直链检测结果（只在本次打开期间有效；文件内容变了 sha 对不上就作废）
+const repoLinkStatus = new Map();   // uploadKey → { s: 'ok'|'dead'|'cdn', sha, t }
+let repoLinkCheckRunning = false, repoLinkCheckStop = false;
+function repoFolderFiles() {
+    if (!repoCurrentPath) return [];
+    const prefix = repoCurrentPath + '/';
+    return repoLiveFiles.filter(f => f.name !== '.gitkeep' && f.path.startsWith(prefix));
+}
+function repoDeadCount() { return repoLiveFiles.reduce((n, f) => n + (f.name !== '.gitkeep' && repoLinkStatusOf(f) === 'dead' ? 1 : 0), 0); }
+function repoLinkStatusOf(f) {
+    const v = repoLinkStatus.get(uploadKey(f.owner, f.repo, f.path));
+    return (v && v.sha === f.sha) ? v.s : '';
+}
+// v3.0.9：重复文件（内容 sha 相同）。path → { sha, extra }，extra=true 的是建议删除的多余副本
+let repoDupInfo = new Map();
+function repoDupOf(f) { const v = repoDupInfo.get(f.path); return (v && v.sha === f.sha) ? v : null; }
+// v3.0.10：仓库工具箱的结果（同样只在本次打开期间有效，靠 sha 判断文件有没有变）
+const REPO_SPECIAL_FILTERS = new Set(['fav', 'dead', 'dup', 'orphan', 'sim']);   // 这些筛选跨文件夹，在整个仓库里找
+let repoOrphanInfo = new Map();   // path → sha：没被导入的文件引用的图片 / 字体
+let repoSimInfo = new Map();      // path → { sha, g, extra }：相似图分组，extra=true 是建议删除的那份
+function repoOrphanOf(f) { return repoOrphanInfo.get(f.path) === f.sha; }
+function repoSimOf(f) { const v = repoSimInfo.get(f.path); return (v && v.sha === f.sha) ? v : null; }
 let repoLiveLoaded = false;
 let repoLiveLoading = false;
 let repoLiveLoadedAt = 0;
@@ -4702,12 +4751,16 @@ function setRepoFilter(f) {
 
 function getRepoVisibleList() {
     const prefix = repoCurrentPath ? repoCurrentPath + '/' : '';
-    const globalView = repoFilter === 'fav' || !!repoTag || repoOnlyUnlinked; // 收藏 / 标签 / 未入库筛选：跨文件夹，在整个仓库里找
+    const globalView = REPO_SPECIAL_FILTERS.has(repoFilter) || !!repoTag || repoOnlyUnlinked; // 收藏 / 标签 / 未入库筛选：跨文件夹，在整个仓库里找
     const libIdx = repoOnlyUnlinked ? libraryIndex() : null;
     const list = repoLiveFiles.filter(f => {
         if (f.name === '.gitkeep') return false;
         if (libIdx && libIdx.has(uploadKey(f.owner, f.repo, f.path))) return false;
         if (repoFilter === 'fav') { if (!repoMetaIsFav(f)) return false; }
+        else if (repoFilter === 'dead') { if (repoLinkStatusOf(f) !== 'dead') return false; }
+        else if (repoFilter === 'dup') { if (!repoDupOf(f)) return false; }
+        else if (repoFilter === 'orphan') { if (!repoOrphanOf(f)) return false; }
+        else if (repoFilter === 'sim') { if (!repoSimOf(f)) return false; }
         else if (repoFilter !== 'all' && f.type !== repoFilter) return false;
         if (repoTag && !repoMetaTags(f).includes(repoTag)) return false;
         if (repoSearch) return f.path.toLowerCase().includes(repoSearch) || repoMetaTags(f).join(' ').toLowerCase().includes(repoSearch); // 搜索：整个仓库（含标签）
@@ -4716,6 +4769,12 @@ function getRepoVisibleList() {
         const rest = f.path.slice(prefix.length);
         return rest.length > 0 && rest.indexOf('/') === -1;
     });
+    if (repoFilter === 'dup') {   // 同一组重复文件挨在一起，每组第一个是保留的那份
+        return list.sort((a, b) => (a.sha < b.sha ? -1 : a.sha > b.sha ? 1 : 0) || (repoDupOf(a).extra - repoDupOf(b).extra) || a.path.localeCompare(b.path));
+    }
+    if (repoFilter === 'sim') {   // 同一组相似图挨在一起，每组第一个是保留的那份
+        return list.sort((a, b) => (repoSimOf(a).g - repoSimOf(b).g) || (repoSimOf(a).extra - repoSimOf(b).extra) || a.path.localeCompare(b.path));
+    }
     return sortRepoFiles(list);
 }
 
@@ -5186,6 +5245,7 @@ async function loadRepoLiveFiles(force = false) {
         status.textContent = (tree.truncated ? '仓库文件太多，部分目录未能读全 · ' : '实时仓库 · ') + repoLiveFiles.length + ' 个文件 · ' + ctx.owner + '/' + s.repo;
         repoMetaCtx = { owner: ctx.owner, repo: s.repo, branch: ctx.branch, complete: !tree.truncated };
         setTimeout(() => syncRepoMeta(false), 0);   // 不阻塞列表显示，后台对一下仓库里的标签
+        try { maybeAutoRepoLinkCheck(); } catch (_) {}
     } catch (e) {
         if (seq !== repoLoadSeq) return;
         repoMetaCtx = null;
@@ -5217,12 +5277,12 @@ function renderRepoLiveFiles() {
     }
     if (repoLiveLoaded) refreshRepoTagChips();
     renderRepoBreadcrumb();
-    const folders = (repoSearch || repoFilter === 'fav' || repoTag || repoOnlyUnlinked) ? [] : getRepoSubfolders();
+    const folders = (repoSearch || REPO_SPECIAL_FILTERS.has(repoFilter) || repoTag || repoOnlyUnlinked) ? [] : getRepoSubfolders();
     const visible = getRepoVisibleList();
     container.innerHTML = '';
     updateRepoSelectionUI();
     if (!folders.length && !visible.length) {
-        container.innerHTML = '<div class="repo-live-empty">' + (repoSearch ? '没有匹配的文件' : (repoOnlyUnlinked ? '没有未入库的文件' : '暂无内容')) + '</div>';
+        container.innerHTML = '<div class="repo-live-empty">' + (repoSearch ? '没有匹配的文件' : (repoOnlyUnlinked ? '没有未入库的文件' : (repoFilter === 'dead' ? '没有失效的文件' : (repoFilter === 'dup' ? '没有重复的文件' : repoFilter === 'orphan' ? '没有未引用的文件' : repoFilter === 'sim' ? '没有相似的图片' : '暂无内容')))) + '</div>';
         return;
     }
     const list = document.createElement('div');
@@ -5313,6 +5373,33 @@ function renderRepoLiveFiles() {
         mark.className = 'repo-live-select-mark';
         mark.textContent = repoSelected.has(file.path) ? '✓' : '';
         item.appendChild(mark);
+        const lkSt = repoLinkStatusOf(file);
+        if (lkSt === 'dead' || lkSt === 'cdn') {
+            const bd = document.createElement('div');
+            bd.className = 'tile-badge' + (lkSt === 'cdn' ? ' cdn' : '');
+            bd.textContent = lkSt === 'dead' ? '失效' : 'CDN 未同步';
+            bd.title = lkSt === 'dead' ? '检测时这个直链打不开（可能是私有仓库、文件名有特殊字符或文件过大）' : '文件在仓库里，但 jsDelivr 还没同步到';
+            item.appendChild(bd);
+        }
+        const dupV = repoDupOf(file);
+        if (dupV && dupV.extra && lkSt !== 'dead' && lkSt !== 'cdn') {
+            const bd = document.createElement('div');
+            bd.className = 'tile-badge cdn';
+            bd.textContent = '重复';
+            bd.title = '内容和另一个文件完全相同（建议保留路径最短的那份）';
+            item.appendChild(bd);
+        }
+        {
+            const simV = repoSimOf(file), orphV = repoOrphanOf(file);
+            const hasOther = lkSt === 'dead' || lkSt === 'cdn' || (dupV && dupV.extra);
+            if (!hasOther && ((simV && simV.extra) || orphV)) {
+                const bd = document.createElement('div');
+                bd.className = 'tile-badge cdn';
+                bd.textContent = (simV && simV.extra) ? '相似' : '未引用';
+                bd.title = (simV && simV.extra) ? '和另一张图看起来几乎一样（建议保留文件更大的那张）' : '你导入的文件里没有用到这个文件';
+                item.appendChild(bd);
+            }
+        }
         if (repoMetaIsFav(file)) { const st = document.createElement('div'); st.className = 'tile-fav'; st.textContent = '★'; item.appendChild(st); }
         if (libIdx.size && !libIdx.has(uploadKey(file.owner, file.repo, file.path))) { const lb = document.createElement('div'); lb.className = 'tile-lib'; lb.textContent = '未入库'; lb.title = '这台设备的资源库里没有它的记录'; item.appendChild(lb); }
 
@@ -5341,7 +5428,7 @@ function renderRepoLiveFiles() {
         item.appendChild(preview);
         const name = document.createElement('div');
         name.className = 'repo-live-name tile-name';
-        name.textContent = (repoSearch || repoFilter === 'fav' || repoTag || repoOnlyUnlinked) ? file.path : file.name; // 搜索结果带上文件夹路径，方便区分同名文件
+        name.textContent = (repoSearch || REPO_SPECIAL_FILTERS.has(repoFilter) || repoTag || repoOnlyUnlinked) ? file.path : file.name; // 搜索结果带上文件夹路径，方便区分同名文件
         item.appendChild(name);
         const ts = uploadRank.get(uploadKey(file.owner, file.repo, file.path));
         const meta = makeTileMeta([formatBytes(file.size), ts ? formatDate(ts).slice(5) : ''].filter(Boolean).join(' · '));
@@ -6576,6 +6663,14 @@ function buildImgProxyUrl(tpl, target) {
     if (/[?&][^=&]*=$/.test(tpl)) return tpl + enc;          // 已写好 ?url= 之类，直接接上
     return tpl + (tpl.indexOf('?') === -1 ? '?' : '&') + 'url=' + enc; // 只填了地址，自动补 ?url=
 }
+// 把下载失败的状态码翻译成能看懂、能照着做的原因
+function describeFetchStatus(status, hasProxy) {
+    if (status === 401 || status === 403) return '对方开了防盗链（HTTP ' + status + '）' + (hasProxy ? '，图片代理也没能绕过，换个代理试试' : '，在设置里填「图片代理」后重试');
+    if (status === 404 || status === 410) return '原链接已经失效（HTTP ' + status + '），对方服务器上这张图已被删除';
+    if (status === 429) return '请求太频繁被对方限流（HTTP 429），过一会儿再重试';
+    if (status >= 500) return '对方服务器出错了（HTTP ' + status + '），稍后重试';
+    return 'HTTP ' + status;
+}
 async function urlToFile(rawUrl) {
     let u;
     try { u = new URL(rawUrl); } catch (e) { throw new Error('链接格式不正确'); }
@@ -6594,10 +6689,10 @@ async function urlToFile(rawUrl) {
             const r2 = await fetchWithRetry(buildImgProxyUrl(imgProxy, u.href), { credentials: 'omit', referrerPolicy: 'no-referrer' }, { tries: 3 });
             if (r2.ok) res = r2; else proxyErr = 'HTTP ' + r2.status;
         } catch (_) { proxyErr = '网络错误'; }
-        if (!res) throw new Error('无法获取该链接：直连被跨域拦截，图片代理也失败（' + proxyErr + '）');
+        if (!res) throw new Error('直连被跨域限制拦截，图片代理也失败了（' + proxyErr + '）。检查「图片代理」地址是否正确，或换个时间再试');
     }
-    if (!res) throw new Error('无法获取该链接，可能是对方服务器拒绝跨域访问（CORS）。可在设置里填一个「图片代理」作为兜底');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    if (!res) throw new Error('被对方服务器的跨域限制（CORS）拦截，或网络不通。在设置里填「图片代理」后重试');
+    if (!res.ok) throw new Error(describeFetchStatus(res.status, !!imgProxy));
     const declaredSize = Number(res.headers.get('content-length'));
     if (declaredSize && declaredSize > MAX_UPLOAD_SIZE) throw new Error('文件超过 ' + Math.round(MAX_UPLOAD_SIZE / 1048576) + 'MB，已跳过');
     const blob = await res.blob();
@@ -6752,7 +6847,7 @@ function isOwnHostUrl(url) {
 }
 
 // collector: 可选的 Map(原链接 → 新直链)，afterFn: 全部处理完（含失败重试）后的回调
-async function convertUrls(urls, collector, afterFn) {
+async function convertUrls(urls, collector, afterFn, namer) {
     urls = Array.from(new Set(urls.map(s => s.trim()).filter(Boolean)));
     const before = urls.length;
     urls = urls.filter(u => !isOwnHostUrl(u));
@@ -6764,7 +6859,15 @@ async function convertUrls(urls, collector, afterFn) {
     const results = await settleWithLimit(urls, 4, urlToFile);
     results.forEach((result, index) => {
         if (result.status === 'fulfilled') {
-            const f = result.value;
+            let f = result.value;
+            if (namer) {   // 转存时按调用方的要求改文件名、放进指定文件夹
+                try {
+                    const nm = namer(urls[index], f);
+                    const nf = new File([f], nm.name, { type: f.type });
+                    if (nm.relPath) nf._relPath = nm.relPath;
+                    f = nf;
+                } catch (_) {}
+            }
             if (collector) { f._srcUrl = urls[index]; f._collector = collector; f._afterFn = afterFn; }
             files.push(f);
         } else {
@@ -6789,17 +6892,26 @@ async function convertUrls(urls, collector, afterFn) {
                 title: '部分链接未能转换或上传', sub: failures.length + ' 项失败，详情如下（上传失败的文件可在结果列表里点「重试」）',
                 onRetry: (f) => {
                     closeUploadErrorModal();
-                    if (/^https?:\/\//i.test(f.name)) convertUrls([f.name], collector, afterFn);
+                    if (/^https?:\/\//i.test(f.name)) convertUrls([f.name], collector, afterFn, namer);
+                },
+                onRetryAll: (list) => {
+                    closeUploadErrorModal();
+                    const again = list.map(f => f.name).filter(x => /^https?:\/\//i.test(x));
+                    if (again.length) convertUrls(again, collector, afterFn, namer);
                 }
             });
             return;
         }
         showUploadErrorModal(failures, {
             title: '链接转换失败',
-            sub: failures.length + ' 个链接未能转换，可逐条重试',
+            sub: failures.length + ' 个链接未能转换，可逐条重试' + (!getSettings().imgProxy && failures.some(f => /图片代理/.test(f.message || '')) ? '。多数是跨域或防盗链造成的，填好「图片代理」就能解决' : ''),
             onRetry: (f) => {
                 closeUploadErrorModal();
-                convertUrls([f.name], collector, afterFn); // name 字段这里存的就是原始链接
+                convertUrls([f.name], collector, afterFn, namer); // name 字段这里存的就是原始链接
+            },
+            onRetryAll: (list) => {
+                closeUploadErrorModal();
+                convertUrls(list.map(f => f.name), collector, afterFn, namer);
             }
         });
     }
@@ -7427,6 +7539,7 @@ function escapeHtmlAttr(t) {
 // 图片 → ![名称](链接) / <img>；字体等其他文件 → 普通超链接
 function formatLink(url, name, fmt) {
     fmt = fmt || prefCopyFormat();
+    url = applyCdnLine(url);   // 复制时换成选定的 CDN 线路（默认不变）
     if (fmt === 'url') return url;
     const full = String(name || '').trim() || linkNameFromUrl(url);
     const base = full.split('/').pop(); // 文件夹上传时名称带路径，只取文件名
@@ -8034,6 +8147,519 @@ async function runLinkCheck(opts) {
     const first = document.querySelector('#gallery-container .gallery-tile .tile-badge:not(.cdn)');
     if (first) first.parentElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
 }
+// v3.0.5：仓库页检测失效链接。仓库里的文件一定存在，所以这里测的是「直链现在能不能打开」
+async function checkRepoFileLink(f) {
+    const url = repoShareUrl(f);
+    if (!url) return 'net';
+    const r1 = await probeUrl(url);
+    if (r1 === 'ok') return 'ok';
+    if (r1 === 'net') return 'net';
+    if (f.rawUrl && f.rawUrl !== url) {
+        const r2 = await probeUrl(f.rawUrl);
+        if (r2 === 'ok') return 'cdn';   // jsDelivr 打不开但 raw 能打开：CDN 还没同步
+        if (r2 === 'net') return 'net';
+    }
+    return 'dead';
+}
+function repoLinkCheckAtKey(f) { return 'kb_repo_link_check_at:' + String(f.owner || '').toLowerCase() + '/' + String(f.repo || '').toLowerCase(); }
+async function runRepoLinkCheck(opts) {
+    opts = opts || {};
+    const quiet = !!opts.silent;
+    if (repoLinkCheckRunning) { if (!quiet) { repoLinkCheckStop = true; toast('正在停止检测…', 'info'); } return; }
+    if (!repoLiveLoaded) { if (!quiet) toast('仓库文件还没读取完，稍后再试', 'info'); return; }
+    const onlyDead = !!opts.onlyDead;
+    const subset = Array.isArray(opts.files);   // 只检测指定的文件（当前文件夹 / 选中的文件）
+    const files = (subset ? opts.files : repoLiveFiles).filter(f => f.name !== '.gitkeep' && (!onlyDead || repoLinkStatusOf(f) === 'dead'));
+    if (!files.length) { if (!quiet) toast(onlyDead ? '没有需要重测的失效项' : (subset ? '没有可检测的文件' : '仓库里还没有文件'), 'info'); return; }
+    const atKey = repoLinkCheckAtKey(files[0]);
+    repoLinkCheckRunning = true; repoLinkCheckStop = false;
+    const total = files.length;
+    let done = 0, next = 0;
+    const found = { ok: [], dead: [], cdn: [], net: [] };
+    if (!quiet) toast('检测链接 0/' + total, 'loading');
+    async function worker() {
+        while (!repoLinkCheckStop && next < files.length) {
+            const f = files[next++];
+            let r = 'net';
+            try { r = await checkRepoFileLink(f); } catch (_) {}
+            found[r].push(f);
+            done++;
+            if (!quiet && (done % 4 === 0 || done === total)) linkCheckProgressToast(done, total);
+        }
+    }
+    try { await Promise.all(Array.from({ length: Math.min(6, files.length) }, worker)); }
+    finally { repoLinkCheckRunning = false; }
+    const stopped = repoLinkCheckStop;
+    repoLinkCheckStop = false;
+    if (done >= 5 && found.net.length >= done * 0.6) { if (!quiet) toast('大部分链接连不上，可能是网络问题，这次结果没有保存', 'error'); return; }
+    if (!onlyDead && !subset && done >= 5 && found.dead.length >= done * 0.9) { if (!quiet) toast('几乎所有直链都打不开，仓库可能是私有的（外部访问不了私有仓库的文件），这次结果没有保存', 'info'); return; }
+    const now = Date.now();
+    ['ok', 'dead', 'cdn'].forEach(k => found[k].forEach(f => repoLinkStatus.set(uploadKey(f.owner, f.repo, f.path), { s: k, sha: f.sha, t: now })));
+    if (!stopped && !onlyDead && !subset) lsSet(atKey, String(now));
+    renderRepoLiveFiles();
+    const dead = found.dead.length, cdn = found.cdn.length, net = found.net.length;
+    if (quiet) { if (dead) toast('仓库里有 ' + dead + ' 个文件的直链已失效，缩略图上有红色标记', 'info'); return; }
+    if (onlyDead) {
+        if (stopped) return toast('已停止：重测了 ' + done + '/' + total + ' 个，' + (found.ok.length + cdn) + ' 个已恢复', 'info');
+        return toast(dead ? ('重测完成：' + (total - dead - net) + ' 个已恢复，' + dead + ' 个仍然失效' + (net ? '，' + net + ' 个暂时连不上' : '')) : ('重测完成：' + (total - net) + ' 个都已恢复' + (cdn ? '（其中 ' + cdn + ' 个 CDN 还没同步）' : '')), dead ? 'info' : undefined);
+    }
+    if (stopped) return toast('已停止：检测了 ' + done + '/' + total + ' 个，发现 ' + dead + ' 个失效', 'info');
+    if (!dead) return toast('检测完成：' + (total - net) + ' 个直链都能打开' + (cdn ? '，其中 ' + cdn + ' 个 CDN 还没同步' : '') + (net ? '，' + net + ' 个暂时连不上' : ''));
+    const rc = $('card-repo');
+    if (!rc || !rc.offsetParent) return toast('检测完成：发现 ' + dead + ' 个失效直链，到仓库页可以看到红色标记', 'info');
+    hideToast();
+    const yes = await showConfirm({
+        title: '发现 ' + dead + ' 个失效链接',
+        message: '这些文件在仓库里，但直链现在打不开，可能是文件名有特殊字符、文件过大或仓库设置的原因。要选中它们吗？选中后可以重命名、移动或删除。',
+        confirmText: '选中失效项', cancelText: '先不选'
+    });
+    if (!yes) return;
+    resetRepoView();
+    repoFilter = 'dead';
+    document.querySelectorAll('.filter-btn[data-rf]').forEach(b => b.classList.toggle('active', b.dataset.rf === 'dead'));
+    repoSelected.clear();
+    found.dead.forEach(f => repoSelected.add(f.path));
+    repoMultiMode = true;
+    renderRepoLiveFiles();
+    updateRepoSelectionUI();
+    syncRepoSelectionDom();
+}
+// 跟随「自动检测失效链接」开关：读完仓库文件后，同一个仓库每 7 天自动检测一次
+// 找内容完全相同的文件：git 的 sha 由内容决定，所以不用下载任何文件
+async function findRepoDuplicates() {
+    if (!repoLiveLoaded) return toast('仓库文件还没读取完，稍后再试', 'info');
+    const groups = new Map();
+    repoLiveFiles.forEach(f => {
+        if (f.name === '.gitkeep' || !f.sha || !f.size) return;
+        if (!groups.has(f.sha)) groups.set(f.sha, []);
+        groups.get(f.sha).push(f);
+    });
+    const dups = Array.from(groups.values()).filter(g => g.length > 1);
+    repoDupInfo = new Map();
+    if (!dups.length) { renderRepoLiveFiles(); return toast('没有重复文件'); }
+    const extras = [];
+    let bytes = 0;
+    dups.forEach(g => {
+        // 每组保留目录层级最浅、路径最短的一份
+        g.sort((a, b) => a.path.split('/').length - b.path.split('/').length || a.path.length - b.path.length || a.path.localeCompare(b.path));
+        g.forEach((f, i) => {
+            repoDupInfo.set(f.path, { sha: f.sha, extra: i > 0 });
+            if (i > 0) { extras.push(f); bytes += f.size || 0; }
+        });
+    });
+    renderRepoLiveFiles();
+    const yes = await showConfirm({
+        title: '发现 ' + dups.length + ' 组重复文件',
+        message: '共有 ' + extras.length + ' 个多余的副本，约占 ' + fmtSize(bytes) + '。每组保留路径最短的一份。注意：删除副本后，用这些路径的直链会失效。要选中多余的副本吗？',
+        confirmText: '选中多余副本', cancelText: '先不选'
+    });
+    if (!yes) return;
+    resetRepoView();
+    repoFilter = 'dup';
+    document.querySelectorAll('.filter-btn[data-rf]').forEach(b => b.classList.toggle('active', b.dataset.rf === 'dup'));
+    repoSelected.clear();
+    extras.forEach(f => repoSelected.add(f.path));
+    repoMultiMode = true;
+    renderRepoLiveFiles();
+    updateRepoSelectionUI();
+    syncRepoSelectionDom();
+}
+/* ===== v3.0.10：仓库工具箱 ===== */
+function syncSpecialChip(id, filter, label, n) {
+    const c = $(id);
+    if (!c) return;
+    c.hidden = n === 0;
+    c.textContent = n ? label + ' ' + n : label;
+    if (!n && repoFilter === filter) {
+        repoFilter = 'all';
+        document.querySelectorAll('.filter-btn[data-rf]').forEach(b => b.classList.toggle('active', b.dataset.rf === 'all'));
+    }
+}
+// 切到某个筛选，并选中其中的一批文件（接着用现有的删除 / 移动）
+function selectRepoSubset(filter, files) {
+    resetRepoView();
+    repoFilter = filter;
+    document.querySelectorAll('.filter-btn[data-rf]').forEach(b => b.classList.toggle('active', b.dataset.rf === filter));
+    repoSelected.clear();
+    files.forEach(f => repoSelected.add(f.path));
+    repoMultiMode = true;
+    renderRepoLiveFiles();
+    updateRepoSelectionUI();
+    syncRepoSelectionDom();
+}
+function openRepoToolsMenu(btn) {
+    openMoreMenu(btn, [
+        { label: repoSimRunning ? '停止分析相似图片' : '查找相似图片', icon: ICON_COPY, onClick: () => (repoSimRunning ? runSimilarScan(0) : openSimilarityMenu(btn)) },
+        { label: '扫描未被引用的文件', icon: ICON_SELECT, onClick: () => { const i = $('orphan-scan-input'); if (i) i.click(); } },
+        { label: '导出表情包 JSON', icon: ICON_SORT, onClick: exportStickerJson },
+        { label: 'CDN 线路：' + (prefCdnLine() ? cdnLineLabel(prefCdnLine()) : '默认'), icon: ICON_LINKCHK, onClick: () => runCdnSpeedTest(btn) }
+    ]);
+}
+
+/* ---- 1. 未被引用的文件：导入你的项目文件，对照仓库里哪些图没被用到 ---- */
+// 路径要作为完整的一段出现：前面不能紧挨着字母 / 数字 / . 等，后面不能接着更长的文件名
+function repoPathMentioned(text, path) {
+    const variants = [path];
+    const e1 = path.split('/').map(encodeURIComponent).join('/');
+    if (e1 !== path) variants.push(e1);
+    try { const e2 = encodeURI(path); if (e2 !== path && e2 !== e1) variants.push(e2); } catch (_) {}
+    for (const v of variants) {
+        let i = text.indexOf(v);
+        while (i !== -1) {
+            const before = i > 0 ? text[i - 1] : '';
+            const after = text[i + v.length] || '';
+            const nextTwo = text.slice(i + v.length, i + v.length + 2);
+            if (!/[\w%.~-]/.test(before) && !/[\w%~-]/.test(after) && !/^\.\w/.test(nextTwo)) return true;
+            i = text.indexOf(v, i + 1);
+        }
+    }
+    return false;
+}
+async function handleOrphanScan(fileList) {
+    const files = Array.from(fileList || []);
+    const inp = $('orphan-scan-input');
+    if (inp) inp.value = '';
+    if (!files.length) return;
+    if (!repoLiveLoaded) return toast('仓库文件还没读取完，稍后再试', 'info');
+    const assets = repoLiveFiles.filter(f => f.name !== '.gitkeep' && f.type !== 'file');
+    if (!assets.length) return toast('仓库里还没有图片或字体', 'info');
+    toast('读取文件…', 'loading');
+    const texts = [];
+    let skipped = 0;
+    for (const file of files) {
+        try {
+            if (file.size > 30 * 1024 * 1024) { skipped++; continue; }
+            const t = await file.text();
+            if (t.indexOf('\u0000') !== -1) { skipped++; continue; }
+            texts.push(t);
+        } catch (_) { skipped++; }
+    }
+    if (!texts.length) { hideToast(); return toast('这些文件读不了，只支持文本文件（HTML、JSON、JS、CSS、Markdown 等）', 'error'); }
+    const orphans = [];
+    for (let i = 0; i < assets.length; i++) {
+        const f = assets[i];
+        if (!texts.some(t => repoPathMentioned(t, f.path))) orphans.push(f);
+        if (i % 40 === 39) await new Promise(r => setTimeout(r, 0));
+    }
+    hideToast();
+    repoOrphanInfo = new Map(orphans.map(f => [f.path, f.sha]));
+    renderRepoLiveFiles();
+    if (!orphans.length) return toast('对照了 ' + texts.length + ' 个文件：仓库里的图片和字体都被引用了');
+    const bytes = orphans.reduce((n, f) => n + (f.size || 0), 0);
+    const yes = await showConfirm({
+        title: '有 ' + orphans.length + ' 个文件没被引用',
+        message: '对照了你导入的 ' + texts.length + ' 个文件' + (skipped ? '（另有 ' + skipped + ' 个读不了，已跳过）' : '') + '，仓库的 ' + assets.length + ' 个图片和字体里有 ' + orphans.length + ' 个没出现，约占 ' + fmtSize(bytes) + '。只认完整路径；你没导入的文件里还在用的图，也会被算成未引用，删除前请先在「未引用」分类里看一遍。要选中它们吗？',
+        confirmText: '选中', cancelText: '先不选'
+    });
+    if (!yes) return;
+    selectRepoSubset('orphan', orphans);
+}
+
+/* ---- 2. 表情包：导出成 url / meaning / category 的 JSON；导入时按分类建文件夹、用含义命名 ---- */
+function exportStickerJson() {
+    if (!repoLiveLoaded) return toast('仓库文件还没读取完，稍后再试', 'info');
+    let files, label;
+    if (repoMultiMode && repoSelected.size) { files = repoLiveFiles.filter(f => repoSelected.has(f.path)); label = '选中'; }
+    else if (repoCurrentPath) { files = repoFolderFiles(); label = repoCurrentPath.split('/').pop(); }
+    else { files = repoLiveFiles; label = '全部'; }
+    files = files.filter(f => f.name !== '.gitkeep' && f.type === 'image');
+    if (!files.length) return toast('没有可导出的图片', 'info');
+    files.sort((a, b) => a.path.localeCompare(b.path, 'zh', { numeric: true }));
+    const list = files.map(f => {
+        const parts = f.path.split('/');
+        const name = parts.pop();
+        const parent = parts.length ? parts[parts.length - 1] : '';
+        return {
+            url: applyCdnLine(repoShareUrl(f)),
+            meaning: name.replace(/\.[^./]+$/, ''),
+            category: (parent === 'images' || parent === 'fonts') ? '' : parent
+        };
+    });
+    const blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json' });
+    const href = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = href;
+    a.download = '表情包-' + label + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(href), 30000);
+    toast('已导出 ' + list.length + ' 条（含义取自文件名，分类取自所在文件夹）');
+}
+async function handleStickerJson(file) {
+    const inp = $('sticker-json-input');
+    if (!file) return;
+    if (!getSettings().token) { if (inp) inp.value = ''; toast('请先配置 Token'); switchTab('settings'); return; }
+    if (isBatchUploading) { if (inp) inp.value = ''; toast('上传中，请稍候', 'info'); return; }
+    hideReplaceResult();
+    let text = '', bom = false;
+    try {
+        text = await file.text();
+        const head = new Uint8Array(await file.slice(0, 3).arrayBuffer());
+        bom = head.length === 3 && head[0] === 0xEF && head[1] === 0xBB && head[2] === 0xBF;
+    } catch (e) {
+        if (inp) inp.value = '';
+        return toast('读取失败：' + (e.message || '未知错误'));
+    }
+    if (inp) inp.value = '';
+    let data;
+    try { data = JSON.parse(text.replace(/^\uFEFF/, '')); }
+    catch (e) { return toast('这不是有效的 JSON：' + (e.message || '解析失败'), 'error'); }
+    const info = new Map();   // 原链接 → { meaning, category }
+    (function walk(n) {
+        if (Array.isArray(n)) { n.forEach(walk); return; }
+        if (!n || typeof n !== 'object') return;
+        if (typeof n.url === 'string' && /^https?:\/\//i.test(n.url.trim())) {
+            const u = n.url.trim();
+            if (!info.has(u)) {
+                const pick = (...ks) => { for (const k of ks) if (typeof n[k] === 'string' && n[k].trim()) return n[k].trim(); return ''; };
+                info.set(u, { meaning: pick('meaning', 'name', 'title', 'desc', 'label'), category: pick('category', 'group', 'pack') });
+            }
+            return;
+        }
+        Object.values(n).forEach(walk);
+    })(data);
+    const urls = Array.from(info.keys());
+    if (!urls.length) return toast('JSON 里没有找到带 url 的条目', 'info');
+    const map = new Map();
+    const total = urls.filter(u => !isOwnHostUrl(u)).length;
+    const rebuild = () => buildReplaceOutput(file.name, 'application/json', bom, text, map, new Set(), total, new Map());
+    // 文件放进「图片 / 分类名」文件夹，文件名用含义，这样仓库里一眼能看懂，也能再导出
+    const namer = (url, f) => {
+        const it = info.get(url) || {};
+        const ext = (f.name.match(/\.[A-Za-z0-9]+$/) || [''])[0];
+        const stem = (it.meaning || f.name.replace(/\.[A-Za-z0-9]+$/, '')).replace(/[\\/:*?"<>|]+/g, '-').slice(0, 80);
+        const dir = it.category ? safeDirName(it.category) + '/' : '';
+        return { name: stem + ext, relPath: dir + stem + ext };
+    };
+    moveResultCardAfter('card-replace-file');
+    await convertUrls(urls, map, rebuild, namer);
+}
+
+/* ---- 3. CDN 线路：测速，复制链接时换成最快的那条 ---- */
+const PREF_CDNLINE_KEY = 'kb_pref_cdn_line';   // kb_pref_ 前缀：会随设置备份一起导出
+const CDN_LINES = ['cdn.jsdelivr.net', 'fastly.jsdelivr.net', 'gcore.jsdelivr.net', 'testingcf.jsdelivr.net', 'raw'];
+const CDN_GH_RE = /^https:\/\/(?:cdn|fastly|gcore|testingcf|originfastly)\.jsdelivr\.net\/gh\/([^/]+)\/([^@/]+)@([^/]+)\/(.+)$/;
+let cdnTesting = false;
+function prefCdnLine() { const v = lsGet(PREF_CDNLINE_KEY); return (v && v !== 'cdn.jsdelivr.net' && CDN_LINES.includes(v)) ? v : ''; }
+function cdnLineLabel(l) { return l === 'raw' ? 'raw.githubusercontent.com' : l; }
+function applyCdnLine(url, line) {
+    if (line === undefined) line = prefCdnLine();
+    if (!line) return url;
+    const m = String(url).match(CDN_GH_RE);
+    if (!m) return url;
+    if (line === 'raw') return 'https://raw.githubusercontent.com/' + m[1] + '/' + m[2] + '/' + m[3] + '/' + m[4];
+    return 'https://' + line + '/gh/' + m[1] + '/' + m[2] + '@' + m[3] + '/' + m[4];
+}
+function setCdnLine(line) {
+    lsSet(PREF_CDNLINE_KEY, line === 'cdn.jsdelivr.net' ? '' : line);
+    toast('复制的链接会使用：' + cdnLineLabel(line), 'info');
+}
+async function cdnTimeOne(url, timeoutMs) {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), timeoutMs);
+    const t0 = performance.now();
+    try {
+        const r = await fetch(url, { cache: 'no-store', mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl.signal });
+        if (!r.ok) return -1;
+        await r.arrayBuffer();
+        return Math.round(performance.now() - t0);
+    } catch (_) { return -1; } finally { clearTimeout(timer); }
+}
+async function runCdnSpeedTest(btn) {
+    if (cdnTesting) return;
+    if (!repoLiveLoaded) return toast('仓库文件还没读取完，稍后再试', 'info');
+    // 样本：300KB 以内、最接近 100KB 的文件（太小测不出差别，太大浪费流量）
+    const cand = repoLiveFiles.filter(f => f.name !== '.gitkeep' && f.size > 0 && f.size <= 300 * 1024 && CDN_GH_RE.test(f.url || ''));
+    if (!cand.length) return toast('仓库里没有合适的小文件可以拿来测速', 'info');
+    const sample = cand.reduce((a, b) => (Math.abs(a.size - 102400) <= Math.abs(b.size - 102400) ? a : b));
+    cdnTesting = true;
+    toast('测速中，约 10 秒…', 'loading');
+    try {
+        const res = await Promise.all(CDN_LINES.map(async line => {
+            const u = applyCdnLine(sample.url, line);
+            const ts = [];
+            for (let i = 0; i < 3; i++) { const t = await cdnTimeOne(u, 6000); if (t >= 0) ts.push(t); }
+            ts.sort((a, b) => a - b);
+            return { line, ms: ts.length ? ts[Math.floor(ts.length / 2)] : -1 };
+        }));
+        hideToast();
+        const good = res.filter(r => r.ms >= 0).sort((a, b) => a.ms - b.ms);
+        if (!good.length) return toast('所有线路都连不上，检查一下网络', 'error');
+        const cur = prefCdnLine() || 'cdn.jsdelivr.net';
+        const items = [{ label: '自动选最快：' + cdnLineLabel(good[0].line) + '（' + good[0].ms + ' ms）', icon: ICON_REFRESH, onClick: () => setCdnLine(good[0].line) }];
+        res.forEach(r => items.push({
+            label: cdnLineLabel(r.line) + '  ' + (r.ms >= 0 ? r.ms + ' ms' : '不通'),
+            icon: r.line === cur ? CHECK_SVG : '',
+            onClick: () => setCdnLine(r.line)
+        }));
+        openMoreMenu(btn, items);
+    } finally { cdnTesting = false; }
+}
+
+/* ---- 4. 相似图片：在浏览器里算每张图的指纹（dHash），找出看起来几乎一样的 ---- */
+const PHASH_KEY = 'kb_phash_v2';
+let phashCache = null;
+let repoSimRunning = false, repoSimStop = false;
+function phashLoad() {
+    if (phashCache) return phashCache;
+    try { phashCache = JSON.parse(lsGet(PHASH_KEY) || '{}') || {}; } catch (_) { phashCache = {}; }
+    return phashCache;
+}
+function phashSave() {
+    try {
+        const ks = Object.keys(phashCache);
+        if (ks.length > 6000) ks.slice(0, ks.length - 6000).forEach(k => delete phashCache[k]);
+        lsSet(PHASH_KEY, JSON.stringify(phashCache));
+    } catch (_) {}
+}
+function dHashFromImage(img) {
+    const W = 72, H = 72;   // 先缩到 72×72，再按 8×8 的块取平均，比直接缩小抗锯齿
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);   // 透明背景按白底算
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, W, H);
+    const d = ctx.getImageData(0, 0, W, H).data;
+    const g = new Array(81);
+    let mn = 255, mx = 0;
+    for (let gy = 0; gy < 9; gy++) {
+        for (let gx = 0; gx < 9; gx++) {
+            let sum = 0;
+            for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
+                const i = ((gy * 8 + y) * W + gx * 8 + x) * 4;
+                sum += d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114;
+            }
+            const v = sum / 64;
+            g[gy * 9 + gx] = v;
+            if (v < mn) mn = v;
+            if (v > mx) mx = v;
+        }
+    }
+    // 128 位：横向 64 位（左右相邻比大小）+ 纵向 64 位（上下相邻比大小）；末尾 2 位十六进制是画面对比度
+    const w = [0, 0, 0, 0];
+    let n = 0;
+    for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
+        const k = n >> 5;
+        w[k] = (w[k] << 1) | (g[y * 9 + x] > g[y * 9 + x + 1] ? 1 : 0);
+        const k2 = 2 + (n >> 5);
+        w[k2] = (w[k2] << 1) | (g[y * 9 + x] > g[(y + 1) * 9 + x] ? 1 : 0);
+        n++;
+    }
+    return w.map(v => (v >>> 0).toString(16).padStart(8, '0')).join('') + Math.min(255, Math.round(mx - mn)).toString(16).padStart(2, '0');
+}
+function loadImageForHash(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        const timer = setTimeout(() => { img.src = ''; reject(new Error('timeout')); }, 20000);
+        img.onload = () => { clearTimeout(timer); resolve(img); };
+        img.onerror = () => { clearTimeout(timer); reject(new Error('load')); };
+        img.src = url;
+    });
+}
+async function hashRepoImage(f) {
+    let img;
+    try { img = await loadImageForHash(f.url); }
+    catch (e) { if (f.rawUrl && f.rawUrl !== f.url) img = await loadImageForHash(f.rawUrl); else throw e; }
+    return dHashFromImage(img);
+}
+function pop32(x) {
+    x = x - ((x >>> 1) & 0x55555555);
+    x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
+    return (((x + (x >>> 4)) & 0x0F0F0F0F) * 0x01010101) >>> 24;
+}
+function openSimilarityMenu(btn) {
+    openMoreMenu(btn, [
+        { label: '严格（几乎一样）', onClick: () => runSimilarScan(3) },
+        { label: '标准', onClick: () => runSimilarScan(6) },
+        { label: '宽松（可能有误报）', onClick: () => runSimilarScan(10) }
+    ]);
+}
+async function runSimilarScan(th) {
+    if (repoSimRunning) { repoSimStop = true; return toast('正在停止…', 'info'); }
+    if (!repoLiveLoaded) return toast('仓库文件还没读取完，稍后再试', 'info');
+    const imgs = repoLiveFiles.filter(f => f.type === 'image' && f.sha && f.size > 0 && f.size <= 8 * 1024 * 1024 && /\.(png|jpe?g|gif|webp|bmp|avif)$/i.test(f.path));
+    if (imgs.length < 2) return toast('图片太少，没法比较', 'info');
+    const cache = phashLoad();
+    const todo = imgs.filter(f => !cache[f.sha]);
+    if (todo.length > 30) {
+        const mb = todo.reduce((n, f) => n + f.size, 0);
+        const yes = await showConfirm({
+            title: '需要分析 ' + todo.length + ' 张图片',
+            message: '要先把这些图片下载下来分析，约 ' + fmtSize(mb) + ' 流量，第一次会比较久。分析结果会缓存，下次只分析新增的图片。继续吗？',
+            confirmText: '开始', cancelText: '取消'
+        });
+        if (!yes) return;
+    }
+    repoSimRunning = true; repoSimStop = false;
+    let done = 0, next = 0, failed = 0;
+    if (todo.length) toast('分析图片 0/' + todo.length, 'loading');
+    const worker = async () => {
+        while (!repoSimStop && next < todo.length) {
+            const f = todo[next++];
+            try { cache[f.sha] = await hashRepoImage(f); } catch (_) { failed++; }
+            done++;
+            if (done % 3 === 0 || done === todo.length) toast('分析图片 ' + done + '/' + todo.length, 'loading');
+        }
+    };
+    try { await Promise.all(Array.from({ length: Math.min(4, todo.length || 1) }, worker)); }
+    finally { repoSimRunning = false; phashSave(); }
+    if (repoSimStop) { repoSimStop = false; return toast('已停止，已分析的结果已保存，下次接着来', 'info'); }
+    hideToast();
+    // 对比度太低的图（纯色、几乎空白）指纹没有区分度，不参与比较
+    const items = [];
+    imgs.forEach(f => {
+        const h = cache[f.sha];
+        if (!h || h.length !== 34) return;
+        if (parseInt(h.slice(32), 16) < 12) return;
+        items.push({ f, w: [0, 8, 16, 24].map(o => parseInt(h.slice(o, o + 8), 16) >>> 0) });
+    });
+    const lim = th * 2;   // 阈值按 64 位给的，指纹是 128 位
+    const parent = items.map((_, i) => i);
+    const find = i => { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+    for (let i = 0; i < items.length; i++) {
+        for (let j = i + 1; j < items.length; j++) {
+            const x = items[i].w, y = items[j].w;
+            if (pop32((x[0] ^ y[0]) >>> 0) + pop32((x[1] ^ y[1]) >>> 0) + pop32((x[2] ^ y[2]) >>> 0) + pop32((x[3] ^ y[3]) >>> 0) <= lim) {
+                const ra = find(i), rb = find(j);
+                if (ra !== rb) parent[ra] = rb;
+            }
+        }
+    }
+    const groups = new Map();
+    items.forEach((it, i) => { const r = find(i); if (!groups.has(r)) groups.set(r, []); groups.get(r).push(it.f); });
+    const sims = Array.from(groups.values()).filter(g => g.length > 1);
+    repoSimInfo = new Map();
+    if (!sims.length) { renderRepoLiveFiles(); return toast('没找到相似的图片' + (failed ? '（' + failed + ' 张分析失败）' : '')); }
+    const extras = [];
+    let bytes = 0;
+    sims.forEach((g, gi) => {
+        g.sort((a, b) => (b.size - a.size) || (a.path.length - b.path.length) || a.path.localeCompare(b.path));   // 每组保留文件最大的一份
+        g.forEach((f, i) => {
+            repoSimInfo.set(f.path, { sha: f.sha, g: gi, extra: i > 0 });
+            if (i > 0) { extras.push(f); bytes += f.size || 0; }
+        });
+    });
+    renderRepoLiveFiles();
+    const yes = await showConfirm({
+        title: '发现 ' + sims.length + ' 组相似图片',
+        message: '共 ' + extras.length + ' 张看起来和别的图几乎一样，约占 ' + fmtSize(bytes) + '。每组保留文件最大的一张。相似不等于相同，比如同一个角色的不同表情也可能被算进来，选中后请先在「相似」分类里逐组看一遍。删除后用这些路径的直链会失效。要选中吗？',
+        confirmText: '选中多余的', cancelText: '先不选'
+    });
+    if (!yes) return;
+    selectRepoSubset('sim', extras);
+}
+
+function maybeAutoRepoLinkCheck() {
+    if (!prefLinkCheck() || repoLinkCheckRunning || isBatchUploading || !repoLiveLoaded) return;
+    const first = repoLiveFiles.find(f => f.name !== '.gitkeep');
+    if (!first) return;
+    if (Date.now() - Number(lsGet(repoLinkCheckAtKey(first)) || 0) < 7 * 24 * 3600 * 1000) return;
+    const seq = repoLoadSeq;
+    setTimeout(() => { if (seq === repoLoadSeq && !repoLinkCheckRunning) runRepoLinkCheck({ silent: true }); }, 1500);
+}
 function maybeAutoLinkCheck() {
     if (!prefLinkCheck() || linkCheckRunning || isBatchUploading) return;
     if (Date.now() - Number(lsGet(LINKCHK_AT_KEY) || 0) < 7 * 24 * 3600 * 1000) return;
@@ -8182,7 +8808,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '3.0.4';
+const APP_VERSION = '3.0.11';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -8402,6 +9028,10 @@ function refreshRepoTagChips() {
     }
     if (repoTag && !tags.has(repoTag)) repoTag = '';
     if (tc) { tc.hidden = tags.size === 0; tc.textContent = repoTag ? '#' + repoTag : '标签'; tc.classList.toggle('active', !!repoTag); }
+    syncSpecialChip('repo-dead-chip', 'dead', '失效', repoDeadCount());
+    syncSpecialChip('repo-sim-chip', 'sim', '相似', repoLiveFiles.reduce((n, f) => { const v = repoSimOf(f); return n + (v && v.extra ? 1 : 0); }, 0));
+    syncSpecialChip('repo-orphan-chip', 'orphan', '未引用', repoLiveFiles.reduce((n, f) => n + (repoOrphanOf(f) ? 1 : 0), 0));
+    syncSpecialChip('repo-dup-chip', 'dup', '重复', repoLiveFiles.reduce((n, f) => { const v = repoDupOf(f); return n + (v && v.extra ? 1 : 0); }, 0));
     if (!nf && repoFilter === 'fav') {
         repoFilter = 'all';
         document.querySelectorAll('.filter-btn[data-rf]').forEach(b => b.classList.toggle('active', b.dataset.rf === 'all'));

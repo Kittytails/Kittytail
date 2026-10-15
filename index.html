@@ -1220,7 +1220,6 @@ html[data-theme="dark"] .page { box-shadow: -.5px 0 0 rgba(255,255,255,.12); }
 .rh-title { font-size: 13px; font-weight: 600; color: #8E8E93; }
 .rh-clear { border: 0; background: transparent !important; padding: 6px 14px; font-size: 13px; font-weight: 600; font-family: inherit; color: #8E8E93 !important; cursor: pointer; border-radius: 8px; }
 .rh-clear:active { opacity: .5; }
-.rh-dots { flex: none; width: 22px; height: 22px; margin: -2px -2px -2px 0; color: #A1A1A6; }
 .rh-search { display: block; width: 100%; box-sizing: border-box; margin: 0 0 10px; border: 0; border-radius: 12px; padding: 10px 14px 10px 38px; font-size: 14px; font-family: inherit; color: var(--text-main); -webkit-appearance: none; appearance: none;
     background-color: rgba(118,118,128,.12); background-repeat: no-repeat; background-position: 13px center; background-size: 16px;
     --rh-ico: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2.2' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg>"); background-image: var(--rh-ico); }
@@ -3516,8 +3515,11 @@ function openMoreMenu(btn, items, opts) {
     });
     document.body.appendChild(m);
     const r = btn.getBoundingClientRect();
-    if (opts && opts.up) m.style.bottom = Math.max(8, window.innerHeight - r.top + 8) + 'px';   // 底部浮条的菜单向上展开
-    else m.style.top = (r.bottom + 8) + 'px';
+    // 默认在按钮下面展开；下面放不下、上面放得下就改向上展开（按钮靠近屏幕底部时，菜单不会被挤出屏幕）
+    const mh = m.offsetHeight;
+    const up = !!(opts && opts.up) || (r.bottom + 8 + mh > window.innerHeight - 8 && r.top - 8 - mh >= 8);
+    if (up) { m.style.bottom = Math.max(8, window.innerHeight - r.top + 8) + 'px'; m.style.transformOrigin = 'bottom right'; }
+    else m.style.top = Math.max(8, Math.min(r.bottom + 8, window.innerHeight - mh - 8)) + 'px';
     m.style.right = Math.max(8, window.innerWidth - r.right) + 'px';
     const mr0 = m.getBoundingClientRect();
     if (mr0.left < 8) { m.style.right = 'auto'; m.style.left = '8px'; }
@@ -7723,7 +7725,6 @@ function downloadReplaceOutput() {
 const RH_INDEX_KEY = 'replace_hist', RH_BODY_PREFIX = 'rh:', RH_LS_KEY = 'kb_replace_hist';
 const RH_BODY_MAX = 30 * 1024 * 1024;
 const RH_ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v10M8 10.5l4 4 4-4M5 19.5h14"/></svg>';
-const RH_ICON_DOTS = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18.5" cy="12" r="1.8"/></svg>';
 const rhMemBodies = new Map();   // IndexedDB 写不进去时，内容先留在内存里（刷新页面就没了）
 const rhPending = new Map();     // 会话 id → 待写入的记录（防抖合并）
 let rhTimer = null, rhChain = Promise.resolve(), rhShowAll = false, rhAskedPersist = false, rhQuery = '';
@@ -7842,7 +7843,6 @@ async function rhRender() {
         row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); } };
         const line = document.createElement('div'); line.className = 'st-line';
         const nm = document.createElement('span'); nm.className = 'st-name'; nm.textContent = it.name; line.appendChild(nm);
-        const dots = document.createElement('span'); dots.className = 'rh-dots'; dots.innerHTML = RH_ICON_DOTS; line.appendChild(dots);
         row.appendChild(line);
         const sub = document.createElement('div'); sub.className = 'rb-sub';
         // 只写时间；有链接没替换成功时才多一句，免得每行都是同样的字
@@ -10710,7 +10710,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '3.0.36';
+const APP_VERSION = '3.0.37';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}

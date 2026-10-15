@@ -1449,7 +1449,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
                 <input type="file" id="file-input" multiple style="display:none" onchange="moveResultCardAfter('card-upload'); handleFiles(this.files)">
                 <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V5"/><path d="M7.5 9.5 12 5l4.5 4.5"/><path d="M5 15v2.5A1.5 1.5 0 0 0 6.5 19h11a1.5 1.5 0 0 0 1.5-1.5V15"/></svg>
                 <div class="dropzone-title">Click or drag files here</div>
-                <div class="dropzone-sub">图片 · 字体 · ZIP</div>
+                <div class="dropzone-sub">图片 · 视频 · 音频 · 字体 · ZIP</div>
             </div>
             <button class="ghost-btn primary upload-paste" id="paste-btn" type="button" onclick="pasteUploadFromClipboard()">粘贴图片</button>
             <input type="file" id="folder-input" webkitdirectory directory multiple style="display:none" onchange="handleFolderInput(this)">
@@ -1674,6 +1674,10 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
                 <span class="pref-text">HEIC 转 JPG</span>
                 <input type="checkbox" class="switch" id="pref-heic" onchange="savePrefs()">
             </label>
+            <label class="pref-card">
+                <span class="pref-text">上传前去除 EXIF / 位置信息</span>
+                <input type="checkbox" class="switch" id="pref-stripexif" onchange="onStripExifPrefChange(this)">
+            </label>
         </div>
         <div class="pref-group">
             <div class="pref-card pref-seg-card">
@@ -1762,7 +1766,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
         <div class="about-sec">
             <div class="about-cap">这是什么</div>
             <div class="about-box">
-            <div class="about-item"><div class="about-t">Direct Link</div><div class="about-d">把图片、字体、ZIP 上传到你自己的 GitHub 仓库，并自动生成可直接使用的直链。文件存在你自己的仓库里，不经过第三方服务器。</div></div>
+            <div class="about-item"><div class="about-t">Direct Link</div><div class="about-d">把图片、视频、音频、字体、ZIP 上传到你自己的 GitHub 仓库，并自动生成可直接使用的直链。文件存在你自己的仓库里，不经过第三方服务器。</div></div>
             <div class="about-item"><div class="about-t">数据只存在本机</div><div class="about-d">GitHub Token、仓库设置、偏好和上传记录都只保存在这台设备的浏览器里。清除网站数据、删除主屏幕 App 或换设备后，需要重新填写 Token 并设置偏好。仓库文件的收藏和标签可以同步到仓库里，见「同步标签到仓库」。</div></div>
             <div class="about-item"><div class="about-t">离线使用</div><div class="about-d" id="about-offline-status">检查中…</div></div>
             <div class="about-item"><div class="about-t">本地数据保护</div><div class="about-d" id="about-storage-status">检查中…</div></div>
@@ -1779,7 +1783,8 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
         <div class="about-sec">
             <div class="about-cap">上传规则</div>
             <div class="about-box">
-            <div class="about-item"><div class="about-t">支持的内容</div><div class="about-d">图片、字体和 ZIP。字体始终保持原文件名和原位置，不受「文件名」「文件夹」设置影响。</div></div>
+            <div class="about-item"><div class="about-t">隐私：去除 EXIF</div><div class="about-d">默认开启。JPEG / PNG / WebP 上传前会无损删掉拍摄位置、设备型号、时间等信息，画质不变，照片方向和颜色配置会保留。HEIC、AVIF 无法无损处理，会在结果行提示；开启「HEIC 转 JPG」后转出来的 JPG 不带 EXIF。</div></div>
+            <div class="about-item"><div class="about-t">支持的内容</div><div class="about-d">图片、视频、音频、字体和 ZIP。视频放在 videos/、音频放在 audio/；超过 20MB 的视频走 GitHub raw 直链，部分场景可能无法直接在网页里播放。字体始终保持原文件名和原位置，不受「文件名」「文件夹」设置影响。</div></div>
             <div class="about-item"><div class="about-t">大小限制</div><div class="about-d">单个文件最大 99MB，超过的会被跳过。超过 20MB 的文件 jsDelivr 不支持，会自动改用 GitHub raw 直链。导入 ZIP 压缩包时，压缩包本身不能超过 400MB。</div></div>
             <div class="about-item"><div class="about-t">自动重试</div><div class="about-d">网络波动、超时、服务器 5xx、提交冲突、被限流这类临时问题会自动重试。Token 错误、仓库不存在、文件过大这类确定的错误不会重试，需要修正后在结果列表里手动点「重试」。</div></div>
             <div class="about-item"><div class="about-t">重复文件</div><div class="about-d">8MB 以内的文件会先查重，避免传重复内容；更大的文件为了不占内存，跳过查重。</div></div>
@@ -2141,10 +2146,15 @@ document.addEventListener('touchstart', function () {}, { passive: true });
 // 统一的图片扩展名（上传 / 链接转换 / 资源库判断共用同一份规则）
 const IMAGE_EXT_RE = /\.(?:png|jpe?g|webp|gif|avif|bmp|svg|ico|heic|heif)$/i;
 const FONT_EXT_RE = /\.(?:ttf|otf|woff2?|eot)(?:$|[?#])/i;
+const VIDEO_EXT_RE = /\.(?:mp4|m4v|mov|webm|mkv|avi|3gp|ogv)(?:$|[?#])/i;
+const AUDIO_EXT_RE = /\.(?:mp3|m4a|aac|wav|flac|ogg|oga|opus|amr)(?:$|[?#])/i;
 const MIME_EXT = {
     'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png': 'png', 'image/gif': 'gif', 'image/webp': 'webp',
     'image/avif': 'avif', 'image/bmp': 'bmp', 'image/svg+xml': 'svg', 'image/x-icon': 'ico',
-    'image/vnd.microsoft.icon': 'ico', 'image/heic': 'heic', 'image/heif': 'heif'
+    'image/vnd.microsoft.icon': 'ico', 'image/heic': 'heic', 'image/heif': 'heif',
+    'video/mp4': 'mp4', 'video/quicktime': 'mov', 'video/webm': 'webm', 'video/x-m4v': 'm4v', 'video/3gpp': '3gp',
+    'audio/mpeg': 'mp3', 'audio/mp3': 'mp3', 'audio/mp4': 'm4a', 'audio/x-m4a': 'm4a', 'audio/aac': 'aac',
+    'audio/wav': 'wav', 'audio/x-wav': 'wav', 'audio/ogg': 'ogg', 'audio/flac': 'flac', 'audio/webm': 'webm'
 };
 
 function isValidRepoName(name) {
@@ -3516,6 +3526,7 @@ function openLibraryMenu(btn) {
         { label: '导出链接清单', icon: ICON_COPY, onClick: () => exportLinkList('library') },
         { label: '复制格式：' + COPY_FORMATS[prefCopyFormat()], icon: ICON_COPY, onClick: cycleCopyFormat },
         { label: linkCheckRunning ? '停止检测' : '检测失效链接', icon: ICON_LINKCHK, onClick: () => runLinkCheck() },
+        ...(!linkCheckRunning ? [{ label: '重新检测全部（忽略缓存）', icon: ICON_LINKCHK, onClick: () => runLinkCheck({ force: true }) }] : []),
         ...(nCdn ? [{ label: '修复 CDN 未同步（' + nCdn + '）', icon: ICON_REFRESH, onClick: () => fixCdnLinks() }] : []),
         ...(nRaw ? [{ label: '改回 jsDelivr（' + nRaw + '）', icon: ICON_REFRESH, onClick: () => revertRawLinks() }] : []),
         { label: '清除失效记录', icon: ICON_TRASH, onClick: clearDeadRecords },
@@ -3533,6 +3544,7 @@ function openRepoMenu(btn) {
         { label: '新建文件夹', icon: ICON_FOLDER_PLUS, onClick: createRepoFolder },
         { label: '复制格式：' + COPY_FORMATS[prefCopyFormat()], icon: ICON_COPY, onClick: cycleCopyFormat },
         { label: repoLinkCheckRunning ? '停止检测' : '检测失效链接', icon: ICON_LINKCHK, onClick: () => runRepoLinkCheck() },
+        ...(!repoLinkCheckRunning ? [{ label: '重新检测全部（忽略缓存）', icon: ICON_LINKCHK, onClick: () => runRepoLinkCheck({ force: true }) }] : []),
         { label: '查找重复文件', icon: ICON_COPY, onClick: findRepoDuplicates },
         { label: '更多工具', icon: ICON_SELECT, onClick: () => openRepoToolsMenu(btn) },
         ...((!repoLinkCheckRunning && repoMultiMode && repoSelected.size > 0) ? [{ label: '只检测选中的文件（' + repoSelected.size + '）', icon: ICON_LINKCHK, onClick: () => runRepoLinkCheck({ files: repoLiveFiles.filter(f => repoSelected.has(f.path)) }) }] : []),
@@ -3916,7 +3928,8 @@ function saveHistory(list) {
 // --- 失败上传队列：失败的文件连同原始内容存进 IndexedDB，刷新 / 关掉页面后还能继续传 ---
 const FAILED_MAX_AGE = 14 * 24 * 3600 * 1000;   // 超过 14 天的自动清掉
 const FAILED_MAX_BYTES = 300 * 1024 * 1024;     // 队列总大小上限，避免占满本机存储
-async function persistFailedUpload(file, ctx, message) {
+const UPLOAD_SESSION = 's-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);   // 本次打开页面的标识
+async function putFailedRecord(file, ctx, message, pending) {
     // 「替换文件」「外链转换」带有回调，只能在当前页面里重试，不入队
     if (!storeUsesIDB || !file || file._collector || file._afterFn) return;
     try {
@@ -3927,13 +3940,48 @@ async function persistFailedUpload(file, ctx, message) {
         await dlDB.put('failed', undefined, {
             id: file._failId, file, name: file.name, size: file.size || 0,
             relPath: file._relPath || '', forceImage: !!file._forceImage, sniffExt: file._sniffExt || '',
-            owner: (ctx && ctx.owner) || '', repo: getSettings().repo, message: String(message || ''), time: Date.now()
+            owner: (ctx && ctx.owner) || '', repo: getSettings().repo, message: String(message || ''), time: Date.now(),
+            pending: !!pending, session: UPLOAD_SESSION
         });
         if (storagePersisted !== true) requestPersistentStorage(false);
     } catch (_) { /* 存不下就算了：当前页面里的「重试」按钮照常可用 */ }
 }
+async function persistFailedUpload(file, ctx, message) {
+    if (file && file._persistP) { try { await file._persistP; } catch (_) {} }   // 先等「排队中」那条写完，再改成「失败」
+    return putFailedRecord(file, ctx, message, false);
+}
+// 一批文件开始上传时，先在后台把它们依次存进本机队列：上传到一半被关掉 / 被系统杀掉，下次打开还能继续
+let pendingPersistChain = Promise.resolve();
+function persistPendingUploads(files, ctx) {
+    if (!storeUsesIDB) return;
+    files.forEach(f => {
+        if (!f || f._collector || f._afterFn) return;
+        f._persistP = pendingPersistChain = pendingPersistChain.then(() => putFailedRecord(f, ctx, '上次上传被中断', true)).catch(() => {});
+    });
+}
 function forgetFailedUpload(file) {
-    if (file && file._failId && storeUsesIDB) dlDB.del('failed', file._failId).catch(() => {});
+    if (!file || !storeUsesIDB) return;
+    const go = () => { if (file._failId) dlDB.del('failed', file._failId).catch(() => {}); };
+    if (file._persistP) file._persistP.then(go, go); else go();
+}
+// 本次批次进行期间持有一把锁：别的窗口据此判断「这些排队文件是不是还有人在传」
+function holdUploadSessionLock() {
+    const lm = (typeof navigator !== 'undefined') && navigator.locks;
+    if (!lm || typeof lm.request !== 'function') return () => {};
+    let release = () => {};
+    const p = new Promise(r => { release = r; });
+    try { lm.request('dl-upload-session-' + UPLOAD_SESSION, () => p).catch(() => {}); } catch (_) {}
+    return release;
+}
+async function liveUploadSessions() {
+    const lm = (typeof navigator !== 'undefined') && navigator.locks;
+    if (!lm || typeof lm.query !== 'function') return null;
+    try {
+        const q = await lm.query();
+        const set = new Set();
+        (q.held || []).forEach(l => { if (l && l.name && l.name.indexOf('dl-upload-session-') === 0) set.add(l.name.slice('dl-upload-session-'.length)); });
+        return set;
+    } catch (_) { return null; }
 }
 async function offerFailedUploads() {
     if (!storeUsesIDB || isBatchUploading) return;
@@ -3949,14 +3997,18 @@ async function offerFailedUploadsCore() {
     const st = getSettings();
     if (!st.token || !st.repo) return;
     const curOwner = String(lsGet('kb_standalone_owner') || '').toLowerCase();
-    const mine = recs.filter(r => String(r.repo || '').toLowerCase() === st.repo.toLowerCase()
+    let mine = recs.filter(r => String(r.repo || '').toLowerCase() === st.repo.toLowerCase()
         && (!curOwner || !r.owner || String(r.owner).toLowerCase() === curOwner));   // 同名仓库、不同账号的不混在一起
+    if (!mine.length) return;
+    // 「排队中」的记录：如果另一个窗口还在上传它们，就先别插手（锁不可用时，只接管超过 5 分钟的）
+    const live = await liveUploadSessions();
+    mine = mine.filter(r => !r.pending || (live ? !live.has(r.session) : now - (r.time || 0) > 5 * 60 * 1000));
     if (!mine.length) return;
     mine.sort((a, b) => (a.time || 0) - (b.time || 0));
     const total = mine.reduce((n, r) => n + (r.size || 0), 0);
     const go = await showConfirm({
         title: '继续上传 ' + mine.length + ' 个文件？',
-        message: '上次有 ' + mine.length + ' 个文件没有传成功（共 ' + fmtSize(total) + '）。要现在重新上传到 ' + st.repo + ' 吗？',
+        message: '上次有 ' + mine.length + ' 个文件没有传完（中断或失败，共 ' + fmtSize(total) + '）。要现在继续上传到 ' + st.repo + ' 吗？',
         confirmText: '重新上传', cancelText: '先不处理'
     });
     if (!go) {
@@ -5096,6 +5148,8 @@ function toggleRepoSelection(path) {
 
 // ===== 下载仓库文件：图片 → 分享面板「存储图像」(相册)；其他文件 → 「存储到文件」 =====
 const DL_MIME = {
+    mp4: 'video/mp4', m4v: 'video/x-m4v', mov: 'video/quicktime', webm: 'video/webm', mkv: 'video/x-matroska', '3gp': 'video/3gpp', ogv: 'video/ogg',
+    mp3: 'audio/mpeg', m4a: 'audio/mp4', aac: 'audio/aac', wav: 'audio/wav', flac: 'audio/flac', ogg: 'audio/ogg', oga: 'audio/ogg', opus: 'audio/ogg',
     jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png', gif:'image/gif', webp:'image/webp',
     avif:'image/avif', bmp:'image/bmp', svg:'image/svg+xml', ico:'image/x-icon', heic:'image/heic', heif:'image/heif',
     ttf:'font/ttf', otf:'font/otf', woff:'font/woff', woff2:'font/woff2',
@@ -5541,12 +5595,25 @@ function authThumbSlot() {
         else authThumbWait.push(() => { authThumbActive++; res(); });
     });
 }
+const AUTH_THUMB_MAX = 400;   // 缓存的缩略图上限：每张 blob 地址都占着内存，大仓库来回翻会越积越多
+function authThumbTrim() {
+    while (authThumbCache.size > AUTH_THUMB_MAX) {
+        const oldKey = authThumbCache.keys().next().value;
+        const old = authThumbCache.get(oldKey);
+        authThumbCache.delete(oldKey);
+        if (old && old.then) old.then(u => { try { URL.revokeObjectURL(u); } catch (_) {} }, () => {});
+    }
+}
 function authThumbFree() { authThumbActive--; const n = authThumbWait.shift(); if (n) n(); }
 function canAuthThumb(owner, repo, path) { return !!(getSettings().token && owner && repo && path); }
 function preferAuthThumb(owner, repo) { return authThumbRepos.has(owner + '/' + repo) && !!getSettings().token; }
 function loadAuthThumb(owner, repo, branch, path) {
     const key = owner + '/' + repo + '@' + (branch || 'main') + '/' + path;
-    if (authThumbCache.has(key)) return authThumbCache.get(key);
+    if (authThumbCache.has(key)) {
+        const hit = authThumbCache.get(key);
+        authThumbCache.delete(key); authThumbCache.set(key, hit);   // 用过的挪到最后，淘汰时先淘汰最久没用的
+        return hit;
+    }
     const job = (async () => {
         const s = getSettings();
         await authThumbSlot();
@@ -5578,6 +5645,7 @@ function loadAuthThumb(owner, repo, branch, path) {
     })();
     authThumbCache.set(key, job);
     job.catch(() => authThumbCache.delete(key));   // 失败的不缓存，滑回来可以重试
+    authThumbTrim();
     return job;
 }
 
@@ -6220,11 +6288,33 @@ function repoTreeCacheSet(key, etag, result) {
     repoTreeCache.delete(key);
     repoTreeCache.set(key, { etag, result });
     while (repoTreeCache.size > 3) repoTreeCache.delete(repoTreeCache.keys().next().value);
+    treeDiskSet(key, etag, result);
+}
+// 同时存一份到本机数据库（IndexedDB），关掉页面再打开也能带着 ETag 问 GitHub「变了吗」，没变就 304，不用重新下载。
+// 只存完整（未截断）、不超过 4 万条的树，最多保留 3 个仓库；读不到 / 写不进都当没有缓存。
+const TREE_DISK_MAX = 3, TREE_DISK_MAX_ENTRIES = 40000;
+async function treeDiskGet(key) {
+    if (!storeUsesIDB) return null;
+    try { const v = await dlDB.get('kv', 'tree:' + key); return (v && v.etag && v.result && Array.isArray(v.result.tree)) ? v : null; } catch (_) { return null; }
+}
+async function treeDiskSet(key, etag, result) {
+    if (!storeUsesIDB || !etag || !result || result.truncated || (result.tree || []).length > TREE_DISK_MAX_ENTRIES) return;
+    try {
+        await dlDB.put('kv', 'tree:' + key, { etag, result, t: Date.now() });
+        const idx = (await dlDB.get('kv', 'tree-index')) || [];
+        const next = [key].concat(idx.filter(k => k !== key));
+        for (const old of next.slice(TREE_DISK_MAX)) { try { await dlDB.del('kv', 'tree:' + old); } catch (_) {} }
+        await dlDB.put('kv', 'tree-index', next.slice(0, TREE_DISK_MAX));
+    } catch (_) {}
 }
 async function fetchRepoTree(owner, repo, branch, auth) {
     const base = '/repos/' + owner + '/' + repo + '/git/trees/';
     const ckey = (owner + '/' + repo + '@' + branch).toLowerCase();
-    const hit = repoTreeCache.get(ckey);
+    let hit = repoTreeCache.get(ckey);
+    if (!hit && !auth.proxy) {   // 内存里没有（刚打开页面）：看看本机数据库里有没有上次存的
+        const d = await treeDiskGet(ckey);
+        if (d) { hit = { etag: d.etag, result: d.result }; repoTreeCache.set(ckey, hit); }
+    }
     let newEtag = '';
     const firstUrl = base + encodeURIComponent(branch) + '?recursive=1';
     let first = await githubRequest(firstUrl, { method: 'GET', etag: hit && hit.etag, onEtag: t => { newEtag = t; } }, auth.token, auth.proxy);
@@ -6416,6 +6506,16 @@ function getSafeFilename(name) {
 function isImageFile(file) {
     return !!file._forceImage || (file.type || '').startsWith('image/') || IMAGE_EXT_RE.test(file.name || '');
 }
+// 视频 / 音频：按 MIME 或扩展名判断（图片优先，避免 .webm 之类的歧义影响图片流程）
+function isVideoFile(file) {
+    if (!file || isImageFile(file)) return false;
+    return /^video\//i.test(file.type || '') || VIDEO_EXT_RE.test(file.name || '');
+}
+function isAudioFile(file) {
+    if (!file || isImageFile(file) || isVideoFile(file)) return false;
+    return /^audio\//i.test(file.type || '') || AUDIO_EXT_RE.test(file.name || '');
+}
+function isMediaFile(file) { return isVideoFile(file) || isAudioFile(file); }
 
 // 生成不会覆盖仓库现有文件的路径。
 // 旧版本在再次上传同名文件时会 PUT 到同一路径，直接替换旧资源，导致历史直链内容被悄悄改变。
@@ -6727,10 +6827,11 @@ async function uploadToGithub(file, ctx) {
     const branch = ctx.branch;
 
     const isImage = isImageFile(file);
-    const folder = isImage ? 'images' : 'fonts';
+    const isVideo = isVideoFile(file), isAudio = isAudioFile(file);
+    const folder = isImage ? 'images' : isVideo ? 'videos' : isAudio ? 'audio' : 'fonts';
     let safeName = getSafeFilename(file.name);
-    // 没有扩展名的图片按 MIME 补上，否则 CDN 会用错误的 Content-Type 返回，图片无法显示
-    if (isImage && !/\.[A-Za-z0-9]+$/.test(safeName) && (MIME_EXT[file.type] || file._sniffExt)) safeName += '.' + (MIME_EXT[file.type] || file._sniffExt);
+    // 没有扩展名的图片 / 视频 / 音频按 MIME 补上，否则 CDN 会用错误的 Content-Type 返回，无法显示 / 播放
+    if ((isImage || isVideo || isAudio) && !/\.[A-Za-z0-9]+$/.test(safeName) && (MIME_EXT[file.type] || file._sniffExt)) safeName += '.' + (MIME_EXT[file.type] || file._sniffExt);
     if (isImage && uploadPref('naming') === 'random') {
         const m = safeName.match(/\.[A-Za-z0-9]+$/);
         safeName = randomFileStem() + (m ? m[0].toLowerCase() : '');
@@ -6825,7 +6926,7 @@ function buildResultItem(name, isImage) {
     } else {
         thumb = document.createElement('div');
         thumb.className = 'result-thumb-icon';
-        thumb.textContent = 'Aa';
+        thumb.textContent = VIDEO_EXT_RE.test(name || '') ? '▶' : AUDIO_EXT_RE.test(name || '') ? '♪' : 'Aa';
     }
     row.appendChild(thumb);
 
@@ -6949,12 +7050,160 @@ function carryFileProps(from, to) {
     if (from._relPath) to._relPath = from._relPath;
     return to;
 }
+
+/* ====================================================================
+   v3.0.27：上传前去除 EXIF / 位置信息（无损，不重新编码）
+   JPEG：删掉 EXIF / XMP / IPTC / 注释 / 缩略图，只保留颜色配置（ICC）和「旋转方向」；
+   PNG：删掉文本块、EXIF、时间块；WebP：删掉 EXIF / XMP 块。
+   其他格式（HEIC、GIF、AVIF 等）无法无损处理，会在结果行里提示。
+   ==================================================================== */
+const PREF_STRIPEXIF_KEY = 'kb_pref_stripexif';
+function prefStripExif() { return lsGet(PREF_STRIPEXIF_KEY) !== '0'; }   // 默认开启
+function onStripExifPrefChange(el) {
+    lsSet(PREF_STRIPEXIF_KEY, el.checked ? '1' : '0');
+    toast(el.checked ? '上传前会去除照片里的位置等隐私信息' : '已关闭：照片会带着原始 EXIF 上传', 'info');
+}
+function readExifInfo(seg) {   // seg：含 FF E1 + 长度 的整段
+    const info = { orientation: 1, gps: false };
+    if (seg.length < 18 || seg[4] !== 0x45 || seg[5] !== 0x78 || seg[6] !== 0x69 || seg[7] !== 0x66) return info;   // "Exif"
+    try {
+        const dv = new DataView(seg.buffer, seg.byteOffset + 10, seg.length - 10);
+        const le = dv.getUint16(0) === 0x4949;
+        const ifd = dv.getUint32(4, le);
+        const cnt = dv.getUint16(ifd, le);
+        for (let i = 0; i < cnt; i++) {
+            const e = ifd + 2 + i * 12;
+            const tag = dv.getUint16(e, le);
+            if (tag === 0x0112) { const o = dv.getUint16(e + 8, le); if (o >= 1 && o <= 8) info.orientation = o; }
+            else if (tag === 0x8825) info.gps = true;
+        }
+    } catch (_) {}
+    return info;
+}
+function buildOrientationExif(o) {   // 只含「方向」一项的最小 EXIF，保证去掉元数据后照片不会躺着
+    return new Uint8Array([0xFF, 0xE1, 0x00, 0x22, 0x45, 0x78, 0x69, 0x66, 0x00, 0x00,
+        0x4D, 0x4D, 0x00, 0x2A, 0x00, 0x00, 0x00, 0x08,
+        0x00, 0x01, 0x01, 0x12, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01, 0x00, o, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00]);
+}
+function joinChunks(chunks) {
+    let n = 0; chunks.forEach(c => { n += c.length; });
+    const out = new Uint8Array(n); let o = 0;
+    chunks.forEach(c => { out.set(c, o); o += c.length; });
+    return out;
+}
+function stripJpegMeta(u8) {
+    const n = u8.length;
+    if (n < 4 || u8[0] !== 0xFF || u8[1] !== 0xD8) return null;
+    const out = [u8.subarray(0, 2)];
+    let insertIdx = 1, orientation = 1, gps = false, removed = 0, p = 2, sawEOI = false;
+    while (p + 1 < n) {
+        if (u8[p] !== 0xFF) return null;
+        const m = u8[p + 1];
+        if (m === 0xFF) { p++; continue; }   // 填充字节
+        if (m === 0xD9) { out.push(u8.subarray(p, p + 2)); p += 2; sawEOI = true; break; }   // EOI：后面附带的缩略图 / 增益图一并丢掉
+        if (m === 0x01 || (m >= 0xD0 && m <= 0xD7)) { out.push(u8.subarray(p, p + 2)); p += 2; continue; }
+        if (p + 4 > n) return null;
+        const len = (u8[p + 2] << 8) | u8[p + 3];
+        if (len < 2 || p + 2 + len > n) return null;
+        const segEnd = p + 2 + len;
+        if (m === 0xDA) {   // SOS：头部 + 熵编码数据，一直到下一个真正的标记
+            let q = segEnd;
+            while (q + 1 < n) {
+                if (u8[q] === 0xFF) {
+                    const b = u8[q + 1];
+                    if (b === 0x00 || (b >= 0xD0 && b <= 0xD7)) { q += 2; continue; }
+                    if (b === 0xFF) { q++; continue; }
+                    break;
+                }
+                q++;
+            }
+            if (q + 1 >= n) q = n;
+            out.push(u8.subarray(p, q)); p = q; continue;
+        }
+        const seg = u8.subarray(p, segEnd);
+        let keep = true;
+        if (m === 0xE0) { out.push(seg); if (insertIdx === 1) insertIdx = out.length; p = segEnd; continue; }
+        if (m === 0xE1) { const info = readExifInfo(seg); if (info.orientation > 1) orientation = info.orientation; if (info.gps) gps = true; keep = false; }
+        else if (m === 0xE2) keep = len >= 14 && u8[p + 4] === 0x49 && u8[p + 5] === 0x43 && u8[p + 6] === 0x43;   // "ICC_PROFILE"
+        else if (m === 0xEE) keep = len >= 7 && u8[p + 4] === 0x41 && u8[p + 5] === 0x64 && u8[p + 6] === 0x6F;   // "Adobe"（颜色转换标记，不能丢）
+        else if ((m >= 0xE3 && m <= 0xED) || m === 0xEF || m === 0xFE) keep = false;
+        if (keep) out.push(seg); else removed += seg.length;
+        p = segEnd;
+    }
+    if (!sawEOI) { if (p < n) out.push(u8.subarray(p)); }
+    else removed += n - p;   // EOI 之后的尾部数据
+    if (orientation > 1) { const ex = buildOrientationExif(orientation); out.splice(insertIdx, 0, ex); removed -= ex.length; }
+    return { bytes: joinChunks(out), removed, gps };
+}
+function stripPngMeta(u8) {
+    const sig = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+    if (u8.length < 20 || sig.some((b, i) => u8[i] !== b)) return null;
+    const DROP = { tEXt: 1, zTXt: 1, iTXt: 1, eXIf: 1, tIME: 1 };
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.length);
+    const out = [u8.subarray(0, 8)];
+    let p = 8, removed = 0, sawEnd = false;
+    while (p + 12 <= u8.length) {
+        const len = dv.getUint32(p), end = p + 12 + len;
+        if (end > u8.length) return null;
+        const type = String.fromCharCode(u8[p + 4], u8[p + 5], u8[p + 6], u8[p + 7]);
+        if (DROP[type]) removed += end - p; else out.push(u8.subarray(p, end));
+        p = end;
+        if (type === 'IEND') { sawEnd = true; break; }
+    }
+    if (!sawEnd) return null;
+    removed += u8.length - p;
+    return { bytes: joinChunks(out), removed, gps: false };
+}
+function stripWebpMeta(u8) {
+    const tag = o => String.fromCharCode(u8[o], u8[o + 1], u8[o + 2], u8[o + 3]);
+    if (u8.length < 20 || tag(0) !== 'RIFF' || tag(8) !== 'WEBP') return null;
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.length);
+    const parts = [u8.subarray(0, 12)];
+    let p = 12, removed = 0;
+    while (p + 8 <= u8.length) {
+        const t = tag(p), len = dv.getUint32(p + 4, true);
+        if (p + 8 + len > u8.length) return null;
+        const end = Math.min(u8.length, p + 8 + len + (len & 1));
+        if (t === 'EXIF' || t === 'XMP ') removed += end - p;
+        else { const c = u8.slice(p, end); if (t === 'VP8X') c[8] &= ~0x0C; parts.push(c); }   // VP8X 标志位里的 EXIF / XMP 位一并清掉
+        p = end;
+    }
+    if (!removed) return { bytes: u8, removed: 0, gps: false };
+    const out = joinChunks(parts);
+    new DataView(out.buffer).setUint32(4, out.length - 8, true);
+    return { bytes: out, removed, gps: false };
+}
+// 返回 { file, note }：file 是处理后的文件（没东西可去就是原文件），note 是结果行里显示的提示
+async function stripImageMetadata(file) {
+    const name = file.name || '', type = (file.type || '').toLowerCase();
+    let kind = '', mime = '';
+    if (type === 'image/jpeg' || /\.jpe?g$/i.test(name)) { kind = 'jpeg'; mime = 'image/jpeg'; }
+    else if (type === 'image/png' || /\.png$/i.test(name)) { kind = 'png'; mime = 'image/png'; }
+    else if (type === 'image/webp' || /\.webp$/i.test(name)) { kind = 'webp'; mime = 'image/webp'; }
+    else if (HEIC_RE.test(name) || /image\/hei[cf]/.test(type)) return { file, note: 'HEIC 仍带原始信息' };
+    else if (/\.(avif|tiff?)$/i.test(name) || /image\/(avif|tiff)/.test(type)) return { file, note: '该格式未去除 EXIF' };
+    else return { file, note: '' };   // GIF / SVG / ICO / BMP：基本不带位置信息
+    if (file.size > 80 * 1024 * 1024) return { file, note: '' };
+    let res = null;
+    try {
+        const u8 = new Uint8Array(await file.arrayBuffer());
+        res = kind === 'jpeg' ? stripJpegMeta(u8) : kind === 'png' ? stripPngMeta(u8) : stripWebpMeta(u8);
+    } catch (_) { res = null; }
+    if (!res) return { file, note: '' };            // 解析不了（文件有点怪）：原样上传，不冒险改它
+    if (res.removed <= 0) return { file, note: '' }; // 本来就是干净的
+    const out = new File([res.bytes], file.name, { type: file.type || mime });
+    carryFileProps(file, out);
+    return { file: out, note: res.gps ? '已去位置信息' : '已去元数据' };
+}
+
 function startPrepare(file) {
     if (!file || file._prep) return;
     file._prep = (async () => {
         await prepSem.acquire();
         try {
             let work = file;
+            let reencoded = false;   // 经过 canvas 重新编码的图片本来就不带 EXIF，不用再去
             // 偏好「HEIC 转 JPG」：上传前转换（原先只在“存到相册”时生效，和说明不符）。转不了（非 Safari）就保持原文件。
             if (prefHeicJpg() && isHeicFile(file)) {
                 try {
@@ -6962,12 +7211,18 @@ function startPrepare(file) {
                     carryFileProps(file, jpg);
                     if (file._relPath) jpg._relPath = file._relPath.replace(HEIC_RE, '') + '.jpg';
                     jpg._forceImage = true;
-                    work = jpg;
+                    work = jpg; reencoded = true;
                 } catch (_) { work = file; }
             }
             if (prefCompress() !== 'off' && isImageFile(work)) {
-                try { work = await preprocessFile(work); } catch (_) { /* 保持 work */ }
+                try { const pre = await preprocessFile(work); if (pre !== work) { work = pre; reencoded = true; } } catch (_) { /* 保持 work */ }
             }
+            // 去除 EXIF / 位置信息：放在压缩之后，只处理没被重新编码过的图片
+            let metaNote = '';
+            if (!reencoded && prefStripExif() && isImageFile(work)) {
+                try { const r = await stripImageMetadata(work); work = r.file; metaNote = r.note; } catch (_) { /* 失败就原样上传 */ }
+            }
+            if (metaNote) work._saveNote = (work._saveNote ? work._saveNote + ' · ' : '') + metaNote;
             try { work = await pluginBeforeUpload(work); } catch (_) { /* 插件出错不影响上传 */ }
             if (work !== file) file._processed = work;
         } finally { prepSem.release(); }
@@ -7057,7 +7312,8 @@ async function runUpload(file, refs, ctx) {
         statusEl.style.cursor = 'pointer';
 
         const failure = { name: file.name, message };
-        if (isTransientUploadError(err) || /额度已用完/.test(message)) persistFailedUpload(file, ctx, message);   // Token 错误、文件过大这类永远不会成功的失败不入队
+        if (isTransientUploadError(err) || /额度已用完/.test(message)) persistFailedUpload(file, ctx, message);
+        else forgetFailedUpload(file);   // Token 错误、文件过大这类永远不会成功的失败：从排队里拿掉
         statusEl.onclick = () => showUploadErrorModal([failure]);
 
         const retryBtn = document.createElement('button');
@@ -7510,7 +7766,7 @@ let uploadWakeLock = null;
 
 function isAllowedAssetFile(file) {
     if (!file || !file.name) return false;
-    return isImageFile(file) || FONT_EXT_RE.test(file.name || '') || /^font\//i.test(file.type || '');
+    return isImageFile(file) || isMediaFile(file) || FONT_EXT_RE.test(file.name || '') || /^font\//i.test(file.type || '');
 }
 
 /* ===== 后台保活：开关打开期间，循环播放一段人耳听不到的静音音频，让 iOS 不把页面挂起 =====
@@ -7752,7 +8008,7 @@ async function handleFiles(files) {
     const invalidFailures = zipFailures.slice();
     expanded.forEach(file => {
         if (!isAllowedAssetFile(file)) {
-            invalidFailures.push({ name: file.name || '未命名文件', message: '不支持的文件类型，仅支持图片和 TTF/OTF/WOFF/WOFF2 字体' });
+            invalidFailures.push({ name: file.name || '未命名文件', message: '不支持的文件类型，仅支持图片、视频、音频和 TTF/OTF/WOFF/WOFF2 字体' });
         } else if (!file.size) {
             invalidFailures.push({ name: file.name || '未命名文件', message: '文件大小为 0（可能还在 iCloud、没下载到本机）' });
         } else if (file.size > MAX_UPLOAD_SIZE) {
@@ -7787,6 +8043,7 @@ async function handleFiles(files) {
     if (isBatchUploading) { toast('上传中，请稍候', 'info'); return; }
     isBatchUploading = true;
     requestUploadWakeLock();
+    const releaseSessionLock = holdUploadSessionLock();
     const convertBtn = $('convert-link-btn');
     const importBtn = $('import-file-btn');
     const replaceBtn = $('replace-file-btn');
@@ -7842,6 +8099,7 @@ async function handleFiles(files) {
         list.appendChild(refs.item);
         return { file, refs, i };
     });
+    persistPendingUploads(validFiles, ctx);   // 后台依次存进本机队列；传完一个删一个
     const results = new Array(items.length);
     const fracs = new Map();
     let active = 0, nextIdx = 0, inflightBytes = 0;
@@ -7920,6 +8178,7 @@ async function handleFiles(files) {
     } finally {
         isBatchUploading = false;
         releaseUploadWakeLock();
+        releaseSessionLock();
         if (convertBtn) convertBtn.disabled = false;
         if (importBtn) importBtn.disabled = false;
         if (replaceBtn) replaceBtn.disabled = false;
@@ -7984,6 +8243,9 @@ function formatLink(url, name, fmt) {
         const u = String(url).replace(/\(/g, '%28').replace(/\)/g, '%29'); // 文件名里的括号会截断 Markdown 链接
         return isImg ? '![' + alt.replace(/[\[\]]/g, '') + '](' + u + ')' : '[' + base.replace(/[\[\]]/g, '') + '](' + u + ')';
     }
+    const urlPath = String(url).split(/[?#]/)[0];
+    if (VIDEO_EXT_RE.test(base) || VIDEO_EXT_RE.test(urlPath)) return '<video src="' + escapeHtmlAttr(url) + '" controls playsinline preload="metadata"></video>';
+    if (AUDIO_EXT_RE.test(base) || AUDIO_EXT_RE.test(urlPath)) return '<audio src="' + escapeHtmlAttr(url) + '" controls preload="metadata"></audio>';
     return isImg
         ? '<img src="' + escapeHtmlAttr(url) + '" alt="' + escapeHtmlAttr(alt) + '">'
         : '<a href="' + escapeHtmlAttr(url) + '">' + escapeHtmlAttr(base) + '</a>';
@@ -9078,6 +9340,12 @@ async function runLinkCheck(opts) {
     const found = { ok: [], dead: [], cdn: [], net: [] };
     if (!quiet) toast('检测链接 0/' + total, 'loading');
     let todo = entries;
+    // 24 小时内测过且结果正常的链接不再重复检测（菜单里的「重新检测全部」可以忽略缓存）
+    const cachedOk = new Set();
+    if (!opts.force) {
+        const nowC = Date.now();
+        entries.forEach(e => { const v = linkStatus[e.id]; if (v && v.s === 'ok' && nowC - (v.t || 0) < 24 * 3600 * 1000) cachedOk.add(e.id); });
+    }
     async function worker() {
         while (!linkCheckStop && next < todo.length) {
             const e = todo[next++];
@@ -9090,15 +9358,15 @@ async function runLinkCheck(opts) {
     }
     try {
         let pre = new Set();
-        try { pre = await precheckLinksByRepo(entries); } catch (_) {}
+        try { pre = await precheckLinksByRepo(entries.filter(e => !cachedOk.has(e.id))); } catch (_) {}
         // 最近 3 天上传的 jsDelivr 链接：就算仓库里有文件，CDN 也可能还没同步，要实际打开确认
         const recentMs = 3 * 24 * 3600 * 1000, nowT = Date.now();
         entries.forEach(e => { if (pre.has(e.id) && nowT - (e.time || 0) < recentMs && /cdn\.jsdelivr\.net/.test(e.url || '')) pre.delete(e.id); });
         pre.forEach(id => found.ok.push(id));
-        done = pre.size;
+        done = pre.size + cachedOk.size;
         if (!quiet && done) linkCheckProgressToast(done, total);
-        todo = entries.filter(e => !pre.has(e.id));
-        await Promise.all(Array.from({ length: Math.min(6, todo.length) }, worker));
+        todo = entries.filter(e => !pre.has(e.id) && !cachedOk.has(e.id));
+        await Promise.all(Array.from({ length: Math.min(8, todo.length) }, worker));
     }
     finally { linkCheckRunning = false; }
     const stopped = linkCheckStop;
@@ -9123,6 +9391,7 @@ async function runLinkCheck(opts) {
         const gp1 = $('page-gallery');
         if (cdn && gp1 && gp1.classList.contains('active')) { hideToast(); return fixCdnLinks(); }
         return toast('检测完成：' + (total - net) + ' 个链接都能打开'
+            + (cachedOk.size ? '（' + cachedOk.size + ' 个 24 小时内测过，未重复检测）' : '')
             + (cdn ? '，其中 ' + cdn + ' 个 CDN 还没同步' : '') + (net ? '，' + net + ' 个暂时连不上' : ''));
     }
     // 检测期间用户已经切到别的页面：不要弹确认框、也不要在看不见的资源库里偷偷进入多选
@@ -9173,12 +9442,19 @@ async function runRepoLinkCheck(opts) {
     const atKey = repoLinkCheckAtKey(files[0]);
     repoLinkCheckRunning = true; repoLinkCheckStop = false;
     const total = files.length;
-    let done = 0, next = 0;
+    // 内容没变（sha 相同）、24 小时内测过且正常的文件不再重复检测
+    const cachedPaths = new Set();
+    if (!opts.force && !onlyDead) {
+        const nowC = Date.now();
+        files.forEach(f => { const v = repoLinkStatus.get(uploadKey(f.owner, f.repo, f.path)); if (v && v.s === 'ok' && v.sha === f.sha && nowC - (v.t || 0) < 24 * 3600 * 1000) cachedPaths.add(f.path); });
+    }
+    const todoFiles = cachedPaths.size ? files.filter(f => !cachedPaths.has(f.path)) : files;
+    let done = cachedPaths.size, next = 0;
     const found = { ok: [], dead: [], cdn: [], net: [] };
     if (!quiet) toast('检测链接 0/' + total, 'loading');
     async function worker() {
-        while (!repoLinkCheckStop && next < files.length) {
-            const f = files[next++];
+        while (!repoLinkCheckStop && next < todoFiles.length) {
+            const f = todoFiles[next++];
             let r = 'net';
             try { r = await checkRepoFileLink(f); } catch (_) {}
             found[r].push(f);
@@ -9186,7 +9462,7 @@ async function runRepoLinkCheck(opts) {
             if (!quiet && (done % 4 === 0 || done === total)) linkCheckProgressToast(done, total);
         }
     }
-    try { await Promise.all(Array.from({ length: Math.min(6, files.length) }, worker)); }
+    try { await Promise.all(Array.from({ length: Math.min(8, todoFiles.length) }, worker)); }
     finally { repoLinkCheckRunning = false; }
     const stopped = repoLinkCheckStop;
     repoLinkCheckStop = false;
@@ -10172,6 +10448,7 @@ function initV13Prefs() {
     $('pref-clipwatch').checked = prefClipWatch();
     $('pref-linkcheck').checked = prefLinkCheck();
     $('pref-metasync').checked = prefMetaSync();
+    $('pref-stripexif').checked = prefStripExif();
     refreshCopyFormatUI();
     refreshCompressUI();
     refreshUploadPrefUI();
@@ -10216,7 +10493,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '3.0.26';
+const APP_VERSION = '3.0.27';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}

@@ -1215,6 +1215,10 @@ html[data-theme="dark"] .page { box-shadow: -.5px 0 0 rgba(255,255,255,.12); }
 .st-bar .progress-fill.warn { background: #E08A00; }
 .st-bar .progress-fill.danger { background: #C62828; }
 .st-empty { padding: 28px 20px; text-align: center; font-size: 14px; color: #8E8E93; }
+#rh-wrap { margin-top: 22px; }
+#rh-wrap .rh-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 6px 10px 22px; }
+#rh-more { display: block; margin: 12px auto 0; }
+#rh-wrap .rh-title { font-size: 13px; font-weight: 600; color: #8E8E93; }
 .st-err { padding: 16px 20px; font-size: 13px; color: #C62828; }
 html[data-theme="dark"] .st-err { color: #FF6B63; }
 html[data-theme="dark"] .st-badge { color: #A1A1A6; }
@@ -1516,6 +1520,15 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             </div>
         </div>
 
+        <div id="rh-wrap" style="display:none">
+            <div class="rh-head">
+                <div class="rh-title" id="rh-title">替换历史</div>
+                <button class="small-btn danger" type="button" onclick="rhClear()">清空</button>
+            </div>
+            <input type="search" id="rh-search" class="url-input" placeholder="搜索文件名" oninput="rhSearchInput(this.value)" style="display:none; margin:0 0 12px;">
+            <div id="rh-list"></div>
+        </div>
+
     </div>
 
     <input type="file" id="orphan-scan-input" multiple style="display:none" onchange="handleOrphanScan(this.files)">
@@ -1812,6 +1825,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div class="about-item"><div class="about-t">批量重命名</div><div class="about-d">在仓库页或资源库选中 2 个以上的文件，点「重命名」，可以按规则加前缀、加后缀、按序号命名或查找替换。扩展名保持不变，弹窗里会先预览结果，一次提交完成，改完可以撤销。改名后原来的直链会失效。</div></div>
             <div class="about-item"><div class="about-t">自定义复制格式</div><div class="about-d">设置里的「自定义模板」可以写自己的复制格式：{url} 是直链，{name} 是文件名，{stem} 是不带扩展名的文件名，{ext} 是扩展名。例如 url("{url}")。保存后复制格式会切到「自定义」，换回直链、Markdown 或 HTML 就恢复原样。</div></div>
             <div class="about-item"><div class="about-t">导出链接清单</div><div class="about-d">仓库页的「更多工具」和资源库的菜单里都有「导出链接清单」，可以按选中、当前列表或全部，导出成纯链接、按当前复制格式、JSON 或 CSV 文件，方便备份、搬家和批量替换。</div></div>
+            <div class="about-item"><div class="about-t">替换历史</div><div class="about-d">「替换链接」页下面会记下每次替换（包括表情包转存）生成的新文件，不会自动删除，一直留到你自己移除或清空。点一条可以重新下载、复制「旧链接 → 新直链」的对照表，或从列表移除。内容只存在这台设备的浏览器里，不会上传；导出备份时会一起带上（备份文件会因此变大），导入时只补回缺少的，已有的不会被覆盖。没有备份的话，清除网站数据会把它一起清掉。</div></div>
             </div>
         </div>
         <div class="about-sec">
@@ -3047,6 +3061,7 @@ function openPage(name) {
         if (name === 'gallery') { renderGallery(); loadRepoLiveFiles(false); }
         if (name === 'storage') loadStorage(false);
         if (name === 'recycle') recycleRender();
+        if (name === 'replace') rhRender();
         if (name === 'prefs') renderPlugins();
         if (name === 'about') { renderAboutPlugins(); try { offlineStatusRefresh(); } catch (_) {} try { storageStatusRefresh(); } catch (_) {} }
         if (name === 'update' && typeof aboutOnOpen === 'function') aboutOnOpen();
@@ -7692,7 +7707,200 @@ function downloadReplaceOutput() {
     a.remove();
 }
 
-function buildReplaceOutput(fileName, mime, bom, originalText, map, protoRelative, total, aliases) {
+/* ---------- 替换历史（v3.0.28，v3.0.29 起不再限制条数）：每次替换 / 表情包转存生成的新文件都记下来，之后可以重新下载 ----------
+   索引（名字、时间、数量）和内容分开存：索引一份，内容一条一份，都放在 IndexedDB 的 kv 里。
+   同一次替换里失败重试、重新生成结果时，更新的是同一条记录，不会多出重复项。 */
+const RH_INDEX_KEY = 'replace_hist', RH_BODY_PREFIX = 'rh:', RH_LS_KEY = 'kb_replace_hist';
+const RH_BODY_MAX = 30 * 1024 * 1024;
+const RH_ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v10M8 10.5l4 4 4-4M5 19.5h14"/></svg>';
+const rhMemBodies = new Map();   // IndexedDB 写不进去时，内容先留在内存里（刷新页面就没了）
+const rhPending = new Map();     // 会话 id → 待写入的记录（防抖合并）
+let rhTimer = null, rhChain = Promise.resolve(), rhShowAll = false, rhAskedPersist = false, rhQuery = '';
+const RH_PAGE = 20;   // 列表一次先画 20 条，其余点「显示更多」
+
+function rhBegin(kind, src, map) {
+    return { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), kind: kind, src: src || '', map: map || null, time: 0 };
+}
+async function rhReadIndex() {
+    try {
+        const a = await dlDB.get('kv', RH_INDEX_KEY);
+        if (a === undefined) return { list: [], idb: true };
+        if (Array.isArray(a)) return { list: a, idb: true };
+    } catch (_) {}
+    let a = null;
+    try { a = JSON.parse(lsGet(RH_LS_KEY) || 'null'); } catch (_) {}
+    return { list: Array.isArray(a) ? a : [], idb: false };
+}
+async function rhWriteIndex(list, idb) {
+    if (idb) { try { await dlDB.put('kv', RH_INDEX_KEY, list); return; } catch (e) { console.warn('写入替换历史失败：', e); } }
+    lsSet(RH_LS_KEY, JSON.stringify(list));
+}
+async function rhGetBody(it) {
+    const m = rhMemBodies.get(it.id);
+    if (m) return m;
+    try { const b = await dlDB.get('kv', RH_BODY_PREFIX + it.id); if (b && typeof b.text === 'string') return b; } catch (_) {}
+    return null;
+}
+// sess：rhBegin 返回的会话；info：{ name, mime, bom, text, done, total, count }
+function rhRecord(sess, info) {
+    if (!sess || !info || !info.name || typeof info.text !== 'string') return;
+    rhPending.set(sess.id, { sess: sess, info: info });
+    clearTimeout(rhTimer);
+    rhTimer = setTimeout(() => { rhChain = rhChain.then(rhFlush).catch(e => console.warn('记录替换历史失败：', e)); }, 400);
+}
+async function rhFlush() {
+    const batch = Array.from(rhPending.values());
+    rhPending.clear();
+    if (!batch.length) return;
+    const got = await rhReadIndex();
+    let list = got.list.filter(x => x && x.id);
+    const dropped = [];
+    let unsaved = false;   // 有内容没能存进浏览器（太大 / 空间不足）：提醒一次，免得以为存好了
+    for (const { sess, info } of batch) {
+        const bytes = new Blob([info.text]).size;
+        const old = list.find(x => x.id === sess.id);
+        const pairs = sess.map ? Array.from(sess.map).filter(kv => !/^(?:local-sticker:|data:)/i.test(kv[0])) : [];
+        const meta = {
+            id: sess.id, kind: sess.kind, src: sess.src, name: info.name, mime: info.mime || 'text/plain', bom: !!info.bom,
+            done: info.done || 0, total: info.total || 0, count: info.count || 0, size: bytes,
+            time: old ? old.time : Date.now()
+        };
+        if (bytes <= RH_BODY_MAX) {
+            let ok = false;
+            if (got.idb) { try { await dlDB.put('kv', RH_BODY_PREFIX + sess.id, { text: info.text, pairs: pairs }); ok = true; } catch (e) { console.warn('保存替换结果失败：', e); } }
+            if (ok) rhMemBodies.delete(sess.id); else { rhMemBodies.set(sess.id, { text: info.text, pairs: pairs }); unsaved = true; }
+        } else unsaved = true;
+        list = [meta].concat(list.filter(x => x.id !== sess.id));
+    }
+    await rhWriteIndex(list, got.idb);
+    if (unsaved) toast('这次的替换结果没能存进历史（文件太大或空间不足），请先下载保存', 'info');
+    if (!rhAskedPersist) { rhAskedPersist = true; try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (_) {} }   // 申请「持久存储」，降低被系统清掉的概率
+    for (const d of dropped) { rhMemBodies.delete(d.id); try { await dlDB.del('kv', RH_BODY_PREFIX + d.id); } catch (_) {} }
+    const pg = $('page-replace');
+    if (pg && pg.classList.contains('active')) rhRender();
+}
+// 备份：把替换历史（索引 + 内容）一起导出 / 导入。导入只补缺少的，已有的不动。
+async function rhExport() {
+    const items = [];
+    const got = await rhReadIndex();
+    for (const it of got.list) {
+        if (!it || !it.id) continue;
+        const b = await rhGetBody(it);
+        items.push(Object.assign({}, it, b ? { body: { text: b.text, pairs: Array.isArray(b.pairs) ? b.pairs : [] } } : {}));
+    }
+    return items;
+}
+async function rhImport(items) {
+    if (!Array.isArray(items) || !items.length) return 0;
+    const got = await rhReadIndex();
+    const have = new Set(got.list.map(x => x && x.id));
+    const list = got.list.filter(x => x && x.id);
+    let n = 0;
+    for (const it of items) {
+        if (!it || typeof it.id !== 'string' || typeof it.name !== 'string' || have.has(it.id)) continue;
+        const meta = {
+            id: it.id, kind: it.kind === 'sticker' ? 'sticker' : 'replace', src: String(it.src || ''), name: it.name,
+            mime: String(it.mime || 'text/plain'), bom: !!it.bom, done: +it.done || 0, total: +it.total || 0,
+            count: +it.count || 0, size: +it.size || 0, time: +it.time || Date.now()
+        };
+        if (it.body && typeof it.body.text === 'string') {
+            const body = { text: it.body.text, pairs: Array.isArray(it.body.pairs) ? it.body.pairs : [] };
+            let ok = false;
+            if (got.idb) { try { await dlDB.put('kv', RH_BODY_PREFIX + meta.id, body); ok = true; } catch (_) {} }
+            if (!ok) rhMemBodies.set(meta.id, body);
+        }
+        list.push(meta); have.add(meta.id); n++;
+    }
+    if (n) { list.sort((a, b) => (b.time || 0) - (a.time || 0)); await rhWriteIndex(list, got.idb); }
+    return n;
+}
+async function rhRender() {
+    const wrap = $('rh-wrap'), box = $('rh-list');
+    if (!wrap || !box) return;
+    let list = [];
+    try { list = (await rhReadIndex()).list.filter(x => x && x.id && x.name); } catch (_) {}
+    wrap.style.display = list.length ? '' : 'none';
+    box.innerHTML = '';
+    if (!list.length) return;
+    const total = list.reduce((n, x) => n + (+x.size || 0), 0);
+    const sb = $('rh-search'); if (sb) sb.style.display = list.length > 8 || rhQuery ? '' : 'none';
+    const q = rhQuery.trim().toLowerCase();
+    const all = list;
+    if (q) list = list.filter(x => (x.name + ' ' + (x.src || '')).toLowerCase().indexOf(q) >= 0);
+    const tt = $('rh-title'); if (tt) tt.textContent = '替换历史 · ' + all.length + ' 条' + (total ? ' · ' + fmtSize(total) : '');
+    if (!list.length) { const e = document.createElement('div'); e.className = 'st-empty'; e.textContent = '没有匹配的记录'; box.appendChild(e); return; }
+    const shown = rhShowAll ? list : list.slice(0, RH_PAGE);
+    const group = document.createElement('div'); group.className = 'st-group';
+    shown.forEach(it => {
+        const row = document.createElement('div'); row.className = 'st-row rb-row';
+        row.setAttribute('role', 'button'); row.tabIndex = 0;
+        const line = document.createElement('div'); line.className = 'st-line';
+        const nm = document.createElement('span'); nm.className = 'st-name'; nm.textContent = it.name; line.appendChild(nm);
+        if (it.kind === 'sticker') { const b = document.createElement('span'); b.className = 'st-badge'; b.textContent = '表情包'; line.appendChild(b); }
+        const sz = document.createElement('span'); sz.className = 'st-size'; sz.textContent = fmtSize(it.size) || ''; line.appendChild(sz);
+        row.appendChild(line);
+        const sub = document.createElement('div'); sub.className = 'rb-sub';
+        const what = it.kind === 'sticker' ? '已转存 ' + it.done + '/' + it.total + ' 张' : '已替换 ' + it.done + '/' + it.total + ' 个链接';
+        sub.textContent = (it.src ? it.src + ' · ' : '') + what + ' · ' + recycleAgo(it.time);
+        row.appendChild(sub);
+        row.onclick = () => openMoreMenu(row, [
+            { label: '下载', icon: RH_ICON_DL, onClick: () => rhDownload(it) },
+            { label: '复制链接对照', icon: ICON_COPY, onClick: () => rhCopyPairs(it) },
+            { label: '从历史移除', icon: ICON_TRASH, danger: true, onClick: () => rhRemove(it) }
+        ]);
+        group.appendChild(row);
+    });
+    box.appendChild(group);
+    if (list.length > shown.length) {
+        const more = document.createElement('button'); more.type = 'button'; more.id = 'rh-more'; more.className = 'small-btn';
+        more.textContent = '显示更多（还有 ' + (list.length - shown.length) + ' 条）';
+        more.onclick = () => { rhShowAll = true; rhRender(); };
+        box.appendChild(more);
+    }
+}
+function rhSearchInput(v) { rhQuery = v || ''; rhShowAll = false; rhRender(); }
+async function rhDownload(it) {
+    const b = await rhGetBody(it);
+    if (!b) return toast('这个文件的内容没有保存下来，没法再下载', 'error');
+    const blob = new Blob(it.bom ? [new Uint8Array([0xEF, 0xBB, 0xBF]), b.text] : [b.text], { type: it.mime || 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = it.name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+async function rhCopyPairs(it) {
+    const b = await rhGetBody(it);
+    const pairs = b && Array.isArray(b.pairs) ? b.pairs : [];
+    if (!pairs.length) return toast('这条记录没有可复制的链接对照', 'info');
+    const ok = await writeClipboard(pairs.map(kv => kv[0] + '\t' + kv[1]).join('\n'));
+    toast(ok ? '已复制 ' + pairs.length + ' 条链接对照（旧链接 → 新直链）' : '复制失败，请手动复制', ok ? 'ok' : 'error');
+}
+function rhRemove(it) {
+    rhChain = rhChain.then(async () => {
+        const got = await rhReadIndex();
+        await rhWriteIndex(got.list.filter(x => x && x.id !== it.id), got.idb);
+        rhMemBodies.delete(it.id);
+        try { await dlDB.del('kv', RH_BODY_PREFIX + it.id); } catch (_) {}
+        rhRender();
+    }).catch(e => console.warn('移除替换历史失败：', e));
+    return rhChain;
+}
+async function rhClear() {
+    const got = await rhReadIndex();
+    if (!got.list.length) return toast('没有可清空的内容', 'info');
+    const ok = await showConfirm({ title: '清空替换历史？', message: '只清空这份记录，之后不能再从这里重新下载这 ' + got.list.length + ' 个文件。已经下载到手机上的文件和仓库里的图片都不受影响。', confirmText: '清空' });
+    if (!ok) return;
+    rhChain = rhChain.then(async () => {
+        const fresh = await rhReadIndex();
+        await rhWriteIndex([], fresh.idb);
+        for (const x of fresh.list) { rhMemBodies.delete(x.id); try { await dlDB.del('kv', RH_BODY_PREFIX + x.id); } catch (_) {} }
+        rhShowAll = false; rhQuery = ''; const sb = $('rh-search'); if (sb) sb.value = '';
+        rhRender();
+    }).catch(e => console.warn('清空替换历史失败：', e));
+}
+
+function buildReplaceOutput(fileName, mime, bom, originalText, map, protoRelative, total, aliases, sess) {
     if (!map.size) { hideReplaceResult(); return; }
     const r = applyLinkMap(originalText, map, protoRelative, aliases);
     if (replaceOutput && replaceOutput.url) URL.revokeObjectURL(replaceOutput.url);
@@ -7701,6 +7909,7 @@ function buildReplaceOutput(fileName, mime, bom, originalText, map, protoRelativ
     const parts = bom ? [new Uint8Array([0xEF, 0xBB, 0xBF]), r.text] : [r.text];
     const blob = new Blob(parts, { type: mime || 'text/plain' });
     replaceOutput = { url: URL.createObjectURL(blob), name: outName };
+    rhRecord(sess, { name: outName, mime: mime || 'text/plain', bom: bom, text: r.text, done: map.size, total: total, count: r.count });
     const failed = total - map.size;
     $('replace-result-text').textContent = '已替换 ' + map.size + '/' + total + ' 个链接（共 ' + r.count + ' 处）' +
         (failed > 0 ? '，' + failed + ' 个失败的保持原样' : '') + '。';
@@ -7742,7 +7951,8 @@ async function handleReplaceFile(file) {
 
     const map = new Map(); // 原链接 → 新直链
     const total = urls.filter(u => !isOwnHostUrl(u)).length;
-    const rebuild = () => buildReplaceOutput(file.name, file.type, bom, text, map, protoRelative, total, aliases);
+    const sess = rhBegin('replace', file.name, map);
+    const rebuild = () => buildReplaceOutput(file.name, file.type, bom, text, map, protoRelative, total, aliases, sess);
 
     moveResultCardAfter('card-replace-file');
     await convertUrls(urls, map, rebuild);
@@ -9801,11 +10011,12 @@ function parseStickerLines(text, defaultCategory) {
     return out;
 }
 
-function buildStickerOutput(outName, text, mime, bom, done, total) {
+function buildStickerOutput(outName, text, mime, bom, done, total, sess) {
     if (!done) { hideReplaceResult(); return; }
     if (replaceOutput && replaceOutput.url) URL.revokeObjectURL(replaceOutput.url);
     const blob = new Blob(bom ? [new Uint8Array([0xEF, 0xBB, 0xBF]), text] : [text], { type: mime });
     replaceOutput = { url: URL.createObjectURL(blob), name: outName };
+    rhRecord(sess, { name: outName, mime: mime, bom: bom, text: text, done: done, total: total, count: 0 });
     const failed = total - done;
     $('replace-result-text').textContent = '已转存 ' + done + '/' + total + ' 张表情' +
         (failed > 0 ? '，' + failed + ' 张失败的保持原样' : '') + '。';
@@ -10079,19 +10290,20 @@ async function handleStickerImport(file) {
     const total = urls.filter(u => !isOwnHostUrl(u)).length;
     const hasLocal = urls.some(u => u.indexOf(STICKER_LOCAL) === 0);
     const dot = file.name.lastIndexOf('.');
+    const sess = rhBegin('sticker', file.name, map);
     let rebuild;
     if (jsonMode && !hasLocal && !edited) {
-        rebuild = () => buildReplaceOutput(file.name, 'application/json', bom, text, map, new Set(), total, new Map());
+        rebuild = () => buildReplaceOutput(file.name, 'application/json', bom, text, map, new Set(), total, new Map(), sess);
     } else if (jsonMode) {
         rebuild = () => {
             nodes.forEach(x => { if (map.has(x.key)) x.n[x.k] = map.get(x.key); });
-            buildStickerOutput((dot > 0 ? file.name.slice(0, dot) : file.name) + '-replaced.json', JSON.stringify(data, null, 2), 'application/json', false, map.size, total);
+            buildStickerOutput((dot > 0 ? file.name.slice(0, dot) : file.name) + '-replaced.json', JSON.stringify(data, null, 2), 'application/json', false, map.size, total, sess);
         };
     } else {
         rebuild = () => {
             const list = urls.map(u => ({ url: map.get(u) || u, meaning: info.get(u).meaning, category: info.get(u).category }));
             const o = stickerFormatOutput(list, pre.format, pre.tpl);
-            buildStickerOutput(stem + '-表情包.' + o.ext, o.text, o.mime, o.bom, map.size, total);
+            buildStickerOutput(stem + '-表情包.' + o.ext, o.text, o.mime, o.bom, map.size, total, sess);
         };
     }
     // 文件放进「分类名」文件夹，文件名用含义，这样仓库里一眼能看懂，也能再导出
@@ -10493,7 +10705,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '3.0.27';
+const APP_VERSION = '3.0.32';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -11134,6 +11346,7 @@ async function exportBackup() {
             activeAccount: accActiveId(),
             history: loadHistory()
         };
+        try { const rh = await rhExport(); if (rh.length) data.replaceHist = rh; } catch (e) { console.warn('替换历史没能放进备份：', e); }
         const out = pass ? await bkEncrypt(data, pass) : data;
         const name = 'direct-link-backup-' + new Date().toISOString().slice(0, 10) + (pass ? '-encrypted' : '') + '.json';
         const blob = new Blob([JSON.stringify(out)], { type: 'application/json' });
@@ -11162,7 +11375,7 @@ async function importBackup(file) {
     if (!data || data.app !== 'direct-link' || !data.prefs || typeof data.prefs !== 'object') return toast('这不是 Direct Link 的备份文件', 'error');
     const ok = await showConfirm({
         title: '导入这份备份？',
-        message: '会恢复偏好设置，补回缺少的上传记录和账号（已有的不会被覆盖），并在当前 Token、仓库、代理为空时填入备份里的值。导入后页面会自动刷新。',
+        message: '会恢复偏好设置，补回缺少的上传记录、替换历史和账号（已有的不会被覆盖），并在当前 Token、仓库、代理为空时填入备份里的值。导入后页面会自动刷新。',
         confirmText: '导入'
     });
     if (!ok) return;
@@ -11188,6 +11401,7 @@ async function importBackup(file) {
             const add = data.history.filter(e => e && e.id && !ids.has(e.id));
             if (add.length && !saveHistory(cur.concat(add))) return toast('导入失败：存储空间不足', 'error');
         }
+        try { await rhImport(data.replaceHist); } catch (e) { console.warn('替换历史没能导入：', e); }
     } catch (e) { return toast('导入失败：' + (e && e.message || '未知错误'), 'error'); }
     try { await flushStoreNow(); } catch (_) {}   // 记录是延迟写入的，等写完再刷新，否则记录多时会被刷新打断
     toast('导入完成，正在刷新…', 'ok');

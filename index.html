@@ -1215,10 +1215,17 @@ html[data-theme="dark"] .page { box-shadow: -.5px 0 0 rgba(255,255,255,.12); }
 .st-bar .progress-fill.warn { background: #E08A00; }
 .st-bar .progress-fill.danger { background: #C62828; }
 .st-empty { padding: 28px 20px; text-align: center; font-size: 14px; color: #8E8E93; }
-#rh-wrap { margin-top: 22px; }
-#rh-wrap .rh-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 6px 10px 22px; }
-#rh-more { display: block; margin: 12px auto 0; }
-#rh-wrap .rh-title { font-size: 13px; font-weight: 600; color: #8E8E93; }
+#rh-wrap { margin-top: 18px; }
+#rh-wrap .st-summary { margin-bottom: 14px; }
+.rh-search { display: block; width: 100%; box-sizing: border-box; margin-top: 16px; border: 0; border-radius: 12px; padding: 10px 14px 10px 38px; font-size: 14px; font-family: inherit; color: var(--text-main); -webkit-appearance: none; appearance: none;
+    background-color: rgba(118,118,128,.12); background-repeat: no-repeat; background-position: 13px center; background-size: 16px;
+    --rh-ico: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2.2' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg>"); background-image: var(--rh-ico); }
+.rh-search:focus { outline: none; }
+.rh-search::placeholder { color: #8E8E93; }
+html[data-theme="dark"] .rh-search { background: rgba(118,118,128,.28) var(--rh-ico) no-repeat 13px center / 16px !important; border-color: transparent !important; }
+#rh-list .st-name { font-size: 15px; }
+#rh-list .st-size { font-size: 13px; font-weight: 500; color: #8E8E93; }
+#rh-list .rh-more { text-align: center; font-size: 14px; font-weight: 600; color: var(--text-main); padding: 13px 20px; }
 .st-err { padding: 16px 20px; font-size: 13px; color: #C62828; }
 html[data-theme="dark"] .st-err { color: #FF6B63; }
 html[data-theme="dark"] .st-badge { color: #A1A1A6; }
@@ -1521,11 +1528,18 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
         </div>
 
         <div id="rh-wrap" style="display:none">
-            <div class="rh-head">
-                <div class="rh-title" id="rh-title">替换历史</div>
-                <button class="small-btn danger" type="button" onclick="rhClear()">清空</button>
+            <div class="card st-summary">
+                <div class="st-total-row">
+                    <div>
+                        <div class="st-total" id="rh-total">—</div>
+                        <div class="st-meta" id="rh-meta"></div>
+                    </div>
+                    <div class="card-head-actions">
+                        <button class="small-btn danger" type="button" onclick="rhClear()">清空</button>
+                    </div>
+                </div>
+                <input type="search" id="rh-search" class="rh-search" placeholder="搜索文件名" oninput="rhSearchInput(this.value)" style="display:none">
             </div>
-            <input type="search" id="rh-search" class="url-input" placeholder="搜索文件名" oninput="rhSearchInput(this.value)" style="display:none; margin:0 0 12px;">
             <div id="rh-list"></div>
         </div>
 
@@ -7827,7 +7841,8 @@ async function rhRender() {
     const q = rhQuery.trim().toLowerCase();
     const all = list;
     if (q) list = list.filter(x => (x.name + ' ' + (x.src || '')).toLowerCase().indexOf(q) >= 0);
-    const tt = $('rh-title'); if (tt) tt.textContent = '替换历史 · ' + all.length + ' 条' + (total ? ' · ' + fmtSize(total) : '');
+    const tt = $('rh-total'); if (tt) tt.textContent = all.length + ' 条历史';
+    const tm = $('rh-meta'); if (tm) tm.textContent = (total ? '共 ' + fmtSize(total) + ' · ' : '') + '一直保留';
     if (!list.length) { const e = document.createElement('div'); e.className = 'st-empty'; e.textContent = '没有匹配的记录'; box.appendChild(e); return; }
     const shown = rhShowAll ? list : list.slice(0, RH_PAGE);
     const group = document.createElement('div'); group.className = 'st-group';
@@ -7836,12 +7851,11 @@ async function rhRender() {
         row.setAttribute('role', 'button'); row.tabIndex = 0;
         const line = document.createElement('div'); line.className = 'st-line';
         const nm = document.createElement('span'); nm.className = 'st-name'; nm.textContent = it.name; line.appendChild(nm);
-        if (it.kind === 'sticker') { const b = document.createElement('span'); b.className = 'st-badge'; b.textContent = '表情包'; line.appendChild(b); }
         const sz = document.createElement('span'); sz.className = 'st-size'; sz.textContent = fmtSize(it.size) || ''; line.appendChild(sz);
         row.appendChild(line);
         const sub = document.createElement('div'); sub.className = 'rb-sub';
         const what = it.kind === 'sticker' ? '已转存 ' + it.done + '/' + it.total + ' 张' : '已替换 ' + it.done + '/' + it.total + ' 个链接';
-        sub.textContent = (it.src ? it.src + ' · ' : '') + what + ' · ' + recycleAgo(it.time);
+        sub.textContent = (it.kind === 'sticker' ? '表情包 · ' : '') + (it.src ? it.src + ' · ' : '') + what + ' · ' + recycleAgo(it.time);
         row.appendChild(sub);
         row.onclick = () => openMoreMenu(row, [
             { label: '下载', icon: RH_ICON_DL, onClick: () => rhDownload(it) },
@@ -7850,13 +7864,13 @@ async function rhRender() {
         ]);
         group.appendChild(row);
     });
-    box.appendChild(group);
     if (list.length > shown.length) {
-        const more = document.createElement('button'); more.type = 'button'; more.id = 'rh-more'; more.className = 'small-btn';
+        const more = document.createElement('div'); more.className = 'st-row rb-row rh-more'; more.setAttribute('role', 'button'); more.tabIndex = 0;
         more.textContent = '显示更多（还有 ' + (list.length - shown.length) + ' 条）';
         more.onclick = () => { rhShowAll = true; rhRender(); };
-        box.appendChild(more);
+        group.appendChild(more);
     }
+    box.appendChild(group);
 }
 function rhSearchInput(v) { rhQuery = v || ''; rhShowAll = false; rhRender(); }
 async function rhDownload(it) {
@@ -10705,7 +10719,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '3.0.32';
+const APP_VERSION = '3.0.33';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}

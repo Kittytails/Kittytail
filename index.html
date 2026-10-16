@@ -276,7 +276,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
 .rb-sub { margin-top: 5px; font-size: 12px; line-height: 1.5; color: #8E8E93; word-break: break-all; }
 
     /* 顶部提示（Toast）：悬浮的磨砂玻璃圆角矩形，从上方滑下；本身不拦截页面点击，点提示条可立即收起。 */
-    /* ===== 提示栏配色（改颜色只需改这一组变量；夜间那组在下方） =====
+    /* ----- 提示栏配色（夜间配色在下方） -----
        日间：深墨色底 + 浅色字；成功/失败/提示三种图标各有语义色。 */
     #kb-toast {
         --t-bg: #1D1D1F; --t-fg: #F5F5F7; --t-border: #1D1D1F;
@@ -354,8 +354,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
         --t-info: #0A63C9; --t-info-bg: rgba(10,99,201,.13);
     }
 
-    /* ================= 系统日夜间适配 =================
-       自动跟随设备的浅色/深色模式，无需手动切换。 */
+    /* ================= 日夜间适配（自动跟随系统） ================= */
     @media (prefers-color-scheme: dark) {
         :root {
             --primary: #F5F5F7;
@@ -507,7 +506,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
 
     }
 
-    /* ===== 强制可靠的系统日夜间适配（CSS + JS 双保险） ===== */
+    /* ----- 日夜间适配补强（CSS + JS 双保险） ----- */
     html { color-scheme: light dark; }
     @media (prefers-color-scheme: dark) {
         html, body { background: #111113 !important; color: #F5F5F7 !important; }
@@ -684,7 +683,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
 
     /* 夜间：删除小圆点的描边要和卡片底色一致，否则会出现一圈白边 */
 
-    /* ===== 仓库选择 / 新建 ===== */
+    /* ----- 仓库选择 / 新建 ----- */
     .repo-target { width:100%; display:flex; align-items:center; gap:10px; margin:-2px 0 16px; padding:11px 13px; border-radius:12px; border:1px solid var(--border); background:#FAFAFA; color:var(--primary); font-family:inherit; font-size:13px; cursor:pointer; text-align:left; transition:.2s; }
     .repo-target:active { background:#F0F0F0; transform:scale(.99); }
     .repo-target-label { color:var(--text-secondary); font-size:12px; font-weight:600; flex-shrink:0; }
@@ -720,7 +719,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     html[data-theme="dark"] .move-folder-item.active .repo-pick-badge { background:rgba(0,0,0,.18); color:#111113; }
     html[data-theme="dark"] .repo-create-title { color:#F5F5F7; }
 
-    /* ===== 排版微调：标题行 / 文件夹图标 / 文件名 / 吸顶操作栏 ===== */
+    /* ----- 排版微调：标题行、文件夹图标、文件名、吸顶栏 ----- */
     .card > .card-head-row .title { font-size:17px; letter-spacing:-0.3px; }
     .card-head-actions .small-btn { padding:7px 12px; }
     .card-head-actions { gap:5px; }
@@ -734,7 +733,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     html[data-theme="dark"] .gallery-tile .tile-name,
     html[data-theme="dark"] .gallery-tile .repo-live-name { color:#B4B4BA !important; }
 
-    /* ===== 顶部 / 底部雾化渐变 ===== */
+    /* ----- 顶部 / 底部雾化渐变 ----- */
     :root { --fog: 247,247,249; }
     @media (prefers-color-scheme: dark) { :root { --fog: 17,17,19; } }
     html[data-theme="dark"] { --fog: 17,17,19; }
@@ -791,7 +790,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     #page-gallery[data-seg="library"] #card-repo { display:none; }
     #page-gallery[data-seg="repo"] #card-library { display:none; }
 
-/* ================= 新版外壳：设置风格主页 + 子页面（照搬 设置18.html） ================= */
+/* ================= 外壳：主页与子页面 ================= */
 :root { --s-top: calc(env(safe-area-inset-top) + 18px); --s-side: 18px; --s-bottom: calc(env(safe-area-inset-bottom) + 32px); }
 
 body { display: block; padding: 0; min-height: 0; }
@@ -903,7 +902,7 @@ html[data-theme="dark"] .pref-card .switch:checked { background: #F5F5F7 !import
 .panel-title:active { opacity: .5; }
 .panel-title:focus-visible { outline: 2px solid #111; outline-offset: 2px; border-radius: 6px; }
 
-/* ================= 资源库 / 仓库：名册风格 ================= */
+/* ================= 资源库 / 仓库列表 ================= */
 #page-gallery .panel-head { margin-bottom: 0; }
 #page-gallery .panel-title { font-size: 34px; line-height: 41px; letter-spacing: -.8px; margin-left: -1px; }
 #page-gallery .panel-subtitle { display: none; }
@@ -933,7 +932,7 @@ html[data-theme="dark"] #page-gallery .filter-btn.active { background: #F5F5F7; 
 .more-menu-item { height: 40px; padding: 0 14px; border-radius: 13px; gap: 12px; justify-content: space-between; font-size: 15px; font-weight: 500; }
 .more-menu-item svg { width: 17px; height: 17px; }
 
-/* ================= 主页名片（照搬设置里的账户卡） ================= */
+/* ================= 主页账户卡 ================= */
 .home .profile-row { min-height: 88px; align-items: center; padding-left: 16px; }
 .profile-avatar { flex: none; width: 56px; height: 56px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: rgba(127,127,127,.16); color: #8E8E93; font-size: 24px; font-weight: 600; }
 .profile-avatar svg { width: 62%; height: 62%; }
@@ -943,7 +942,7 @@ html[data-theme="dark"] #page-gallery .filter-btn.active { background: #F5F5F7; 
 .home .profile-name { flex: none; font-size: 21px; font-weight: 700; line-height: 26px; letter-spacing: -.3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .profile-sub { font-size: 14px; line-height: 19px; color: #8E8E93; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* ================= GitHub 页：头像 + 切换账号 ================= */
+/* ================= GitHub 页：头像与切换账号 ================= */
 #page-settings > .card > .title, #page-settings > .card > .title + .sub { display: none; }
 .acct-card { display: flex; align-items: center; gap: 16px; padding: 18px 20px; background: var(--card-bg); border-radius: 26px; }
 .acct-avatar { flex: none; width: 72px; height: 72px; padding: 0; border: 0; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: rgba(127,127,127,.16); color: #8E8E93; font: inherit; font-size: 30px; font-weight: 600; cursor: pointer; }
@@ -982,7 +981,7 @@ html[data-theme="dark"] #page-gallery .filter-group { background: transparent !i
 /* 修复：深色模式下首页底部搜索框里的输入框被涂成方块，和圆角胶囊底色不一致 */
 html[data-theme="dark"] .search-bar input, html[data-theme="dark"] .searchpill input { background: transparent !important; border-color: transparent !important; }
 
-/* ===== 点击反馈 ===== */
+/* ----- 点击反馈 ----- */
 .ghost-btn, .small-btn, .filter-btn, .repo-target, .move-folder-item, .sp-btn, .sb-mic, .dropzone, .home .row-icon {
     transition: transform .16s cubic-bezier(.2,.8,.2,1), opacity .16s ease, background-color .16s ease;
 }
@@ -996,7 +995,7 @@ html[data-theme="dark"] .search-bar input, html[data-theme="dark"] .searchpill i
 .home .row:active .row-arrow { opacity: .9; }
 .gallery-tile:active .repo-live-preview, .gallery-tile:active > img { filter: brightness(.94); }
 
-/* ===== 骨架屏 ===== */
+/* ----- 骨架屏 ----- */
 @keyframes sk-shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
 .gallery-tile > img:not(.is-loaded) { background-color: rgba(127,127,127,.10); }
 .sk {
@@ -1024,7 +1023,7 @@ html[data-theme="dark"] .sk {
     .gallery-tile, .repo-live-item { overflow: visible; }
     .gallery-tile .tile-del { display: block; z-index: 6; }
 
-    /* ===== 多选悬浮操作坞（资源库 / 仓库共用）：底部悬浮的白灰磨砂玻璃，纯图标 ===== */
+    /* ----- 多选悬浮操作坞（资源库 / 仓库共用） ----- */
     .sel-dock {
         display: none; position: fixed; z-index: 1000;
         left: 0; right: 0; margin: 0 auto; width: max-content; max-width: calc(100% - 28px);
@@ -1083,7 +1082,7 @@ html[data-theme="dark"] #page-gallery > .card {
     /* 偏好设置：卡片之间的间距与主页一致（主页 32px，页面本身 gap 为 18px，这里补 14px） */
     #page-prefs .pref-group + .pref-group { margin-top: 14px; }
 
-    /* ===== 存到文件：底部磨砂选项板 ===== */
+    /* ----- 存到文件：底部选项板 ----- */
     .save-sheet { width: 100%; max-width: 560px; box-sizing: border-box; padding: 9px 14px calc(env(safe-area-inset-bottom) + 14px); border-radius: 30px 30px 0 0;
         background: rgba(244,244,247,.74); -webkit-backdrop-filter: blur(36px) saturate(185%); backdrop-filter: blur(36px) saturate(185%);
         box-shadow: 0 -18px 55px rgba(0,0,0,.14), inset 0 .5px 0 rgba(255,255,255,.9); animation: uploadErrorSheetIn .28s cubic-bezier(.22,1,.36,1); }
@@ -1111,7 +1110,7 @@ html[data-theme="dark"] #page-gallery > .card {
     html[data-theme="dark"] .save-opt + .save-opt::before { background: rgba(255,255,255,.14); }
     html[data-theme="dark"] .save-opt:active, html[data-theme="dark"] .save-cancel:active { background: rgba(255,255,255,.16); }
 
-    /* ===== 表情包导入预览 ===== */
+    /* ----- 表情包导入预览 ----- */
     .sticker-sheet { max-height: 90vh; max-height: 90dvh; display: flex; flex-direction: column; }
     .stk-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 4px 10px; }
     .stk-chip { flex: none; border: 0; border-radius: 14px; padding: 8px 14px; background: rgba(60,60,67,.1); font: inherit; font-size: 14px; font-weight: 600; color: #111; cursor: pointer; }
@@ -1149,7 +1148,7 @@ html[data-theme="dark"] #page-gallery > .card {
 
     .pref-chev { flex: none; width: 8px; height: 14px; color: #B5B5BA; }
 
-/* ================= 丝滑转场（iOS 风格） ================= */
+/* ================= 页面转场 ================= */
 :root { --ease-ios: cubic-bezier(.32,.72,0,1); --dur-push: .48s; --dur-pop: .36s; }
 
 /* 子页面：整页从右侧推入，不再淡入淡出；退出时同样滑出 */
@@ -1196,7 +1195,7 @@ html[data-theme="dark"] .page { box-shadow: -.5px 0 0 rgba(255,255,255,.12); }
     .delete-sheet, .save-sheet, .upload-error-panel, .show > .delete-sheet, .show > .save-sheet, .show > .upload-error-panel { transform: none; transition: none; }
 }
 
-/* ================= v1.4 存储页 ================= */
+/* ================= 存储页 ================= */
 .st-summary { padding: 22px 22px 20px; }
 .st-total-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .st-total { font-size: 34px; font-weight: 800; letter-spacing: -1px; line-height: 38px; color: var(--text-main); }
@@ -1233,6 +1232,9 @@ html[data-theme="dark"] .st-row + .st-row::before { background: rgba(255,255,255
 html[data-theme="dark"] .rh-search { background: rgba(118,118,128,.28) var(--rh-ico) no-repeat 13px center / 16px !important; border-color: transparent !important; }
 #rh-list .st-name { font-size: 15px; }
 .fm-head-btns { display: flex; align-items: center; }
+.fm-head-btns .rh-clear { padding: 6px 9px; }
+.fm-more { flex: none; border: 0; background: transparent !important; padding: 2px 8px; margin: -4px -8px -4px 0; font: inherit; font-size: 17px; font-weight: 700; letter-spacing: 1px; line-height: 1; color: #8E8E93 !important; cursor: pointer; border-radius: 8px; -webkit-tap-highlight-color: transparent; }
+.fm-more:active { opacity: .5; }
 .fm-crumb { display: flex; align-items: center; gap: 2px; overflow-x: auto; white-space: nowrap; padding: 0 14px 8px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .fm-crumb::-webkit-scrollbar { display: none; }
 .fm-crumb button { flex: none; border: 0; background: transparent !important; padding: 5px 6px; font: inherit; font-size: 13px; font-weight: 600; color: #8E8E93 !important; cursor: pointer; border-radius: 8px; }
@@ -1262,7 +1264,7 @@ html[data-theme="dark"] .rh-search { background: rgba(118,118,128,.28) var(--rh-
 html[data-theme="dark"] .st-err { color: #FF6B63; }
 html[data-theme="dark"] .st-badge { color: #A1A1A6; }
 
-/* ================= v1.3 新功能样式 ================= */
+/* ================= 通用样式补丁 ================= */
 /* 子页面是纵向 flex 容器：内容超过一屏时，带 overflow:hidden 的卡片会被压扁，这里禁止收缩，改为整页滚动 */
 .page > * { flex-shrink: 0; }
 .pref-seg-card { cursor: default; }
@@ -1318,7 +1320,7 @@ html[data-theme="dark"] .about-item + .about-item::before { background: rgba(255
 .about-d { margin-top: 4px; font-size: 13.5px; line-height: 20px; color: #8E8E93; }
 .about-d b { font-weight: 600; color: var(--text-main); }
 
-/* ===== v1.9：标签 / 收藏 / 滚动 / 性能 ===== */
+/* ----- 标签 / 收藏 / 滚动 / 性能 ----- */
 .gallery-tile .tile-fav { position:absolute; z-index:3; top:7px; left:7px; width:20px; height:20px; border-radius:50%; background:rgba(17,17,17,.55); color:#FFD60A; font-size:12px; line-height:20px; text-align:center; pointer-events:none; }
 .gallery-tile .tile-badge + .tile-fav { top:29px; }
 .gallery-multi-mode .gallery-tile .tile-fav, .repo-multi-mode .gallery-tile .tile-fav { display:none; }
@@ -1577,16 +1579,18 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
 
     <div class="page" id="page-files" data-title="File Manager" data-sub="按路径管理仓库里的文件">
         <div class="card" id="card-fm-upload">
-            <div class="title">Upload to Path</div>
-            <div class="sub">把任意文件传到仓库里你指定的路径。</div>
-            <input type="file" id="fm-file-input" style="display:none" onchange="fmPickFile(this)">
-            <button class="ghost-btn primary" type="button" onclick="document.getElementById('fm-file-input').click()">选择文件并指定路径</button>
+            <div class="title">Upload</div>
+            <div class="sub">选一个文件可改路径，选多个传到当前文件夹。</div>
+            <input type="file" id="fm-file-input" multiple style="display:none" onchange="fmPickFile(this)">
+            <button class="ghost-btn primary" type="button" onclick="document.getElementById('fm-file-input').click()">选择文件</button>
         </div>
 
         <div id="fm-wrap">
             <div class="rh-head">
                 <div class="rh-title" id="fm-title">仓库文件</div>
                 <div class="fm-head-btns">
+                    <button class="rh-clear" type="button" onclick="fmNewFolder()">新建</button>
+                    <button class="rh-clear" type="button" id="fm-sort-btn" onclick="fmCycleSort()">排序</button>
                     <button class="rh-clear" type="button" onclick="fmOpenHist()">历史</button>
                     <button class="rh-clear" type="button" onclick="fmEnter(true)">刷新</button>
                 </div>
@@ -1892,7 +1896,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div class="about-item"><div class="about-t">自定义复制格式</div><div class="about-d">设置里的「自定义模板」可以写自己的复制格式：{url} 是直链，{name} 是文件名，{stem} 是不带扩展名的文件名，{ext} 是扩展名。例如 url("{url}")。保存后复制格式会切到「自定义」，换回直链、Markdown 或 HTML 就恢复原样。</div></div>
             <div class="about-item"><div class="about-t">导出链接清单</div><div class="about-d">仓库页的「更多工具」和资源库的菜单里都有「导出链接清单」，可以按选中、当前列表或全部，导出成纯链接、按当前复制格式、JSON 或 CSV 文件，方便备份、搬家和批量替换。</div></div>
             <div class="about-item"><div class="about-t">替换历史</div><div class="about-d">「替换链接」页下面会记下每次替换（包括表情包转存）生成的新文件，不会自动删除，一直留到你自己移除或清空。点一条可以重新下载、复制「旧链接 → 新直链」的对照表，或从列表移除。内容只存在这台设备的浏览器里，不会上传；导出备份时会一起带上（备份文件会因此变大），导入时只补回缺少的，已有的不会被覆盖。没有备份的话，清除网站数据会把它一起清掉。</div></div>
-            <div class="about-item"><div class="about-t">文件管理</div><div class="about-d">按文件夹逐层浏览仓库里的文件。点一个文件可以预览（图片、文本代码），并复制直链、移动 / 重命名、在文件夹内手动上移下移、删除（删除的文件可以在「最近删除」恢复）。顶部可以把任意文件上传到你指定的路径；右上角「历史」记着这个仓库最近 30 次操作，移动类操作可以撤销。排序和历史只存在这台设备上。</div></div>
+            <div class="about-item"><div class="about-t">文件管理</div><div class="about-d">按文件夹逐层浏览仓库文件，右上角可以新建文件夹、切换排序（手动 / 名称 / 大小 / 类型）、查看历史。点文件可预览（图片、文本代码）、复制直链、移动 / 改名、手动上移下移（仅手动排序）、删除；文件夹右侧的「···」可以重命名 / 移动整个文件夹或删除它，里面的文件一起处理，都能撤销或在「最近删除」恢复。上传时选一个文件可指定路径，选多个会保留原名传到当前文件夹，一次提交。历史记着这个仓库最近 30 次操作，移动类操作可以撤销。排序方式、手动顺序和历史只存在这台设备上。</div></div>
             </div>
         </div>
         <div class="about-sec">
@@ -2191,11 +2195,11 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
 
 
 <script>
-// --- 工具函数 ---
+/* ----- 工具函数 ----- */
 const $ = id => document.getElementById(id);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-/* ===== 自动重试 / 骨架屏 / 点击反馈 辅助 ===== */
+/* ----- 自动重试与加载辅助 ----- */
 // 暂时性故障（网络波动、超时、5xx、409 冲突、限流）才自动重试；Token 错误、404、文件过大等确定性错误不重试
 function isTransientUploadError(err) {
     const m = String((err && err.message) || '');
@@ -2300,7 +2304,7 @@ async function writeClipboard(text) {
     tmp.remove();
     return ok;
 }
-// --- 提示（Toast） ---
+/* ----- 提示（Toast） ----- */
 // type: 'ok' | 'error' | 'info' | 'loading'。不传时按文案粗略判断（兼容旧调用）。
 // loading 不会自动消失，直到下一条提示出现或调用 hideToast()。
 const TOAST_ICONS = {
@@ -2349,7 +2353,7 @@ function toast(msg, type) {
     if (type !== 'loading') el._t = setTimeout(hideToast, Math.min(9000, TOAST_MS[type] + Math.max(0, String(msg).length - 14) * 90)); // 长文案多停一会儿
 }
 
-// --- 撤销（v3.0.4）---
+/* ----- 撤销 ----- */
 // 移动 / 重命名 / 删除成功后，底部弹出「撤销」条（约 9 秒）。只记住最近一次操作，新的操作会顶掉旧的。
 // 仓库里的撤销 = 再提交一次反向的 Git 变更（历史照样保留）；本地的收藏、标签、排序、资源库记录一并还原。
 let undoJob = null;   // { run, timer, busy }
@@ -2534,7 +2538,7 @@ async function undoRepoRename(owner, repo, branch, oldPath, newPath, sha) {
     return '已恢复为 ' + pathBasename(oldPath);
 }
 
-// --- 失败详情弹窗（上传 / 转换 / 删除失败共用） ---
+/* ----- 失败详情弹窗 ----- */
 // failures: [{ name, message }]
 // opts.title / opts.sub 可自定义文案；opts.onRetry 传入时每条失败记录带「重试」按钮，点击时调用 onRetry(failure)。
 let lastFailures = [];
@@ -2602,7 +2606,7 @@ function showUploadErrorModal(failures, opts) {
     if (closeBtn) closeBtn.focus({ preventScroll: true });
 }
 
-// --- 通用确认 / 输入对话框（替代浏览器原生 confirm / prompt） ---
+/* ----- 确认 / 输入对话框 ----- */
 let dlgResolve = null;
 let dlgMode = 'confirm';
 let dlgValidate = null;
@@ -2714,7 +2718,7 @@ document.addEventListener('keydown', e => {
 });
 
 
-// --- 仓库选择 / 新建 ---
+/* ----- 仓库选择 / 新建 ----- */
 let myRepos = [];           // [{ name, private, pushed }]
 let myReposLoading = false;
 
@@ -3082,8 +3086,8 @@ async function createRepoFromSheet() {
     }
 }
 
-// --- 底部导航 / 页面切换 ---
-// --- 页面切换（照搬设置页的面板逻辑）：主页常驻，子页面全屏滑入，无顶栏 ---
+/* ----- 底部导航 / 页面切换 ----- */
+// 主页常驻，子页面全屏滑入，无顶栏
 const PAGE_TITLES = { gallery: ['Library', '你上传过的文件'], repo: ['Repository', '仓库里的全部文件'] };
 let histDepth = 0, skipPop = 0, inPop = false;
 // iOS 上不压历史记录：否则系统自带的边缘滑动返回会和下面自写的跟手返回同时触发，
@@ -3187,7 +3191,7 @@ document.querySelectorAll('.page').forEach(p => {
     p.insertBefore(head, p.firstChild);
 });
 
-/* ---------- 左边缘右滑返回（跟手） ----------
+/* ----- 左边缘右滑返回（跟手） -----
    手势只绑在左边缘的专用感应条 #edge-swipe 上（touch-action:none）：
    1) 浏览器不会再拿这根手指去判断滚动，所以不会中途 pointercancel，也就不会"回弹"；
    2) pointermove 一开始就按满帧率送达，起步不再卡一下；
@@ -3292,7 +3296,7 @@ if (edgeStrip) {
     edgeStrip.addEventListener('pointercancel', endDrag);
 }
 
-/* ---------- 底部搜索栏：过滤主页入口 ---------- */
+/* ----- 底部搜索栏：过滤主页入口 ----- */
 (function () {
     const input = document.getElementById('searchInput'), bar = document.getElementById('searchBar'), empty = document.getElementById('searchEmpty');
     const groups = [...document.querySelectorAll('.home .cards .group')];
@@ -3541,7 +3545,7 @@ function clearAvatar() {
 }
 
 
-// --- 资源库分段切换：我的上传 / 仓库 ---
+/* ----- 资源库分段切换（我的上传 / 仓库） ----- */
 const GSEG_KEY = 'kb_gallery_seg';
 function setGallerySeg(seg) {
     if (seg !== 'repo') seg = 'library';
@@ -3559,7 +3563,8 @@ function setGallerySeg(seg) {
     if (seg === 'repo') loadRepoLiveFiles(false);
 }
 
-// --- 设备适配：触屏设备没有拖拽，且手机浏览器基本不支持选文件夹 ---
+/* ----- 触屏设备适配 ----- */
+// 触屏设备没有拖拽，手机浏览器基本不支持选文件夹。
 function applyDeviceHints() {
     const touchOnly = !!(window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches);
     if (!touchOnly) return;
@@ -3571,7 +3576,7 @@ function applyDeviceHints() {
     if (folderBtn) folderBtn.style.display = 'none';
 }
 
-// --- 「…」弹出菜单 ---
+/* ----- 「…」弹出菜单 ----- */
 let moreMenuEl = null;
 function closeMoreMenu() {
     if (!moreMenuEl) return;
@@ -3666,7 +3671,7 @@ function openRepoMenu(btn) {
     ]);
 }
 
-// --- 偏好（修改后立即保存，不依赖「保存并测试连接」） ---
+/* ----- 偏好（改完立即保存，不依赖「保存并测试连接」） ----- */
 const PREF_AUTOJUMP_KEY = 'kb_pref_autojump';
 const PREF_HEIC_KEY = 'kb_pref_heic_jpg';
 const PREF_KEEPALIVE_KEY = 'kb_pref_keepalive';
@@ -3692,7 +3697,7 @@ function savePrefs() {
 }
 
 
-// ===== 上传完成通知（页面在后台时提醒） =====
+/* ----- 上传完成通知（页面在后台时提醒） ----- */
 function notifySupported() { return typeof Notification !== 'undefined'; }
 function askNotifyPermission() {
     return new Promise(resolve => {
@@ -3754,7 +3759,7 @@ function notifyUploadDone(okCount, failedCount, skippedCount) {
     showSysNotification(title, body, 'dl-upload');
 }
 
-// --- 设置逻辑 ---
+/* ----- 设置逻辑 ----- */
 function getSettings() {
     return {
         token: ($('gh-token').value || '').trim(),
@@ -3796,7 +3801,8 @@ async function saveSettings() {
     }
 }
 
-/* ---------- 跨窗口锁（navigator.locks）：两个窗口 / 标签页同时写同一份东西时，排队一个一个来 ----------
+/* ----- 跨窗口锁（navigator.locks） -----
+   两个窗口 / 标签页同时写同一份东西时，排队一个一个来。
    不支持锁、环境不让用（比如本地 file://）、或者等锁超时，都退回没有锁时的老做法，不会因此卡住。 */
 async function withCrossTabLock(name, fn, waitMs) {
     const lm = (typeof navigator !== 'undefined') && navigator.locks;
@@ -3829,7 +3835,7 @@ async function runIfLockFree(name, fn) {
     }
 }
 
-// --- 本地数据库（IndexedDB）---
+/* ----- 本地数据库（IndexedDB） ----- */
 // 资源库记录、上传顺序、失败上传队列都放这里。读写走内存缓存（启动时读一次），
 // 不再每次从 localStorage 整份 JSON.parse / stringify；落盘在后台防抖进行，也没有 5MB 的上限。
 // IndexedDB 不可用时（个别隐私模式 / 旧系统）自动退回 localStorage，行为和以前一样。
@@ -4022,7 +4028,7 @@ document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && storeReady && storeUsesIDB) { storeReloadHistory(); storeReloadOrder(); }
 });
 
-// --- 历史记录（不限量，全部保存） ---
+/* ----- 历史记录 ----- */
 // loadHistory() 返回内存里的同一个数组：要改就改完调用 saveHistory(list)；只读用 filter/map 即可。
 function loadHistory() { return historyCache; }
 function saveHistory(list) {
@@ -4036,7 +4042,7 @@ function saveHistory(list) {
     if (!historyTimer) historyTimer = setTimeout(flushHistory, 300);
     return true;
 }
-// --- 失败上传队列：失败的文件连同原始内容存进 IndexedDB，刷新 / 关掉页面后还能继续传 ---
+/* ----- 失败上传队列（刷新后可继续传） ----- */
 const FAILED_MAX_AGE = 14 * 24 * 3600 * 1000;   // 超过 14 天的自动清掉
 const FAILED_MAX_BYTES = 300 * 1024 * 1024;     // 队列总大小上限，避免占满本机存储
 const UPLOAD_SESSION = 's-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);   // 本次打开页面的标识
@@ -4160,7 +4166,8 @@ function removeHistoryItem(id) {
     if (entry) offerUndo('已移除 1 条记录', async () => { restoreHistoryEntries([{ idx, entry }]); renderGallery(); return '已恢复这条记录'; });
 }
 
-// --- 上传顺序（实时仓库按此排序）---
+/* ----- 上传顺序 ----- */
+// 实时仓库按此顺序排序。
 // GitHub 的文件树只按路径字母序返回、不带上传时间，所以上传成功时在本地记一笔时间。
 // 单独存一份（不随图库记录被删而丢失）；没有记录的文件（别的设备/手动上传）视为最早。
 const REPO_SORT_NEWEST_FIRST = false; // false = 先上传的在前；改成 true = 最新上传的在最前
@@ -4609,7 +4616,7 @@ let repoFilter = 'all';
 let repoSearch = ''; // 非空时在整个仓库里按路径搜索，忽略当前所在文件夹
 let repoSearchTimer = null;
 
-// ---- 仓库文件的收藏 / 标签（与资源库功能一致；存在本机，按 账号/仓库/路径 记录）----
+/* ----- 仓库文件的收藏 / 标签（存本机） ----- */
 const REPO_META_KEY = 'kb_repo_meta';
 let repoTag = '';
 let repoMetaCache = null;
@@ -4650,7 +4657,7 @@ function pruneRepoMeta(files) {
     if (changed) saveRepoMeta(files[0] ? { owner: files[0].owner, repo: files[0].repo } : undefined);
 }
 
-/* ---- 仓库文件的收藏 / 标签同步到仓库（.directlink/meta.json），多设备共用 ---- */
+/* ----- 收藏 / 标签同步到仓库（.directlink/meta.json） ----- */
 const PREF_METASYNC_KEY = 'kb_pref_metasync';
 const META_SYNC_STATE_KEY = 'kb_repo_meta_sync';        // 每个仓库：上次同步到的远端版本 t、本机是否有未同步的改动
 const META_SYNC_FORCE_KEY = 'kb_repo_meta_sync_force';  // 导入备份后置 1：下次同步一定按「合并」处理，避免备份里的标签被远端盖掉
@@ -4985,7 +4992,7 @@ async function createRepoFolder() {
 }
 
 
-// --- 移动文件到文件夹 ---
+/* ----- 移动文件到文件夹 ----- */
 let moveScope = 'repo', moveGalleryPaths = [], moveGallerySkipped = 0;
 async function openMoveSheet(scope) {
     moveScope = scope === 'gallery' ? 'gallery' : 'repo';
@@ -5257,7 +5264,8 @@ function toggleRepoSelection(path) {
     syncRepoSelectionDom();
 }
 
-// ===== 下载仓库文件：图片 → 分享面板「存储图像」(相册)；其他文件 → 「存储到文件」 =====
+/* ----- 下载仓库文件 ----- */
+// 图片走分享面板「存储图像」（相册），其他文件走「存储到文件」。
 const DL_MIME = {
     mp4: 'video/mp4', m4v: 'video/x-m4v', mov: 'video/quicktime', webm: 'video/webm', mkv: 'video/x-matroska', '3gp': 'video/3gpp', ogv: 'video/ogg',
     mp3: 'audio/mpeg', m4a: 'audio/mp4', aac: 'audio/aac', wav: 'audio/wav', flac: 'audio/flac', ogg: 'audio/ogg', oga: 'audio/ogg', opus: 'audio/ogg',
@@ -5365,7 +5373,7 @@ async function heicToJpegFile(file) {
 }
 let isSavingFiles = false;
 
-// ===== 存到文件：选择保存方式（逐个文件 / ZIP 压缩包 / 直链清单） =====
+/* ----- 存到文件：保存方式选择 ----- */
 let saveSheetScope = null;
 function openSaveSheet(scope) {
     if (isSavingFiles) return toast('正在保存，请稍候', 'info');
@@ -5536,13 +5544,13 @@ function saveSelectedGalleryEntries(mode) {
     saveItemsToDevice(loadHistory().filter(e => ids.has(e.id)).map(galleryEntryToSaveItem), mode);
 }
 
-async function deleteSelectedRepoFiles() {
+async function deleteSelectedRepoFiles(opts) {
     const paths = Array.from(repoSelected);
     if (!paths.length) return toast('请先选择');
     if (!getSettings().token) return toast('请先配置 Token');
     const selected = repoLiveFiles.filter(f => paths.includes(f.path));
     if (!selected.length) return exitRepoMultiMode();
-    const ok = await showConfirm({
+    const ok = (opts && opts.confirm === false) ? true : await showConfirm({
         title: '删除仓库文件',
         message: '确定删除选中的 ' + selected.length + ' 个仓库文件？删除会直接提交到仓库，之后可以在首页的「最近删除」里恢复。',
         confirmText: '删除'
@@ -5693,7 +5701,7 @@ async function loadRepoLiveFiles(force = false) {
     }
 }
 
-/* ---------- 私有仓库缩略图 ----------
+/* ----- 私有仓库缩略图 -----
    私有仓库的文件，jsDelivr 和 Raw 都读不到（404）。这时改用带 Token 的 GitHub API 取回文件，缩成小图再显示。
    最多同时取 4 张；同一个仓库试过一次成功后，后面的格子直接走这条路，不再先白白请求 CDN。 */
 const authThumbCache = new Map();    // 'owner/repo@branch/path' -> Promise<blob 地址>
@@ -5760,7 +5768,7 @@ function loadAuthThumb(owner, repo, branch, path) {
     return job;
 }
 
-/* ---------- 大列表缩略图内存管理 ----------
+/* ----- 大列表缩略图内存管理 -----
    仓库里的缩略图是原图（jsDelivr 不能缩小），一张 4000×3000 的照片解码后要几十 MB。
    列表超过 THUMB_KEEP_MIN 张时，只让屏幕上下各约 3 屏范围内的图保持加载，滑远了就释放，滑回来再加载（走 HTTP / 离线缓存，很快）。
    少于这个数量的列表完全不受影响。 */
@@ -6268,7 +6276,7 @@ window.onload = async () => {
 // 其他标签页修改了资源库记录时同步刷新
 window.addEventListener('storage', e => { if (!storeUsesIDB && e.key === HISTORY_KEY) { const h = readLegacyJSON(HISTORY_KEY, []); historyCache = Array.isArray(h) ? h : []; renderGallery(); } });
 
-// --- 拖拽处理 ---
+/* ----- 拖拽处理 ----- */
 function handleDragOver(e) { e.preventDefault(); $('dropzone').classList.add('dragover'); }
 function handleDragLeave(e) { e.preventDefault(); $('dropzone').classList.remove('dragover'); }
 function handleDrop(e) {
@@ -6292,7 +6300,7 @@ function handleDrop(e) {
     }
 }
 
-// --- 文件夹：递归读取（拖拽）与 webkitdirectory（点选） ---
+/* ----- 文件夹读取（拖拽 / 点选） ----- */
 function readAllEntries(dirEntry) {
     const reader = dirEntry.createReader();
     const all = [];
@@ -6375,7 +6383,7 @@ function safeDirName(name) {
     return 'folder-' + h.toString(36).slice(0, 6);
 }
 
-// --- 本次结果卡片跟随当前使用的获取直链方式 ---
+/* ----- 结果卡片跟随获取方式 ----- */
 // 上传文件 → 紧跟上传卡片；转换链接 → 紧跟转换卡片；导入文件 → 紧跟导入卡片。
 // 只移动结果卡片本身，不改变其它卡片的结构和样式。
 function moveResultCardAfter(cardId) {
@@ -6389,7 +6397,7 @@ function moveResultCardAfter(cardId) {
     }
 }
 
-// --- GitHub API 核心 ---
+/* ----- GitHub API 核心 ----- */
 // 读取仓库文件树。recursive=1 在文件特别多（约 10 万条 / 7MB）时会被 GitHub 截断，
 // 这时改成按目录逐层读取，把被截断的部分补全；个别目录读不到才会降级为「只显示部分」。
 // 同一个分支的文件树没变化时，GitHub 对带 If-None-Match 的请求回 304：不占 API 额度，也不用重新下载几 MB 的列表。
@@ -6468,7 +6476,8 @@ async function fetchRepoTree(owner, repo, branch, auth) {
     if (newEtag) repoTreeCacheSet(ckey, newEtag, full);
     return full;
 }
-// ---- GitHub 限流：全局冷却（所有请求共用一个倒计时，避免并发请求各自乱撞）+ 额度提示 ----
+/* ----- GitHub 限流冷却与额度提示 ----- */
+// 所有请求共用一个冷却倒计时，避免并发请求各自乱撞。
 const RATE_WAIT_MAX_MS = 90000;
 let ghCooldownUntil = 0, ghQuota = null, ghLowWarnedReset = 0;
 function ghClock(ts) { try { return new Date(ts).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }); } catch (_) { return ''; } }
@@ -6855,7 +6864,8 @@ function getCommitQueue(ctx, owner, s, branch) {
     return q;
 }
 
-// --- 上传前按内容查重：Git 的 blob sha = SHA-1("blob <字节数>\0" + 内容) ---
+/* ----- 上传前按内容查重 ----- */
+// Git 的 blob sha = SHA-1("blob <字节数>\0" + 内容)。
 // 仓库里已有内容完全相同（且扩展名相同）的文件时，直接复用它的直链，不再重复上传。
 const DEDUP_MAX_SIZE = 8 * 1024 * 1024; // 更大的文件整份读进内存算哈希太吃力，跳过查重
 async function gitBlobSha(file) {
@@ -6891,7 +6901,7 @@ function getRepoShaIndex(ctx, owner, branch, s) {
     return p;
 }
 
-// --- 固定到提交版本：拿到本次提交的 sha，直链用 @sha 而不是 @分支 ---
+/* ----- 固定到提交版本（@sha） ----- */
 async function resolvePinRef(commitSha, owner, branch, s) {
     if (!s.pin) return branch;
     if (commitSha) return commitSha;
@@ -7022,7 +7032,7 @@ async function uploadToGithub(file, ctx) {
     }
 }
 
-// --- 结果条目构建（本次上传列表用） ---
+/* ----- 结果条目构建 ----- */
 function buildResultItem(name, isImage) {
     const item = document.createElement('div');
     item.className = 'result-item';
@@ -7091,7 +7101,7 @@ async function copyTextList(items) {
     toast((await writeClipboard(lines.join('\n'))) ? FMT_COPIED_MANY[fmt](lines.length) : '复制失败，请手动复制');
 }
 
-// --- 本次上传结果：复制全部 / 清空 ---
+/* ----- 本次上传结果：复制全部 / 清空 ----- */
 function collectBatchLinks() {
     return Array.from(document.querySelectorAll('#results-list .result-item')).map(it => ({
         url: ((it.querySelector('.result-action .url-input') || {}).value || ''),
@@ -7119,7 +7129,7 @@ function clearBatchResults() {
     if (percent) percent.textContent = '0%';
 }
 
-// --- 解析一次 owner/branch，供整批上传共用，避免逐文件重复请求触发限流 ---
+/* ----- 批量上传共用的 owner / branch 解析 ----- */
 async function resolveGithubContext(opts = {}) {
     const s = getSettings();
     if (!s.token) throw new Error('未配置 Token');
@@ -7146,7 +7156,7 @@ async function resolveGithubContext(opts = {}) {
     return { owner, branch, usedPaths: new Set() };
 }
 
-// --- 单个文件上传（含重试） ---
+/* ----- 单文件上传（含重试） ----- */
 // 上传前处理（HEIC 转 JPG / 压缩 / 转 WebP）+ 查重哈希。放进并发池后，下一批文件在当前文件上传时就开始处理，
 // 但同一时刻最多只处理 2 张（canvas 很吃内存，手机上同时处理太多会被系统杀掉页面）。
 const prepSem = (() => {
@@ -7162,12 +7172,11 @@ function carryFileProps(from, to) {
     return to;
 }
 
-/* ====================================================================
-   v3.0.27：上传前去除 EXIF / 位置信息（无损，不重新编码）
+/* ================= 上传前去除 EXIF / 位置信息（无损，不重新编码） =================
    JPEG：删掉 EXIF / XMP / IPTC / 注释 / 缩略图，只保留颜色配置（ICC）和「旋转方向」；
    PNG：删掉文本块、EXIF、时间块；WebP：删掉 EXIF / XMP 块。
    其他格式（HEIC、GIF、AVIF 等）无法无损处理，会在结果行里提示。
-   ==================================================================== */
+   */
 const PREF_STRIPEXIF_KEY = 'kb_pref_stripexif';
 function prefStripExif() { return lsGet(PREF_STRIPEXIF_KEY) !== '0'; }   // 默认开启
 function onStripExifPrefChange(el) {
@@ -7445,7 +7454,7 @@ async function runUpload(file, refs, ctx) {
     }
 }
 
-// --- 外部图床链接转换 ---
+/* ----- 外部图床链接转换 ----- */
 // 代理地址里含 {url} 就替换；否则把编码后的原链接直接接在末尾（如 https://x.workers.dev/?url=）
 function buildImgProxyUrl(tpl, target) {
     const enc = encodeURIComponent(target);
@@ -7508,7 +7517,8 @@ async function urlToFile(rawUrl) {
     return new File([blob], name, { type: blob.type || 'application/octet-stream' });
 }
 
-// --- 图床识别：只提取“图片上下文”里的 URL，避免把代码本身的普通网址也当成图床 ---
+/* ----- 图床识别 ----- */
+// 只提取「图片上下文」里的 URL，避免把代码里的普通网址当成图床。
 function cleanRawUrl(raw) {
     if (!raw) return '';
     let value = String(raw).trim();
@@ -7723,7 +7733,7 @@ async function handleExternalLinks() {
     await convertUrls(urls);
 }
 
-// --- 导入任意文本类文件，自动提取里面的直链并转换 ---
+/* ----- 导入文本文件 ----- */
 async function handleImportFile(file) {
     if (!file) return;
     if (!getSettings().token) { toast('请先配置 Token'); switchTab('settings'); return; }
@@ -7746,7 +7756,7 @@ async function handleImportFile(file) {
     await convertUrls(urls);
 }
 
-// --- 导入文本文件：提取图床链接 → 转换 → 在文件里替换 → 输出新文件下载 ---
+/* ----- 替换文本文件里的链接 ----- */
 let replaceOutput = null; // { url, name }
 
 function escapeRegExp(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
@@ -7803,7 +7813,8 @@ function downloadReplaceOutput() {
     a.remove();
 }
 
-/* ---------- 替换历史：每次替换 / 表情包转存生成的新文件都记下来（不限条数），之后可以重新下载 ----------
+/* ----- 替换历史 -----
+   每次替换 / 表情包转存生成的新文件都记下来（不限条数），之后可以重新下载。
    索引（名字、时间、数量）和内容分开存：索引一份，内容一条一份，都放在 IndexedDB 的 kv 里。
    同一次替换里失败重试、重新生成结果时，更新的是同一条记录，不会多出重复项。 */
 const RH_INDEX_KEY = 'replace_hist', RH_BODY_PREFIX = 'rh:', RH_LS_KEY = 'kb_replace_hist';
@@ -7989,49 +8000,84 @@ async function rhClear() {
     }).catch(e => console.warn('清空替换历史失败：', e));
 }
 
-/* ---------- 文件管理（File Manager）：按路径浏览仓库文件，预览 / 移动 / 手动排序 / 上传到指定路径，并记录操作历史 ----------
-   文件列表和仓库页共用同一份数据（repoLiveFiles），移动、删除都走仓库页现成的提交、撤销和「最近删除」逻辑；
-   这一页自己只多存两样东西：每个仓库的手动排序、最近 30 次操作的历史。 */
+/* ================= 文件管理 ================= */
+// 按路径浏览仓库文件。列表数据与仓库页共用（repoLiveFiles），移动 / 删除复用仓库页的提交、撤销和「最近删除」；
+// 本页自己只存两份本机数据：每个仓库的手动排序、最近 30 条操作历史。
 const FM_TEXT_MAX = 2 * 1024 * 1024, FM_IMG_MAX = 8 * 1024 * 1024, FM_TEXT_SHOW = 200000;
 const FM_UPLOAD_MAX = 50 * 1024 * 1024, FM_HIST_MAX = 30, FM_PAGE = 100;
 const FM_IMG_RE = /\.(png|jpe?g|gif|webp|avif|svg|bmp|ico)$/i;
-let fmPath = '', fmQuery = '', fmShowAll = false, fmLastId = '', fmState = 'loading', fmPrevSeq = 0;
+const FM_EMPTY_SHA = 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391';   // 空文件的 blob sha（.gitkeep 占位文件）
+const FM_SORTS = [['manual', '手动'], ['name', '名称'], ['size', '大小'], ['type', '类型']];
+const FM_SORT_KEY = 'kb_fm_sort';
+let fmPath = '', fmQuery = '', fmShowAll = false, fmLastId = '', fmState = 'loading', fmPrevSeq = 0, fmSearchTimer = 0;
 
+/* ----- 路径与格式 ----- */
 function fmId() { return repoMetaCtx && repoMetaCtx.owner ? (repoMetaCtx.owner + '/' + repoMetaCtx.repo).toLowerCase() : ''; }
 function fmNorm(p) { return String(p || '').replace(/\\/g, '/').split('/').map(x => x.trim()).filter(x => x && x !== '.' && x !== '..').join('/'); }
+function fmSizeText(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(0.1, n / 1024).toFixed(1) + ' KB'; }
+function fmExt(name) { const m = /\.([^./]+)$/.exec(name || ''); return m ? m[1].toLowerCase() : ''; }
+function fmReal(files) { return files.filter(f => f.name !== '.gitkeep'); }
+function fmFolderFiles(path) { return repoLiveFiles.filter(f => f.path.indexOf(path + '/') === 0); }
+function fmReserved(p) { return /^\.directlink(\/|$)/i.test(p) || /(^|\/)\.git(\/|$)/i.test(p); }
+// 上级路径里有文件会挡住新路径：返回那个文件的路径
+function fmBlockingParent(p) {
+    const parts = p.split('/');
+    for (let i = 1; i < parts.length; i++) {
+        const up = parts.slice(0, i).join('/');
+        if (repoLiveFiles.some(f => f.path === up)) return up;
+    }
+    return '';
+}
 // mode：'move' 目标已存在就拒绝；'upload' 目标已存在由调用方确认覆盖
 function fmPathProblem(v, from, mode) {
     const p = fmNorm(v);
     if (!p) return '路径不能为空';
     if (p === from) return '路径没有变化';
-    if (/^\.directlink(\/|$)/i.test(p) || /(^|\/)\.git(\/|$)/i.test(p)) return '这个路径是保留的，换一个';
+    if (fmReserved(p)) return '这个路径是保留的，换一个';
     if (p.split('/').some(x => INVALID_FOLDER_NAME_RE.test(x))) return '路径里不能包含 \\ : * ? " < > |';
-    if (repoLiveFiles.some(f => f.path.indexOf(p + '/') === 0)) return '已经有同名的文件夹';
-    const parts = p.split('/');
-    for (let i = 1; i < parts.length; i++) {
-        const up = parts.slice(0, i).join('/');
-        if (repoLiveFiles.some(f => f.path === up)) return '上级路径「' + up + '」是一个文件';
-    }
+    if (fmFolderFiles(p).length) return '已经有同名的文件夹';
+    const up = fmBlockingParent(p);
+    if (up) return '上级路径「' + up + '」是一个文件';
     if (mode === 'move' && repoLiveFiles.some(f => f.path === p)) return '目标已经存在，换一个路径';
     return '';
 }
-function fmSizeText(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(0.1, n / 1024).toFixed(1) + ' KB'; }
+function fmFolderProblem(v, from) {
+    const p = fmNorm(v);
+    if (!p) return '路径不能为空';
+    if (p === from) return '路径没有变化';
+    if (p.indexOf(from + '/') === 0) return '不能移到它自己里面';
+    if (fmReserved(p)) return '这个路径是保留的，换一个';
+    if (p.split('/').some(x => INVALID_FOLDER_NAME_RE.test(x))) return '路径里不能包含 \\ : * ? " < > |';
+    if (repoLiveFiles.some(f => f.path === p || f.path.indexOf(p + '/') === 0)) return '目标已经存在，换一个路径';
+    const up = fmBlockingParent(p);
+    if (up) return '上级路径「' + up + '」是一个文件';
+    return '';
+}
 
-/* --- 手动排序（每个仓库一份，存在本机） --- */
+/* ----- 排序（手动顺序每个仓库一份，排序方式全局一份，都存在本机） ----- */
+function fmSortMode() { const v = lsGet(FM_SORT_KEY); return FM_SORTS.some(x => x[0] === v) ? v : 'manual'; }
+function fmCycleSort() {
+    const cur = fmSortMode(), i = FM_SORTS.findIndex(x => x[0] === cur), next = FM_SORTS[(i + 1) % FM_SORTS.length];
+    lsSet(FM_SORT_KEY, next[0]);
+    fmRender();
+    toast(next[0] === 'manual' ? '手动排序' : '按' + next[1] + '排序', 'info');
+}
 function fmOrderKey() { return 'kb_fm_order:' + fmId(); }
 function fmOrderLoad() { try { const a = JSON.parse(lsGet(fmOrderKey()) || '[]'); return Array.isArray(a) ? a : []; } catch (_) { return []; } }
-function fmMerged() {   // 已排过序的在前（按你排的顺序），没排过的按名字排在后面
+function fmOrderSave(a) { try { lsSet(fmOrderKey(), JSON.stringify(a)); return true; } catch (_) { return false; } }
+function fmMerged() {   // 排过序的在前（按你排的顺序），没排过的按名字排在后面
     const have = new Set(repoLiveFiles.map(f => f.path));
     const saved = fmOrderLoad().filter(x => have.has(x));
     const known = new Set(saved);
     const rest = repoLiveFiles.filter(f => !known.has(f.path)).map(f => f.path).sort((a, b) => a.localeCompare(b, 'zh'));
     return saved.concat(rest);
 }
-function fmOrderRename(from, to) {
-    const a = fmOrderLoad(), i = a.indexOf(from);
-    if (i < 0) return;
-    a[i] = to;
-    try { lsSet(fmOrderKey(), JSON.stringify(a)); } catch (_) {}
+// 路径变了（移动 / 改名 / 撤销）：手动顺序跟着走。pairs: [[from, to], ...]
+function fmOrderRemap(pairs) {
+    const a = fmOrderLoad(), map = new Map(pairs);
+    let changed = false;
+    for (let i = 0; i < a.length; i++) if (map.has(a[i])) { a[i] = map.get(a[i]); changed = true; }
+    if (changed) fmOrderSave(a);
 }
 function fmShift(path, delta) {
     const vis = fmVisible().files;
@@ -8042,12 +8088,12 @@ function fmShift(path, delta) {
     const a = order.indexOf(path), b = order.indexOf(vis[j].path);
     if (a < 0 || b < 0) return;
     order[a] = vis[j].path; order[b] = path;
-    try { lsSet(fmOrderKey(), JSON.stringify(order)); } catch (_) { return toast('保存排序失败：本机存储空间不足', 'error'); }
+    if (!fmOrderSave(order)) return toast('保存排序失败：本机存储空间不足', 'error');
     fmRender();
     toast(delta < 0 ? '已上移' : '已下移', 'ok');
 }
 
-/* --- 操作历史（每个仓库一份，最近 30 条） --- */
+/* ----- 操作历史（每个仓库一份，最近 30 条） ----- */
 function fmHistKey() { return 'kb_fm_hist:' + fmId(); }
 function fmHistLoad() { try { const a = JSON.parse(lsGet(fmHistKey()) || '[]'); return Array.isArray(a) ? a : []; } catch (_) { return []; } }
 function fmHistSave(a) { try { lsSet(fmHistKey(), JSON.stringify(a.slice(0, FM_HIST_MAX))); } catch (_) {} }
@@ -8096,7 +8142,7 @@ async function fmUndoHist(id) {
     try {
         const u = e.undo;
         const msg = await undoRepoMoves(u.owner, u.repo, u.branch, u.moves);
-        u.moves.forEach(m => fmOrderRename(m.to, m.from));
+        fmOrderRemap(u.moves.map(m => [m.to, m.from]));
         fmHistMarkUndone(id);
         toast(msg || '已撤销', 'ok');
         fmOpenHist(); fmRender();
@@ -8105,7 +8151,7 @@ async function fmUndoHist(id) {
     }
 }
 
-/* --- 读取 / 列表 --- */
+/* ----- 读取与列表 ----- */
 async function fmEnter(force) {
     const s = getSettings();
     if (!s.token) { fmState = 'notoken'; return fmRender(); }
@@ -8123,27 +8169,38 @@ async function fmEnter(force) {
     fmState = 'ok';
     fmRender();
 }
+// 当前文件夹里的内容；搜索时返回全仓库的匹配文件。folders: [{ name, n, size }]
 function fmVisible() {
     const q = fmQuery.trim().toLowerCase();
     const prefix = fmPath ? fmPath + '/' : '';
-    let files, folders = [];
+    const mode = fmSortMode();
+    let files = [], folders = [];
     if (q) files = repoLiveFiles.filter(f => f.name !== '.gitkeep' && f.path.toLowerCase().indexOf(q) >= 0);
     else {
-        const set = new Set();
-        files = [];
+        const dirs = new Map();
         repoLiveFiles.forEach(f => {
             if (f.path.indexOf(prefix) !== 0) return;
             const rest = f.path.slice(prefix.length), slash = rest.indexOf('/');
-            if (slash > 0) set.add(rest.slice(0, slash));
-            else if (f.name !== '.gitkeep') files.push(f);
+            if (slash > 0) {
+                const name = rest.slice(0, slash);
+                const d = dirs.get(name) || { name: name, n: 0, size: 0 };
+                if (f.name !== '.gitkeep') { d.n++; d.size += f.size || 0; }
+                dirs.set(name, d);
+            } else if (f.name !== '.gitkeep') files.push(f);
         });
-        folders = Array.from(set).sort((a, b) => a.localeCompare(b, 'zh'));
+        folders = Array.from(dirs.values()).sort(mode === 'size' ? (a, b) => b.size - a.size || a.name.localeCompare(b.name, 'zh') : (a, b) => a.name.localeCompare(b.name, 'zh', { numeric: true }));
     }
-    const idx = new Map(fmMerged().map((p, i) => [p, i]));
-    files.sort((a, b) => idx.get(a.path) - idx.get(b.path));
+    const byName = (a, b) => a.name.localeCompare(b.name, 'zh', { numeric: true });
+    if (mode === 'name') files.sort(byName);
+    else if (mode === 'size') files.sort((a, b) => (b.size || 0) - (a.size || 0) || byName(a, b));
+    else if (mode === 'type') files.sort((a, b) => fmExt(a.name).localeCompare(fmExt(b.name)) || byName(a, b));
+    else {
+        const idx = new Map(fmMerged().map((p, i) => [p, i]));
+        files.sort((a, b) => idx.get(a.path) - idx.get(b.path));
+    }
     return { folders: folders, files: files };
 }
-function fmSearchInput(v) { fmQuery = v || ''; fmShowAll = false; fmRender(); }
+function fmSearchInput(v) { fmQuery = v || ''; fmShowAll = false; clearTimeout(fmSearchTimer); fmSearchTimer = setTimeout(fmRender, 120); }
 function fmGo(path) { fmPath = path; fmQuery = ''; fmShowAll = false; const sb = $('fm-search'); if (sb) sb.value = ''; fmRender(); const pg = $('page-files'); if (pg) pg.scrollTop = 0; }
 function fmMark(el, text, q) {
     const i = q ? text.toLowerCase().indexOf(q) : -1;
@@ -8158,10 +8215,12 @@ function fmRender() {
     const list = $('fm-list'), crumb = $('fm-crumb'), sb = $('fm-search');
     if (!list || !crumb) return;
     list.innerHTML = ''; crumb.innerHTML = '';
+    const sortBtn = $('fm-sort-btn');
+    if (sortBtn) sortBtn.textContent = fmSortMode() === 'manual' ? '排序' : FM_SORTS.find(x => x[0] === fmSortMode())[1];
     const msg = { notoken: '请先在设置里配置 GitHub Token', norepo: '在上传页点「更换」选择一个仓库后显示文件', loading: '读取中…', error: '读取失败，点右上角「刷新」重试' }[fmState];
     if (msg) { if (sb) sb.style.display = 'none'; list.appendChild(fmNote(msg)); return; }
-    if (fmPath && !repoLiveFiles.some(f => f.path.indexOf(fmPath + '/') === 0)) fmPath = '';   // 当前文件夹已经没了（被删 / 改名）：回到根目录
-    const mk = (label, path, last) => {
+    while (fmPath && !fmFolderFiles(fmPath).length) fmPath = fmPath.indexOf('/') < 0 ? '' : fmPath.slice(0, fmPath.lastIndexOf('/'));   // 当前文件夹没了（被删 / 改名）：退到还在的上一级
+    const mk = (label, path) => {
         if (crumb.childNodes.length) { const sp = document.createElement('span'); sp.className = 'sep'; sp.textContent = '/'; crumb.appendChild(sp); }
         const b = document.createElement('button'); b.type = 'button'; b.textContent = label;
         b.onclick = () => fmGo(path);
@@ -8173,51 +8232,74 @@ function fmRender() {
     if (sb) sb.style.display = repoLiveFiles.length > 8 || fmQuery ? '' : 'none';
     const q = fmQuery.trim().toLowerCase();
     const v = fmVisible();
+    const t = $('fm-title'); if (t) t.textContent = '仓库文件 · ' + fmReal(repoLiveFiles).length + ' 个';
     if (!v.folders.length && !v.files.length) { list.appendChild(fmNote(q ? '没有找到' : '这里还没有文件')); return; }
     const group = document.createElement('div'); group.className = 'st-group';
-    const addRow = (name, sub, onTap, hl) => {
+    const addRow = (name, sub, onTap, hl, onMore) => {
         const row = document.createElement('div'); row.className = 'st-row rb-row';
         row.setAttribute('role', 'button'); row.tabIndex = 0;
-        row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); } };
+        row.onkeydown = e => { if (e.target === row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); row.click(); } };
         const line = document.createElement('div'); line.className = 'st-line';
         const nm = document.createElement('span'); nm.className = 'st-name';
         if (hl) fmMark(nm, name, q); else nm.textContent = name;
-        line.appendChild(nm); row.appendChild(line);
+        line.appendChild(nm);
+        if (onMore) {
+            const mb = document.createElement('button'); mb.type = 'button'; mb.className = 'fm-more'; mb.setAttribute('aria-label', '管理文件夹'); mb.textContent = '···';
+            mb.onclick = e => { e.stopPropagation(); onMore(); };
+            line.appendChild(mb);
+        }
+        row.appendChild(line);
         if (sub) { const sb2 = document.createElement('div'); sb2.className = 'rb-sub'; sb2.textContent = sub; row.appendChild(sb2); }
         row.onclick = onTap;
         group.appendChild(row);
     };
-    v.folders.forEach(name => addRow(name + '/', '', () => fmGo((fmPath ? fmPath + '/' : '') + name), false));
+    v.folders.forEach(d => {
+        const full = (fmPath ? fmPath + '/' : '') + d.name;
+        addRow(d.name + '/', d.n ? d.n + ' 个文件 · ' + fmSizeText(d.size) : '空文件夹', () => fmGo(full), false, () => fmOpenFolder(full));
+    });
     const left = FM_PAGE - v.folders.length;
     const shown = fmShowAll ? v.files : v.files.slice(0, Math.max(20, left));
     shown.forEach(f => addRow(q ? f.path : f.name, fmSizeText(f.size || 0), () => fmOpenFile(f), !!q));
     if (v.files.length > shown.length) {
         const more = document.createElement('div'); more.className = 'st-row rb-row rh-more'; more.setAttribute('role', 'button'); more.tabIndex = 0;
-        more.textContent = '显示更多';
+        more.textContent = '显示更多（还有 ' + (v.files.length - shown.length) + ' 个）';
         more.onclick = () => { fmShowAll = true; fmRender(); };
         more.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); more.click(); } };
         group.appendChild(more);
     }
     list.appendChild(group);
-    const t = $('fm-title'); if (t) t.textContent = '仓库文件 · ' + repoLiveFiles.length + ' 个';
 }
 
-/* --- 文件详情 / 预览 --- */
-function fmOpenFile(f) {
+/* ----- 详情面板：文件 / 文件夹共用 ----- */
+function fmSheet(title, sub, actions) {
     const seq = ++fmPrevSeq;
-    $('fm-sheet-title').textContent = f.name;
-    $('fm-sheet-sub').textContent = (f.path !== f.name ? f.path + ' · ' : '') + fmSizeText(f.size || 0);
+    $('fm-sheet-title').textContent = title;
+    $('fm-sheet-sub').textContent = sub;
     const acts = $('fm-actions'); acts.innerHTML = '';
-    const btn = (label, fn, danger) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'small-btn' + (danger ? ' danger' : ''); b.textContent = label; b.onclick = fn; acts.appendChild(b); };
-    btn('复制直链', () => fmCopyLink(f));
-    btn('移动 / 改名', () => fmMove(f));
-    btn('上移', () => fmShift(f.path, -1));
-    btn('下移', () => fmShift(f.path, 1));
-    btn('删除', () => fmDelete(f), true);
-    fmLoadPreview(f, seq);
+    actions.forEach(a => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'small-btn' + (a[2] ? ' danger' : ''); b.textContent = a[0]; b.onclick = a[1];
+        acts.appendChild(b);
+    });
     $('fm-sheet-backdrop').classList.add('show');
+    return seq;
 }
 function fmCloseSheet() { fmPrevSeq++; $('fm-sheet-backdrop').classList.remove('show'); }
+function fmOpenFile(f) {
+    const acts = [['复制直链', () => fmCopyLink(f)], ['移动 / 改名', () => fmMove(f)]];
+    if (fmSortMode() === 'manual') acts.push(['上移', () => fmShift(f.path, -1)], ['下移', () => fmShift(f.path, 1)]);
+    acts.push(['删除', () => fmDelete(f), true]);
+    const seq = fmSheet(f.name, (f.path !== f.name ? f.path + ' · ' : '') + fmSizeText(f.size || 0), acts);
+    $('fm-preview').style.display = '';
+    fmLoadPreview(f, seq);
+}
+function fmOpenFolder(path) {
+    const files = fmReal(fmFolderFiles(path));
+    fmSheet(path.split('/').pop() + '/', path + ' · ' + files.length + ' 个文件 · ' + fmSizeText(files.reduce((n, f) => n + (f.size || 0), 0)), [
+        ['重命名 / 移动', () => fmMoveFolder(path)],
+        ['删除文件夹', () => fmDeleteFolder(path), true]
+    ]);
+    const box = $('fm-preview'); box.innerHTML = ''; box.style.display = 'none';
+}
 function fmSetPreviewNote(text) { const box = $('fm-preview'); box.innerHTML = ''; const n = document.createElement('div'); n.className = 'fm-note'; n.textContent = text; box.appendChild(n); }
 async function fmLoadPreview(f, seq) {
     const isImg = FM_IMG_RE.test(f.path);
@@ -8230,7 +8312,7 @@ async function fmLoadPreview(f, seq) {
         const b64 = String((b && b.content) || '').replace(/\s/g, '');
         const box = $('fm-preview');
         if (isImg) {
-            const ext = (f.path.split('.').pop() || '').toLowerCase();
+            const ext = fmExt(f.path);
             const mime = ext === 'svg' ? 'image/svg+xml' : ext === 'jpg' ? 'image/jpeg' : ext === 'ico' ? 'image/x-icon' : 'image/' + ext;
             const img = new Image();
             img.alt = f.name;
@@ -8254,7 +8336,29 @@ async function fmCopyLink(f) {
     toast(ok ? '直链已复制' : '复制失败，请手动复制', ok ? 'ok' : 'error');
 }
 
-/* --- 移动 / 重命名、删除、上传到指定路径 --- */
+/* ----- 移动 / 改名 / 删除 ----- */
+// 一次提交搬一组文件，本地状态、手动顺序、历史和撤销条一起更新。moves: [{ from, to, sha }]
+async function fmApplyMoves(moves, commitMsg, doneMsg, histAction, histDetail) {
+    const s = getSettings();
+    const ctx = await resolveGithubContext();
+    const changes = [];
+    moves.forEach(m => {
+        changes.push({ path: m.from, mode: '100644', type: 'blob', sha: null });
+        changes.push({ path: m.to, mode: '100644', type: 'blob', sha: m.sha || FM_EMPTY_SHA });
+    });
+    await commitTreeChanges(ctx.owner, s.repo, ctx.branch, changes, commitMsg, s);
+    applyLocalMoves(ctx.owner, s.repo, ctx.branch, moves);
+    fmOrderRemap(moves.map(m => [m.from, m.to]));
+    renderRepoLiveFiles();
+    const undo = { owner: ctx.owner, repo: s.repo, branch: ctx.branch, moves: moves };
+    const hid = fmHistAdd(histAction, histDetail, undo);
+    fmRender();
+    offerUndo(doneMsg, async () => {
+        const msg = await undoRepoMoves(undo.owner, undo.repo, undo.branch, undo.moves);
+        fmOrderRemap(undo.moves.map(m => [m.to, m.from])); fmHistMarkUndone(hid); fmRender();
+        return msg;
+    });
+}
 async function fmMove(f) {
     const from = f.path;   // 先记下原路径：applyLocalMoves 会就地改掉 f.path
     const raw = await showPrompt({ title: '移动 / 重命名', message: '输入新的完整路径（含文件名）', value: from, validate: v => fmPathProblem(v, from, 'move') });
@@ -8263,24 +8367,26 @@ async function fmMove(f) {
     fmCloseSheet();
     toast('正在移动…', 'loading');
     try {
-        const s = getSettings();
-        const ctx = await resolveGithubContext();
-        await commitTreeChanges(ctx.owner, s.repo, ctx.branch, [
-            { path: from, mode: '100644', type: 'blob', sha: null },
-            { path: to, mode: '100644', type: 'blob', sha: f.sha }
-        ], '移动 ' + from + ' → ' + to, s);
-        const moves = [{ from: from, to: to, sha: f.sha }];
-        applyLocalMoves(ctx.owner, s.repo, ctx.branch, moves);
-        fmOrderRename(from, to);
-        renderRepoLiveFiles();
-        const undo = { owner: ctx.owner, repo: s.repo, branch: ctx.branch, moves: moves };
-        const hid = fmHistAdd(pathBasename(from) === pathBasename(to) ? '移动' : '移动 / 重命名', from + ' → ' + to, undo);
+        await fmApplyMoves([{ from: from, to: to, sha: f.sha }], '移动 ' + from + ' → ' + to, '已移动到 ' + to,
+            pathBasename(from) === pathBasename(to) ? '移动' : '移动 / 重命名', from + ' → ' + to);
+    } catch (e) {
+        toast('移动失败：' + ((e && e.message) || '未知错误'), 'error');
+    }
+}
+async function fmMoveFolder(from) {
+    const files = fmFolderFiles(from);
+    if (!files.length) return;
+    const n = fmReal(files).length;
+    const raw = await showPrompt({ title: '重命名 / 移动文件夹', message: '输入新的完整路径，里面的 ' + n + ' 个文件会一起移动', value: from, validate: v => fmFolderProblem(v, from) });
+    if (raw === null) return;
+    const to = fmNorm(raw);
+    fmCloseSheet();
+    toast('正在移动…', 'loading');
+    try {
+        const moves = files.map(f => ({ from: f.path, to: to + f.path.slice(from.length), sha: f.sha || FM_EMPTY_SHA }));
+        await fmApplyMoves(moves, '移动文件夹 ' + from + ' → ' + to, '已移动到 ' + to, '移动文件夹', from + ' → ' + to + '（' + n + ' 个文件）');
+        if (fmPath === from || fmPath.indexOf(from + '/') === 0) fmPath = to + fmPath.slice(from.length);
         fmRender();
-        offerUndo('已移动到 ' + to, async () => {
-            const msg = await undoRepoMoves(undo.owner, undo.repo, undo.branch, undo.moves);
-            fmOrderRename(to, from); fmHistMarkUndone(hid); fmRender();
-            return msg;
-        });
     } catch (e) {
         toast('移动失败：' + ((e && e.message) || '未知错误'), 'error');
     }
@@ -8292,15 +8398,74 @@ async function fmDelete(f) {
     if (!repoLiveFiles.some(x => x.path === f.path)) fmHistAdd('删除', f.path + '（可在「最近删除」恢复）', null);
     fmRender();
 }
-async function fmPickFile(input) {
-    const file = input.files && input.files[0];
-    input.value = '';
-    if (!file) return;
+async function fmDeleteFolder(path) {
+    const files = fmFolderFiles(path);
+    if (!files.length) return;
+    const n = fmReal(files).length;
+    const ok = await showConfirm({ title: '删除文件夹', message: n ? '「' + path + '」和里面的 ' + n + ' 个文件会被删除，之后可以在首页的「最近删除」恢复。' : '「' + path + '」是空文件夹，会被删除。', confirmText: '删除' });
+    if (!ok) return;
+    fmCloseSheet();
+    files.forEach(f => { if (!f.sha) f.sha = FM_EMPTY_SHA; });   // 本地新建的 .gitkeep 没有 sha：补上空文件的，「最近删除」才能恢复
+    repoSelected.clear(); files.forEach(f => repoSelected.add(f.path));
+    try { await deleteSelectedRepoFiles({ confirm: false }); } finally { repoSelected.clear(); }
+    if (!fmFolderFiles(path).length) fmHistAdd('删除文件夹', path + '（' + n + ' 个文件，可在「最近删除」恢复）', null);
+    fmRender();
+}
+
+/* ----- 新建文件夹 / 上传 ----- */
+// GitHub 不支持空目录：用一个空的 .gitkeep 占位
+async function fmNewFolder() {
     const s = getSettings();
     if (!s.token) return toast('请先配置 Token', 'error');
     if (!s.repo) return toast('请先选择仓库', 'error');
-    if (file.size > FM_UPLOAD_MAX) return toast('文件太大：单个文件请控制在 50 MB 以内', 'error');
+    if (fmState !== 'ok') return toast('文件列表还没读取完', 'info');
+    const prefix = fmPath ? fmPath + '/' : '';
+    const name = await showPrompt({
+        title: '新建文件夹', message: fmPath ? '创建在「' + fmPath + '」下' : '创建在根目录下', placeholder: '文件夹名称', confirmText: '创建',
+        validate: v => {
+            if (!v) return '请输入文件夹名称';
+            if (INVALID_FOLDER_NAME_RE.test(v)) return '名称不能包含 / \\ : * ? " < > |';
+            if (fmReserved(prefix + v)) return '这个名称是保留的，换一个';
+            if (repoLiveFiles.some(f => f.path === prefix + v || f.path.indexOf(prefix + v + '/') === 0)) return '已经有同名的文件或文件夹';
+            return '';
+        }
+    });
+    if (!name) return;
+    const path = prefix + name + '/.gitkeep';
+    toast('正在创建…', 'loading');
+    try {
+        const ctx = await resolveGithubContext();
+        const contentsPath = '/repos/' + ctx.owner + '/' + s.repo + '/contents/' + path.split('/').map(encodeURIComponent).join('/');
+        await githubRequest(contentsPath, { method: 'PUT', body: JSON.stringify({ message: '创建文件夹 ' + prefix + name, content: '', branch: ctx.branch }) }, s.token, s.proxy);
+        repoLiveFiles.push({ path: path, name: '.gitkeep', sha: FM_EMPTY_SHA, size: 0, type: 'file', url: '', rawUrl: '', owner: ctx.owner, repo: s.repo, branch: ctx.branch });
+        renderRepoLiveFiles();
+        fmHistAdd('新建文件夹', prefix + name, null);
+        toast('已创建文件夹「' + name + '」', 'ok');
+        fmGo(prefix + name);
+    } catch (e) {
+        toast('创建失败：' + ((e && e.message) || '未知错误'), 'error');
+    }
+}
+// 上传成功后把文件记进本地列表（已有同路径的就更新）
+function fmLocalPut(path, file, sha, ctx, s) {
+    const rec = { path: path, name: pathBasename(path), sha: sha, size: file.size, type: repoFileType(path), url: repoCdnUrl(ctx.owner, s.repo, ctx.branch, path), rawUrl: repoRawUrl(ctx.owner, s.repo, ctx.branch, path), owner: ctx.owner, repo: s.repo, branch: ctx.branch };
+    const i = repoLiveFiles.findIndex(f => f.path === path);
+    if (i >= 0) repoLiveFiles[i] = Object.assign({}, repoLiveFiles[i], rec); else repoLiveFiles.push(rec);
+}
+const fmIsEmptyRepoErr = e => !!(e && e.status === 409 && /empty/i.test(String(e.message)));
+async function fmPickFile(input) {
+    const files = Array.from(input.files || []);
+    input.value = '';
+    if (!files.length) return;
+    const s = getSettings();
+    if (!s.token) return toast('请先配置 Token', 'error');
+    if (!s.repo) return toast('请先选择仓库', 'error');
+    const big = files.find(f => f.size > FM_UPLOAD_MAX);
+    if (big) return toast((files.length > 1 ? big.name + '：' : '') + '文件太大：单个文件请控制在 50 MB 以内', 'error');
     if (!repoLiveLoaded) { await fmEnter(false); if (!repoLiveLoaded) return toast('读取仓库失败，暂时不能上传', 'error'); }
+    return files.length > 1 ? fmUploadMany(files, s) : fmUploadOne(files[0], s);
+}
+async function fmUploadOne(file, s) {
     const raw = await showPrompt({ title: '上传到哪个路径', message: '输入仓库里的完整路径（含文件名）', value: (fmPath ? fmPath + '/' : '') + file.name, validate: v => fmPathProblem(v, '', 'upload') });
     if (raw === null) return;
     const path = fmNorm(raw);
@@ -8318,19 +8483,59 @@ async function fmPickFile(input) {
             sha = blob.sha;
             await commitTreeChanges(ctx.owner, s.repo, ctx.branch, [{ path: path, mode: '100644', type: 'blob', sha: sha }], '上传 ' + path, s);
         } catch (e) {
-            if (!(e && e.status === 409 && /empty/i.test(String(e.message)))) throw e;
+            if (!fmIsEmptyRepoErr(e)) throw e;
             await uploadViaContentsApi(file, path, ctx.owner, ctx.branch, s);   // 仓库还是空的：第一次提交只能走 contents 接口
             sha = '';
         }
-        if (sha) {
-            const rec = { path: path, name: pathBasename(path), sha: sha, size: file.size, type: repoFileType(path), url: repoCdnUrl(ctx.owner, s.repo, ctx.branch, path), rawUrl: repoRawUrl(ctx.owner, s.repo, ctx.branch, path), owner: ctx.owner, repo: s.repo, branch: ctx.branch };
-            const i = repoLiveFiles.findIndex(f => f.path === path);
-            if (i >= 0) repoLiveFiles[i] = Object.assign({}, repoLiveFiles[i], rec); else repoLiveFiles.push(rec);
-            renderRepoLiveFiles();
-        }
+        if (sha) { fmLocalPut(path, file, sha, ctx, s); renderRepoLiveFiles(); }
         fmHistAdd(old ? '上传（覆盖）' : '上传', path, null);
         toast(old ? '已覆盖 ' + pathBasename(path) : '已上传到 ' + path, 'ok');
         if (sha) fmRender(); else fmEnter(true);
+    } catch (e) {
+        toast('上传失败：' + ((e && e.message) || '未知错误'), 'error');
+    }
+}
+// 多个文件：全部传到当前文件夹、保留原文件名，一次提交
+async function fmUploadMany(files, s) {
+    const prefix = fmPath ? fmPath + '/' : '';
+    const items = files.map(file => ({ file: file, path: fmNorm(prefix + file.name) }));
+    for (const it of items) {
+        const p = fmPathProblem(it.path, '', 'upload');
+        if (p) return toast(it.file.name + '：' + p, 'error');
+    }
+    if (new Set(items.map(it => it.path)).size !== items.length) return toast('选中的文件里有重名的', 'error');
+    const dup = items.filter(it => repoLiveFiles.some(f => f.path === it.path));
+    if (dup.length) {
+        const ok = await showConfirm({ title: '覆盖同名文件？', message: dup.length + ' 个文件已经存在，上传会覆盖它们。', confirmText: '覆盖' });
+        if (!ok) return;
+    }
+    const where = fmPath || '根目录';
+    try {
+        const ctx = await resolveGithubContext();
+        const changes = [], done = [];
+        let viaContents = false;
+        try {
+            for (let i = 0; i < items.length; i++) {
+                const it = items[i], tag = (i + 1) + '/' + items.length + ' · ' + it.file.name;
+                toast('正在上传 ' + tag, 'loading');
+                const blob = await uploadBlobChunked(it.file, ctx.owner, s, (t) => toast(tag + ' · ' + t, 'loading'), ctx);
+                changes.push({ path: it.path, mode: '100644', type: 'blob', sha: blob.sha });
+                done.push([it, blob.sha]);
+            }
+            toast('正在提交…', 'loading');
+            await commitTreeChanges(ctx.owner, s.repo, ctx.branch, changes, '上传 ' + items.length + ' 个文件到 ' + where, s);
+        } catch (e) {
+            if (!fmIsEmptyRepoErr(e)) throw e;
+            viaContents = true;   // 仓库还是空的：第一次提交只能走 contents 接口，逐个传
+            for (let i = 0; i < items.length; i++) {
+                toast('正在上传 ' + (i + 1) + '/' + items.length + ' · ' + items[i].file.name, 'loading');
+                await uploadViaContentsApi(items[i].file, items[i].path, ctx.owner, ctx.branch, s);
+            }
+        }
+        if (!viaContents) { done.forEach(d => fmLocalPut(d[0].path, d[0].file, d[1], ctx, s)); renderRepoLiveFiles(); }
+        fmHistAdd('上传', items.length + ' 个文件 → ' + where, null);
+        toast('已上传 ' + items.length + ' 个文件到 ' + where, 'ok');
+        if (viaContents) fmEnter(true); else fmRender();
     } catch (e) {
         toast('上传失败：' + ((e && e.message) || '未知错误'), 'error');
     }
@@ -8394,7 +8599,7 @@ async function handleReplaceFile(file) {
     await convertUrls(urls, map, rebuild);
 }
 
-// --- 批量处理逻辑 ---
+/* ----- 批量处理 ----- */
 // 单文件上传上限（受 GitHub Git Data API 限制，并考虑手机浏览器内存；base64 后体积约 ×1.33）。
 const MAX_UPLOAD_SIZE = 99 * 1024 * 1024;
 // jsDelivr 对 GitHub 单文件有 20MB 上限：更大的文件不走 jsDelivr，改用 raw.githubusercontent.com 直链。
@@ -8415,7 +8620,8 @@ function isAllowedAssetFile(file) {
     return isImageFile(file) || isMediaFile(file) || FONT_EXT_RE.test(file.name || '') || /^font\//i.test(file.type || '');
 }
 
-/* ===== 后台保活：开关打开期间，循环播放一段人耳听不到的静音音频，让 iOS 不把页面挂起 =====
+/* ----- 后台保活（静音音频） -----
+   开关打开期间循环播放一段人耳听不到的静音音频，让 iOS 不把页面挂起。
    与是否在上传无关：开关开着，整个 App 里的所有功能都受保护；关掉开关才停止。
    iOS 要求播放由点击触发，若被拒绝，会在下一次触摸时自动补上。 */
 // 应用图标：给锁屏 / 控制中心的「正在播放」用（取页面自带的图标）
@@ -8502,7 +8708,7 @@ window.addEventListener('pageshow', () => keepAlive.resume());
 try { if (navigator.audioSession && navigator.audioSession.addEventListener) navigator.audioSession.addEventListener('statechange', () => keepAlive.resume()); } catch (_) {}
 try { if ('mediaSession' in navigator) navigator.mediaSession.setActionHandler('play', () => keepAlive.resume()); } catch (_) {}
 
-/* ===== 保活 / 常亮：由两个开关直接决定，开着就一直生效（不再只在上传时） ===== */
+/* ----- 保活 / 常亮开关 ----- */
 let wakeLockPending = false;
 async function requestScreenWakeLock() {
     if (!prefWakeLock() || !('wakeLock' in navigator) || document.visibilityState !== 'visible') return;
@@ -8549,7 +8755,7 @@ window.addEventListener('beforeunload', e => { if (isBatchUploading) { e.prevent
 // 上传中断网 / 恢复的提示统一在 initOffline 里处理（重试会等到网络恢复后再继续，见 waitOnline）
 
 
-// ===== ZIP 压缩包导入：在浏览器里解压，只取图片 / 字体 =====
+/* ----- ZIP 压缩包导入 ----- */
 const ZIP_RE = /\.zip$/i;
 function isZipFile(f) { return ZIP_RE.test(f.name || '') || /^application\/(?:x-)?zip(?:-compressed)?$/i.test(f.type || ''); }
 function zipDecodeName(bytes, utf8Flag) {
@@ -8832,10 +9038,7 @@ async function handleFiles(files) {
 }
 
 
-/* ====================================================================
-   v1.3 新功能：复制格式 / 自动复制 / 粘贴上传 / 压缩与 WebP / 重命名 /
-   排序 / 仓库用量 / 失效链接检测
-   ==================================================================== */
+/* ================= 上传与仓库工具 ================= */
 const PREF_COPYFMT_KEY = 'kb_pref_copyfmt';
 const PREF_AUTOCOPY_KEY = 'kb_pref_autocopy';
 const PREF_CLIPWATCH_KEY = 'kb_pref_clipwatch';
@@ -8851,7 +9054,7 @@ function prefAutoCopy() { return lsGet(PREF_AUTOCOPY_KEY) === '1'; }
 function prefClipWatch() { return lsGet(PREF_CLIPWATCH_KEY) === '1'; }
 function prefLinkCheck() { return lsGet(PREF_LINKCHECK_KEY) === '1'; }
 
-/* ---------- 1. 复制格式：直链 / Markdown / HTML ---------- */
+/* ----- 复制格式（直链 / Markdown / HTML） ----- */
 const COPY_FORMATS = { url: '直链', md: 'Markdown', html: 'HTML', custom: '自定义' };
 const FMT_COPIED_ONE = { url: '已复制直链', md: '已复制 Markdown', html: '已复制 HTML', custom: '已复制（自定义格式）' };
 const FMT_COPIED_MANY = {
@@ -8927,7 +9130,7 @@ function cycleCopyFormat() {
     toast('复制格式：' + COPY_FORMATS[next]);
 }
 
-/* ---------- 2. 上传后自动复制 ---------- */
+/* ----- 上传后自动复制 ----- */
 async function autoCopyBatch(items) {
     const fmt = prefCopyFormat();
     const ok = await writeClipboard(items.map(it => formatLink(it.url, it.name, fmt)).join('\n'));
@@ -8939,7 +9142,7 @@ async function autoCopyBatch(items) {
     return ok ? 'ok' : 'fail';
 }
 
-/* ---------- 3. 剪贴板 / 相册上传 ---------- */
+/* ----- 剪贴板 / 相册上传 ----- */
 const CLIP_EXT = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif', 'image/heic': 'heic', 'image/heif': 'heif', 'image/avif': 'avif', 'image/bmp': 'bmp' };
 function clipboardFileName(type, i) {
     const d = new Date(), p = n => String(n).padStart(2, '0');
@@ -9040,8 +9243,7 @@ async function checkClipboardOnOpen() {
     setTimeout(kick, 1500);
 })();
 
-/* ---------- 4. 上传前压缩 / 转 WebP ---------- */
-/* ---------- 文件名 / 文件夹归档（只作用于图片；字体保持原名、原位置） ---------- */
+/* ----- 上传命名与归档（仅图片） ----- */
 const UPLOAD_PREFS = { naming: { key: 'kb_pref_naming', def: 'keep', ok: ['keep', 'random'] }, archive: { key: 'kb_pref_archive', def: 'flat', ok: ['flat', 'month'] } };
 function uploadPref(name) { const o = UPLOAD_PREFS[name], v = lsGet(o.key); return o.ok.indexOf(v) >= 0 ? v : o.def; }
 function refreshUploadPrefUI() {
@@ -9092,7 +9294,8 @@ function loadImageForCanvas(file) {
 function canvasBlob(c, type, q) {
     return new Promise(r => { try { c.toBlob(r, type, q); } catch (_) { r(null); } });
 }
-/* ---------- 图片后台线程：压缩 / 相似图指纹放进 Worker，批量处理时界面不卡 ----------
+/* ----- 图片后台线程（压缩 / 相似图指纹） -----
+   压缩 / 相似图指纹放进 Worker，批量处理时界面不卡。
    需要 Worker + createImageBitmap + OffscreenCanvas（iOS 16.4+）。任何一环不可用、自检不过或运行出错，
    都会自动退回主线程的老做法，结果不变。HEIC 转换仍在主线程（只有 Safari 能解码，Worker 里不一定行）。 */
 // 自检图：4×2 的 JPEG，EXIF 方向 = 6（顺时针转 90°）。方向被正确应用时，解码出来应是 2×4。
@@ -9305,7 +9508,8 @@ async function preprocessFile(file) {
     return out;
 }
 
-/* ---------- 5. 重命名（一次 Git 提交：删旧路径 + 用同一个 blob 建新路径） ---------- */
+/* ----- 重命名（一次 Git 提交） ----- */
+// 删旧路径，再用同一个 blob 建新路径。
 const BAD_FILENAME_RE = /[\/\\:*?"<>|]/;
 function pathDirname(p) { const i = String(p).lastIndexOf('/'); return i < 0 ? '' : p.slice(0, i); }
 function pathBasename(p) { return String(p).split('/').pop(); }
@@ -9404,7 +9608,7 @@ async function renameAsset(ref) {
     if (nn === oldName) { toast('名称没有变化', 'info'); return false; }
     return doRename(ref, nn);
 }
-/* ---------- 批量重命名：按规则一次改多个文件（一次 Git 提交，可撤销） ---------- */
+/* ----- 批量重命名 ----- */
 const RENAME_MODES = [['prefix', '加前缀'], ['suffix', '加后缀'], ['seq', '序号'], ['replace', '替换']];
 function splitExt(name) { const m = String(name).match(/\.[^./]+$/); return m ? [name.slice(0, -m[0].length), m[0]] : [name, '']; }
 // 按规则算出每个文件的新名字；扩展名不动。返回 { error } 或 { moves }
@@ -9552,7 +9756,7 @@ async function renameSelectedGallery() {
     if (ok) exitGalleryMultiMode();
 }
 
-/* ---------- 最近删除：删掉的仓库文件先记在这里，30 天内可以恢复 ---------- */
+/* ----- 最近删除 ----- */
 // 文件删除后，它的内容仍然留在 Git 历史里；恢复就是把原来的文件（按 sha）重新放回原路径，不用重新上传。
 const RECYCLE_KEY = 'kb_recycle';
 const RECYCLE_DAYS = 30, RECYCLE_MAX = 500;
@@ -9710,7 +9914,7 @@ async function recycleRestore(items) {
     }
 }
 
-/* ---------- 导出链接清单：选中 / 当前列表 / 全部，导出成 txt、JSON 或 CSV ---------- */
+/* ----- 导出链接清单 ----- */
 function saveTextFile(name, text, mime) {
     const blob = new Blob([text], { type: mime || 'text/plain' });
     const href = URL.createObjectURL(blob);
@@ -9801,7 +10005,7 @@ async function exportLinkList(kind) {
     toast('已导出 ' + items.length + ' 个链接', 'ok');
 }
 
-/* ---------- 6. 排序 ---------- */
+/* ----- 排序 ----- */
 // 名称排序用同一个 Collator：每次 localeCompare(…, 'zh', {numeric}) 都会重建排序规则，8000 条记录要慢几十倍
 let NAME_COLLATOR; try { NAME_COLLATOR = new Intl.Collator('zh', { numeric: true }); } catch (_) { NAME_COLLATOR = new Intl.Collator(undefined, { numeric: true }); }
 const GALLERY_SORTS = [['new', '时间 · 新到旧'], ['old', '时间 · 旧到新'], ['size-desc', '大小 · 大到小'], ['size-asc', '大小 · 小到大'], ['name', '名称 A–Z']];
@@ -9856,7 +10060,7 @@ function setRepoSort(k) {
     renderRepoLiveFiles();
 }
 
-/* ---------- 7. 仓库用量提示 ---------- */
+/* ----- 仓库用量提示 ----- */
 let repoUsage = null; // { kb, at, repo }  —— kb 来自 GitHub 的仓库信息（含历史记录，更新会有延迟）
 const REPO_SOFT_LIMIT = 1024 * 1024 * 1024; // GitHub 建议单个仓库保持在 1 GB 以内
 function fmtSize(n) {
@@ -9884,7 +10088,7 @@ async function afterBatchUsageCheck(ctx) {
     } catch (_) { /* 拿不到就算了，不影响上传 */ }
 }
 
-/* ---------- 8. 失效链接检测 ---------- */
+/* ----- 失效链接检测 ----- */
 function loadLinkStatus() {
     try { const o = JSON.parse(lsGet(LINKCHK_KEY) || '{}'); return (o && typeof o === 'object') ? o : {}; } catch (_) { return {}; }
 }
@@ -10185,7 +10389,7 @@ async function findRepoDuplicates() {
     updateRepoSelectionUI();
     syncRepoSelectionDom();
 }
-/* ===== 仓库工具箱 ===== */
+/* ================= 仓库工具箱 ================= */
 function syncSpecialChip(id, filter, label, n) {
     const c = $(id);
     if (!c) return;
@@ -10218,7 +10422,7 @@ function openRepoToolsMenu(btn) {
     ]);
 }
 
-/* ---- 1. 未被引用的文件：导入你的项目文件，对照仓库里哪些图没被用到 ---- */
+/* ----- 未被引用的文件 ----- */
 // 路径要作为完整的一段出现：前面不能紧挨着字母 / 数字 / . 等，后面不能接着更长的文件名
 function repoPathMentioned(text, path) {
     const variants = [path];
@@ -10277,7 +10481,8 @@ async function handleOrphanScan(fileList) {
     selectRepoSubset('orphan', orphans);
 }
 
-/* ---- 2. 表情包导入：JSON（链接或内嵌图片）/ Word / 文本；导出成 url / meaning / category 的 JSON ---- */
+/* ----- 表情包导入 / 导出 ----- */
+// JSON（链接或内嵌图片）/ Word / 文本；导出成 url / meaning / category 的 JSON。
 function exportStickerJson() {
     if (!repoLiveLoaded) return toast('仓库文件还没读取完，稍后再试', 'info');
     let files, label;
@@ -10491,7 +10696,7 @@ async function looksLikeStickerFile(file) {
     return withUrl.filter(l => re.test(l)).length / withUrl.length >= 0.8;
 }
 
-/* ---- 表情包导入前预览：缩略图网格，可改含义 / 分类、取消勾选；纯文本来源还能选输出格式 ---- */
+/* ----- 表情包导入预览 ----- */
 const STK_FMT_KEY = 'kb_pref_sticker_fmt', STK_TPL_KEY = 'kb_pref_sticker_tpl';   // kb_pref_ 前缀：会随设置备份一起导出
 const STK_FORMATS = [
     ['json', 'JSON（url / meaning / category）'],
@@ -10758,7 +10963,7 @@ async function handleStickerImport(file) {
     await convertUrls(urls, map, rebuild, namer);
 }
 
-/* ---- 3. CDN 线路：测速，复制链接时换成最快的那条 ---- */
+/* ----- CDN 线路测速 ----- */
 const PREF_CDNLINE_KEY = 'kb_pref_cdn_line';   // kb_pref_ 前缀：会随设置备份一起导出
 const CDN_LINES = ['cdn.jsdelivr.net', 'fastly.jsdelivr.net', 'gcore.jsdelivr.net', 'testingcf.jsdelivr.net', 'raw'];
 const CDN_GH_RE = /^https:\/\/(?:cdn|fastly|gcore|testingcf|originfastly)\.jsdelivr\.net\/gh\/([^/]+)\/([^@/]+)@([^/]+)\/(.+)$/;
@@ -10819,7 +11024,7 @@ async function runCdnSpeedTest(btn) {
     } finally { cdnTesting = false; }
 }
 
-/* ---- 4. 相似图片：在浏览器里算每张图的指纹（dHash），找出看起来几乎一样的 ---- */
+/* ----- 相似图片（dHash 指纹） ----- */
 const PHASH_KEY = 'kb_phash_v2';
 let phashCache = null;
 let repoSimRunning = false, repoSimStop = false;
@@ -10996,7 +11201,7 @@ function maybeAutoLinkCheck() {
     setTimeout(() => runLinkCheck({ silent: true }), 1200);
 }
 
-/* ---------- 9. 存储页：所有账号名下每个仓库的占用空间 ---------- */
+/* ----- 存储页数据 ----- */
 const ST_CACHE_KEY = 'kb_storage_cache', ST_SORT_KEY = 'kb_storage_sort';
 let storageData = null, storageLoading = false, storageSeq = 0;
 function storageSort() { return lsGet(ST_SORT_KEY) === 'recent' ? 'recent' : 'size'; }
@@ -11090,7 +11295,7 @@ function renderStorage() {
 }
 function invalidateStorage() { storageSeq++; storageData = null; try { localStorage.removeItem(ST_CACHE_KEY); } catch (_) {} }   // storageSeq++：正在读取的那一轮结果作废，免得旧数据又写回来
 
-/* ---------- 初始化 ---------- */
+/* ----- 初始化 ----- */
 function initV13Prefs() {
     $('pref-autocopy').checked = prefAutoCopy();
     $('pref-clipwatch').checked = prefClipWatch();
@@ -11140,8 +11345,8 @@ function initV13Prefs() {
 
 
 <script>
-/* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '3.0.38';
+/* ================= 拉取最新版 / 设置备份 ================= */
+const APP_VERSION = '3.0.39';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -11199,7 +11404,7 @@ async function pullLatest() {
 }
 
 
-/* ---------- 标签 / 收藏（资源库） ---------- */
+/* ----- 标签 / 收藏（资源库） ----- */
 const ICON_TAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.2V5.5a2 2 0 0 1 2-2h6.7a2 2 0 0 1 1.4.6l6.8 6.8a2 2 0 0 1 0 2.8l-6.7 6.7a2 2 0 0 1-2.8 0L4.1 13.6a2 2 0 0 1-.6-1.4z"/><circle cx="8.5" cy="8.5" r="1.2"/></svg>';
 const ICON_STAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.6l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.6l-5.1 2.7 1-5.7-4.1-4 5.7-.8z"/></svg>';
 function entryTags(e) { return e && Array.isArray(e.tags) ? e.tags : []; }
@@ -11244,7 +11449,7 @@ function openTagFilterMenu(btn) {
     }
     if (items.length) openMoreMenu(btn, items);
 }
-/* ---------- 标签与收藏：底部磨砂面板 ---------- */
+/* ----- 标签 / 收藏面板 ----- */
 function openTagSheet(title, sub, items) {
     $('tag-sheet-title').textContent = title;
     $('tag-sheet-sub').textContent = sub || '';
@@ -11330,7 +11535,7 @@ function removeTagFromSelected(x) {
     commitGalleryMeta('已移除 #' + x);
 }
 
-/* ---------- 标签 / 收藏（仓库文件，与资源库同款） ---------- */
+/* ----- 标签 / 收藏（仓库文件） ----- */
 function selectedRepoFiles() { return repoLiveFiles.filter(f => repoSelected.has(f.path)); }
 function commitRepoMeta(msg) {
     saveRepoMeta();
@@ -11418,7 +11623,7 @@ function removeTagFromRepoSelected(x) {
     commitRepoMeta('已移除 #' + x);
 }
 
-/* ---------- 按标签全选 ---------- */
+/* ----- 按标签全选 ----- */
 function selectAllByGalleryTag() {
     const list = getGalleryVisibleList();
     if (!list.length) return toast('这个标签下没有项目', 'info');
@@ -11438,7 +11643,7 @@ function selectAllByRepoTag() {
     toast('已选中 ' + list.length + ' 个文件', 'ok');
 }
 
-/* ---------- 资源库 ↔ 仓库联动 ---------- */
+/* ----- 资源库 ↔ 仓库联动 ----- */
 const ICON_LOCATE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="2.6"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3"/></svg>';
 function resetRepoView() {
     repoFilter = 'all'; repoTag = ''; repoSearch = '';
@@ -11483,7 +11688,7 @@ async function locateInRepo(entry) {
     requestAnimationFrame(() => flashTile(Array.from(document.querySelectorAll('#repo-live-container .repo-live-item[data-path]')).find(x => x.dataset.path === f.path)));
 }
 
-/* ---------- CDN 未同步：一键改用 raw 直链 ---------- */
+/* ----- CDN 未同步：改用 raw 直链 ----- */
 async function fixCdnLinks() {
     const list = loadHistory().filter(e => linkStatusOf(e.id) === 'cdn');
     if (!list.length) return toast('没有需要修复的链接', 'info');
@@ -11529,7 +11734,7 @@ async function revertRawLinks() {
     toast('已改回 ' + n + ' 个链接', 'ok');
 }
 
-/* ---------- 离线使用（Service Worker，需要同目录的 sw.js） ---------- */
+/* ----- 离线使用（需要同目录 sw.js） ----- */
 async function offlineStatusText() {
     if (!isWebOrigin()) return '当前是本地文件，用不了离线缓存';
     if (!('serviceWorker' in navigator)) return '这个浏览器不支持离线缓存';
@@ -11545,7 +11750,8 @@ async function offlineStatusRefresh() {
     if (el) el.textContent = await offlineStatusText();
 }
 async function offlineInfo() { toast(await offlineStatusText(), 'info'); }
-/* ---------- 申请持久存储：iOS / 浏览器空间紧张时，默认会优先清掉网站数据（上传队列、指纹缓存都在里面） ---------- */
+/* ----- 申请持久存储 ----- */
+// iOS / 浏览器空间紧张时默认会优先清掉网站数据（上传队列、指纹缓存都在里面）。
 let storagePersisted = null, storageAskedAt = 0;
 async function requestPersistentStorage(force) {
     if (!force && Date.now() - storageAskedAt < 10 * 60 * 1000) return storagePersisted;   // 10 分钟内不重复申请
@@ -11586,7 +11792,7 @@ async function storageStatusRefresh() {
 /* 清理旧版「外观」功能留下的背景图（IndexedDB），只做一次 */
 try { if (!lsGet('kb_ap_cleaned')) { indexedDB.deleteDatabase('kb_appearance'); lsSet('kb_ap_cleaned', '1'); } } catch (_) {}
 
-/* ---------- 插件（同目录的 plugins.js，里面可以放任意多个插件） ---------- */
+/* ----- 插件（同目录 plugins.js） ----- */
 const PLUGIN_STATE_KEY = 'kb_pref_plugins';   // 带 kb_pref_ 前缀，会随设置备份一起导出
 const DL = window.DL = {
     apiVersion: 3,
@@ -11713,8 +11919,7 @@ async function renderAboutPlugins() {
     });
 })();
 
-/* ---------- 设置备份 ---------- */
-/* ---------- 备份加密（口令 → PBKDF2-SHA256 → AES-GCM-256） ---------- */
+/* ----- 设置备份与加密（口令 → PBKDF2-SHA256 → AES-GCM-256） ----- */
 const BK_ITER = 250000;
 const bkHasCrypto = () => typeof crypto !== 'undefined' && !!crypto.subtle && typeof TextEncoder !== 'undefined';
 function bkB64(u8) { let t = ''; for (let i = 0; i < u8.length; i += 0x8000) t += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(t); }
@@ -11843,7 +12048,7 @@ async function importBackup(file) {
     toast('导入完成，正在刷新…', 'ok');
     setTimeout(() => location.reload(), 700);
 }
-/* ---------- 多选时滑动选择 ---------- */
+/* ----- 多选时滑动选择 ----- */
 // 两种用法：①已经在多选里，手指横着在图上划一下就开始（竖着划仍然是滚动）；②长按一张图进入多选后不松手，直接拖。
 // 选中范围 = 起点到手指所在位置之间（按页面上的先后顺序）的所有图；往回拖会收缩。起点原本就是选中的，则整片取消选择。
 // 手指拖到屏幕上 / 下边缘会自动滚动。

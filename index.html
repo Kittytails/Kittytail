@@ -255,7 +255,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     html[data-theme="dark"] .upload-error-modal { background: rgba(0,0,0,.34); }
     html[data-theme="dark"] .upload-error-panel { background: rgba(30,30,32,.78); border-color: #38383A; }
     html[data-theme="dark"] .upload-error-item { background: rgba(255,255,255,.07); border-color: #38383A; }
-    html[data-theme="dark"] .upload-error-copy { border-color: rgba(255,255,255,.14); background: rgba(255,255,255,.08); }
+    html[data-theme="dark"] .upload-error-copy { border-color: rgba(255,255,255,.14); background: rgba(255,255,255,.12); }
     html[data-theme="dark"] .upload-error-close { background: #F5F5F7; color: #111113; }
 
     /* 确认 / 输入对话框（替代浏览器原生 confirm / prompt）：复用删除确认层的外观 */
@@ -808,7 +808,8 @@ body { display: block; padding: 0; min-height: 0; }
 .home .row-icon svg { width: 20px; height: 20px; }
 .home .row-icon svg * { vector-effect: non-scaling-stroke; }
 .home .row-body { flex: 1; min-width: 0; display: flex; align-items: center; margin-left: 14px; padding-right: 20px; position: relative; }
-.home .row + .row .row-body::before { content: ""; position: absolute; top: 0; left: 0; right: 20px; height: .5px; background: rgba(60,60,67,.22); }
+.home .row + .row .row-body::before { content: ""; position: absolute; top: 0; left: 0; right: 20px; height: 1px; border-radius: 1px; background: rgba(60,60,67,.04); }
+html[data-theme="dark"] .home .row + .row .row-body::before { background: rgba(255,255,255,.05); }
 .home .row-title { flex: 1; min-width: 0; font-size: 17px; font-weight: 500; line-height: 23px; letter-spacing: -.2px; }
 .home .row-arrow { flex: none; width: 8px; height: 14px; margin: 0 2px 0 12px; opacity: .45;
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14' fill='none' stroke='%23888' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.5 1.5 6.5 7l-5 5.5'/%3E%3C/svg%3E") center/contain no-repeat; }
@@ -838,7 +839,7 @@ body.kb-lock { position: fixed; left: 0; right: 0; width: 100%; overflow: hidden
 .sb-mic { flex: none; width: 40px; height: 40px; border: 0; background: none; border-radius: 50%; display: grid; place-items: center; color: #111; cursor: pointer; }
 .sb-mic svg { width: 22px; height: 22px; }
 .sb-mic:active { background: rgba(0,0,0,.06); }
-html[data-theme="dark"] .search-bar { background: rgba(44,44,46,.55); border-color: rgba(255,255,255,.12); box-shadow: 0 8px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08); }
+html[data-theme="dark"] .search-bar { background: rgba(44,44,46,.55); border-color: rgba(255,255,255,.12); box-shadow: 0 8px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.12); }
 html[data-theme="dark"] .search-bar input, html[data-theme="dark"] .sb-ico, html[data-theme="dark"] .sb-mic { color: #F5F5F7; }
 
 /* 子页面：全屏面板，无顶栏，左边缘右滑返回 */
@@ -875,7 +876,8 @@ html[data-theme="dark"] .search-bar input, html[data-theme="dark"] .sb-ico, html
     position: relative; min-height: 54px; padding: 12px 16px 12px 20px;
     cursor: pointer; transition: background .12s ease;
 }
-.pref-card + .pref-card::before { content: ""; position: absolute; top: 0; left: 20px; right: 16px; height: .5px; background: rgba(60,60,67,.22); }
+.pref-card + .pref-card::before { content: ""; position: absolute; top: 0; left: 20px; right: 20px; height: 1px; border-radius: 1px; background: rgba(60,60,67,.04); }
+html[data-theme="dark"] .pref-card + .pref-card::before { background: rgba(255,255,255,.05); }
 .pref-card:active { background: rgba(60,60,67,.12); }
 .pref-text { flex: 1; min-width: 0; font-size: 17px; font-weight: 500; line-height: 23px; letter-spacing: -.2px; color: var(--text-main); }
 .pref-card .switch {
@@ -960,7 +962,8 @@ html[data-theme="dark"] .av-btn:not(.plain) { background: #F5F5F7; color: #111; 
 .acct-group { background: var(--card-bg); border-radius: 26px; overflow: hidden; }
 .acct-row { position: relative; display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 0 16px; cursor: pointer; transition: background .12s ease; }
 .acct-row:active { background: rgba(60,60,67,.12); }
-.acct-row + .acct-row::before { content: ""; position: absolute; top: 0; left: 66px; right: 16px; height: .5px; background: rgba(60,60,67,.22); }
+.acct-row + .acct-row::before { content: ""; position: absolute; top: 0; left: 66px; right: 20px; height: 1px; border-radius: 1px; background: rgba(60,60,67,.04); }
+html[data-theme="dark"] .acct-row + .acct-row::before { background: rgba(255,255,255,.05); }
 .acct-av { flex: none; width: 38px; height: 38px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: rgba(127,127,127,.16); color: #8E8E93; font-size: 16px; font-weight: 600; }
 .acct-av svg { width: 60%; height: 60%; }
 .acct-body { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 9px 0; }
@@ -1202,8 +1205,10 @@ html[data-theme="dark"] .page { box-shadow: -.5px 0 0 rgba(255,255,255,.12); }
 #st-list .st-acct { margin: 18px 22px 8px; font-size: 13px; font-weight: 600; color: #8E8E93; }
 #st-list .st-acct:first-child { margin-top: 4px; }
 .st-group { background: var(--card-bg); border-radius: 26px; overflow: hidden; }
-.st-row { position: relative; padding: 14px 20px 15px; }
-.st-row + .st-row::before { content: ""; position: absolute; top: 0; left: 20px; right: 16px; height: .5px; background: rgba(60,60,67,.22); }
+.st-row { position: relative; padding: 15px 20px 16px; }
+/* 柔和分割线：更淡、两端留白、圆角 */
+.st-row + .st-row::before { content: ""; position: absolute; top: 0; left: 20px; right: 20px; height: 1px; border-radius: 1px; background: rgba(60,60,67,.04); }
+html[data-theme="dark"] .st-row + .st-row::before { background: rgba(255,255,255,.05); }
 .st-line { display: flex; align-items: center; gap: 8px; }
 .st-name { flex: 1; min-width: 0; font-size: 16px; font-weight: 600; letter-spacing: -.2px; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .st-badge { flex: none; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: rgba(127,127,127,.16); color: #777; }
@@ -1227,6 +1232,31 @@ html[data-theme="dark"] .page { box-shadow: -.5px 0 0 rgba(255,255,255,.12); }
 .rh-search::placeholder { color: #8E8E93; }
 html[data-theme="dark"] .rh-search { background: rgba(118,118,128,.28) var(--rh-ico) no-repeat 13px center / 16px !important; border-color: transparent !important; }
 #rh-list .st-name { font-size: 15px; }
+.fm-head-btns { display: flex; align-items: center; }
+.fm-crumb { display: flex; align-items: center; gap: 2px; overflow-x: auto; white-space: nowrap; padding: 0 14px 8px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.fm-crumb::-webkit-scrollbar { display: none; }
+.fm-crumb button { flex: none; border: 0; background: transparent !important; padding: 5px 6px; font: inherit; font-size: 13px; font-weight: 600; color: #8E8E93 !important; cursor: pointer; border-radius: 8px; }
+.fm-crumb button:last-child { color: var(--text-main) !important; }
+.fm-crumb .sep { color: #C7C7CC; font-size: 13px; }
+#fm-list .st-name { font-size: 15px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#fm-list mark { background: rgba(255,214,10,.45); color: inherit; border-radius: 3px; }
+#fm-list .st-empty { padding: 36px 20px; }
+.fm-sheet-title { word-break: break-all; }
+.fm-preview { margin: 14px 0 0; border-radius: 14px; background: rgba(118,118,128,.1); overflow: hidden; }
+.fm-preview img { display: block; max-width: 100%; max-height: 42vh; margin: 0 auto; object-fit: contain; }
+.fm-text { margin: 0; padding: 12px 14px; max-height: 40vh; overflow: auto; font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; word-break: break-all; color: var(--text-main); }
+.fm-note { padding: 22px 16px; text-align: center; font-size: 13px; color: #8E8E93; }
+.fm-actions { display: flex; gap: 8px; margin: 14px 0 16px; }
+.fm-actions .small-btn { flex: 1 1 0; min-width: 0; padding-left: 4px; padding-right: 4px; white-space: nowrap; }
+.fm-one { display: block; }
+.fm-one .delete-cancel { width: 100%; }
+.fm-hist-list { max-height: 50vh; overflow-y: auto; margin-top: 4px; }
+.fm-hist-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 2px; border-top: .5px solid rgba(60,60,67,.18); }
+.fm-hist-item:first-child { border-top: 0; }
+.fm-hist-main { flex: 1; min-width: 0; }
+.fm-hist-act { font-size: 14px; font-weight: 600; }
+.fm-hist-det { margin-top: 3px; font-size: 12px; color: #8E8E93; word-break: break-all; }
+.fm-hist-done { flex: none; font-size: 12px; color: #8E8E93; padding-top: 2px; }
 #rh-list .rh-more { text-align: center; font-size: 14px; font-weight: 600; color: var(--text-main); padding: 13px 20px; }
 .st-err { padding: 16px 20px; font-size: 13px; color: #C62828; }
 html[data-theme="dark"] .st-err { color: #FF6B63; }
@@ -1282,7 +1312,8 @@ html[data-theme="dark"] .clip-banner .cb-go { background: #F5F5F7; color: #111; 
 .about-cap { margin: 0 0 8px 4px; font-size: 13px; line-height: 18px; color: #999; }
 .about-box { background: var(--card-bg); border-radius: 26px; overflow: hidden; }
 .about-item { position: relative; padding: 14px 20px 15px; }
-.about-item + .about-item::before { content: ""; position: absolute; top: 0; left: 20px; right: 16px; height: .5px; background: rgba(60,60,67,.22); }
+.about-item + .about-item::before { content: ""; position: absolute; top: 0; left: 20px; right: 20px; height: 1px; border-radius: 1px; background: rgba(60,60,67,.04); }
+html[data-theme="dark"] .about-item + .about-item::before { background: rgba(255,255,255,.05); }
 .about-t { font-size: 16px; font-weight: 600; line-height: 22px; color: var(--text-main); }
 .about-d { margin-top: 4px; font-size: 13.5px; line-height: 20px; color: #8E8E93; }
 .about-d b { font-weight: 600; color: var(--text-main); }
@@ -1382,12 +1413,16 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
           <span class="row-body"><span class="row-title">上传</span><span class="row-arrow"></span></span>
         </button>
         <button class="row" type="button" data-keywords="library 图库 我的上传 相册" onclick="openGallery('library')">
-          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="9" cy="9" r="1.6"/><path d="M4 16.5l4.3-4.1a2 2 0 0 1 2.8 0l5.4 5.2M14 14.2l1.4-1.4a2 2 0 0 1 2.8 0l2.3 2.3"/></svg></span>
+          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><polyline points="11 3 11 11 14 8 17 11 17 3"></polyline></svg></span>
           <span class="row-body"><span class="row-title">资源库</span><span class="row-arrow"></span></span>
         </button>
         <button class="row" type="button" data-keywords="repository repo 文件 文件夹 重命名 删除" onclick="openGallery('repo')">
           <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8A2.5 2.5 0 0 1 6 5.5h3a2 2 0 0 1 1.5 .7l1 1.1a2 2 0 0 0 1.5 .7H18A2.5 2.5 0 0 1 20.5 10.5V17A2.5 2.5 0 0 1 18 19.5H6A2.5 2.5 0 0 1 3.5 17z"/></svg></span>
           <span class="row-body"><span class="row-title">仓库</span><span class="row-arrow"></span></span>
+        </button>
+        <button class="row" type="button" data-keywords="files file manager 文件管理 路径 预览 排序 历史 撤销 上传到路径" onclick="openPage('files')">
+          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M8.2 6H15a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h6.8"/></svg></span>
+          <span class="row-body"><span class="row-title">文件管理</span><span class="row-arrow"></span></span>
         </button>
       </div>
       <div class="group">
@@ -1396,11 +1431,11 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
           <span class="row-body"><span class="row-title">链接转换</span><span class="row-arrow"></span></span>
         </button>
         <button class="row" type="button" data-keywords="import 导入 文本" onclick="openPage('import')">
-          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3.5H8.5A3 3 0 0 0 5.5 6.5v11a3 3 0 0 0 3 3h7a3 3 0 0 0 3-3V8z"/><path d="M14 3.5V7a1 1 0 0 0 1 1h3.5"/><path d="M9 13h6M9 16.5h4"/></svg></span>
+          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5l1.3-3A2 2 0 0 1 7.1 4.3h9.8a2 2 0 0 1 1.8 1.2L20 8.5"/><rect x="4" y="8.5" width="16" height="11" rx="2.5"/><path d="M10 13h4"/></svg></span>
           <span class="row-body"><span class="row-title">导入文件</span><span class="row-arrow"></span></span>
         </button>
         <button class="row" type="button" data-keywords="replace 替换 下载" onclick="openPage('replace')">
-          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5 20 7l-3.5 3.5M4 12v-1a4 4 0 0 1 4-4h12M7.5 20.5 4 17l3.5-3.5M20 12v1a4 4 0 0 1-4 4H4"/></svg></span>
+          <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 22H18a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v9.5"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M13.378 15.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"></path></svg></span>
           <span class="row-body"><span class="row-title">替换链接</span><span class="row-arrow"></span></span>
         </button>
       </div>
@@ -1538,6 +1573,28 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div id="rh-list"></div>
         </div>
 
+    </div>
+
+    <div class="page" id="page-files" data-title="File Manager" data-sub="按路径管理仓库里的文件">
+        <div class="card" id="card-fm-upload">
+            <div class="title">Upload to Path</div>
+            <div class="sub">把任意文件传到仓库里你指定的路径。</div>
+            <input type="file" id="fm-file-input" style="display:none" onchange="fmPickFile(this)">
+            <button class="ghost-btn primary" type="button" onclick="document.getElementById('fm-file-input').click()">选择文件并指定路径</button>
+        </div>
+
+        <div id="fm-wrap">
+            <div class="rh-head">
+                <div class="rh-title" id="fm-title">仓库文件</div>
+                <div class="fm-head-btns">
+                    <button class="rh-clear" type="button" onclick="fmOpenHist()">历史</button>
+                    <button class="rh-clear" type="button" onclick="fmEnter(true)">刷新</button>
+                </div>
+            </div>
+            <div class="fm-crumb" id="fm-crumb"></div>
+            <input type="search" id="fm-search" class="rh-search" placeholder="搜索路径" oninput="fmSearchInput(this.value)" style="display:none">
+            <div id="fm-list"></div>
+        </div>
     </div>
 
     <input type="file" id="orphan-scan-input" multiple style="display:none" onchange="handleOrphanScan(this.files)">
@@ -1835,6 +1892,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div class="about-item"><div class="about-t">自定义复制格式</div><div class="about-d">设置里的「自定义模板」可以写自己的复制格式：{url} 是直链，{name} 是文件名，{stem} 是不带扩展名的文件名，{ext} 是扩展名。例如 url("{url}")。保存后复制格式会切到「自定义」，换回直链、Markdown 或 HTML 就恢复原样。</div></div>
             <div class="about-item"><div class="about-t">导出链接清单</div><div class="about-d">仓库页的「更多工具」和资源库的菜单里都有「导出链接清单」，可以按选中、当前列表或全部，导出成纯链接、按当前复制格式、JSON 或 CSV 文件，方便备份、搬家和批量替换。</div></div>
             <div class="about-item"><div class="about-t">替换历史</div><div class="about-d">「替换链接」页下面会记下每次替换（包括表情包转存）生成的新文件，不会自动删除，一直留到你自己移除或清空。点一条可以重新下载、复制「旧链接 → 新直链」的对照表，或从列表移除。内容只存在这台设备的浏览器里，不会上传；导出备份时会一起带上（备份文件会因此变大），导入时只补回缺少的，已有的不会被覆盖。没有备份的话，清除网站数据会把它一起清掉。</div></div>
+            <div class="about-item"><div class="about-t">文件管理</div><div class="about-d">按文件夹逐层浏览仓库里的文件。点一个文件可以预览（图片、文本代码），并复制直链、移动 / 重命名、在文件夹内手动上移下移、删除（删除的文件可以在「最近删除」恢复）。顶部可以把任意文件上传到你指定的路径；右上角「历史」记着这个仓库最近 30 次操作，移动类操作可以撤销。排序和历史只存在这台设备上。</div></div>
             </div>
         </div>
         <div class="about-sec">
@@ -2007,6 +2065,31 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
         <div class="delete-sheet-actions">
             <button class="delete-cancel" onclick="closeMoveSheet()">取消</button>
             <button class="delete-confirm" onclick="confirmMoveSheet()">确认移动</button>
+        </div>
+    </div>
+</div>
+
+<!-- 文件管理：文件详情 / 预览 -->
+<div class="delete-sheet-backdrop" id="fm-sheet-backdrop" onclick="if(event.target===this) fmCloseSheet()">
+    <div class="delete-sheet" role="dialog" aria-modal="true" aria-labelledby="fm-sheet-title">
+        <div class="delete-sheet-title fm-sheet-title" id="fm-sheet-title"></div>
+        <div class="delete-sheet-sub" id="fm-sheet-sub"></div>
+        <div class="fm-preview" id="fm-preview"></div>
+        <div class="fm-actions" id="fm-actions"></div>
+        <div class="delete-sheet-actions fm-one">
+            <button class="delete-cancel" type="button" onclick="fmCloseSheet()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<!-- 文件管理：操作历史 -->
+<div class="delete-sheet-backdrop" id="fm-hist-backdrop" onclick="if(event.target===this) fmCloseHist()">
+    <div class="delete-sheet" role="dialog" aria-modal="true" aria-labelledby="fm-hist-title">
+        <div class="delete-sheet-title" id="fm-hist-title">操作历史</div>
+        <div class="delete-sheet-sub">这个仓库最近的 30 次操作，只存在这台设备上。</div>
+        <div class="fm-hist-list" id="fm-hist-list"></div>
+        <div class="delete-sheet-actions fm-one">
+            <button class="delete-cancel" type="button" onclick="fmCloseHist()">关闭</button>
         </div>
     </div>
 </div>
@@ -3071,6 +3154,7 @@ function openPage(name) {
         if (name === 'storage') loadStorage(false);
         if (name === 'recycle') recycleRender();
         if (name === 'replace') rhRender();
+        if (name === 'files') fmEnter(false);
         if (name === 'prefs') renderPlugins();
         if (name === 'about') { renderAboutPlugins(); try { offlineStatusRefresh(); } catch (_) {} try { storageStatusRefresh(); } catch (_) {} }
         if (name === 'update' && typeof aboutOnOpen === 'function') aboutOnOpen();
@@ -7905,6 +7989,353 @@ async function rhClear() {
     }).catch(e => console.warn('清空替换历史失败：', e));
 }
 
+/* ---------- 文件管理（File Manager）：按路径浏览仓库文件，预览 / 移动 / 手动排序 / 上传到指定路径，并记录操作历史 ----------
+   文件列表和仓库页共用同一份数据（repoLiveFiles），移动、删除都走仓库页现成的提交、撤销和「最近删除」逻辑；
+   这一页自己只多存两样东西：每个仓库的手动排序、最近 30 次操作的历史。 */
+const FM_TEXT_MAX = 2 * 1024 * 1024, FM_IMG_MAX = 8 * 1024 * 1024, FM_TEXT_SHOW = 200000;
+const FM_UPLOAD_MAX = 50 * 1024 * 1024, FM_HIST_MAX = 30, FM_PAGE = 100;
+const FM_IMG_RE = /\.(png|jpe?g|gif|webp|avif|svg|bmp|ico)$/i;
+let fmPath = '', fmQuery = '', fmShowAll = false, fmLastId = '', fmState = 'loading', fmPrevSeq = 0;
+
+function fmId() { return repoMetaCtx && repoMetaCtx.owner ? (repoMetaCtx.owner + '/' + repoMetaCtx.repo).toLowerCase() : ''; }
+function fmNorm(p) { return String(p || '').replace(/\\/g, '/').split('/').map(x => x.trim()).filter(x => x && x !== '.' && x !== '..').join('/'); }
+// mode：'move' 目标已存在就拒绝；'upload' 目标已存在由调用方确认覆盖
+function fmPathProblem(v, from, mode) {
+    const p = fmNorm(v);
+    if (!p) return '路径不能为空';
+    if (p === from) return '路径没有变化';
+    if (/^\.directlink(\/|$)/i.test(p) || /(^|\/)\.git(\/|$)/i.test(p)) return '这个路径是保留的，换一个';
+    if (p.split('/').some(x => INVALID_FOLDER_NAME_RE.test(x))) return '路径里不能包含 \\ : * ? " < > |';
+    if (repoLiveFiles.some(f => f.path.indexOf(p + '/') === 0)) return '已经有同名的文件夹';
+    const parts = p.split('/');
+    for (let i = 1; i < parts.length; i++) {
+        const up = parts.slice(0, i).join('/');
+        if (repoLiveFiles.some(f => f.path === up)) return '上级路径「' + up + '」是一个文件';
+    }
+    if (mode === 'move' && repoLiveFiles.some(f => f.path === p)) return '目标已经存在，换一个路径';
+    return '';
+}
+function fmSizeText(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(0.1, n / 1024).toFixed(1) + ' KB'; }
+
+/* --- 手动排序（每个仓库一份，存在本机） --- */
+function fmOrderKey() { return 'kb_fm_order:' + fmId(); }
+function fmOrderLoad() { try { const a = JSON.parse(lsGet(fmOrderKey()) || '[]'); return Array.isArray(a) ? a : []; } catch (_) { return []; } }
+function fmMerged() {   // 已排过序的在前（按你排的顺序），没排过的按名字排在后面
+    const have = new Set(repoLiveFiles.map(f => f.path));
+    const saved = fmOrderLoad().filter(x => have.has(x));
+    const known = new Set(saved);
+    const rest = repoLiveFiles.filter(f => !known.has(f.path)).map(f => f.path).sort((a, b) => a.localeCompare(b, 'zh'));
+    return saved.concat(rest);
+}
+function fmOrderRename(from, to) {
+    const a = fmOrderLoad(), i = a.indexOf(from);
+    if (i < 0) return;
+    a[i] = to;
+    try { lsSet(fmOrderKey(), JSON.stringify(a)); } catch (_) {}
+}
+function fmShift(path, delta) {
+    const vis = fmVisible().files;
+    const i = vis.findIndex(f => f.path === path), j = i + delta;
+    if (i < 0) return;
+    if (j < 0 || j >= vis.length) return toast('已经在最' + (delta < 0 ? '前' : '后') + '面了', 'info');
+    const order = fmMerged();
+    const a = order.indexOf(path), b = order.indexOf(vis[j].path);
+    if (a < 0 || b < 0) return;
+    order[a] = vis[j].path; order[b] = path;
+    try { lsSet(fmOrderKey(), JSON.stringify(order)); } catch (_) { return toast('保存排序失败：本机存储空间不足', 'error'); }
+    fmRender();
+    toast(delta < 0 ? '已上移' : '已下移', 'ok');
+}
+
+/* --- 操作历史（每个仓库一份，最近 30 条） --- */
+function fmHistKey() { return 'kb_fm_hist:' + fmId(); }
+function fmHistLoad() { try { const a = JSON.parse(lsGet(fmHistKey()) || '[]'); return Array.isArray(a) ? a : []; } catch (_) { return []; } }
+function fmHistSave(a) { try { lsSet(fmHistKey(), JSON.stringify(a.slice(0, FM_HIST_MAX))); } catch (_) {} }
+function fmHistAdd(action, detail, undo) {
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    const a = fmHistLoad();
+    a.unshift({ id: id, time: Date.now(), action: action, detail: detail, undo: undo || null });
+    fmHistSave(a);
+    return id;
+}
+function fmHistMarkUndone(id) {
+    const a = fmHistLoad(), e = a.find(x => x.id === id);
+    if (!e) return;
+    e.undo = null; e.undone = true;
+    fmHistSave(a);
+}
+function fmOpenHist() {
+    const box = $('fm-hist-list');
+    box.innerHTML = '';
+    const a = fmHistLoad();
+    if (!a.length) { const e = document.createElement('div'); e.className = 'fm-note'; e.textContent = '还没有操作记录'; box.appendChild(e); }
+    a.forEach(it => {
+        const row = document.createElement('div'); row.className = 'fm-hist-item';
+        const main = document.createElement('div'); main.className = 'fm-hist-main';
+        const act = document.createElement('div'); act.className = 'fm-hist-act'; act.textContent = it.action;
+        const det = document.createElement('div'); det.className = 'fm-hist-det'; det.textContent = it.detail + ' · ' + recycleAgo(it.time);
+        main.appendChild(act); main.appendChild(det); row.appendChild(main);
+        if (it.undo) {
+            const b = document.createElement('button'); b.type = 'button'; b.className = 'small-btn'; b.textContent = '撤销';
+            b.onclick = () => fmUndoHist(it.id);
+            row.appendChild(b);
+        } else if (it.undone) {
+            const d = document.createElement('div'); d.className = 'fm-hist-done'; d.textContent = '已撤销'; row.appendChild(d);
+        }
+        box.appendChild(row);
+    });
+    $('fm-hist-backdrop').classList.add('show');
+}
+function fmCloseHist() { $('fm-hist-backdrop').classList.remove('show'); }
+async function fmUndoHist(id) {
+    const e = fmHistLoad().find(x => x.id === id);
+    if (!e || !e.undo) return;
+    const ok = await showConfirm({ title: '撤销这次操作？', message: e.detail, confirmText: '撤销' });
+    if (!ok) return;
+    toast('正在撤销…', 'loading');
+    try {
+        const u = e.undo;
+        const msg = await undoRepoMoves(u.owner, u.repo, u.branch, u.moves);
+        u.moves.forEach(m => fmOrderRename(m.to, m.from));
+        fmHistMarkUndone(id);
+        toast(msg || '已撤销', 'ok');
+        fmOpenHist(); fmRender();
+    } catch (err) {
+        toast('撤销失败：' + ((err && err.message) || '未知错误'), 'error');
+    }
+}
+
+/* --- 读取 / 列表 --- */
+async function fmEnter(force) {
+    const s = getSettings();
+    if (!s.token) { fmState = 'notoken'; return fmRender(); }
+    if (!s.repo) { fmState = 'norepo'; return fmRender(); }
+    if (!repoLiveLoaded || force) {
+        fmState = 'loading'; fmRender();
+        try {
+            await loadRepoLiveFiles(!!force);
+            const t0 = Date.now();
+            while (repoLiveLoading && Date.now() - t0 < 60000) await new Promise(r => setTimeout(r, 150));   // 别处正在读：等它读完
+        } catch (_) {}
+    }
+    if (!repoLiveLoaded) { fmState = 'error'; return fmRender(); }
+    if (fmId() !== fmLastId) { fmLastId = fmId(); fmPath = ''; fmQuery = ''; const sb = $('fm-search'); if (sb) sb.value = ''; }
+    fmState = 'ok';
+    fmRender();
+}
+function fmVisible() {
+    const q = fmQuery.trim().toLowerCase();
+    const prefix = fmPath ? fmPath + '/' : '';
+    let files, folders = [];
+    if (q) files = repoLiveFiles.filter(f => f.name !== '.gitkeep' && f.path.toLowerCase().indexOf(q) >= 0);
+    else {
+        const set = new Set();
+        files = [];
+        repoLiveFiles.forEach(f => {
+            if (f.path.indexOf(prefix) !== 0) return;
+            const rest = f.path.slice(prefix.length), slash = rest.indexOf('/');
+            if (slash > 0) set.add(rest.slice(0, slash));
+            else if (f.name !== '.gitkeep') files.push(f);
+        });
+        folders = Array.from(set).sort((a, b) => a.localeCompare(b, 'zh'));
+    }
+    const idx = new Map(fmMerged().map((p, i) => [p, i]));
+    files.sort((a, b) => idx.get(a.path) - idx.get(b.path));
+    return { folders: folders, files: files };
+}
+function fmSearchInput(v) { fmQuery = v || ''; fmShowAll = false; fmRender(); }
+function fmGo(path) { fmPath = path; fmQuery = ''; fmShowAll = false; const sb = $('fm-search'); if (sb) sb.value = ''; fmRender(); const pg = $('page-files'); if (pg) pg.scrollTop = 0; }
+function fmMark(el, text, q) {
+    const i = q ? text.toLowerCase().indexOf(q) : -1;
+    if (i < 0) { el.textContent = text; return; }
+    el.textContent = '';
+    el.append(text.slice(0, i));
+    const m = document.createElement('mark'); m.textContent = text.slice(i, i + q.length); el.appendChild(m);
+    el.append(text.slice(i + q.length));
+}
+function fmNote(text) { const e = document.createElement('div'); e.className = 'st-empty'; e.textContent = text; return e; }
+function fmRender() {
+    const list = $('fm-list'), crumb = $('fm-crumb'), sb = $('fm-search');
+    if (!list || !crumb) return;
+    list.innerHTML = ''; crumb.innerHTML = '';
+    const msg = { notoken: '请先在设置里配置 GitHub Token', norepo: '在上传页点「更换」选择一个仓库后显示文件', loading: '读取中…', error: '读取失败，点右上角「刷新」重试' }[fmState];
+    if (msg) { if (sb) sb.style.display = 'none'; list.appendChild(fmNote(msg)); return; }
+    if (fmPath && !repoLiveFiles.some(f => f.path.indexOf(fmPath + '/') === 0)) fmPath = '';   // 当前文件夹已经没了（被删 / 改名）：回到根目录
+    const mk = (label, path, last) => {
+        if (crumb.childNodes.length) { const sp = document.createElement('span'); sp.className = 'sep'; sp.textContent = '/'; crumb.appendChild(sp); }
+        const b = document.createElement('button'); b.type = 'button'; b.textContent = label;
+        b.onclick = () => fmGo(path);
+        crumb.appendChild(b);
+    };
+    mk('仓库', '');
+    if (fmPath) fmPath.split('/').forEach((part, i, arr) => mk(part, arr.slice(0, i + 1).join('/')));
+    crumb.style.display = fmQuery.trim() || !fmPath ? 'none' : '';
+    if (sb) sb.style.display = repoLiveFiles.length > 8 || fmQuery ? '' : 'none';
+    const q = fmQuery.trim().toLowerCase();
+    const v = fmVisible();
+    if (!v.folders.length && !v.files.length) { list.appendChild(fmNote(q ? '没有找到' : '这里还没有文件')); return; }
+    const group = document.createElement('div'); group.className = 'st-group';
+    const addRow = (name, sub, onTap, hl) => {
+        const row = document.createElement('div'); row.className = 'st-row rb-row';
+        row.setAttribute('role', 'button'); row.tabIndex = 0;
+        row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); } };
+        const line = document.createElement('div'); line.className = 'st-line';
+        const nm = document.createElement('span'); nm.className = 'st-name';
+        if (hl) fmMark(nm, name, q); else nm.textContent = name;
+        line.appendChild(nm); row.appendChild(line);
+        if (sub) { const sb2 = document.createElement('div'); sb2.className = 'rb-sub'; sb2.textContent = sub; row.appendChild(sb2); }
+        row.onclick = onTap;
+        group.appendChild(row);
+    };
+    v.folders.forEach(name => addRow(name + '/', '', () => fmGo((fmPath ? fmPath + '/' : '') + name), false));
+    const left = FM_PAGE - v.folders.length;
+    const shown = fmShowAll ? v.files : v.files.slice(0, Math.max(20, left));
+    shown.forEach(f => addRow(q ? f.path : f.name, fmSizeText(f.size || 0), () => fmOpenFile(f), !!q));
+    if (v.files.length > shown.length) {
+        const more = document.createElement('div'); more.className = 'st-row rb-row rh-more'; more.setAttribute('role', 'button'); more.tabIndex = 0;
+        more.textContent = '显示更多';
+        more.onclick = () => { fmShowAll = true; fmRender(); };
+        more.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); more.click(); } };
+        group.appendChild(more);
+    }
+    list.appendChild(group);
+    const t = $('fm-title'); if (t) t.textContent = '仓库文件 · ' + repoLiveFiles.length + ' 个';
+}
+
+/* --- 文件详情 / 预览 --- */
+function fmOpenFile(f) {
+    const seq = ++fmPrevSeq;
+    $('fm-sheet-title').textContent = f.name;
+    $('fm-sheet-sub').textContent = (f.path !== f.name ? f.path + ' · ' : '') + fmSizeText(f.size || 0);
+    const acts = $('fm-actions'); acts.innerHTML = '';
+    const btn = (label, fn, danger) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'small-btn' + (danger ? ' danger' : ''); b.textContent = label; b.onclick = fn; acts.appendChild(b); };
+    btn('复制直链', () => fmCopyLink(f));
+    btn('移动 / 改名', () => fmMove(f));
+    btn('上移', () => fmShift(f.path, -1));
+    btn('下移', () => fmShift(f.path, 1));
+    btn('删除', () => fmDelete(f), true);
+    fmLoadPreview(f, seq);
+    $('fm-sheet-backdrop').classList.add('show');
+}
+function fmCloseSheet() { fmPrevSeq++; $('fm-sheet-backdrop').classList.remove('show'); }
+function fmSetPreviewNote(text) { const box = $('fm-preview'); box.innerHTML = ''; const n = document.createElement('div'); n.className = 'fm-note'; n.textContent = text; box.appendChild(n); }
+async function fmLoadPreview(f, seq) {
+    const isImg = FM_IMG_RE.test(f.path);
+    if ((f.size || 0) > (isImg ? FM_IMG_MAX : FM_TEXT_MAX)) return fmSetPreviewNote(isImg ? '图片比较大，暂不预览（超过 8 MB）' : '文件比较大，暂不预览（超过 2 MB）');
+    fmSetPreviewNote('读取中…');
+    try {
+        const s = getSettings();
+        const b = await githubRequest('/repos/' + f.owner + '/' + f.repo + '/git/blobs/' + f.sha, { method: 'GET' }, s.token, s.proxy);
+        if (seq !== fmPrevSeq) return;
+        const b64 = String((b && b.content) || '').replace(/\s/g, '');
+        const box = $('fm-preview');
+        if (isImg) {
+            const ext = (f.path.split('.').pop() || '').toLowerCase();
+            const mime = ext === 'svg' ? 'image/svg+xml' : ext === 'jpg' ? 'image/jpeg' : ext === 'ico' ? 'image/x-icon' : 'image/' + ext;
+            const img = new Image();
+            img.alt = f.name;
+            img.onerror = () => { if (seq === fmPrevSeq) fmSetPreviewNote('图片无法显示'); };
+            img.src = 'data:' + mime + ';base64,' + b64;
+            box.innerHTML = ''; box.appendChild(img);
+            return;
+        }
+        const text = metaB64Decode(b64);
+        if (text.indexOf('\u0000') >= 0) return fmSetPreviewNote('这是二进制文件，不能预览');
+        const pre = document.createElement('pre'); pre.className = 'fm-text';
+        pre.textContent = text.length > FM_TEXT_SHOW ? text.slice(0, FM_TEXT_SHOW) + '\n\n…（只显示前 ' + FM_TEXT_SHOW + ' 个字符）' : text;
+        box.innerHTML = ''; box.appendChild(pre);
+    } catch (e) {
+        if (seq === fmPrevSeq) fmSetPreviewNote('预览失败：' + ((e && e.message) || '未知错误'));
+    }
+}
+async function fmCopyLink(f) {
+    const url = (f.size || 0) > 20 * 1024 * 1024 ? f.rawUrl : f.url;   // jsDelivr 单文件上限 20MB，超过改用 raw 直链
+    const ok = await writeClipboard(url);
+    toast(ok ? '直链已复制' : '复制失败，请手动复制', ok ? 'ok' : 'error');
+}
+
+/* --- 移动 / 重命名、删除、上传到指定路径 --- */
+async function fmMove(f) {
+    const from = f.path;   // 先记下原路径：applyLocalMoves 会就地改掉 f.path
+    const raw = await showPrompt({ title: '移动 / 重命名', message: '输入新的完整路径（含文件名）', value: from, validate: v => fmPathProblem(v, from, 'move') });
+    if (raw === null) return;
+    const to = fmNorm(raw);
+    fmCloseSheet();
+    toast('正在移动…', 'loading');
+    try {
+        const s = getSettings();
+        const ctx = await resolveGithubContext();
+        await commitTreeChanges(ctx.owner, s.repo, ctx.branch, [
+            { path: from, mode: '100644', type: 'blob', sha: null },
+            { path: to, mode: '100644', type: 'blob', sha: f.sha }
+        ], '移动 ' + from + ' → ' + to, s);
+        const moves = [{ from: from, to: to, sha: f.sha }];
+        applyLocalMoves(ctx.owner, s.repo, ctx.branch, moves);
+        fmOrderRename(from, to);
+        renderRepoLiveFiles();
+        const undo = { owner: ctx.owner, repo: s.repo, branch: ctx.branch, moves: moves };
+        const hid = fmHistAdd(pathBasename(from) === pathBasename(to) ? '移动' : '移动 / 重命名', from + ' → ' + to, undo);
+        fmRender();
+        offerUndo('已移动到 ' + to, async () => {
+            const msg = await undoRepoMoves(undo.owner, undo.repo, undo.branch, undo.moves);
+            fmOrderRename(to, from); fmHistMarkUndone(hid); fmRender();
+            return msg;
+        });
+    } catch (e) {
+        toast('移动失败：' + ((e && e.message) || '未知错误'), 'error');
+    }
+}
+async function fmDelete(f) {
+    fmCloseSheet();
+    repoSelected.clear(); repoSelected.add(f.path);
+    try { await deleteSelectedRepoFiles(); } finally { repoSelected.clear(); }   // 确认框、提交、「最近删除」和撤销条都在这里面
+    if (!repoLiveFiles.some(x => x.path === f.path)) fmHistAdd('删除', f.path + '（可在「最近删除」恢复）', null);
+    fmRender();
+}
+async function fmPickFile(input) {
+    const file = input.files && input.files[0];
+    input.value = '';
+    if (!file) return;
+    const s = getSettings();
+    if (!s.token) return toast('请先配置 Token', 'error');
+    if (!s.repo) return toast('请先选择仓库', 'error');
+    if (file.size > FM_UPLOAD_MAX) return toast('文件太大：单个文件请控制在 50 MB 以内', 'error');
+    if (!repoLiveLoaded) { await fmEnter(false); if (!repoLiveLoaded) return toast('读取仓库失败，暂时不能上传', 'error'); }
+    const raw = await showPrompt({ title: '上传到哪个路径', message: '输入仓库里的完整路径（含文件名）', value: (fmPath ? fmPath + '/' : '') + file.name, validate: v => fmPathProblem(v, '', 'upload') });
+    if (raw === null) return;
+    const path = fmNorm(raw);
+    const old = repoLiveFiles.find(f => f.path === path);
+    if (old) {
+        const ok = await showConfirm({ title: '覆盖同名文件？', message: path + ' 已经存在，上传会覆盖它。', confirmText: '覆盖' });
+        if (!ok) return;
+    }
+    toast('正在上传…', 'loading');
+    try {
+        const ctx = await resolveGithubContext();
+        let sha = '';
+        try {
+            const blob = await uploadBlobChunked(file, ctx.owner, s, (t) => toast(file.name + ' · ' + t, 'loading'), ctx);
+            sha = blob.sha;
+            await commitTreeChanges(ctx.owner, s.repo, ctx.branch, [{ path: path, mode: '100644', type: 'blob', sha: sha }], '上传 ' + path, s);
+        } catch (e) {
+            if (!(e && e.status === 409 && /empty/i.test(String(e.message)))) throw e;
+            await uploadViaContentsApi(file, path, ctx.owner, ctx.branch, s);   // 仓库还是空的：第一次提交只能走 contents 接口
+            sha = '';
+        }
+        if (sha) {
+            const rec = { path: path, name: pathBasename(path), sha: sha, size: file.size, type: repoFileType(path), url: repoCdnUrl(ctx.owner, s.repo, ctx.branch, path), rawUrl: repoRawUrl(ctx.owner, s.repo, ctx.branch, path), owner: ctx.owner, repo: s.repo, branch: ctx.branch };
+            const i = repoLiveFiles.findIndex(f => f.path === path);
+            if (i >= 0) repoLiveFiles[i] = Object.assign({}, repoLiveFiles[i], rec); else repoLiveFiles.push(rec);
+            renderRepoLiveFiles();
+        }
+        fmHistAdd(old ? '上传（覆盖）' : '上传', path, null);
+        toast(old ? '已覆盖 ' + pathBasename(path) : '已上传到 ' + path, 'ok');
+        if (sha) fmRender(); else fmEnter(true);
+    } catch (e) {
+        toast('上传失败：' + ((e && e.message) || '未知错误'), 'error');
+    }
+}
+
 function buildReplaceOutput(fileName, mime, bom, originalText, map, protoRelative, total, aliases, sess) {
     if (!map.size) { hideReplaceResult(); return; }
     const r = applyLinkMap(originalText, map, protoRelative, aliases);
@@ -10710,7 +11141,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= v1.6：拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '3.0.37';
+const APP_VERSION = '3.0.38';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}

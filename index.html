@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<script>const APP_VERSION = '3.0.61';   // 放在文件最前面：检查更新时读到这一行就不再往下下载</script>
+<script>const APP_VERSION = '3.0.62';   // 放在文件最前面：检查更新时读到这一行就不再往下下载</script>
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F7F7F9">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111113">
@@ -32,7 +32,10 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
         --rh-ico: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2.2' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg>");   /* 搜索框里的放大镜 */
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; scrollbar-width: none; }
-    *::-webkit-scrollbar { display: none; }   /* 所有滚动区域都不显示滚动条（iOS 的长条） */
+    *::-webkit-scrollbar { display: none; }   /* 原生滚动条一律不显示（iOS 的长条），改用下面固定短短一截的指示条 */
+    #scroll-ind { position: fixed; right: 2px; top: 0; width: 3px; height: 34px; border-radius: 2px; background: rgba(60,60,67,.42); opacity: 0; transition: opacity .3s ease; pointer-events: none; z-index: 5000; }
+    #scroll-ind.on { opacity: 1; transition-duration: .1s; }
+    html[data-theme="dark"] #scroll-ind { background: rgba(235,235,245,.45); }
     html, body { touch-action: manipulation; }
     body {
         font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Roboto, sans-serif;
@@ -106,6 +109,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .repo-filter-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 15px; }
     .repo-filter-row .repo-filter-group { margin:0 !important; flex-shrink:0; }
     /* 仓库文件：与上方图库保持完全相同的三列、间距、缩略图与文件名规格 */
+    .repo-more { height:1px; }
     .repo-live-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px 16px; }
     .repo-live-item { position:relative; min-width:0; display:flex; flex-direction:column; gap:6px; cursor:pointer; touch-action:manipulation; transition:transform .2s cubic-bezier(.34,1.56,.64,1); }
     .repo-live-item:active { transform:scale(.95); }
@@ -5930,30 +5934,29 @@ function authThumbNote(err) {   // 失败原因只提示一次，别刷屏
     authThumbWarned = true;
     toast('私有仓库缩略图读取失败：' + ((err && err.message) || '未知原因') + '（不影响复制直链）', 'info');
 }
-// 带 Token 读一个文件的原始内容：超时、限流、5xx 各自处理
-async function authThumbFetch(url, token) {
-    let lastErr = null;
-    for (let i = 0; i < 3; i++) {
-        const ctl = new AbortController();
-        const timer = setTimeout(() => ctl.abort(), 45000);
-        try {
-            const res = await fetch(url, { cache: 'no-store', signal: ctl.signal, headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github.raw' } });
-            if (res.ok) return await res.blob();
-            const ra = Number(res.headers.get('retry-after')) || 0;
-            const limited = res.status === 429 || (res.status === 403 && (ra || res.headers.get('x-ratelimit-remaining') === '0'));
-            const err = new Error(limited ? 'GitHub 限流（HTTP ' + res.status + '），稍后再试' : 'HTTP ' + res.status);
-            err.status = res.status;
-            if (limited && ra && ra <= 10 && i < 2) { lastErr = err; await sleep(ra * 1000 + 200); continue; }
-            if ([500, 502, 503, 504].includes(res.status) && i < 2) { lastErr = err; await sleep(600 * (i + 1)); continue; }
-            throw err;
-        } catch (e) {
-            if (e && e.status) throw e;
-            lastErr = (e && e.name === 'AbortError') ? new Error('请求超时') : (e instanceof TypeError ? new Error('网络或代理不通') : e);
-            if (i === 2) throw lastErr;
-            await sleep(600 * (i + 1));
-        } finally { clearTimeout(timer); }
+function b64ToBlob(b64, type) {
+    const bin = atob(String(b64 || '').replace(/\s/g, ''));
+    const u = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+    return new Blob([u], { type });
+}
+// 读文件内容（base64）：和「文件管理」预览同一条路，走 githubRequest，经代理也能用，超时/限流都由它处理
+async function authThumbRead(owner, repo, branch, path, sha, s) {
+    const root = '/repos/' + owner + '/' + repo;
+    if (!sha) {   // 图库记录没带 sha：先按路径读，小文件直接带内容，大文件只给 sha
+        const j = await githubRequest(root + '/contents/' + path.split('/').map(encodeURIComponent).join('/') + '?ref=' + encodeURIComponent(branch || 'main'), { method: 'GET' }, s.token, s.proxy);
+        if (j && j.encoding === 'base64' && j.content) return j.content;
+        sha = j && j.sha;
     }
-    throw lastErr || new Error('读取失败');
+    if (!sha) throw new Error('读不到这个文件');
+    const j = await githubRequest(root + '/git/blobs/' + sha, { method: 'GET' }, s.token, s.proxy);
+    if (!j || !j.content) throw new Error('文件内容为空');
+    return j.content;
+}
+function repoFileSha(owner, repo, path) {   // 仓库列表读过的话，直接拿到 sha，少一次请求
+    if (!repoLiveLoaded) return '';
+    const f = repoLiveFiles.find(x => x.path === path && x.owner === owner && x.repo === repo);
+    return f ? f.sha : '';
 }
 function loadAuthThumb(owner, repo, branch, path, sha) {
     const key = owner + '/' + repo + '@' + (branch || 'main') + '/' + path;
@@ -5966,27 +5969,14 @@ function loadAuthThumb(owner, repo, branch, path, sha) {
         const s = getSettings();
         await authThumbSlot();
         try {
-            const base = s.proxy || 'https://api.github.com';
-            let blob;
-            try {
-                blob = await authThumbFetch(base + '/repos/' + owner + '/' + repo + '/contents/' +
-                    path.split('/').map(encodeURIComponent).join('/') + '?ref=' + encodeURIComponent(branch || 'main'), s.token);
-            } catch (e) {
-                // 按路径读不到时，有 sha 就改按 blob 读（不受分支、路径特殊字符影响）
-                if (!sha || (e && e.status === 401)) throw e;
-                try { blob = await authThumbFetch(base + '/repos/' + owner + '/' + repo + '/git/blobs/' + sha, s.token); }
-                catch (_) { throw e; }
-            }
             const ext = (path.split('.').pop() || '').toLowerCase();
-            const type = DL_MIME[ext] || blob.type || 'image/jpeg';
-            const keepOriginal = () => {
-                authThumbRepos.add(owner + '/' + repo);
-                return URL.createObjectURL(blob.type === type ? blob : new Blob([blob], { type }));
-            };
+            const type = DL_MIME[ext] || 'image/jpeg';
+            const blob = b64ToBlob(await authThumbRead(owner, repo, branch, path, sha, s), type);
+            const keepOriginal = () => { authThumbRepos.add(owner + '/' + repo); return URL.createObjectURL(blob); };
             // 小文件、SVG、动图直接用原文件，别白白重绘
             if (blob.size < 150 * 1024 || ext === 'svg' || ext === 'gif') return keepOriginal();
             try {
-                const bmp = await createImageBitmap(new Blob([blob], { type }));
+                const bmp = await createImageBitmap(blob);
                 try {
                     const k = Math.min(1, 360 / Math.max(bmp.width, bmp.height));
                     const c = document.createElement('canvas');
@@ -6028,11 +6018,15 @@ function makeThumbKeeper() {
     return { watch(img, get) { img._thumb = { get, released: false }; io.observe(img); }, stop() { io.disconnect(); } };
 }
 let repoThumbKeeper = null, galleryThumbKeeper = null;
+let repoMoreIO = null, repoRenderMore = null;   // 仓库页分批画格子：接着画的观察器 / 接着画的函数
+const REPO_TILE_BATCH = 60;
 function renderRepoLiveFiles() {
     const container = $('repo-live-container');
     if (!container) return;
     repoViewEpoch++;   // 重画前先让缓存作废，下面只会算一遍
     if (repoThumbKeeper) { repoThumbKeeper.stop(); repoThumbKeeper = null; }   // 旧的格子马上要被清掉，别让观察器一直引用它们
+    if (repoMoreIO) { repoMoreIO.disconnect(); repoMoreIO = null; }
+    repoRenderMore = null;
     if (repoLiveLoaded) {
         while (repoCurrentPath && !repoLiveFiles.some(f => f.path.startsWith(repoCurrentPath + '/'))) {
             const i = repoCurrentPath.lastIndexOf('/');
@@ -6079,7 +6073,7 @@ function renderRepoLiveFiles() {
         list.appendChild(item);
     });
 
-    visible.forEach(file => {
+    const addTile = file => {
         const item = document.createElement('div');
         item.className = 'gallery-tile repo-live-item' + (repoSelected.has(file.path) ? ' selected' : '');
         item.title = (repoMultiMode ? '点击选择 · ' : '点击复制直链 · 长按多选 · ') + file.path;
@@ -6217,8 +6211,28 @@ function renderRepoLiveFiles() {
         const meta = makeTileMeta([formatBytes(file.size), ts ? formatDate(ts).slice(5) : ''].filter(Boolean).join(' · '));
         if (meta) item.appendChild(meta);
         list.appendChild(item);
-    });
+    };
+    // 文件多的仓库：先画一屏多一点，剩下的滚到附近再接着画，进页面不再卡一下
+    let shown = 0;
+    const more = document.createElement('div'); more.className = 'repo-more'; more.setAttribute('aria-hidden', 'true');
+    const finish = () => { if (repoMoreIO) { repoMoreIO.disconnect(); repoMoreIO = null; } repoRenderMore = null; more.remove(); };
+    // untilPath：画到这个文件为止（「定位到仓库」要用）；不传就画下一批
+    const drawMore = untilPath => {
+        if (untilPath) { while (shown < visible.length) { const f = visible[shown++]; addTile(f); if (f.path === untilPath) break; } }
+        else for (let n = 0; n < REPO_TILE_BATCH && shown < visible.length; n++) addTile(visible[shown++]);
+        if (shown >= visible.length) finish();
+        else if (!untilPath && more.getBoundingClientRect().top < innerHeight + 1500) drawMore();   // 一批没填满屏幕附近，接着画
+    };
     container.appendChild(list);
+    for (let n = 0; n < REPO_TILE_BATCH && shown < visible.length; n++) addTile(visible[shown++]);
+    if (shown < visible.length) {
+        container.appendChild(more);
+        repoRenderMore = drawMore;
+        if ('IntersectionObserver' in window) {
+            repoMoreIO = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) drawMore(); }, { rootMargin: '1500px 0px' });
+            repoMoreIO.observe(more);
+        } else { while (shown < visible.length) drawMore(); }
+    }
 }
 
 function formatBytes(n) {
@@ -6362,7 +6376,7 @@ function renderGallery(opts) {
                 };
                 const viaApi = () => {
                     triedAuth = true; authTries++;
-                    loadAuthThumb(ref.owner, ref.repo, entry.githubBranch || ref.branch || 'main', ref.path, ref.sha).then(u => {
+                    loadAuthThumb(ref.owner, ref.repo, entry.githubBranch || ref.branch || 'main', ref.path, repoFileSha(ref.owner, ref.repo, ref.path)).then(u => {
                         curSrc = u; img.removeAttribute('crossorigin'); img.src = u;
                     }, showPlaceholder);
                 };
@@ -11921,6 +11935,37 @@ function initV13Prefs() {
         else if (media.addListener) media.addListener(syncSystemTheme);
     }
 })();
+
+/* ----- 滚动指示条：只有内容超出一屏才出现，固定短短一截，停下约 1 秒后淡出 ----- */
+(function () {
+    const bar = document.createElement('div'); bar.id = 'scroll-ind'; bar.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(bar);
+    const probe = document.createElement('div'); probe.style.cssText = 'position:fixed;top:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';
+    document.body.appendChild(probe);
+    const LEN = 34, GAP = 10, BOTTOM = 24;
+    let raf = 0, timer = 0, target = document;
+    function draw() {
+        raf = 0;
+        const doc = target === document;
+        const st = doc ? window.scrollY : target.scrollTop;
+        const ch = doc ? window.innerHeight : target.clientHeight;
+        const max = (doc ? document.documentElement.scrollHeight : target.scrollHeight) - ch;
+        if (max <= 4) { bar.classList.remove('on'); return; }   // 没超出一屏就不显示
+        const top = probe.offsetHeight + GAP;
+        const y = top + (ch - top - BOTTOM - LEN) * Math.max(0, Math.min(1, st / max));
+        bar.style.transform = 'translate3d(0,' + Math.round(y) + 'px,0)';
+        bar.classList.add('on');
+        clearTimeout(timer); timer = setTimeout(() => bar.classList.remove('on'), 1000);
+    }
+    // scroll 不冒泡，用捕获监听；只跟随整页滚动：首页（整个文档）和当前打开的子页面
+    document.addEventListener('scroll', e => {
+        const t = e.target;
+        if (t === document) { if (document.body.classList.contains('page-open')) return; }
+        else if (!(t.classList && t.classList.contains('page') && t.classList.contains('active'))) return;
+        target = t;
+        if (!raf) raf = requestAnimationFrame(draw);
+    }, { capture: true, passive: true });
+})();
 </script>
 
 
@@ -12281,6 +12326,7 @@ async function locateInRepo(entry) {
     repoSelected.clear();
     renderRepoLiveFiles();
     toast('已定位：' + f.name, 'ok');
+    if (repoRenderMore) repoRenderMore(f.path);   // 文件多时格子是分批画的，先画到它
     requestAnimationFrame(() => flashTile(Array.from(document.querySelectorAll('#repo-live-container .repo-live-item[data-path]')).find(x => x.dataset.path === f.path)));
 }
 

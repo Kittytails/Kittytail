@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<script>const APP_VERSION = '3.0.59';   // 放在文件最前面：检查更新时读到这一行就不再往下下载</script>
+<script>const APP_VERSION = '3.0.61';   // 放在文件最前面：检查更新时读到这一行就不再往下下载</script>
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F7F7F9">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111113">
@@ -29,8 +29,10 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
         --border: #EAEAEA;
         --text-main: #111111;
         --text-secondary: #888888;
+        --rh-ico: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2.2' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg>");   /* 搜索框里的放大镜 */
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; scrollbar-width: none; }
+    *::-webkit-scrollbar { display: none; }   /* 所有滚动区域都不显示滚动条（iOS 的长条） */
     html, body { touch-action: manipulation; }
     body {
         font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Roboto, sans-serif;
@@ -204,22 +206,21 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     #repo-fab-panel.show { display:flex; }
     #repo-fab-panel.in { opacity:1; transform:scale(1); }
     .fab-head { display:flex; align-items:center; justify-content:space-between; flex-shrink:0; padding:7px 10px 6px; font-size:11px; font-weight:700; color:var(--text-secondary); letter-spacing:.2px; }
-    .fab-head .hint { font-weight:500; opacity:.7; }
     .fab-item { -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
     .fab-item .fr { display:flex; align-items:center; gap:6px; flex-shrink:0; }
     .fab-item .fp { display:flex; width:13px; height:13px; opacity:.7; }
     .fab-item .fp svg { width:100%; height:100%; display:block; }
     .fab-acct.add .fab-av { background:transparent; border:1.5px dashed rgba(120,120,128,.55); }
-    .fab-search { flex-shrink:0; width:calc(100% - 8px); margin:0 4px 6px; border:1px solid var(--border); border-radius:10px; padding:8px 10px; font-size:13px; background:rgba(0,0,0,.03); color:var(--primary); font-family:inherit; }
+    .fab-search { flex-shrink:0; width:calc(100% - 8px); margin:0 4px 6px; border:1px solid var(--border); border-radius:10px; padding:8px 10px 8px 32px; font-size:13px; background-color:rgba(0,0,0,.03); color:var(--primary); font-family:inherit; }
     .fab-search:focus { outline:none; border-color:var(--primary); }
+    .fab-search, .repo-pick-search { background-image:var(--rh-ico); background-repeat:no-repeat; background-position:11px center; background-size:15px; }
     .fab-list { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; display:flex; flex-direction:column; gap:2px; }
     .fab-item { flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 11px; border-radius:12px; border:0; background:transparent; color:var(--primary); font-family:inherit; font-size:13px; font-weight:600; text-align:left; cursor:pointer; transition:background .12s ease, transform .12s ease; }
     .fab-item:active { background:rgba(120,120,128,.16); transform:scale(.985); }
     .fab-item.cur { background:var(--primary); color:var(--bg); }
     .fab-item .fn { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .fab-item .fb { flex-shrink:0; font-size:10px; font-weight:700; padding:2px 7px; border-radius:6px; background:rgba(120,120,128,.18); color:inherit; opacity:.8; }
-    .fab-accts { flex-shrink:0; display:flex; gap:10px; overflow-x:auto; padding:7px 9px 9px; margin-bottom:4px; border-bottom:.5px solid rgba(120,120,128,.25); -webkit-overflow-scrolling:touch; scrollbar-width:none; }
-    .fab-accts::-webkit-scrollbar { display:none; }
+    .fab-accts { flex-shrink:0; display:flex; gap:10px; overflow-x:auto; padding:7px 9px 9px; margin-bottom:4px; border-bottom:.5px solid rgba(120,120,128,.25); -webkit-overflow-scrolling:touch; }
     .fab-acct { flex-shrink:0; width:54px; display:flex; flex-direction:column; align-items:center; gap:4px; padding:0; border:0; background:transparent; color:var(--text-secondary); font-family:inherit; cursor:pointer; }
     .fab-av { width:40px; height:40px; border-radius:50%; overflow:hidden; display:flex; align-items:center; justify-content:center; background:rgba(120,120,128,.18); color:var(--text-secondary); font-size:16px; font-weight:700; box-shadow:0 0 0 0 transparent; transition:box-shadow .15s ease, transform .12s ease; }
     .fab-av img { width:100%; height:100%; object-fit:cover; display:block; }
@@ -232,7 +233,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .fab-foot { flex-shrink:0; margin-top:4px; padding-top:4px; border-top:.5px solid rgba(120,120,128,.25); }
     .fab-foot .fab-item { width:100%; color:var(--text-secondary); font-weight:600; justify-content:center; }
     html[data-theme="dark"] #repo-fab-panel { background:rgba(44,44,46,.94); border-color:rgba(255,255,255,.1); box-shadow:0 10px 32px rgba(0,0,0,.5); }
-    html[data-theme="dark"] .fab-search { background:rgba(255,255,255,.06); }
+    html[data-theme="dark"] .fab-search { background-color:rgba(255,255,255,.06); }
 
     /* 删除确认层 */
     .delete-sheet-backdrop {
@@ -728,7 +729,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .repo-target-label { color:var(--text-secondary); font-size:12px; font-weight:600; flex-shrink:0; }
     .repo-target-name { flex:1; min-width:0; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .repo-target-change { font-size:12px; font-weight:600; color:var(--text-secondary); flex-shrink:0; }
-    .repo-pick-search { width:100%; box-sizing:border-box; border:1px solid var(--border); border-radius:10px; padding:10px 12px; font-size:13px; background:#FAFAFA; font-family:inherit; color:var(--primary); margin-bottom:10px; }
+    .repo-pick-search { width:100%; box-sizing:border-box; border:1px solid var(--border); border-radius:10px; padding:10px 12px 10px 34px; font-size:13px; background-color:#FAFAFA; font-family:inherit; color:var(--primary); margin-bottom:10px; }
     .repo-pick-search:focus { outline:none; border-color:var(--primary); }
     .repo-pick-list { max-height:32vh; overflow:auto; display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
     .repo-pick-item { display:flex; align-items:center; justify-content:space-between; gap:10px; }
@@ -753,7 +754,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .repo-create-row input { min-width:0; }
     html[data-theme="dark"] .repo-target { background:#2C2C2E; border-color:#48484A; color:#F5F5F7; }
     html[data-theme="dark"] .repo-target:active { background:#3A3A3C; }
-    html[data-theme="dark"] .repo-pick-search { background:#2C2C2E; border-color:#48484A; color:#F5F5F7; }
+    html[data-theme="dark"] .repo-pick-search { background-color:#2C2C2E; border-color:#48484A; color:#F5F5F7; }
     html[data-theme="dark"] .repo-pick-badge { background:#48484A; color:#D1D1D6; }
     html[data-theme="dark"] .move-folder-item.active .repo-pick-badge { background:rgba(0,0,0,.18); color:#111113; }
     html[data-theme="dark"] .repo-create-title { color:#F5F5F7; }
@@ -1247,24 +1248,24 @@ html[data-theme="dark"] .st-row + .st-row::before { background: rgba(255,255,255
 .st-bar .progress-fill.danger { background: #C62828; }
 .st-empty { padding: 28px 20px; text-align: center; font-size: 14px; color: #8E8E93; }
 #rh-wrap { margin-top: 28px; }
+#fm-wrap .rh-head { padding: 0; }
 .rh-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 6px 0 20px; margin-bottom: 8px; }
 .rh-title { font-size: 13px; font-weight: 600; color: #8E8E93; }
 .rh-clear { border: 0; background: transparent !important; padding: 6px 14px; font-size: 13px; font-weight: 600; font-family: inherit; color: #8E8E93 !important; cursor: pointer; border-radius: 8px; }
 .rh-clear:active { opacity: .5; }
 .rh-search { display: block; width: 100%; box-sizing: border-box; margin: 0 0 10px; border: 0; border-radius: 12px; padding: 10px 14px 10px 38px; font-size: 14px; font-family: inherit; color: var(--text-main); -webkit-appearance: none; appearance: none;
-    background-color: rgba(118,118,128,.12); background-repeat: no-repeat; background-position: 13px center; background-size: 16px;
-    --rh-ico: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2.2' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg>"); background-image: var(--rh-ico); }
+    background-color: rgba(118,118,128,.12); background-repeat: no-repeat; background-position: 13px center; background-size: 16px; background-image: var(--rh-ico); }
 .rh-search:focus { outline: none; }
 .rh-search::placeholder { color: #8E8E93; }
 html[data-theme="dark"] .rh-search { background: rgba(118,118,128,.28) var(--rh-ico) no-repeat 13px center / 16px !important; border-color: transparent !important; }
 #rh-list .st-name { font-size: 15px; }
-.fm-head-btns { display: flex; align-items: center; }
+.fm-head-btns { display: flex; align-items: center; margin-right: -9px; }   /* 抵掉按钮自带的左右留白，让最后一个字贴齐卡片右边 */
 .fm-head-btns .rh-clear { padding: 6px 9px; }
 .fm-more { flex: none; border: 0; background: transparent !important; padding: 2px 8px; margin: -4px -8px -4px 0; font: inherit; font-size: 17px; font-weight: 700; letter-spacing: 1px; line-height: 1; color: #8E8E93 !important; cursor: pointer; border-radius: 8px; -webkit-tap-highlight-color: transparent; }
 .fm-more:active { opacity: .5; }
-.fm-crumb { display: flex; align-items: center; gap: 2px; overflow-x: auto; white-space: nowrap; padding: 0 14px 8px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-.fm-crumb::-webkit-scrollbar { display: none; }
+.fm-crumb { display: flex; align-items: center; gap: 2px; overflow-x: auto; white-space: nowrap; padding: 0 0 8px; -webkit-overflow-scrolling: touch; }
 .fm-crumb button { flex: none; border: 0; background: transparent !important; padding: 5px 6px; font: inherit; font-size: 13px; font-weight: 600; color: #8E8E93 !important; cursor: pointer; border-radius: 8px; }
+.fm-crumb button:first-child { padding-left: 0; }
 .fm-crumb button:last-child { color: var(--text-main) !important; }
 .fm-crumb .sep { color: #C7C7CC; font-size: 13px; }
 #fm-list .st-name { font-size: 15px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1355,8 +1356,7 @@ html[data-theme="dark"] .about-item + .about-item::before { background: rgba(255
 .gallery-tile .tile-badge + .tile-fav { top:29px; }
 .gallery-multi-mode .gallery-tile .tile-fav, .repo-multi-mode .gallery-tile .tile-fav { display:none; }
 .gallery-sentinel { height:1px; width:100%; }
-#page-gallery .gallery-filter-group { overflow-x:auto; max-width:100%; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
-#page-gallery .gallery-filter-group::-webkit-scrollbar { display:none; }
+#page-gallery .gallery-filter-group { overflow-x:auto; max-width:100%; -webkit-overflow-scrolling:touch; }
 #page-gallery .gallery-filter-group .filter-btn { flex:none; }
 /* 多选时每个格子一个毛玻璃层会很吃力：改成实色底，肉眼几乎看不出区别 */
 .gallery-tile .select-mark { -webkit-backdrop-filter:none; backdrop-filter:none; }
@@ -2120,6 +2120,7 @@ async function proxyImage(request, u) {
             <div class="about-item"><div class="about-t">超过 1 GB 会怎样</div><div class="about-d">1 GB 是 GitHub 的建议上限，不是硬限制。用量到 80% 会提醒，超过后进度条变红。在超过 1 GB 的仓库里上传时，会先弹出确认，你可以选择继续上传，或者换一个仓库。过大的仓库可能被 GitHub 提醒瘦身，具体政策以 GitHub 官方为准。</div></div>
             <div class="about-item"><div class="about-t">单个文件</div><div class="about-d">单个文件最大 99MB，超过的会被跳过；超过 20MB 的文件 jsDelivr 不支持，会自动改用 GitHub raw 直链。</div></div>
             <div class="about-item"><div class="about-t">公开 / 私有</div><div class="about-d">新建仓库时可以选公开或私有。已有的仓库，在「选择上传仓库」列表里点右侧的「公开」或「私有」标签就能切换，切换前会让你确认。改为私有后外部打不开里面的文件，已贴出去的直链会失效；改为公开后任何人都能看到仓库里的全部内容。</div></div>
+<div class="about-item"><div class="about-t">悬浮球里固定仓库</div><div class="about-d">在悬浮球的仓库列表里长按某个仓库，它会固定在最前面；再长按一次取消固定。</div></div>
             </div>
         </div>
         <div class="about-sec">
@@ -5923,7 +5924,38 @@ function authThumbTrim() {
 function authThumbFree() { authThumbActive--; const n = authThumbWait.shift(); if (n) n(); }
 function canAuthThumb(owner, repo, path) { return !!(getSettings().token && owner && repo && path); }
 function preferAuthThumb(owner, repo) { return authThumbRepos.has(owner + '/' + repo) && !!getSettings().token; }
-function loadAuthThumb(owner, repo, branch, path) {
+let authThumbWarned = false;
+function authThumbNote(err) {   // 失败原因只提示一次，别刷屏
+    if (authThumbWarned) return;
+    authThumbWarned = true;
+    toast('私有仓库缩略图读取失败：' + ((err && err.message) || '未知原因') + '（不影响复制直链）', 'info');
+}
+// 带 Token 读一个文件的原始内容：超时、限流、5xx 各自处理
+async function authThumbFetch(url, token) {
+    let lastErr = null;
+    for (let i = 0; i < 3; i++) {
+        const ctl = new AbortController();
+        const timer = setTimeout(() => ctl.abort(), 45000);
+        try {
+            const res = await fetch(url, { cache: 'no-store', signal: ctl.signal, headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github.raw' } });
+            if (res.ok) return await res.blob();
+            const ra = Number(res.headers.get('retry-after')) || 0;
+            const limited = res.status === 429 || (res.status === 403 && (ra || res.headers.get('x-ratelimit-remaining') === '0'));
+            const err = new Error(limited ? 'GitHub 限流（HTTP ' + res.status + '），稍后再试' : 'HTTP ' + res.status);
+            err.status = res.status;
+            if (limited && ra && ra <= 10 && i < 2) { lastErr = err; await sleep(ra * 1000 + 200); continue; }
+            if ([500, 502, 503, 504].includes(res.status) && i < 2) { lastErr = err; await sleep(600 * (i + 1)); continue; }
+            throw err;
+        } catch (e) {
+            if (e && e.status) throw e;
+            lastErr = (e && e.name === 'AbortError') ? new Error('请求超时') : (e instanceof TypeError ? new Error('网络或代理不通') : e);
+            if (i === 2) throw lastErr;
+            await sleep(600 * (i + 1));
+        } finally { clearTimeout(timer); }
+    }
+    throw lastErr || new Error('读取失败');
+}
+function loadAuthThumb(owner, repo, branch, path, sha) {
     const key = owner + '/' + repo + '@' + (branch || 'main') + '/' + path;
     if (authThumbCache.has(key)) {
         const hit = authThumbCache.get(key);
@@ -5934,29 +5966,41 @@ function loadAuthThumb(owner, repo, branch, path) {
         const s = getSettings();
         await authThumbSlot();
         try {
-            const url = (s.proxy || 'https://api.github.com') + '/repos/' + owner + '/' + repo + '/contents/' +
-                path.split('/').map(encodeURIComponent).join('/') + '?ref=' + encodeURIComponent(branch || 'main');
-            const res = await fetchWithRetry(url, { cache: 'no-store', headers: { 'Authorization': 'Bearer ' + s.token, 'Accept': 'application/vnd.github.raw' } }, { tries: 2 });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const blob = await res.blob();
+            const base = s.proxy || 'https://api.github.com';
+            let blob;
+            try {
+                blob = await authThumbFetch(base + '/repos/' + owner + '/' + repo + '/contents/' +
+                    path.split('/').map(encodeURIComponent).join('/') + '?ref=' + encodeURIComponent(branch || 'main'), s.token);
+            } catch (e) {
+                // 按路径读不到时，有 sha 就改按 blob 读（不受分支、路径特殊字符影响）
+                if (!sha || (e && e.status === 401)) throw e;
+                try { blob = await authThumbFetch(base + '/repos/' + owner + '/' + repo + '/git/blobs/' + sha, s.token); }
+                catch (_) { throw e; }
+            }
             const ext = (path.split('.').pop() || '').toLowerCase();
             const type = DL_MIME[ext] || blob.type || 'image/jpeg';
-            // 小文件、SVG、动图直接用原文件，别白白重绘
-            if (blob.size < 150 * 1024 || ext === 'svg' || ext === 'gif') {
+            const keepOriginal = () => {
                 authThumbRepos.add(owner + '/' + repo);
                 return URL.createObjectURL(blob.type === type ? blob : new Blob([blob], { type }));
-            }
-            const bmp = await createImageBitmap(new Blob([blob], { type }));
+            };
+            // 小文件、SVG、动图直接用原文件，别白白重绘
+            if (blob.size < 150 * 1024 || ext === 'svg' || ext === 'gif') return keepOriginal();
             try {
-                const k = Math.min(1, 360 / Math.max(bmp.width, bmp.height));
-                const c = document.createElement('canvas');
-                c.width = Math.max(1, Math.round(bmp.width * k)); c.height = Math.max(1, Math.round(bmp.height * k));
-                c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
-                const out = await new Promise(r => c.toBlob(r, ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : 'image/webp', 0.82));
-                if (!out) throw new Error('缩略图生成失败');
-                authThumbRepos.add(owner + '/' + repo);
-                return URL.createObjectURL(out);
-            } finally { if (bmp.close) bmp.close(); }
+                const bmp = await createImageBitmap(new Blob([blob], { type }));
+                try {
+                    const k = Math.min(1, 360 / Math.max(bmp.width, bmp.height));
+                    const c = document.createElement('canvas');
+                    c.width = Math.max(1, Math.round(bmp.width * k)); c.height = Math.max(1, Math.round(bmp.height * k));
+                    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+                    const out = await new Promise(r => c.toBlob(r, ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : 'image/webp', 0.82));
+                    if (!out) throw new Error('缩略图生成失败');
+                    authThumbRepos.add(owner + '/' + repo);
+                    return URL.createObjectURL(out);
+                } finally { if (bmp.close) bmp.close(); }
+            } catch (e) {
+                if (blob.size <= 8 * 1024 * 1024) return keepOriginal();   // 缩小失败（内存或格式）：直接用原图，让浏览器自己解码
+                throw e;
+            }
         } finally { authThumbFree(); }
     })();
     authThumbCache.set(key, job);
@@ -6127,14 +6171,17 @@ function renderRepoLiveFiles() {
         preview.className = 'repo-live-preview icon-tile';
         if (file.type === 'image') {
             const img = document.createElement('img');
-            let triedRaw = false, triedAuth = false, curSrc = file.url;
+            let triedRaw = false, triedAuth = false, curSrc = file.url, authTries = 0;
             img.draggable = false;
             img.decoding = 'async';
-            const showPlaceholder = () => { preview.innerHTML = '<div class="repo-live-icon">IMG</div>'; };
+            const showPlaceholder = err => {
+                preview.innerHTML = '<div class="repo-live-icon">IMG</div>';
+                if (err && err.message) { preview.title = '缩略图读取失败：' + err.message; authThumbNote(err); }
+            };
             // 私有仓库：CDN 和 Raw 都读不到，改用带 Token 的 API 取图
             const viaApi = () => {
-                triedAuth = true;
-                loadAuthThumb(file.owner, file.repo, file.branch, file.path).then(u => {
+                triedAuth = true; authTries++;
+                loadAuthThumb(file.owner, file.repo, file.branch, file.path, file.sha).then(u => {
                     curSrc = u; img.removeAttribute('crossorigin'); img.src = u;
                 }, showPlaceholder);
             };
@@ -6146,6 +6193,8 @@ function renderRepoLiveFiles() {
             }
             img.loading = 'lazy';
             img.onerror = () => {
+                // 缓存里的 blob 地址被淘汰回收后再恢复显示会报错：重新取一次
+                if (canApi && authTries < 3 && /^blob:/.test(curSrc || '')) { viaApi(); return; }
                 // jsDelivr 打不开时再回退到 raw 地址，再不行用 Token 取图
                 if (!triedRaw && !triedAuth && file.rawUrl && file.rawUrl !== file.url && !/^blob:/.test(img.currentSrc || '')) { triedRaw = true; curSrc = file.rawUrl; img.src = file.rawUrl; return; }
                 if (!triedAuth && canApi) { viaApi(); return; }
@@ -6302,22 +6351,25 @@ function renderGallery(opts) {
                 const ref = historyAssetRef(entry);
                 const rawFallback = (ref && ref.owner && ref.repo && ref.path)
                     ? repoRawUrl(ref.owner, ref.repo, entry.githubBranch || ref.branch || 'main', ref.path) : '';
-                let triedRaw = false, triedAuth = false, curSrc = entry.url;
+                let triedRaw = false, triedAuth = false, curSrc = entry.url, authTries = 0;
                 const canApi = !!(ref && canAuthThumb(ref.owner, ref.repo, ref.path));
-                const showPlaceholder = () => {
+                const showPlaceholder = err => {
                     const ph = document.createElement('div');
                     ph.className = 'icon-tile';
                     ph.textContent = 'IMG';
+                    if (err && err.message) { ph.title = '缩略图读取失败：' + err.message; authThumbNote(err); }
                     img.replaceWith(ph);
                 };
                 const viaApi = () => {
-                    triedAuth = true;
-                    loadAuthThumb(ref.owner, ref.repo, entry.githubBranch || ref.branch || 'main', ref.path).then(u => {
+                    triedAuth = true; authTries++;
+                    loadAuthThumb(ref.owner, ref.repo, entry.githubBranch || ref.branch || 'main', ref.path, ref.sha).then(u => {
                         curSrc = u; img.removeAttribute('crossorigin'); img.src = u;
                     }, showPlaceholder);
                 };
                 if (canApi && preferAuthThumb(ref.owner, ref.repo)) { img.removeAttribute('src'); viaApi(); }
                 img.onerror = () => {
+                    // 缓存里的 blob 地址被淘汰回收后再恢复显示会报错：重新取一次
+                    if (canApi && authTries < 3 && /^blob:/.test(curSrc || '')) { viaApi(); return; }
                     // jsDelivr 打不开时回退到 raw，再不行用 Token 取图
                     if (!triedRaw && !triedAuth && rawFallback && rawFallback !== entry.url) { triedRaw = true; curSrc = rawFallback; img.src = rawFallback; return; }
                     if (!triedAuth && canApi) { viaApi(); return; }
@@ -11662,10 +11714,9 @@ function fabPlacePanel() {
     panel.style.left = left + 'px'; panel.style.top = top + 'px';
     panel.style.transformOrigin = (fabPos.side === 'l' ? 'left' : 'right') + ' ' + Math.max(0, Math.min(ph, t.y + FAB_SIZE / 2 - top)) + 'px';
 }
-function fabHead(text, hint) {
+function fabHead(text) {
     const h = document.createElement('div'); h.className = 'fab-head';
     const a = document.createElement('span'); a.textContent = text; h.appendChild(a);
-    if (hint) { const b = document.createElement('span'); b.className = 'hint'; b.textContent = hint; h.appendChild(b); }
     return h;
 }
 function renderFabMenu() {
@@ -11716,7 +11767,6 @@ function renderFabPanel() {
     add.onclick = fabAddAccount;
     strip.appendChild(add);
     panel.appendChild(strip);
-    panel.appendChild(fabHead('切换仓库', '长按固定'));
     if (myRepos.length > 7 || q) {
         const inp = document.createElement('input');
         inp.type = 'text'; inp.className = 'fab-search'; inp.placeholder = '搜索仓库'; inp.value = keepQ ? keepQ.value : '';
@@ -11763,7 +11813,7 @@ function renderFabPanel() {
     panel.appendChild(list);
     list.scrollTop = oldTop;
     const foot = document.createElement('div'); foot.className = 'fab-foot';
-    const more = document.createElement('button'); more.type = 'button'; more.className = 'fab-item'; more.textContent = '管理 / 新建仓库…';
+    const more = document.createElement('button'); more.type = 'button'; more.className = 'fab-item'; more.textContent = '管理';
     more.onclick = () => { closeFabPanel(); openRepoSheet(); };
     foot.appendChild(more); panel.appendChild(foot);
     if (hadFocus) { const i = panel.querySelector('.fab-search'); if (i) { i.focus(); try { i.setSelectionRange(i.value.length, i.value.length); } catch (_) {} } }

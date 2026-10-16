@@ -216,7 +216,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
 
     /* 选中状态 */
 
-    /* 失败详情弹窗（上传 / 转换 / 删除失败共用）：底部磨砂 Sheet，盖住悬浮底栏 */
+    /* 失败详情弹窗：底部磨砂 Sheet，盖住悬浮底栏 */
     .upload-error-modal {
         position: fixed; inset: 0; display: none; align-items: flex-end; justify-content: center; padding: 0;
         background: rgba(20, 20, 24, .16);
@@ -258,7 +258,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     html[data-theme="dark"] .upload-error-copy { border-color: rgba(255,255,255,.14); background: rgba(255,255,255,.12); }
     html[data-theme="dark"] .upload-error-close { background: #F5F5F7; color: #111113; }
 
-    /* 确认 / 输入对话框（替代浏览器原生 confirm / prompt）：复用删除确认层的外观 */
+    /* 确认 / 输入对话框：复用删除确认层的外观 */
     #dlg-backdrop { z-index: 9000; }
     .dlg-error { display: none; margin: -6px 2px 12px; font-size: 12px; line-height: 1.5; color: #D93025; }
     .dlg-error.show { display: block; }
@@ -275,9 +275,8 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
 .rb-row:active { background: rgba(60,60,67,.08); }
 .rb-sub { margin-top: 5px; font-size: 12px; line-height: 1.5; color: #8E8E93; word-break: break-all; }
 
-    /* 顶部提示（Toast）：悬浮的磨砂玻璃圆角矩形，从上方滑下；本身不拦截页面点击，点提示条可立即收起。 */
-    /* ----- 提示栏配色（夜间配色在下方） -----
-       日间：深墨色底 + 浅色字；成功/失败/提示三种图标各有语义色。 */
+    /* 顶部提示：悬浮的磨砂玻璃圆角矩形，从上方滑下 */
+    /* ----- 提示栏配色（夜间配色在下方） ----- */
     #kb-toast {
         --t-bg: #1D1D1F; --t-fg: #F5F5F7; --t-border: #1D1D1F;
         --t-shadow: 0 8px 28px rgba(0,0,0,.24), 0 2px 6px rgba(0,0,0,.12);
@@ -287,9 +286,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
         --t-info: #64A8FF; --t-info-bg: rgba(100,168,255,.20);
     }
     #kb-toast {
-        /* left/right 47px = 页面边距 20 + 卡片边框 1 + 卡片内边距 26，正好对齐卡片内容区的左右边界。
-           平时是 display:none（由 JS 控制）：iOS 26 会把「贴着屏幕顶边的 fixed 元素」当成顶栏，
-           在状态栏区域盖一层不透明色块，把往上滚的内容挡住。 */
+        /* left/right 47px = 页面边距 20 + 卡片边框 1 + 卡片内边距 26 */
         position: fixed; left: 47px; right: 47px; top: 70px;
         display: none; justify-content: center; box-sizing: border-box;
         pointer-events: none; z-index: 20000; text-align: center;
@@ -333,7 +330,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     #kb-toast .kb-toast-sheet[data-type="info"] .kb-toast-dot { color: var(--t-info); background: var(--t-info-bg); }
     .kb-spinner { width: 13px; height: 13px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: kbSpin .7s linear infinite; }
     @keyframes kbSpin { to { transform: rotate(360deg); } }
-    /* 夜间：浅色底 + 深色字（与日间反相），在深色页面上更醒目 */
+    /* 夜间：浅色底 + 深色字，在深色页面上更醒目 */
     @media (prefers-color-scheme: dark) {
         #kb-toast {
         --t-bg: #F5F5F7; --t-fg: #1D1D1F; --t-border: #F5F5F7;
@@ -558,7 +555,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
 
     }
 
-    /* JS 设置 data-theme 后，即使宿主页面/浏览器没有正确触发媒体查询也能切换 */
+    /* JS 设置 data-theme 后 */
     html[data-theme="dark"], html[data-theme="dark"] body {
         background: #111113 !important;
         color: #F5F5F7 !important;
@@ -745,7 +742,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .fog-top::after { background:linear-gradient(to bottom, rgba(var(--fog),0.720) 0%, rgba(var(--fog),0.700) 10%, rgba(var(--fog),0.645) 20%, rgba(var(--fog),0.564) 30%, rgba(var(--fog),0.467) 40%, rgba(var(--fog),0.360) 50%, rgba(var(--fog),0.253) 60%, rgba(var(--fog),0.156) 70%, rgba(var(--fog),0.075) 80%, rgba(var(--fog),0.020) 90%, rgba(var(--fog),0.000) 100%); }
     body.is-scrolled .fog-top { opacity:1; }
 
-    /* 搜索胶囊（风格同「名册」页） */
+    /* 搜索胶囊 */
     .searchpill { display:flex; align-items:center; gap:8px; height:38px; margin:0 0 12px; padding:0 4px 0 12px; border-radius:999px; background:#ECECEE; cursor:text; }
     .searchpill .sp-ico { flex:none; width:20px; height:20px; color:#111; }
     .searchpill input { flex:1; min-width:0; height:100%; border:0; outline:0; background:transparent; font:inherit; font-size:16px; font-weight:500; color:#111; -webkit-appearance:none; appearance:none; box-shadow:none; }
@@ -757,7 +754,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     html[data-theme="dark"] .searchpill { background:#2C2C2E; }
     html[data-theme="dark"] .searchpill .sp-ico, html[data-theme="dark"] .searchpill input { color:#F5F5F7; }
 
-    /* 「…」按钮 + 磨砂弹出菜单（风格同「名册」页） */
+    /* 「…」按钮 + 磨砂弹出菜单 */
     .more-btn { width:34px; height:34px; border-radius:50%; background:#FFFFFF; color:#111; border:0; padding:0; display:grid; place-items:center; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05); transition:transform .15s ease; }
     .more-btn:active { transform:scale(.94); }
     .more-btn:disabled { opacity:.5; }
@@ -773,10 +770,10 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     html[data-theme="dark"] .more-menu-item { color:#F5F5F7; }
     html[data-theme="dark"] .more-menu-item:active { background:rgba(255,255,255,.12); }
     html[data-theme="dark"] .more-menu-item.danger { color:#FF6B60; }
-    /* 图块下方的灰色小字（大小 / 日期） */
+    /* 图块下方的灰色小字 */
     .tile-meta { font-size:11px; line-height:14px; color:#8E8E93; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 2px; margin-top:-3px; }
 
-    /* 统一圆角：所有按钮 / 输入框 / 弹层按钮都用同一个值（胶囊形的筛选、搜索框和圆形「…」按钮保持不变） */
+    /* 统一圆角：所有按钮 / 输入框 / 弹层按钮都用同一个值 */
     :root { --r-ctl: 12px; }
     .small-btn,.ghost-btn,.url-input,.result-action .url-input,.result-action .ghost-btn,.card-head-actions .small-btn,.delete-sheet-actions button,.upload-error-actions button,.move-new-folder-row input,.repo-pick-search,.move-folder-item { border-radius: var(--r-ctl); }
 
@@ -820,7 +817,7 @@ html[data-theme="dark"] .home .row + .row .row-body::before { background: rgba(2
 /* 底部磨砂玻璃搜索栏 */
 .search-bar {
     position: fixed; left: max(var(--s-side), calc((100% - 500px) / 2)); right: max(var(--s-side), calc((100% - 500px) / 2));
-    bottom: calc(env(safe-area-inset-bottom) + 10px); z-index: 10;   /* 低于子页面(20)：进入子页面时自动被盖住 */
+    bottom: calc(env(safe-area-inset-bottom) + 10px); z-index: 10;   /* 低于子页面：进入子页面时自动被盖住 */
     height: 50px; display: flex; align-items: center; gap: 10px; padding: 0 6px 0 18px; border-radius: 999px;
     background: rgba(255,255,255,.55);
     -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
@@ -893,7 +890,7 @@ html[data-theme="dark"] .pref-card + .pref-card::before { background: rgba(255,2
 html[data-theme="dark"] .pref-card .switch { background: #39393d; }
 html[data-theme="dark"] .pref-card .switch:checked { background: #F5F5F7; }
 html[data-theme="dark"] .pref-card .switch:checked::after { background: #111; box-shadow: none; }
-/* 修复：深色模式下通用 input 规则(!important)覆盖了开关底色，导致开/关无法区分 */
+/* 修复：深色模式下通用 input 规则覆盖了开关底色，导致开/关无法区分 */
 html[data-theme="dark"] .pref-card .switch { background: #39393d !important; }
 html[data-theme="dark"] .pref-card .switch:checked { background: #F5F5F7 !important; }
 
@@ -907,7 +904,7 @@ html[data-theme="dark"] .pref-card .switch:checked { background: #F5F5F7 !import
 #page-gallery .panel-title { font-size: 34px; line-height: 41px; letter-spacing: -.8px; margin-left: -1px; }
 #page-gallery .panel-subtitle { display: none; }
 
-/* 搜索胶囊：名册同款，右侧麦克风（摆设，点一下只是聚焦输入框） */
+/* 搜索胶囊：名册同款，右侧麦克风 */
 #page-gallery .searchpill { height: 40px; margin: 0 0 14px; padding: 0 4px 0 14px; }
 #page-gallery .searchpill .sp-mic { color: #111; }
 #page-gallery .searchpill .sp-mic svg { width: 20px; height: 20px; }
@@ -927,7 +924,7 @@ html[data-theme="dark"] #page-gallery .searchpill .sp-mic { color: #F5F5F7; }
 html[data-theme="dark"] #page-gallery .filter-btn { background: #2C2C2E; color: #98989F; }
 html[data-theme="dark"] #page-gallery .filter-btn.active { background: #F5F5F7; color: #111; }
 
-/* ⋯ 菜单（比原版大，比上一版小） */
+/* ⋯ 菜单 */
 .more-menu { min-width: 156px; padding: 5px; border-radius: 18px; }
 .more-menu-item { height: 40px; padding: 0 14px; border-radius: 13px; gap: 12px; justify-content: space-between; font-size: 15px; font-weight: 500; }
 .more-menu-item svg { width: 17px; height: 17px; }
@@ -1064,22 +1061,22 @@ html[data-theme="dark"] .sk {
     /* 悬浮坞出现时，给列表底部留出空间，最后一排不会被挡住 */
     body.gallery-multi-mode #page-gallery[data-seg="library"], body.repo-multi-mode #page-gallery[data-seg="repo"] { padding-bottom: calc(var(--s-bottom) + 84px); }
 
-    /* 修复：夜间模式下通用 .card 的 !important 底色盖过了资源库/仓库的透明外壳，出现一圈黑框 */
+    /* 修复：夜间模式下通用 .card 的 !important 底色盖过了资源库/仓库的透明外壳 */
 #page-gallery > .card,
 html[data-theme="dark"] #page-gallery > .card {
     background: transparent !important; border: 0 !important; box-shadow: none !important;
 }
 
-/* 搜索框：跟随内容正常排版，不吸顶、不悬浮（标题 → 搜索框 → 状态/路径 → 分类 → 文件） */
+/* 搜索框：跟随内容正常排版，不吸顶、不悬浮 */
 #page-gallery .searchpill-wrap { position: static; margin: 0 0 14px; }
 #page-gallery .searchpill-wrap .searchpill { margin: 0; }
 
-/* 搜索框：右侧按钮 = 麦克风；输入内容后变成清除键 */
+/* 搜索框：右侧按钮 = 麦克风 */
     .searchpill .sp-mic .ic-clear { display: none; }
     .searchpill.has-text .sp-mic .ic-mic { display: none; }
     .searchpill.has-text .sp-mic .ic-clear { display: block; }
 
-    /* 偏好设置：卡片之间的间距与主页一致（主页 32px，页面本身 gap 为 18px，这里补 14px） */
+    /* 偏好设置：卡片之间的间距与主页一致 */
     #page-prefs .pref-group + .pref-group { margin-top: 14px; }
 
     /* ----- 存到文件：底部选项板 ----- */
@@ -1151,10 +1148,10 @@ html[data-theme="dark"] #page-gallery > .card {
 /* ================= 页面转场 ================= */
 :root { --ease-ios: cubic-bezier(.32,.72,0,1); --dur-push: .48s; --dur-pop: .36s; }
 
-/* 子页面：整页从右侧推入，不再淡入淡出；退出时同样滑出 */
+/* 子页面：整页从右侧推入，不再淡入淡出 */
 .page {
     opacity: 1; transform: translate3d(100%,0,0);
-    /* 边缘细线固定不变、不参与过渡（box-shadow 动画不能走 GPU，会让整页每帧重绘）；未打开时 visibility:hidden，看不到它 */
+    /* 边缘细线固定不变、不参与过渡 */
     box-shadow: -.5px 0 0 rgba(0,0,0,.12);
     transition: transform var(--dur-pop) var(--ease-ios), visibility 0s linear var(--dur-pop);
 }
@@ -1166,7 +1163,7 @@ html[data-theme="dark"] #page-gallery > .card {
 html[data-theme="dark"] .page { box-shadow: -.5px 0 0 rgba(255,255,255,.12); }
 .page.no-anim, .page.no-anim.active { transition: none !important; }
 
-/* 主页：保持不动，子页面直接从右侧滑过来盖住它（不做视差：iOS 上主页同时位移 + 变透明，滑动返回时会出现残影） */
+/* 主页：保持不动，子页面直接从右侧滑过来盖住它 */
 .search-bar { transition: bottom .2s ease; }
 .search-bar[inert] { visibility: visible; } /* 子页面会盖住它，这里不再瞬间消失，转场才连贯 */
 
@@ -1265,7 +1262,7 @@ html[data-theme="dark"] .st-err { color: #FF6B63; }
 html[data-theme="dark"] .st-badge { color: #A1A1A6; }
 
 /* ================= 通用样式补丁 ================= */
-/* 子页面是纵向 flex 容器：内容超过一屏时，带 overflow:hidden 的卡片会被压扁，这里禁止收缩，改为整页滚动 */
+/* 子页面是纵向 flex 容器：内容超过一屏时，带 overflow:hidden 的卡片会被压扁 */
 .page > * { flex-shrink: 0; }
 .pref-seg-card { cursor: default; }
 .pref-seg-card:active { background: transparent; }
@@ -1331,8 +1328,7 @@ html[data-theme="dark"] .about-item + .about-item::before { background: rgba(255
 /* 多选时每个格子一个毛玻璃层会很吃力：改成实色底，肉眼几乎看不出区别 */
 .gallery-tile .select-mark { -webkit-backdrop-filter:none; backdrop-filter:none; }
 @media (max-width: 360px) { .sel-dock .dk-close, .sel-dock .dk-btn { width:34px; height:34px; } .sel-dock .dk-btn svg { width:20px; height:20px; } }
-/* 多选悬浮坞：左列「数字在上、叉在下」，右侧 2×4 功能键。
-   所有格子在同一个网格里、行高固定，数字 / 叉和两排按钮严格上下对齐 */
+/* 多选悬浮坞：左列「数字在上、叉在下」，右侧 2×4 功能键 */
 .sel-dock { --dk: 48px; --gx: 18px; --gy: 2px;
     grid-template-columns: auto repeat(4, var(--dk)); grid-template-rows: var(--dk) var(--dk);
     column-gap: var(--gx); row-gap: var(--gy); padding: 7px 20px; border-radius: 34px; align-items: center; justify-items: center; justify-content: center; }
@@ -1344,7 +1340,7 @@ html[data-theme="dark"] .about-item + .about-item::before { background: rgba(255
 @media (max-width: 430px) { .sel-dock { --dk: 46px; --gx: 14px; padding: 7px 16px; } }
 @media (max-width: 360px) { .sel-dock { --dk: 40px; --gx: 10px; padding: 6px 12px; } .sel-dock .dk-btn svg { width: 21px; height: 21px; } }
 
-/* 备份与更新页：行首图标（和主界面一致） */
+/* 备份与更新页：行首图标 */
 #page-update .pref-card { padding-left: 16px; gap: 14px; }
 #page-update .pref-card + .pref-card::before { left: 66px; }
 #page-update .pref-ico { flex: none; width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: rgba(127,127,127,.12); color: var(--text-main); transition: transform .16s cubic-bezier(.2,.8,.2,1); }
@@ -1352,7 +1348,7 @@ html[data-theme="dark"] .about-item + .about-item::before { background: rgba(255
 #page-update .pref-ico svg * { vector-effect: non-scaling-stroke; }
 #page-update .pref-card:active .pref-ico { transform: scale(.9); }
 @media (prefers-reduced-motion: reduce) { #page-update .pref-ico { transition: none; } }
-/* 卡片之间的间距与主页一致（主页 .cards 的 gap 是 32px） */
+/* 卡片之间的间距与主页一致 */
 #page-update .pref-group + .pref-group { margin-top: 32px; }
 #page-update .pref-val { flex: none; font-size: 15px; letter-spacing: -.1px; color: #8E8E93; }
 #page-update .pref-val.new { color: var(--text-main); font-weight: 600; }
@@ -1390,7 +1386,7 @@ html[data-theme="dark"] #kb-undo .undo-btn { background: rgba(0,0,0,.09); color:
 /* 滑动选择进行中：禁选中 / 长按菜单 */
 body.drag-selecting, body.drag-selecting * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
-/* 左边缘返回感应条：只在子页面打开时存在；touch-action:none 让浏览器不抢这根手指 */
+/* 左边缘返回感应条：只在子页面打开时存在 */
 #edge-swipe { position: fixed; left: 0; top: 0; bottom: 0; width: 28px; z-index: 25; display: none; touch-action: none; -webkit-tap-highlight-color: transparent; }
 body.page-open #edge-swipe { display: block; }
 /* 拖动中：禁选中/长按菜单，页面单独提升成合成层，主线程不用跟着重绘 */
@@ -1896,7 +1892,7 @@ html.swiping .page.active { will-change: transform; backface-visibility: hidden;
             <div class="about-item"><div class="about-t">自定义复制格式</div><div class="about-d">设置里的「自定义模板」可以写自己的复制格式：{url} 是直链，{name} 是文件名，{stem} 是不带扩展名的文件名，{ext} 是扩展名。例如 url("{url}")。保存后复制格式会切到「自定义」，换回直链、Markdown 或 HTML 就恢复原样。</div></div>
             <div class="about-item"><div class="about-t">导出链接清单</div><div class="about-d">仓库页的「更多工具」和资源库的菜单里都有「导出链接清单」，可以按选中、当前列表或全部，导出成纯链接、按当前复制格式、JSON 或 CSV 文件，方便备份、搬家和批量替换。</div></div>
             <div class="about-item"><div class="about-t">替换历史</div><div class="about-d">「替换链接」页下面会记下每次替换（包括表情包转存）生成的新文件，不会自动删除，一直留到你自己移除或清空。点一条可以重新下载、复制「旧链接 → 新直链」的对照表，或从列表移除。内容只存在这台设备的浏览器里，不会上传；导出备份时会一起带上（备份文件会因此变大），导入时只补回缺少的，已有的不会被覆盖。没有备份的话，清除网站数据会把它一起清掉。</div></div>
-            <div class="about-item"><div class="about-t">文件管理</div><div class="about-d">按文件夹逐层浏览仓库文件，右上角可以新建文件夹、切换排序（手动 / 名称 / 大小 / 类型）、查看历史。点文件可预览（图片、文本代码）、复制直链、移动 / 改名、手动上移下移（仅手动排序）、删除；文件夹右侧的「···」可以重命名 / 移动整个文件夹或删除它，里面的文件一起处理，都能撤销或在「最近删除」恢复。上传时选一个文件可指定路径，选多个会保留原名传到当前文件夹，一次提交。历史记着这个仓库最近 30 次操作，移动类操作可以撤销。排序方式、手动顺序和历史只存在这台设备上。</div></div>
+            <div class="about-item"><div class="about-t">文件管理</div><div class="about-d">按文件夹逐层浏览仓库文件，右上角可以新建文件夹、切换排序（手动 / 名称 / 大小 / 类型）、查看历史。点文件可预览（图片、文本代码）、重命名、移动、手动上移下移（仅手动排序）、删除；文件夹右侧的「···」可以重命名、移动整个文件夹或删除它，里面的文件一起处理，都能撤销或在「最近删除」恢复。上传时选一个文件可指定路径，选多个会保留原名传到当前文件夹，一次提交。历史记着这个仓库最近 30 次操作，移动类操作可以撤销。排序方式、手动顺序和历史只存在这台设备上。</div></div>
             </div>
         </div>
         <div class="about-sec">
@@ -2200,7 +2196,7 @@ const $ = id => document.getElementById(id);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* ----- 自动重试与加载辅助 ----- */
-// 暂时性故障（网络波动、超时、5xx、409 冲突、限流）才自动重试；Token 错误、404、文件过大等确定性错误不重试
+// 暂时性故障才自动重试
 function isTransientUploadError(err) {
     const m = String((err && err.message) || '');
     if (err && err.http) {
@@ -2209,7 +2205,7 @@ function isTransientUploadError(err) {
     }
     return !/Token|未配置|过大|超过|不支持|HTTP 4\d\d/.test(m);
 }
-// 网络断开时先等恢复再重试（最多 maxMs），避免在断网期间把重试次数白白耗光
+// 网络断开时先等恢复再重试，避免在断网期间把重试次数白白耗光
 function waitOnline(maxMs) {
     if (typeof navigator === 'undefined' || navigator.onLine !== false) return Promise.resolve(true);
     return new Promise(resolve => {
@@ -2253,7 +2249,7 @@ document.addEventListener('error', e => { if (e.target && e.target.tagName === '
 // 让 iOS Safari 的 :active 点击反馈立即生效
 document.addEventListener('touchstart', function () {}, { passive: true });
 
-// 统一的图片扩展名（上传 / 链接转换 / 资源库判断共用同一份规则）
+// 统一的图片扩展名
 const IMAGE_EXT_RE = /\.(?:png|jpe?g|webp|gif|avif|bmp|svg|ico|heic|heif)$/i;
 const FONT_EXT_RE = /\.(?:ttf|otf|woff2?|eot)(?:$|[?#])/i;
 const VIDEO_EXT_RE = /\.(?:mp4|m4v|mov|webm|mkv|avi|3gp|ogv)(?:$|[?#])/i;
@@ -2286,7 +2282,7 @@ async function settleWithLimit(items, limit, worker) {
     return results;
 }
 
-// 复制到剪贴板：Clipboard API 失败（被拒/非安全上下文）时回退到 execCommand，并如实返回是否成功
+// 复制到剪贴板：Clipboard API 失败时回退到 execCommand
 async function writeClipboard(text) {
     if (navigator.clipboard && window.isSecureContext) {
         try { await navigator.clipboard.writeText(text); return true; } catch (_) {}
@@ -2305,8 +2301,8 @@ async function writeClipboard(text) {
     return ok;
 }
 /* ----- 提示（Toast） ----- */
-// type: 'ok' | 'error' | 'info' | 'loading'。不传时按文案粗略判断（兼容旧调用）。
-// loading 不会自动消失，直到下一条提示出现或调用 hideToast()。
+// type: 'ok' | 'error' | 'info' | 'loading'
+// loading 不会自动消失，直到下一条提示出现或调用 hideToast
 const TOAST_ICONS = {
     ok: '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     error: '<svg viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke-width="2.6" stroke-linecap="round"/></svg>',
@@ -2346,7 +2342,7 @@ function toast(msg, type) {
     sheet.onclick = hideToast;
     sheet.classList.remove('swap');
     void sheet.offsetHeight; // 强制回流：保证滑入动画一定会播放
-    // 提示条已在显示、且图标类型变了才做淡入换字；「正在删除 3/30」这类同类型进度更新只换文字，避免闪烁
+    // 提示条已在显示、且图标类型变了才做淡入换字
     if (wasShown && typeChanged) sheet.classList.add('swap');
     el.classList.add('show');
     clearTimeout(el._t);
@@ -2354,8 +2350,8 @@ function toast(msg, type) {
 }
 
 /* ----- 撤销 ----- */
-// 移动 / 重命名 / 删除成功后，底部弹出「撤销」条（约 9 秒）。只记住最近一次操作，新的操作会顶掉旧的。
-// 仓库里的撤销 = 再提交一次反向的 Git 变更（历史照样保留）；本地的收藏、标签、排序、资源库记录一并还原。
+// 移动 / 重命名 / 删除成功后，底部弹出「撤销」条
+// 仓库里的撤销 = 再提交一次反向的 Git 变更
 let undoJob = null;   // { run, timer, busy }
 const UNDO_MS = 9000;
 function undoErr(msg) { const e = new Error(msg); e.final = true; return e; }   // final：重试也没用，直接收起撤销条
@@ -2432,7 +2428,7 @@ function restoreRepoLocal(snap) {
     const mk = Object.keys(snap.meta || {});
     if (mk.length) { const m = loadRepoMeta(); mk.forEach(k => { m[k] = snap.meta[k]; }); saveRepoMeta(snap.owner ? { owner: snap.owner, repo: snap.repo } : undefined); }
 }
-// 给要删除的文件补上 blob sha（撤销时靠它把文件原样放回仓库）：先用已读到的列表，缺的再读一次文件树
+// 给要删除的文件补上 blob sha：先用已读到的列表，缺的再读一次文件树
 async function attachBlobShas(files) {
     const s = getSettings();
     if (repoLiveLoaded) {
@@ -2452,7 +2448,7 @@ async function attachBlobShas(files) {
     }
 }
 // 撤销「删除」：仓库文件按原 sha 提交回去，再还原本地记录 / 排序 / 标签
-// b = { files: [{owner, repo, branch, path, name, sha, size}], snap, removedHist: [{idx, entry}] }
+// b = { files: [{owner
 async function undoDeleteBundle(b) {
     const s = getSettings();
     let restoredFiles = [];
@@ -2540,7 +2536,7 @@ async function undoRepoRename(owner, repo, branch, oldPath, newPath, sha) {
 
 /* ----- 失败详情弹窗 ----- */
 // failures: [{ name, message }]
-// opts.title / opts.sub 可自定义文案；opts.onRetry 传入时每条失败记录带「重试」按钮，点击时调用 onRetry(failure)。
+// opts.title / opts.sub 可自定义文案
 let lastFailures = [];
 
 function closeUploadErrorModal() {
@@ -2647,14 +2643,14 @@ function openDialog(o) {
     return new Promise(resolve => {
         dlgResolve = resolve;
         $('dlg-backdrop').classList.add('show');
-        // 输入框自动聚焦；纯确认时默认聚焦「取消」，避免误按回车直接执行危险操作
+        // 输入框自动聚焦
         setTimeout(() => (o.input ? input : $('dlg-cancel')).focus({ preventScroll: true }), 30);
     });
 }
 
 // 返回 true / false
 function showConfirm(o) { return openDialog(o).then(v => v === true); }
-// 返回输入内容（字符串）或 null（取消）；validate(value) 返回错误文案时对话框保持打开并就地提示
+// 返回输入内容或 null
 function showPrompt(o) {
     return openDialog(Object.assign({}, o, { input: { value: o.value, placeholder: o.placeholder, type: o.type } }))
         .then(v => (typeof v === 'string' ? v : null));
@@ -2694,7 +2690,7 @@ $('upload-error-copy').onclick = async () => {
     setTimeout(() => { btn.textContent = '复制详情'; }, 1600);
 };
 
-// 点击提示条以外的任意位置收起提示（点击本身照常生效，不被拦截；加载中的提示不受影响）
+// 点击提示条以外的任意位置收起提示
 document.addEventListener('pointerdown', e => {
     const el = $('kb-toast');
     if (!el || !el.classList.contains('show')) return;
@@ -2703,7 +2699,7 @@ document.addEventListener('pointerdown', e => {
     hideToast();
 }, true);
 
-// Esc 关闭最上层的弹窗（处理过就打上标记，页面层的 Esc 监听看到标记就不再关页面）
+// Esc 关闭最上层的弹窗
 document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
     if (dlgResolve) { e._kbEsc = true; return finishDialog(null); }
@@ -2841,7 +2837,7 @@ function chooseRepo(r) {
     if ($('page-gallery').classList.contains('active')) loadRepoLiveFiles(true);
 }
 
-// 切换仓库的公开 / 私有（PATCH /repos/{owner}/{repo}）
+// 切换仓库的公开 / 私有
 async function toggleRepoVisibility(r) {
     const s = getSettings();
     let owner = localStorage.getItem('kb_standalone_owner') || '';
@@ -2879,7 +2875,7 @@ async function toggleRepoVisibility(r) {
     toast('已改为' + (toPrivate ? '私有' : '公开'), 'ok');
 }
 
-// 删除仓库后清掉本地属于该仓库的资源库记录和排序记录（直链已经全部失效）
+// 删除仓库后清掉本地属于该仓库的资源库记录和排序记录
 function purgeLocalRecordsForRepo(owner, repo) {
     const ro = String(owner || '').toLowerCase();
     const rr = String(repo || '').toLowerCase();
@@ -3090,12 +3086,12 @@ async function createRepoFromSheet() {
 // 主页常驻，子页面全屏滑入，无顶栏
 const PAGE_TITLES = { gallery: ['Library', '你上传过的文件'], repo: ['Repository', '仓库里的全部文件'] };
 let histDepth = 0, skipPop = 0, inPop = false;
-// iOS 上不压历史记录：否则系统自带的边缘滑动返回会和下面自写的跟手返回同时触发，
-// 系统会垫一层主页截图（两层主界面），手势结束后还会再滑出一次。
-// 想恢复安卓式返回键支持，把它改成 false 即可。
+// iOS 上不压历史记录：否则系统自带的边缘滑动返回会和下面自写的跟手返回同时触发
+// 系统会垫一层主页截图，手势结束后还会再滑出一次
+// 想恢复安卓式返回键支持，把它改成 false 即可
 const NO_HISTORY = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 function topPanel() { return document.querySelector('.page.active'); }
-// renderAccountUI 会重写本地存储里的账号数据并重新解码头像，放在转场里会掉帧；等转场结束再做
+// renderAccountUI 会重写本地存储里的账号数据并重新解码头像
 let accUiT = 0;
 function scheduleAccountUI() {
     clearTimeout(accUiT);
@@ -3137,7 +3133,7 @@ document.addEventListener('keydown', e => {
     const p = topPanel(); if (p) setPanel(p, false);
 });
 
-// 滑入动画期间主线程要全力出帧；列表渲染 / 网络请求放到动画基本结束后再做（页面已被关掉或切走则跳过）
+// 滑入动画期间主线程要全力出帧
 let pushQ = [], pushT = 0;
 function afterPush(p, fn) {
     pushQ.push([p, fn]);
@@ -3176,7 +3172,7 @@ function openGallery(seg) {
 function closePage() { const p = topPanel(); if (p) setPanel(p, false); }
 function switchTab(name) { openPage(name); }
 
-// 给每个子页面加上标题（没有返回键、没有顶栏）
+// 给每个子页面加上标题
 document.querySelectorAll('.page').forEach(p => {
     p.setAttribute('aria-hidden', 'true'); p.inert = true;
     const head = document.createElement('div');
@@ -3191,11 +3187,7 @@ document.querySelectorAll('.page').forEach(p => {
     p.insertBefore(head, p.firstChild);
 });
 
-/* ----- 左边缘右滑返回（跟手） -----
-   手势只绑在左边缘的专用感应条 #edge-swipe 上（touch-action:none）：
-   1) 浏览器不会再拿这根手指去判断滚动，所以不会中途 pointercancel，也就不会"回弹"；
-   2) pointermove 一开始就按满帧率送达，起步不再卡一下；
-   3) 松手速度只看最后 ~100ms，而不是"从按下到现在的平均值"，快甩一下就能关。 */
+/* ----- 左边缘右滑返回（跟手） ----- */
 const LOCK_DIST = 4, DURATION = 360;   // 感应条宽度在 CSS 的 #edge-swipe 里
 const EASE_IOS = 'cubic-bezier(.32,.72,0,1)';
 let drag = null, animating = false, dragRaf = 0;
@@ -3238,7 +3230,7 @@ function endDrag(e) {
         return;
     }
     const W = window.innerWidth, dx = d.dx, p = d.p;
-    // pointercancel 多半是系统/浏览器打断，不代表用户想取消：和松手一样按位置和速度判断，不再无脑弹回去
+    // pointercancel 多半是系统/浏览器打断
     const v = dragVelocity(d);
     let close;
     if (v > 0.3) close = true;
@@ -3263,7 +3255,7 @@ function endDrag(e) {
     };
     const onEnd = ev => { if (ev.target === p && ev.propertyName === 'transform') fin(); };
     p.addEventListener('transitionend', onEnd);
-    tm = setTimeout(fin, dur + 80);   // 兜底：transitionend 没触发（后台标签页等）也能收尾
+    tm = setTimeout(fin, dur + 80);   // 兜底：transitionend 没触发也能收尾
 }
 if (edgeStrip) {
     edgeStrip.addEventListener('pointerdown', e => {
@@ -3335,14 +3327,14 @@ if (edgeStrip) {
     }
     input.addEventListener('focus', lock);
     input.addEventListener('blur', unlock);
-    /* 点搜索栏以外的地方收起键盘（iOS 默认不会） */
+    /* 点搜索栏以外的地方收起键盘 */
     document.addEventListener('pointerdown', e => {
         if (document.activeElement === input && !bar.contains(e.target)) input.blur();
     }, true);
     input.addEventListener('input', filter);
     input.addEventListener('keydown', e => { if (e.key === 'Enter') input.blur(); });
     document.getElementById('searchMic').addEventListener('click', () => input.focus());
-    /* 键盘弹出时，让悬浮栏贴在键盘上方；键盘收起后无条件回到原位 */
+    /* 键盘弹出时，让悬浮栏贴在键盘上方 */
     const vv = window.visualViewport;
     let settleTimers = [];
     const clearSettle = () => { settleTimers.forEach(clearTimeout); settleTimers = []; };
@@ -3354,7 +3346,7 @@ if (edgeStrip) {
         void bar.offsetHeight;
         bar.style.transition = '';
     };
-    // iOS 的键盘动画结束得比 blur 晚，所以收起后多次校正（滚动位置 + 栏位置）
+    // iOS 的键盘动画结束得比 blur 晚，所以收起后多次校正
     const settle = () => {
         clearSettle();
         snapBack();
@@ -3564,7 +3556,7 @@ function setGallerySeg(seg) {
 }
 
 /* ----- 触屏设备适配 ----- */
-// 触屏设备没有拖拽，手机浏览器基本不支持选文件夹。
+// 触屏设备没有拖拽，手机浏览器基本不支持选文件夹
 function applyDeviceHints() {
     const touchOnly = !!(window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches);
     if (!touchOnly) return;
@@ -3604,7 +3596,7 @@ function openMoreMenu(btn, items, opts) {
     });
     document.body.appendChild(m);
     const r = btn.getBoundingClientRect();
-    // 默认在按钮下面展开；下面放不下、上面放得下就改向上展开（按钮靠近屏幕底部时，菜单不会被挤出屏幕）
+    // 默认在按钮下面展开
     const mh = m.offsetHeight;
     const up = !!(opts && opts.up) || (r.bottom + 8 + mh > window.innerHeight - 8 && r.top - 8 - mh >= 8);
     if (up) { m.style.bottom = Math.max(8, window.innerHeight - r.top + 8) + 'px'; m.style.transformOrigin = 'bottom right'; }
@@ -3677,9 +3669,9 @@ const PREF_HEIC_KEY = 'kb_pref_heic_jpg';
 const PREF_KEEPALIVE_KEY = 'kb_pref_keepalive';
 const PREF_WAKELOCK_KEY = 'kb_pref_wakelock';
 const PREF_NOTIFY_KEY = 'kb_pref_notify';
-function prefNotify() { try { return localStorage.getItem(PREF_NOTIFY_KEY) === '1'; } catch (_) { return false; } } // 默认关闭（需要系统授权）
-function prefKeepAlive() { try { return localStorage.getItem(PREF_KEEPALIVE_KEY) === '1'; } catch (_) { return false; } } // 默认关闭；开启后整个 App 内全程保活
-function prefWakeLock() { try { return localStorage.getItem(PREF_WAKELOCK_KEY) === '1'; } catch (_) { return false; } } // 默认关闭；开启后整个 App 内一直常亮
+function prefNotify() { try { return localStorage.getItem(PREF_NOTIFY_KEY) === '1'; } catch (_) { return false; } } // 默认关闭
+function prefKeepAlive() { try { return localStorage.getItem(PREF_KEEPALIVE_KEY) === '1'; } catch (_) { return false; } } // 默认关闭
+function prefWakeLock() { try { return localStorage.getItem(PREF_WAKELOCK_KEY) === '1'; } catch (_) { return false; } } // 默认关闭
 function prefAutoJump() { try { return localStorage.getItem(PREF_AUTOJUMP_KEY) !== '0'; } catch (_) { return true; } } // 默认开启
 function prefHeicJpg() { try { return localStorage.getItem(PREF_HEIC_KEY) === '1'; } catch (_) { return false; } }
 function savePrefs() {
@@ -3712,7 +3704,7 @@ async function showSysNotification(title, body, tag) {
     if (!notifySupported() || Notification.permission !== 'granted') return false;
     const icon = appIconBlobUrl || appIconSrc();
     const opts = { body, tag: tag || 'dl-upload', icon, badge: icon };
-    try { // 优先走 Service Worker（iOS 主屏幕应用要求这样）
+    try { // 优先走 Service Worker
         if ('serviceWorker' in navigator) {
             const reg = await navigator.serviceWorker.getRegistration();
             if (reg && reg.showNotification) { await reg.showNotification(title, opts); return true; }
@@ -3737,7 +3729,7 @@ async function sendTestNotification() {
     if (perm === 'default') perm = await askNotifyPermission();
     if (perm !== 'granted') return toast('没有通知权限，请到系统设置里允许通知', 'error');
     toast('5 秒后发送测试通知，现在可以切到后台', 'info');
-    keepAlive.start(true, true); // 借用静音保活（即使开关没开）：点击本身就是用户手势，可以播放；避免切到后台后页面被挂起、通知发不出
+    keepAlive.start(true, true); // 借用静音保活：点击本身就是用户手势，可以播放
     clearTimeout(testNotifyTimer);
     testNotifyTimer = setTimeout(async () => {
         const ok = await showSysNotification('测试通知', '收到这条就说明：上传完成后会这样提醒你', 'dl-test');
@@ -3801,9 +3793,7 @@ async function saveSettings() {
     }
 }
 
-/* ----- 跨窗口锁（navigator.locks） -----
-   两个窗口 / 标签页同时写同一份东西时，排队一个一个来。
-   不支持锁、环境不让用（比如本地 file://）、或者等锁超时，都退回没有锁时的老做法，不会因此卡住。 */
+/* ----- 跨窗口锁（navigator.locks） ----- */
 async function withCrossTabLock(name, fn, waitMs) {
     const lm = (typeof navigator !== 'undefined') && navigator.locks;
     if (!lm || typeof lm.request !== 'function') return fn();
@@ -3822,7 +3812,7 @@ async function withCrossTabLock(name, fn, waitMs) {
         return fn();             // 等锁超时 / 锁不可用
     }
 }
-// 锁被别的窗口占着就直接跳过（返回 undefined），不排队
+// 锁被别的窗口占着就直接跳过，不排队
 async function runIfLockFree(name, fn) {
     const lm = (typeof navigator !== 'undefined') && navigator.locks;
     if (!lm || typeof lm.request !== 'function') return fn();
@@ -3836,9 +3826,9 @@ async function runIfLockFree(name, fn) {
 }
 
 /* ----- 本地数据库（IndexedDB） ----- */
-// 资源库记录、上传顺序、失败上传队列都放这里。读写走内存缓存（启动时读一次），
-// 不再每次从 localStorage 整份 JSON.parse / stringify；落盘在后台防抖进行，也没有 5MB 的上限。
-// IndexedDB 不可用时（个别隐私模式 / 旧系统）自动退回 localStorage，行为和以前一样。
+// 资源库记录、上传顺序、失败上传队列都放这里
+// 不再每次从 localStorage 整份 JSON.parse / stringify
+// IndexedDB 不可用时自动退回 localStorage，行为和以前一样
 const HISTORY_KEY = 'kb_standalone_history';            // 旧版 localStorage 键：迁移 + 兜底用
 const UPLOAD_ORDER_KEY = 'kb_standalone_upload_order';  // 同上
 const dlDB = (() => {
@@ -3879,9 +3869,9 @@ const dlDB = (() => {
 })();
 let storeReady = false, storeUsesIDB = false;
 let historyCache = [], orderCache = {};
-let repoViewEpoch = 0, repoVisCache = null;   // 仓库「当前可见文件列表」的缓存；数据变了（重画、改标签 / 收藏）就 +1
-let rankEpoch = 0, rankCache = null;   // 上传时间排名表的缓存；每次写记录 / 写排序就 +1，缓存作废
-// 「上次和数据库对过账」的版本：写盘时拿它判断本窗口改了什么、别的窗口改了什么，两边的改动都保留
+let repoViewEpoch = 0, repoVisCache = null;   // 仓库「当前可见文件列表」的缓存
+let rankEpoch = 0, rankCache = null;   // 上传时间排名表的缓存
+// 「上次和数据库对过账」的版本：写盘时拿它判断本窗口改了什么、别的窗口改了什么
 let historyBase = null, orderBase = null;
 let historyTimer = null, orderTimer = null;
 let storeChannel = null;
@@ -3928,8 +3918,8 @@ function historySnapshot(list) {
     (list || []).forEach(e => { if (e && e.id !== undefined) m.set(e.id, JSON.stringify(e)); });
     return m;
 }
-// 三方合并：base = 上次对账时的样子，local = 本窗口现在的样子，db = 数据库里现在的样子。
-// 本窗口新增 / 改过 / 删掉的，以本窗口为准；别的窗口新增 / 改过 / 删掉的，只要本窗口没碰过，就跟着它。
+// 三方合并：base = 上次对账时的样子
+// 本窗口新增 / 改过 / 删掉的，以本窗口为准
 function mergeHistory(base, local, db) {
     const dbById = new Map();
     db.forEach(e => { if (e && e.id !== undefined) dbById.set(e.id, e); });
@@ -3948,7 +3938,7 @@ function mergeHistory(base, local, db) {
         if (dj !== b) { changed = true; out.push(d); } else out.push(e);   // 别处改过：用它的
     });
     const extra = [];
-    db.forEach(e => { if (e && e.id !== undefined && !seen.has(e.id) && !base.has(e.id)) extra.push(e); });   // 别处新增的（base 里有而本窗口没有的 = 本窗口删的，不加回来）
+    db.forEach(e => { if (e && e.id !== undefined && !seen.has(e.id) && !base.has(e.id)) extra.push(e); });   // 别处新增的
     if (extra.length) changed = true;
     return { list: extra.concat(out), changed };
 }
@@ -4023,13 +4013,13 @@ function flushStoreNow() {
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushStoreNow(); });
 window.addEventListener('pagehide', flushStoreNow);
-// 从后台切回来：这个窗口在后台时可能错过了别的窗口的通知（iOS 会冻结后台页面），回来先对一遍账，再接着改
+// 从后台切回来：这个窗口在后台时可能错过了别的窗口的通知，回来先对一遍账，再接着改
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && storeReady && storeUsesIDB) { storeReloadHistory(); storeReloadOrder(); }
 });
 
 /* ----- 历史记录 ----- */
-// loadHistory() 返回内存里的同一个数组：要改就改完调用 saveHistory(list)；只读用 filter/map 即可。
+// loadHistory 返回内存里的同一个数组：要改就改完调用 saveHistory
 function loadHistory() { return historyCache; }
 function saveHistory(list) {
     rankEpoch++;
@@ -4067,7 +4057,7 @@ async function persistFailedUpload(file, ctx, message) {
     if (file && file._persistP) { try { await file._persistP; } catch (_) {} }   // 先等「排队中」那条写完，再改成「失败」
     return putFailedRecord(file, ctx, message, false);
 }
-// 一批文件开始上传时，先在后台把它们依次存进本机队列：上传到一半被关掉 / 被系统杀掉，下次打开还能继续
+// 一批文件开始上传时，先在后台把它们依次存进本机队列：上传到一半被关掉 / 被系统杀掉
 let pendingPersistChain = Promise.resolve();
 function persistPendingUploads(files, ctx) {
     if (!storeUsesIDB) return;
@@ -4102,7 +4092,7 @@ async function liveUploadSessions() {
 }
 async function offerFailedUploads() {
     if (!storeUsesIDB || isBatchUploading) return;
-    // 两个窗口同时打开时，都会提示「继续上传」，各传一遍就重复了：谁先拿到锁谁处理，另一个跳过
+    // 两个窗口同时打开时，都会提示「继续上传」
     return runIfLockFree('dl-failed-offer', offerFailedUploadsCore);
 }
 async function offerFailedUploadsCore() {
@@ -4117,7 +4107,7 @@ async function offerFailedUploadsCore() {
     let mine = recs.filter(r => String(r.repo || '').toLowerCase() === st.repo.toLowerCase()
         && (!curOwner || !r.owner || String(r.owner).toLowerCase() === curOwner));   // 同名仓库、不同账号的不混在一起
     if (!mine.length) return;
-    // 「排队中」的记录：如果另一个窗口还在上传它们，就先别插手（锁不可用时，只接管超过 5 分钟的）
+    // 「排队中」的记录：如果另一个窗口还在上传它们，就先别插手
     const live = await liveUploadSessions();
     mine = mine.filter(r => !r.pending || (live ? !live.has(r.session) : now - (r.time || 0) > 5 * 60 * 1000));
     if (!mine.length) return;
@@ -4145,12 +4135,12 @@ async function offerFailedUploadsCore() {
 }
 function addToHistory(entry) {
     const list = loadHistory();
-    // 资源库画廊固定“最新的在最上面”；本次上传结果列表另有自己的顺序（按上传先后），互不影响。
+    // 资源库画廊固定“最新的在最上面”
     list.unshift(entry);
     saveHistory(list);
     scheduleRenderGallery();
 }
-// 批量上传时每传完一个就整页重绘一次，100 个文件要重绘 100 次：合并成最多每 400ms 一次
+// 批量上传时每传完一个就整页重绘一次
 let galleryRenderTimer = null;
 function scheduleRenderGallery() {
     if (galleryRenderTimer) return;
@@ -4167,10 +4157,10 @@ function removeHistoryItem(id) {
 }
 
 /* ----- 上传顺序 ----- */
-// 实时仓库按此顺序排序。
-// GitHub 的文件树只按路径字母序返回、不带上传时间，所以上传成功时在本地记一笔时间。
-// 单独存一份（不随图库记录被删而丢失）；没有记录的文件（别的设备/手动上传）视为最早。
-const REPO_SORT_NEWEST_FIRST = false; // false = 先上传的在前；改成 true = 最新上传的在最前
+// 实时仓库按此顺序排序
+// GitHub 的文件树只按路径字母序返回、不带上传时间
+// 单独存一份
+const REPO_SORT_NEWEST_FIRST = false; // false = 先上传的在前
 function uploadKey(owner, repo, path) {
     return [String(owner || '').toLowerCase(), String(repo || '').toLowerCase(), path].join('\u0000');
 }
@@ -4221,8 +4211,8 @@ let longPressTimer = null;
 let longPressMoved = false;
 let longPressStartX = 0;
 let longPressStartY = 0;
-// 长按进入多选后，浏览器仍会紧接着派发一次 click。
-// 不拦截这次 click 会把“刚选中”的项目立即取消选择。
+// 长按进入多选后，浏览器仍会紧接着派发一次 click
+// 不拦截这次 click 会把“刚选中”的项目立即取消选择
 let suppressNextGalleryClick = false;
 let suppressNextRepoClick = false;
 let lastPointerType = 'mouse';
@@ -4245,7 +4235,7 @@ function getGalleryEntryType(entry) {
 let gallerySearch = '';
 let gallerySearchTimer = null;
 let galleryTag = '', galleryRenderedN = 0, galleryIO = null;
-// 搜索框右侧按钮：没内容时是麦克风（点一下聚焦输入），有内容时变成清除键
+// 搜索框右侧按钮：没内容时是麦克风，有内容时变成清除键
 function searchPillAction(btn, ev) {
     if (ev) { ev.preventDefault(); ev.stopPropagation(); }
     const pill = btn.closest('.searchpill');
@@ -4280,7 +4270,7 @@ function getGalleryVisibleList() {
         && (!q || (String(e.name || '') + ' ' + String(e.url || '') + ' ' + entryTags(e).join(' ')).toLowerCase().includes(q))));
 }
 
-// 选中数量位数变化时，悬浮条按内容平滑伸缩（图标之间的间距始终固定）
+// 选中数量位数变化时，悬浮条按内容平滑伸缩
 function animateDockWidth(el, mutate) {
     if (!el || getComputedStyle(el).display === 'none') { mutate(); return; }
     const w0 = el.getBoundingClientRect().width;
@@ -4326,7 +4316,7 @@ function toggleGallerySelectAll() {
     syncGallerySelectionDom();
 }
 
-// 只更新选中状态（类名/对勾/提示），不重建整个网格
+// 只更新选中状态，不重建整个网格
 function syncGallerySelectionDom() {
     document.querySelectorAll('#gallery-container .gallery-tile').forEach(el => {
         const sel = gallerySelected.has(el._entryId);
@@ -4375,7 +4365,7 @@ function setDeleteSheetBusy(busy) {
     document.querySelectorAll('#delete-sheet-backdrop button, #delete-sheet-backdrop input').forEach(el => { el.disabled = busy; });
 }
 function closeDeleteSheet() {
-    if (isDeleting) return; // 删除进行中不允许关闭确认层（进度条就在层里）
+    if (isDeleting) return; // 删除进行中不允许关闭确认层
     const el = $('delete-sheet-backdrop');
     if (el) el.classList.remove('show');
 }
@@ -4429,8 +4419,8 @@ async function deleteGithubAsset(entry) {
     }, s.token, s.proxy);
 }
 
-// 一次 Git 提交批量删除（比逐个 DELETE 快得多，也不会因连续提交互相冲突）。
-// 批量失败时自动退回逐个删除；返回失败列表 [{ path, name, message }]。
+// 一次 Git 提交批量删除
+// 批量失败时自动退回逐个删除
 async function deleteRepoFiles(files) {
     if (!files.length) return [];
     const s = getSettings();
@@ -4455,7 +4445,7 @@ async function deleteRepoFiles(files) {
                 try {
                     await deleteGithubAsset({ githubOwner: file.owner, githubRepo: file.repo, githubBranch: file.branch, githubPath: file.path, name: file.name });
                 } catch (e) {
-                    if (e && e.status === 404) continue; // 文件已经不在仓库里（之前删过 / 在别处删了）：视为删除成功
+                    if (e && e.status === 404) continue; // 文件已经不在仓库里：视为删除成功
                     failures.push({ owner: file.owner, repo: file.repo, branch: file.branch, path: file.path, name: file.name, message: e.message || '未知错误' });
                 }
             }
@@ -4480,7 +4470,7 @@ async function confirmDeleteSelected() {
         return;
     }
 
-    // 保持确认层打开：进度条在层内，删除期间禁止关闭 / 重复点击。
+    // 保持确认层打开：进度条在层内，删除期间禁止关闭 / 重复点击
     isDeleting = true;
     setDeleteSheetBusy(true);
     if (progress) progress.classList.add('show');
@@ -4489,7 +4479,7 @@ async function confirmDeleteSelected() {
     let undoFiles = [], undoSnap = null;   // 给「撤销」用的快照
     try {
         if (deleteCloud) {
-            // 批量：所有仓库文件一次提交删完（原来每个文件 2 个请求 + 1 次提交，慢而且容易互相冲突）
+            // 批量：所有仓库文件一次提交删完
             const s0 = getSettings();
             const seen = new Set(), files = [], idsByKey = new Map();
             selected.forEach(entry => {
@@ -4530,7 +4520,7 @@ async function confirmDeleteSelected() {
         setDeleteSheetBusy(false);
     }
 
-    // 重新读取最新记录再保存：删除期间可能有新的上传记录写入，不能用开头的旧快照覆盖。
+    // 重新读取最新记录再保存：删除期间可能有新的上传记录写入，不能用开头的旧快照覆盖
     const idSet = new Set(ids), removedHist = [], nextHist = [];
     loadHistory().forEach((e, idx) => { if (idSet.has(e.id) && !keepIds.has(e.id)) removedHist.push({ idx, entry: e }); else nextHist.push(e); });
     saveHistory(nextHist);
@@ -4555,7 +4545,7 @@ async function confirmDeleteSelected() {
     }
 }
 
-// 一键清除「已确认失效」的本地记录（只动本地记录，不碰仓库）
+// 一键清除「已确认失效」的本地记录
 async function clearDeadRecords() {
     const hist = loadHistory();
     const dead = hist.filter(e => linkStatusOf(e.id) === 'dead');
@@ -4582,7 +4572,7 @@ async function clearHistory() {
     exitGalleryMultiMode();
     toast('已清空');
 }
-// 复制所选：按当前复制格式（直链 / Markdown / HTML）一次复制
+// 复制所选：按当前复制格式一次复制
 async function copySelectedGallery() {
     if (!gallerySelected.size) return toast('请先选择', 'info');
     const items = getGalleryVisibleList().filter(e => gallerySelected.has(e.id) && e.url).map(e => ({ url: e.url, name: e.name }));
@@ -4606,7 +4596,7 @@ function setGalleryFilter(f) {
     galleryFilter = f;
     galleryRenderedN = 0;
     gallerySelected.clear(); // 避免“选中的项目在当前筛选里看不见却仍会被删除”
-    // 切换分类时只影响图库自己的按钮，避免和下方“仓库文件”的分类状态互相干扰。
+    // 切换分类时只影响图库自己的按钮，避免和下方“仓库文件”的分类状态互相干扰
     document.querySelectorAll('.filter-btn[data-f]').forEach(b => b.classList.toggle('active', b.dataset.f === f));
     updateGallerySelectionUI();
     renderGallery();
@@ -4662,7 +4652,7 @@ const PREF_METASYNC_KEY = 'kb_pref_metasync';
 const META_SYNC_STATE_KEY = 'kb_repo_meta_sync';        // 每个仓库：上次同步到的远端版本 t、本机是否有未同步的改动
 const META_SYNC_FORCE_KEY = 'kb_repo_meta_sync_force';  // 导入备份后置 1：下次同步一定按「合并」处理，避免备份里的标签被远端盖掉
 const META_SYNC_PATH = '.directlink/meta.json';
-let repoMetaCtx = null;          // { owner, repo, branch, complete }：当前文件列表属于哪个仓库
+let repoMetaCtx = null;          // { owner，repo
 let metaSyncTimer = null, metaSyncBusy = false, metaSyncRerun = false, metaSyncSeq = 0, metaSyncPending = false;
 let metaSyncWarned = false, metaSyncLastErr = '';
 function prefMetaSync() { return lsGet(PREF_METASYNC_KEY) !== '0'; }   // 默认开启
@@ -4762,7 +4752,7 @@ async function syncRepoMeta(manual) {
     const c0 = repoMetaCtx;
     // 这些情况下面直接就返回了，不需要锁
     if (!c0 || !c0.owner || !c0.repo || !prefMetaSync() || metaSyncBusy) return syncRepoMetaCore(manual);
-    // 读远端 → 合并 → 写回是一个整体：两个窗口同时做，后写的会撞上「版本不对」报错；加锁后一个一个来
+    // 读远端 → 合并 → 写回是一个整体：两个窗口同时做
     return withCrossTabLock('dl-meta:' + metaSyncRepoKey(c0.owner, c0.repo), () => syncRepoMetaCore(manual), 120000);
 }
 async function syncRepoMetaCore(manual) {
@@ -4793,7 +4783,7 @@ async function syncRepoMetaCore(manual) {
             merged = prune(local);
             needPush = Object.keys(merged).length > 0;
         } else if (dirty) {
-            const sameBase = !forced && st.t !== undefined && remote.t === st.t;   // 远端自上次同步后没人动过：以本机为准（删除才能传上去）
+            const sameBase = !forced && st.t !== undefined && remote.t === st.t;   // 远端自上次同步后没人动过：以本机为准
             merged = prune(sameBase ? local : metaUnion(remote.files, local));    // 别处也改过：取并集，不丢任何一边
             needPush = metaSigAll(merged) !== metaSigAll(remote.files);
         } else {
@@ -4848,8 +4838,8 @@ function onRepoSearchInput() {
     }, 150);
 }
 let repoLiveFiles = [];
-// 仓库文件的直链检测结果（只在本次打开期间有效；文件内容变了 sha 对不上就作废）
-const repoLinkStatus = new Map();   // uploadKey → { s: 'ok'|'dead'|'cdn', sha, t }
+// 仓库文件的直链检测结果
+const repoLinkStatus = new Map();   // uploadKey → { s: 'ok'|'dead'|'cdn'
 let repoLinkCheckRunning = false, repoLinkCheckStop = false;
 function repoFolderFiles() {
     if (!repoCurrentPath) return [];
@@ -4861,20 +4851,20 @@ function repoLinkStatusOf(f) {
     const v = repoLinkStatus.get(uploadKey(f.owner, f.repo, f.path));
     return (v && v.sha === f.sha) ? v.s : '';
 }
-// 重复文件（内容 sha 相同）。path → { sha, extra }，extra=true 的是建议删除的多余副本
+// 重复文件
 let repoDupInfo = new Map();
 function repoDupOf(f) { const v = repoDupInfo.get(f.path); return (v && v.sha === f.sha) ? v : null; }
-// 仓库工具箱的结果（同样只在本次打开期间有效，靠 sha 判断文件有没有变）
+// 仓库工具箱的结果
 const REPO_SPECIAL_FILTERS = new Set(['fav', 'dead', 'dup', 'orphan', 'sim']);   // 这些筛选跨文件夹，在整个仓库里找
 let repoOrphanInfo = new Map();   // path → sha：没被导入的文件引用的图片 / 字体
-let repoSimInfo = new Map();      // path → { sha, g, extra }：相似图分组，extra=true 是建议删除的那份
+let repoSimInfo = new Map();      // path → { sha
 function repoOrphanOf(f) { return repoOrphanInfo.get(f.path) === f.sha; }
 function repoSimOf(f) { const v = repoSimInfo.get(f.path); return (v && v.sha === f.sha) ? v : null; }
 let repoLiveLoaded = false;
 let repoLiveLoading = false;
 let repoLiveLoadedAt = 0;
-let repoLoadSeq = 0; // 每次读取递增；过期的请求结果直接丢弃
-// 换仓库 / 换账号 / 重命名 / 删除后：作废在途的读取，并复位「读取中」状态（否则之后的非强制加载会一直被挡住）
+let repoLoadSeq = 0; // 每次读取递增
+// 换仓库 / 换账号 / 重命名 / 删除后：作废在途的读取，并复位「读取中」状态
 function invalidateRepoLoad() {
     repoLoadSeq++;
     repoLiveLoading = false;
@@ -4882,13 +4872,13 @@ function invalidateRepoLoad() {
 }
 let repoMultiMode = false;
 const repoSelected = new Set();
-let repoCurrentPath = ''; // 当前浏览的文件夹（空字符串 = 根目录）
+let repoCurrentPath = ''; // 当前浏览的文件夹
 let moveTargetFolder = '';
 
 // 非法文件夹名字符：不允许出现路径分隔符等特殊符号
 const INVALID_FOLDER_NAME_RE = /[\/\\:*?"<>|]|^\.{1,2}$/;
 
-// 当前文件夹下的直接子文件夹名（不含更深层级）
+// 当前文件夹下的直接子文件夹名
 function getRepoSubfolders() {
     const prefix = repoCurrentPath ? repoCurrentPath + '/' : '';
     const set = new Set();
@@ -4901,7 +4891,7 @@ function getRepoSubfolders() {
     return Array.from(set).sort((a, b) => a.localeCompare(b, 'zh'));
 }
 
-// 仓库中出现过的所有文件夹路径（含各层级），供"移动到"选择器使用
+// 仓库中出现过的所有文件夹路径，供"移动到"选择器使用
 function getAllRepoFolders() {
     const set = new Set();
     repoLiveFiles.forEach(f => {
@@ -4956,7 +4946,7 @@ function renderRepoBreadcrumb() {
     });
 }
 
-// 新建文件夹：GitHub 不支持空目录，用一个隐藏的 .gitkeep 占位文件来"创建"文件夹
+// 新建文件夹：GitHub 不支持空目录
 async function createRepoFolder() {
     if (!getSettings().token) return toast('请先配置 Token');
     const name = await showPrompt({
@@ -5076,8 +5066,8 @@ async function confirmMoveSheet() {
     await moveSelectedRepoFiles(target);
 }
 
-// 用一次 Git 提交（blob 复用原 sha，无需重新读取文件内容）批量把选中文件挪到目标文件夹
-// 移动成功后同步本地：文件列表、上传顺序、收藏 / 标签、资源库记录里的直链（撤销移动时反向再调用一次）
+// 用一次 Git 提交批量把选中文件挪到目标文件夹
+// 移动成功后同步本地：文件列表、上传顺序、收藏 / 标签、资源库记录里的直链
 function applyLocalMoves(owner, repo, branch, moves) {
     const history = loadHistory();
     const order = loadUploadOrder();
@@ -5094,7 +5084,7 @@ function applyLocalMoves(owner, repo, branch, moves) {
         // 上传顺序跟着文件走
         const oldK = uploadKey(owner, repo, m.from);
         if (order[oldK] !== undefined) { order[uploadKey(owner, repo, m.to)] = order[oldK]; delete order[oldK]; }
-        // 图库记录里的直链也要同步，否则旧链接 404、之后「同时删除仓库文件」也找不到文件
+        // 图库记录里的直链也要同步
         history.forEach(e => {
             const p = historyAssetRef(e);
             if (!p || p.path !== m.from) return;
@@ -5131,7 +5121,7 @@ async function moveSelectedRepoFiles(targetFolder) {
         selected.forEach(f => {
             let newPath = prefix + f.name;
             if (newPath === f.path) return;
-            // 目标位置已有同名文件（或本批里有重名）：自动加 -2、-3，绝不覆盖
+            // 目标位置已有同名文件：自动加 -2、-3，绝不覆盖
             if (occupied.has(newPath)) {
                 const dot = f.name.lastIndexOf('.');
                 const stem = dot > 0 ? f.name.slice(0, dot) : f.name;
@@ -5191,7 +5181,7 @@ function computeRepoVisibleList() {
         else if (repoFilter === 'sim') { if (!repoSimOf(f)) return false; }
         else if (repoFilter !== 'all' && f.type !== repoFilter) return false;
         if (repoTag && !repoMetaTags(f).includes(repoTag)) return false;
-        if (repoSearch) return f.path.toLowerCase().includes(repoSearch) || repoMetaTags(f).join(' ').toLowerCase().includes(repoSearch); // 搜索：整个仓库（含标签）
+        if (repoSearch) return f.path.toLowerCase().includes(repoSearch) || repoMetaTags(f).join(' ').toLowerCase().includes(repoSearch); // 搜索：整个仓库
         if (globalView) return true;
         if (!f.path.startsWith(prefix)) return false;
         const rest = f.path.slice(prefix.length);
@@ -5231,7 +5221,7 @@ function toggleRepoSelectAll() {
     syncRepoSelectionDom();
 }
 
-// 只更新选中状态（类名/对勾/提示），不重建整个网格
+// 只更新选中状态，不重建整个网格
 function syncRepoSelectionDom() {
     document.querySelectorAll('#repo-live-container .repo-live-item[data-path]').forEach(el => {
         const sel = repoSelected.has(el.dataset.path);
@@ -5265,7 +5255,7 @@ function toggleRepoSelection(path) {
 }
 
 /* ----- 下载仓库文件 ----- */
-// 图片走分享面板「存储图像」（相册），其他文件走「存储到文件」。
+// 图片走分享面板「存储图像」，其他文件走「存储到文件」
 const DL_MIME = {
     mp4: 'video/mp4', m4v: 'video/x-m4v', mov: 'video/quicktime', webm: 'video/webm', mkv: 'video/x-matroska', '3gp': 'video/3gpp', ogv: 'video/ogg',
     mp3: 'audio/mpeg', m4a: 'audio/mp4', aac: 'audio/aac', wav: 'audio/wav', flac: 'audio/flac', ogg: 'audio/ogg', oga: 'audio/ogg', opus: 'audio/ogg',
@@ -5278,7 +5268,7 @@ const DL_MIME = {
 function repoShareUrl(f) {
     return ((f.size || 0) > 20 * 1024 * 1024 && f.rawUrl) ? f.rawUrl : f.url;
 }
-// 取回文件内容：jsDelivr → Raw → 带 Token 的 GitHub API（私有仓库、CDN 被墙时也能下）
+// 取回文件内容：jsDelivr → Raw → 带 Token 的 GitHub API
 async function fetchRepoFileAsFile(f) {
     const attempts = [];
     if (f.url) attempts.push({ url: f.url });
@@ -5328,7 +5318,7 @@ async function saveFilesViaShare(files) {
     fallbackDownloadFiles(files);
     return false;
 }
-// 并发取回（4 路），显示进度；返回 { files, failed }
+// 并发取回，显示进度
 async function fetchAllForSave(list) {
     const results = new Array(list.length);
     const failed = [];
@@ -5349,7 +5339,7 @@ async function fetchAllForSave(list) {
 }
 const HEIC_RE = /\.(?:heic|heif)$/i;
 function isHeicFile(f) { return HEIC_RE.test(f.name || '') || /^image\/hei[cf]$/i.test(f.type || ''); }
-// 只有 Safari / iOS 能解码 HEIC；其他浏览器解码失败时会抛错，调用方保留原文件
+// 只有 Safari / iOS 能解码 HEIC
 async function heicToJpegFile(file) {
     const url = URL.createObjectURL(file);
     try {
@@ -5413,7 +5403,7 @@ async function saveLinkList(items) {
     const file = new File([urls.join('\n') + '\n'], 'DirectLink-links-' + stampForFile() + '.txt', { type: 'text/plain' });
     await saveFilesViaShare([file]);
 }
-// 极简 ZIP 打包（仅存储、不压缩：图片 / 字体本身已是压缩格式，打包更快也更稳）
+// 极简 ZIP 打包
 const CRC_TABLE = (() => {
     const t = new Uint32Array(256);
     for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; }
@@ -5463,7 +5453,7 @@ async function makeZipFile(files) {
     const blob = new Blob([...parts, ...central, end.buffer], { type: 'application/zip' });
     return new File([blob], 'DirectLink-' + stampForFile() + '.zip', { type: 'application/zip' });
 }
-// mode: 'photos' 仅图片 → 分享面板选「存储图像」；'files' 全部类型 → 选「存储到“文件”」
+// mode: 'photos' 仅图片 → 分享面板选「存储图像」
 async function saveItemsToDevice(items, mode, opts) {
     if (isSavingFiles) return toast('正在保存，请稍候', 'info');
     if (!items.length) return toast('请先选择');
@@ -5567,8 +5557,8 @@ async function deleteSelectedRepoFiles(opts) {
         toast('正在删除 ' + selected.length + ' 个文件…', 'loading');
         failures.push(...await deleteRepoFiles(selected));
         const failedPaths = new Set(failures.map(x => x.path).filter(Boolean));
-        // 按 owner/repo/path + 分支匹配：别的分支上同路径的文件和记录不受影响。
-        // 记录里查不到分支（旧记录）时，只要 owner/repo/path 对得上就算命中。
+        // 按 owner/repo/path + 分支匹配：别的分支上同路径的文件和记录不受影响
+        // 记录里查不到分支时，只要 owner/repo/path 对得上就算命中
         const okFiles = selected.filter(f => !failedPaths.has(f.path));
         const pathKeys = new Set(okFiles.map(f => uploadKey(f.owner, f.repo, f.path)));
         const exactKeys = new Set(okFiles.filter(f => f.branch).map(f => uploadKey(f.owner, f.repo, f.path) + '\u0001' + f.branch));
@@ -5657,7 +5647,7 @@ async function loadRepoLiveFiles(force = false) {
     try {
         const ctx = await resolveGithubContext();
         const tree = await fetchRepoTree(ctx.owner, s.repo, ctx.branch, s);
-        if (seq !== repoLoadSeq) return; // 期间已发起更新的读取（比如换了仓库），这次结果作废
+        if (seq !== repoLoadSeq) return; // 期间已发起更新的读取，这次结果作废
         repoLiveFiles = (tree.tree || [])
             .filter(x => x.type === 'blob' && !x.path.startsWith('.directlink/'))   // 同步用的 meta 文件不显示
             .map(x => ({
@@ -5671,7 +5661,7 @@ async function loadRepoLiveFiles(force = false) {
                 owner: ctx.owner, repo: s.repo, branch: ctx.branch
             }));
         if (repoCurrentPath && !repoLiveFiles.some(f => f.path.startsWith(repoCurrentPath + '/'))) {
-            repoCurrentPath = ''; // 当前文件夹已不存在（被删除/改名等），回到根目录
+            repoCurrentPath = ''; // 当前文件夹已不存在，回到根目录
         }
         repoSelected.clear();
         repoMultiMode = false;
@@ -5701,9 +5691,7 @@ async function loadRepoLiveFiles(force = false) {
     }
 }
 
-/* ----- 私有仓库缩略图 -----
-   私有仓库的文件，jsDelivr 和 Raw 都读不到（404）。这时改用带 Token 的 GitHub API 取回文件，缩成小图再显示。
-   最多同时取 4 张；同一个仓库试过一次成功后，后面的格子直接走这条路，不再先白白请求 CDN。 */
+/* ----- 私有仓库缩略图 ----- */
 const authThumbCache = new Map();    // 'owner/repo@branch/path' -> Promise<blob 地址>
 const authThumbRepos = new Set();    // 已确认需要走 Token 取图的仓库
 let authThumbActive = 0;
@@ -5768,10 +5756,7 @@ function loadAuthThumb(owner, repo, branch, path) {
     return job;
 }
 
-/* ----- 大列表缩略图内存管理 -----
-   仓库里的缩略图是原图（jsDelivr 不能缩小），一张 4000×3000 的照片解码后要几十 MB。
-   列表超过 THUMB_KEEP_MIN 张时，只让屏幕上下各约 3 屏范围内的图保持加载，滑远了就释放，滑回来再加载（走 HTTP / 离线缓存，很快）。
-   少于这个数量的列表完全不受影响。 */
+/* ----- 大列表缩略图内存管理 ----- */
 const THUMB_KEEP_MIN = 120;
 function makeThumbKeeper() {
     if (!('IntersectionObserver' in window)) return null;
@@ -6039,7 +6024,7 @@ function renderGallery(opts) {
         return;
     }
 
-    // 按时间排序时按日期分组；按大小 / 名称排序时不分日期，整体一组
+    // 按时间排序时按日期分组
     const sortMode = prefGallerySort();
     const byDate = sortMode === 'new' || sortMode === 'old';
     const flatTitle = (GALLERY_SORTS.find(x => x[0] === sortMode) || [])[1] || '';
@@ -6124,7 +6109,7 @@ function renderGallery(opts) {
                 };
                 if (canApi && preferAuthThumb(ref.owner, ref.repo)) { img.removeAttribute('src'); viaApi(); }
                 img.onerror = () => {
-                    // jsDelivr 打不开时回退到 raw，再不行用 Token 取图；仍失败则显示占位，不留空白格
+                    // jsDelivr 打不开时回退到 raw，再不行用 Token 取图
                     if (!triedRaw && !triedAuth && rawFallback && rawFallback !== entry.url) { triedRaw = true; curSrc = rawFallback; img.src = rawFallback; return; }
                     if (!triedAuth && canApi) { viaApi(); return; }
                     showPlaceholder();
@@ -6284,7 +6269,7 @@ function handleDrop(e) {
     $('dropzone').classList.remove('dragover');
     const dt = e.dataTransfer;
     if (!dt) return;
-    // 必须在同步阶段取出 entry，异步之后 DataTransfer 就失效了。
+    // 必须在同步阶段取出 entry，异步之后 DataTransfer 就失效了
     const entries = Array.from(dt.items || [])
         .map(it => (it.kind === 'file' && it.webkitGetAsEntry) ? it.webkitGetAsEntry() : null)
         .filter(Boolean);
@@ -6329,7 +6314,7 @@ async function collectEntryFiles(entries) {
     return classifyFolderFiles(files);
 }
 async function sniffImageExt(file) {
-    // 读文件头判断是不是图片（iOS 上文件名/类型有时拿不到，只能看内容）
+    // 读文件头判断是不是图片
     try {
         const b = new Uint8Array(await file.slice(0, 16).arrayBuffer());
         const asc = String.fromCharCode.apply(null, Array.from(b));
@@ -6377,31 +6362,31 @@ function safeDirName(name) {
     const raw = String(name || '');
     const s = raw.replace(/[^\w.\-\u4e00-\u9fff]+/g, '-').replace(/^[-.]+|[-.]+$/g, '');
     if (s) return s;
-    // 纯假名 / 韩文 / emoji 等会被清空：按原名算一个固定的短后缀，不同名字不会混进同一个文件夹，同名永远落在同一个文件夹
+    // 纯假名 / 韩文 / emoji 等会被清空：按原名算一个固定的短后缀
     let h = 5381;
     for (let i = 0; i < raw.length; i++) h = ((h * 33) ^ raw.charCodeAt(i)) >>> 0;
     return 'folder-' + h.toString(36).slice(0, 6);
 }
 
 /* ----- 结果卡片跟随获取方式 ----- */
-// 上传文件 → 紧跟上传卡片；转换链接 → 紧跟转换卡片；导入文件 → 紧跟导入卡片。
-// 只移动结果卡片本身，不改变其它卡片的结构和样式。
+// 上传文件 → 紧跟上传卡片
+// 只移动结果卡片本身，不改变其它卡片的结构和样式
 function moveResultCardAfter(cardId) {
     const anchor = $(cardId);
     const card = $('result-card');
     if (!anchor || !card || anchor === card) return;
 
-    // 已经在目标卡片后面时不重复操作，避免手机端产生不必要的重排。
+    // 已经在目标卡片后面时不重复操作，避免手机端产生不必要的重排
     if (anchor.nextElementSibling !== card) {
         anchor.insertAdjacentElement('afterend', card);
     }
 }
 
 /* ----- GitHub API 核心 ----- */
-// 读取仓库文件树。recursive=1 在文件特别多（约 10 万条 / 7MB）时会被 GitHub 截断，
-// 这时改成按目录逐层读取，把被截断的部分补全；个别目录读不到才会降级为「只显示部分」。
-// 同一个分支的文件树没变化时，GitHub 对带 If-None-Match 的请求回 304：不占 API 额度，也不用重新下载几 MB 的列表。
-// 只在内存里缓存最近 3 个分支（页面关掉就没了）；ETag 对不上就当普通请求处理。
+// 读取仓库文件树
+// 这时改成按目录逐层读取，把被截断的部分补全
+// 同一个分支的文件树没变化时，GitHub 对带 If-None-Match 的请求回 304：不占 API 额度
+// 只在内存里缓存最近 3 个分支
 const repoTreeCache = new Map();
 function repoTreeCacheSet(key, etag, result) {
     repoTreeCache.delete(key);
@@ -6409,8 +6394,8 @@ function repoTreeCacheSet(key, etag, result) {
     while (repoTreeCache.size > 3) repoTreeCache.delete(repoTreeCache.keys().next().value);
     treeDiskSet(key, etag, result);
 }
-// 同时存一份到本机数据库（IndexedDB），关掉页面再打开也能带着 ETag 问 GitHub「变了吗」，没变就 304，不用重新下载。
-// 只存完整（未截断）、不超过 4 万条的树，最多保留 3 个仓库；读不到 / 写不进都当没有缓存。
+// 同时存一份到本机数据库
+// 只存完整、不超过 4 万条的树，最多保留 3 个仓库
 const TREE_DISK_MAX = 3, TREE_DISK_MAX_ENTRIES = 40000;
 async function treeDiskGet(key) {
     if (!storeUsesIDB) return null;
@@ -6430,7 +6415,7 @@ async function fetchRepoTree(owner, repo, branch, auth) {
     const base = '/repos/' + owner + '/' + repo + '/git/trees/';
     const ckey = (owner + '/' + repo + '@' + branch).toLowerCase();
     let hit = repoTreeCache.get(ckey);
-    if (!hit && !auth.proxy) {   // 内存里没有（刚打开页面）：看看本机数据库里有没有上次存的
+    if (!hit && !auth.proxy) {   // 内存里没有：看看本机数据库里有没有上次存的
         const d = await treeDiskGet(ckey);
         if (d) { hit = { etag: d.etag, result: d.result }; repoTreeCache.set(ckey, hit); }
     }
@@ -6470,14 +6455,14 @@ async function fetchRepoTree(owner, repo, branch, auth) {
             pump();
         });
     } catch (_) {
-        return { tree: first.tree || [], truncated: true }; // 补读失败：退回被截断的原结果（不缓存，下次要重新补读）
+        return { tree: first.tree || [], truncated: true }; // 补读失败：退回被截断的原结果
     }
     const full = { tree: out, truncated: incomplete };
     if (newEtag) repoTreeCacheSet(ckey, newEtag, full);
     return full;
 }
 /* ----- GitHub 限流冷却与额度提示 ----- */
-// 所有请求共用一个冷却倒计时，避免并发请求各自乱撞。
+// 所有请求共用一个冷却倒计时，避免并发请求各自乱撞
 const RATE_WAIT_MAX_MS = 90000;
 let ghCooldownUntil = 0, ghQuota = null, ghLowWarnedReset = 0;
 function ghClock(ts) { try { return new Date(ts).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }); } catch (_) { return ''; } }
@@ -6517,7 +6502,7 @@ async function githubRequest(path, options = {}, token, proxy) {
     const { etag: ifNoneMatch, onEtag, ...fetchOpts } = options;
     const maxAttempts = 5;
     let lastError = null;
-    // 请求体越大，允许的时间越长（按至少 20KB/s 估算），否则慢网下大请求会被 60 秒误杀
+    // 请求体越大，允许的时间越长，否则慢网下大请求会被 60 秒误杀
     const bodyLen = (options.body && (options.body.length || options.body.size)) || 0;
     const timeoutMs = 60000 + Math.min(240000, Math.round(bodyLen / 20));
 
@@ -6534,7 +6519,7 @@ async function githubRequest(path, options = {}, token, proxy) {
                 'Content-Type': 'application/json',
                 'Cache-Control': 'no-cache'
             };
-            // 自建代理的 CORS 白名单里不一定有 If-None-Match，带上会让预检失败，所以只在直连 GitHub 时用条件请求
+            // 自建代理的 CORS 白名单里不一定有 If-None-Match
             if (ifNoneMatch && !proxy) headers['If-None-Match'] = ifNoneMatch;
             const res = await fetch(url, {
                 ...fetchOpts,
@@ -6551,8 +6536,8 @@ async function githubRequest(path, options = {}, token, proxy) {
 
             if (!res.ok) {
                 const msg = data.message || ('HTTP ' + res.status);
-                // GitHub 在短时间内并发/连续请求过多时会触发限流（403 rate limit / abuse，或 429），
-                // 这类错误等一等再重试通常就能成功，不应该直接判定为失败。
+                // GitHub 在短时间内并发/连续请求过多时会触发限流
+                // 这类错误等一等再重试通常就能成功，不应该直接判定为失败
                 const isRateLimited = res.status === 429 || (res.status === 403 && /rate limit|abuse|secondary/i.test(msg));
                 if (isRateLimited) {
                     const retryAfter = Number(res.headers.get('retry-after'));
@@ -6618,7 +6603,7 @@ function getSafeFilename(name) {
     stem = stem.replace(/[^\w.\-\u4e00-\u9fff]+/g, '-').replace(/^[-.]+|[-.]+$/g, '');
     ext = ext.replace(/[^\w.]/g, '');
     if (ext === '.') ext = '';
-    // 纯日文 / emoji 等文件名净化后会变空：回落为 asset-时间戳，并保留扩展名
+    // 纯日文 / emoji 等文件名净化后会变空：回落为 asset-时间戳
     if (!stem) stem = 'asset-' + Date.now();
     return stem + ext;
 }
@@ -6626,7 +6611,7 @@ function getSafeFilename(name) {
 function isImageFile(file) {
     return !!file._forceImage || (file.type || '').startsWith('image/') || IMAGE_EXT_RE.test(file.name || '');
 }
-// 视频 / 音频：按 MIME 或扩展名判断（图片优先，避免 .webm 之类的歧义影响图片流程）
+// 视频 / 音频：按 MIME 或扩展名判断
 function isVideoFile(file) {
     if (!file || isImageFile(file)) return false;
     return /^video\//i.test(file.type || '') || VIDEO_EXT_RE.test(file.name || '');
@@ -6637,15 +6622,15 @@ function isAudioFile(file) {
 }
 function isMediaFile(file) { return isVideoFile(file) || isAudioFile(file); }
 
-// 生成不会覆盖仓库现有文件的路径。
-// 旧版本在再次上传同名文件时会 PUT 到同一路径，直接替换旧资源，导致历史直链内容被悄悄改变。
+// 生成不会覆盖仓库现有文件的路径
+// 旧版本在再次上传同名文件时会 PUT 到同一路径
 function withNameSuffix(path, n) {
     const dot = path.lastIndexOf('.');
     return dot > path.lastIndexOf('/') ? path.slice(0, dot) + '-' + n + path.slice(dot) : path + '-' + n;
 }
 async function findAvailableGithubPath(initialPath, ctx, owner, branch, s) {
-    // 如果资源库刚刚同步过仓库文件列表（同一个 owner/repo/branch），先在本地这份列表里查重，
-    // 避免每个文件都单独发一次 GET 请求去问 GitHub「这个路径是否存在」，减少请求数量和限流风险。
+    // 如果资源库刚刚同步过仓库文件列表，先在本地这份列表里查重
+    // 避免每个文件都单独发一次 GET 请求去问 GitHub「这个路径是否存在」
     const first = repoLiveFiles[0];
     const knownPaths = (repoLiveLoaded && first && owner === first.owner && s.repo === first.repo && branch === first.branch)
         ? new Set(repoLiveFiles.map(f => f.path))
@@ -6672,12 +6657,12 @@ async function findAvailableGithubPath(initialPath, ctx, owner, branch, s) {
     }
 }
 
-// 创建 blob（所有文件统一走这条路，后续由「提交队列」把一批 blob 合并成一次提交）：
-// 1) 内存：每 3MB 转一段 base64，并立刻装进独立的 Blob（浏览器可放到磁盘/外部内存），JS 堆里同一时刻只有一小段。
-//    分块必须是 3 字节的整数倍，各段 base64 拼起来才是合法的 base64。
-// 2) 超时：用 XHR，只要还在持续上传就不会超时；连续 45 秒没有进展判定卡死；请求体发完后再等 90 秒响应。
-//    blob 按内容寻址，重复创建是安全的，所以卡住/断线/5xx 后可以自动重试。
-// 3) 限流：创建内容的请求统一排队（gateContentRequest），遇到二级限流会自动放慢并按 Retry-After 等待。
+// 创建 blob
+// 1) 内存：每 3MB 转一段 base64
+// 分块必须是 3 字节的整数倍，各段 base64 拼起来才是合法的 base64
+// 2) 超时：用 XHR，只要还在持续上传就不会超时
+// blob 按内容寻址，重复创建是安全的，所以卡住/断线/5xx 后可以自动重试
+// 3) 限流：创建内容的请求统一排队
 async function uploadBlobChunked(file, owner, s, onProgress, ctx) {
     const CHUNK = 3 * 1024 * 1024;
     const STALL_MS = 45000;
@@ -6778,7 +6763,7 @@ async function uploadBlobChunked(file, owner, s, onProgress, ctx) {
     throw lastErr || new Error('上传失败');
 }
 
-// 创建内容类请求的统一节流：并发上传时按固定间隔发出，被限流后自动放慢（见 uploadBlobChunked）
+// 创建内容类请求的统一节流：并发上传时按固定间隔发出，被限流后自动放慢
 function gateContentRequest(ctx) {
     const g = ctx._gate || (ctx._gate = { next: 0, gap: 700 });
     const now = Date.now();
@@ -6787,14 +6772,14 @@ function gateContentRequest(ctx) {
     return at > now ? sleep(at - now) : Promise.resolve();
 }
 
-// 一次提交一组树改动（新增 / 删除 / 移动都用它）。
-// 分支在别处被更新（非快进 / 409 / 5xx）时，自动重新取最新提交再来一次，不再直接报「参数错误」。
-// cache：{sha, tree}，连续提交时复用上次提交的结果，省掉每次读取分支头的 2 个请求。
+// 一次提交一组树改动
+// 分支在别处被更新时，自动重新取最新提交再来一次，不再直接报「参数错误」
+// cache：{sha
 async function commitTreeChanges(owner, repo, branch, changes, message, s, cache) {
     const bkey = (owner + '/' + repo + '@' + branch).toLowerCase();
     const stampKey = 'kb_commit_stamp:' + bkey;
     return withCrossTabLock('dl-commit:' + bkey, async () => {
-        // 别的窗口在我们排队期间提交过：缓存的分支头已经过期，直接丢掉，省得先撞一次「非快进」
+        // 别的窗口在我们排队期间提交过：缓存的分支头已经过期
         if (cache && cache.sha && cache.stamp !== undefined && cache.stamp !== (lsGet(stampKey) || '')) { cache.sha = ''; cache.tree = ''; }
         const sha = await commitTreeChangesCore(owner, repo, branch, changes, message, s, cache);
         const stamp = Date.now() + '-' + Math.random().toString(36).slice(2, 8);
@@ -6834,8 +6819,8 @@ async function commitTreeChangesCore(owner, repo, branch, changes, message, s, c
     throw lastErr;
 }
 
-// 提交队列：并发上传的文件各自创建好 blob 后进入队列，攒一小会儿合并成一次提交（blob→tree→commit→ref 只做一轮）。
-// 一次只有一个提交在飞，彻底避开同一分支并发写入造成的 409 / 非快进冲突。
+// 提交队列：并发上传的文件各自创建好 blob 后进入队列
+// 一次只有一个提交在飞，彻底避开同一分支并发写入造成的 409 / 非快进冲突
 function getCommitQueue(ctx, owner, s, branch) {
     if (ctx._cq) return ctx._cq;
     const q = { pending: [], flushing: false, timer: null, head: { sha: '', tree: '' } };
@@ -6865,8 +6850,8 @@ function getCommitQueue(ctx, owner, s, branch) {
 }
 
 /* ----- 上传前按内容查重 ----- */
-// Git 的 blob sha = SHA-1("blob <字节数>\0" + 内容)。
-// 仓库里已有内容完全相同（且扩展名相同）的文件时，直接复用它的直链，不再重复上传。
+// Git 的 blob sha = SHA-1
+// 仓库里已有内容完全相同的文件时，直接复用它的直链，不再重复上传
 const DEDUP_MAX_SIZE = 8 * 1024 * 1024; // 更大的文件整份读进内存算哈希太吃力，跳过查重
 async function gitBlobSha(file) {
     if (typeof crypto === 'undefined' || !crypto.subtle) return ''; // 非 https 环境没有 SubtleCrypto
@@ -6876,7 +6861,7 @@ async function gitBlobSha(file) {
     return Array.from(digest, b => b.toString(16).padStart(2, '0')).join('');
 }
 function pathExt(p) { const m = String(p || '').match(/\.[^./]+$/); return m ? m[0].toLowerCase() : ''; }
-// 整批只取一次仓库文件树（每批 1 次请求），本批新传的文件也会加进来
+// 整批只取一次仓库文件树，本批新传的文件也会加进来
 function getRepoShaIndex(ctx, owner, branch, s) {
     if (ctx._shaIndex) return Promise.resolve(ctx._shaIndex);
     if (ctx._shaIndexP) return ctx._shaIndexP; // 并发上传时多个文件同时来查，只发一次请求
@@ -6888,12 +6873,12 @@ function getRepoShaIndex(ctx, owner, branch, s) {
                 if (x.type !== 'blob' || !x.sha || x.path.split('/').pop() === '.gitkeep') return;
                 if (!idx.has(x.sha)) idx.set(x.sha, x.path);
             });
-            // 同一棵树顺便拿来判断路径是否已存在；树被 GitHub 截断（仓库特别大）时不能据此断定「不存在」
+            // 同一棵树顺便拿来判断路径是否已存在
             ctx._pathSet = new Set((tree.tree || []).filter(x => x.type === 'blob').map(x => x.path));
             ctx._treeTruncated = !!tree.truncated;
-            // 只有读取成功后才缓存；临时网络失败不能把空索引永久当成“仓库没有可复用文件”。
+            // 只有读取成功后才缓存
             ctx._shaIndex = idx;
-        } catch (_) { /* 取不到就当没有，当前文件继续正常上传；下一文件仍允许再次尝试查重 */ }
+        } catch (_) { /* 取不到就当没有，当前文件继续正常上传 */ }
         return idx;
     })();
     ctx._shaIndexP = p;
@@ -6911,7 +6896,7 @@ async function resolvePinRef(commitSha, owner, branch, s) {
     } catch (_) { return branch; }
 }
 
-// 路径分配：并发上传时必须串行决定「用哪个文件名」并立刻占位，否则两个同名文件会同时选中同一个路径
+// 路径分配：并发上传时必须串行决定「用哪个文件名」并立刻占位
 function reservePath(initialPath, ctx, owner, branch, s) {
     const run = () => findAvailableGithubPath(initialPath, ctx, owner, branch, s).then(p => { ctx.usedPaths.add(p); return p; });
     const prev = ctx._allocChain || Promise.resolve();
@@ -6920,7 +6905,7 @@ function reservePath(initialPath, ctx, owner, branch, s) {
     return next;
 }
 
-// 仅用于「空仓库」兜底：空仓库不能创建 blob，只有 Contents API 能创建第一个提交
+// 仅用于「空仓库」兜底：空仓库不能创建 blob
 async function uploadViaContentsApi(file, path, owner, branch, s) {
     if (file.size > 25 * 1024 * 1024) throw new Error('这个仓库还是空的，大文件无法作为第一个提交。请先在仓库里随便传一个小文件，或新建仓库时让 App 自动初始化');
     const content = await fileToBase64(file);
@@ -6929,7 +6914,7 @@ async function uploadViaContentsApi(file, path, owner, branch, s) {
     try {
         putRes = await githubRequest(contentsPath, { method: 'PUT', body: JSON.stringify({ message: '上传素材 ' + path, content, branch }) }, s.token, s.proxy);
     } catch (e) {
-        // 之前的重试其实已写入成功、只是响应丢了：再次 PUT 会得到 422。路径已确认“原本不存在”，此时若已存在就是我们写进去的。
+        // 之前的重试其实已写入成功、只是响应丢了：再次 PUT 会得到 422
         if (!/422/.test(String(e && e.message || ''))) throw e;
         try { await githubRequest(contentsPath + '?ref=' + encodeURIComponent(branch), { method: 'GET' }, s.token, s.proxy); }
         catch (_) { throw e; }
@@ -6941,8 +6926,8 @@ async function uploadToGithub(file, ctx) {
     const s = getSettings();
     if (!s.token) throw new Error('未配置 Token');
 
-    // ctx 一律来自 resolveGithubContext()，总是带着 owner/branch/usedPaths；
-    // 这里不再重复实现一遍获取用户信息、建仓库的逻辑，避免两处代码分叉走样。
+    // ctx 一律来自 resolveGithubContext
+    // 这里不再重复实现一遍获取用户信息、建仓库的逻辑，避免两处代码分叉走样
     if (!ctx || !ctx.owner || !ctx.branch) throw new Error('缺少仓库上下文（owner/branch），请先调用 resolveGithubContext');
     const owner = ctx.owner;
     const branch = ctx.branch;
@@ -6951,7 +6936,7 @@ async function uploadToGithub(file, ctx) {
     const isVideo = isVideoFile(file), isAudio = isAudioFile(file);
     const folder = isImage ? 'images' : isVideo ? 'videos' : isAudio ? 'audio' : 'fonts';
     let safeName = getSafeFilename(file.name);
-    // 没有扩展名的图片 / 视频 / 音频按 MIME 补上，否则 CDN 会用错误的 Content-Type 返回，无法显示 / 播放
+    // 没有扩展名的图片 / 视频 / 音频按 MIME 补上
     if ((isImage || isVideo || isAudio) && !/\.[A-Za-z0-9]+$/.test(safeName) && (MIME_EXT[file.type] || file._sniffExt)) safeName += '.' + (MIME_EXT[file.type] || file._sniffExt);
     if (isImage && uploadPref('naming') === 'random') {
         const m = safeName.match(/\.[A-Za-z0-9]+$/);
@@ -6993,7 +6978,7 @@ async function uploadToGithub(file, ctx) {
 
     let reserved = '';
     try {
-        // 无论是本批次重名，还是仓库里已经存在同名文件，都自动换名，避免覆盖历史资源。
+        // 无论是本批次重名，还是仓库里已经存在同名文件，都自动换名，避免覆盖历史资源
         path = await reservePath(path, ctx, owner, branch, s);
         reserved = path;
 
@@ -7094,7 +7079,7 @@ async function copyText(url, name) {
     toast((await writeClipboard(formatLink(url, name, fmt))) ? FMT_COPIED_ONE[fmt] : '复制失败，请手动复制');
 }
 
-// items：字符串（直链）或 { url, name }
+// items：字符串或 { url, name }
 async function copyTextList(items) {
     const fmt = prefCopyFormat();
     const lines = items.map(it => typeof it === 'string' ? formatLink(it, '', fmt) : formatLink(it.url, it.name, fmt));
@@ -7146,7 +7131,7 @@ async function resolveGithubContext(opts = {}) {
         repoUsage = { kb: Number(repoData.size) || 0, at: Date.now(), repo: s.repo };
     } catch (e) {
         if (e.message.includes('404') || e.message.includes('Not Found')) {
-            // 只有“上传”才允许自动创建仓库；单纯浏览资源库不应有创建仓库的副作用。
+            // 只有“上传”才允许自动创建仓库
             if (!opts.createIfMissing) throw new Error('仓库 ' + owner + '/' + s.repo + ' 不存在，上传第一个文件时会自动创建');
             const created = await githubRequest('/user/repos', { method: 'POST', body: JSON.stringify({ name: s.repo, auto_init: true }) }, s.token, s.proxy);
             branch = created.default_branch || 'main';
@@ -7157,8 +7142,8 @@ async function resolveGithubContext(opts = {}) {
 }
 
 /* ----- 单文件上传（含重试） ----- */
-// 上传前处理（HEIC 转 JPG / 压缩 / 转 WebP）+ 查重哈希。放进并发池后，下一批文件在当前文件上传时就开始处理，
-// 但同一时刻最多只处理 2 张（canvas 很吃内存，手机上同时处理太多会被系统杀掉页面）。
+// 上传前处理+ 查重哈希
+// 但同一时刻最多只处理 2 张
 const prepSem = (() => {
     let free = 2; const q = [];
     return {
@@ -7172,11 +7157,7 @@ function carryFileProps(from, to) {
     return to;
 }
 
-/* ================= 上传前去除 EXIF / 位置信息（无损，不重新编码） =================
-   JPEG：删掉 EXIF / XMP / IPTC / 注释 / 缩略图，只保留颜色配置（ICC）和「旋转方向」；
-   PNG：删掉文本块、EXIF、时间块；WebP：删掉 EXIF / XMP 块。
-   其他格式（HEIC、GIF、AVIF 等）无法无损处理，会在结果行里提示。
-   */
+/* ================= 上传前去除 EXIF / 位置信息（无损，不重新编码） ================= */
 const PREF_STRIPEXIF_KEY = 'kb_pref_stripexif';
 function prefStripExif() { return lsGet(PREF_STRIPEXIF_KEY) !== '0'; }   // 默认开启
 function onStripExifPrefChange(el) {
@@ -7246,7 +7227,7 @@ function stripJpegMeta(u8) {
         if (m === 0xE0) { out.push(seg); if (insertIdx === 1) insertIdx = out.length; p = segEnd; continue; }
         if (m === 0xE1) { const info = readExifInfo(seg); if (info.orientation > 1) orientation = info.orientation; if (info.gps) gps = true; keep = false; }
         else if (m === 0xE2) keep = len >= 14 && u8[p + 4] === 0x49 && u8[p + 5] === 0x43 && u8[p + 6] === 0x43;   // "ICC_PROFILE"
-        else if (m === 0xEE) keep = len >= 7 && u8[p + 4] === 0x41 && u8[p + 5] === 0x64 && u8[p + 6] === 0x6F;   // "Adobe"（颜色转换标记，不能丢）
+        else if (m === 0xEE) keep = len >= 7 && u8[p + 4] === 0x41 && u8[p + 5] === 0x64 && u8[p + 6] === 0x6F;   // "Adobe"
         else if ((m >= 0xE3 && m <= 0xED) || m === 0xEF || m === 0xFE) keep = false;
         if (keep) out.push(seg); else removed += seg.length;
         p = segEnd;
@@ -7294,7 +7275,7 @@ function stripWebpMeta(u8) {
     new DataView(out.buffer).setUint32(4, out.length - 8, true);
     return { bytes: out, removed, gps: false };
 }
-// 返回 { file, note }：file 是处理后的文件（没东西可去就是原文件），note 是结果行里显示的提示
+// 返回 { file，note }：file 是处理后的文件
 async function stripImageMetadata(file) {
     const name = file.name || '', type = (file.type || '').toLowerCase();
     let kind = '', mime = '';
@@ -7310,7 +7291,7 @@ async function stripImageMetadata(file) {
         const u8 = new Uint8Array(await file.arrayBuffer());
         res = kind === 'jpeg' ? stripJpegMeta(u8) : kind === 'png' ? stripPngMeta(u8) : stripWebpMeta(u8);
     } catch (_) { res = null; }
-    if (!res) return { file, note: '' };            // 解析不了（文件有点怪）：原样上传，不冒险改它
+    if (!res) return { file, note: '' };            // 解析不了：原样上传，不冒险改它
     if (res.removed <= 0) return { file, note: '' }; // 本来就是干净的
     const out = new File([res.bytes], file.name, { type: file.type || mime });
     carryFileProps(file, out);
@@ -7324,7 +7305,7 @@ function startPrepare(file) {
         try {
             let work = file;
             let reencoded = false;   // 经过 canvas 重新编码的图片本来就不带 EXIF，不用再去
-            // 偏好「HEIC 转 JPG」：上传前转换（原先只在“存到相册”时生效，和说明不符）。转不了（非 Safari）就保持原文件。
+            // 偏好「HEIC 转 JPG」：上传前转换
             if (prefHeicJpg() && isHeicFile(file)) {
                 try {
                     const jpg = await heicToJpegFile(file);
@@ -7364,7 +7345,7 @@ async function runUpload(file, refs, ctx) {
 
     file._onProgress = (t, f) => { statusEl.textContent = t; if (f != null && file._setFrac) file._setFrac(f); };
     try {
-        // 上传前处理；结果缓存在 file 上，失败重试时不会重复处理
+        // 上传前处理
         if (!file._prep) startPrepare(file);
         if (!file._processed) statusEl.textContent = '处理中…';
         await file._prep;
@@ -7396,7 +7377,7 @@ async function runUpload(file, refs, ctx) {
         if (file._collector && file._srcUrl) file._collector.set(file._srcUrl, url.url || url);
         if (refs.retried && file._afterFn) file._afterFn(); // 「替换文件」流程里手动重试成功：重新生成可下载的替换结果
 
-        // 复用已有文件时，图库里若已有同一文件的记录就不再重复添加（否则删一条会连带删掉另一条依赖的仓库文件）
+        // 复用已有文件时，图库里若已有同一文件的记录就不再重复添加
         const alreadyInHistory = !!url.deduped && loadHistory().some(e => {
             const pr = historyAssetRef(e);
             return pr && uploadKey(pr.owner, pr.repo, pr.path) === uploadKey(url.owner, url.repo, url.path);
@@ -7425,7 +7406,7 @@ async function runUpload(file, refs, ctx) {
         if (file._processed) file._processed._onProgress = null;
         const message = err.message || '未知错误';
 
-        // 列表里只保留简洁的“失败”，避免长错误信息把卡片撑爆。
+        // 列表里只保留简洁的“失败”，避免长错误信息把卡片撑爆
         statusEl.className = 'result-status error';
         statusEl.textContent = '失败';
         statusEl.title = '点击查看失败原因';
@@ -7444,7 +7425,7 @@ async function runUpload(file, refs, ctx) {
             closeUploadErrorModal();
             refs.retried = true;
             isBatchUploading = true; // 重试期间占用上传锁，避免与新一批上传同时提交到同一分支
-            requestUploadWakeLock(); // 同时启动后台保活与屏幕常亮（各自按偏好开关）
+            requestUploadWakeLock(); // 同时启动后台保活与屏幕常亮
             try { await runUpload(file, refs, ctx); }
             finally { isBatchUploading = false; releaseUploadWakeLock(); }
         };
@@ -7455,7 +7436,7 @@ async function runUpload(file, refs, ctx) {
 }
 
 /* ----- 外部图床链接转换 ----- */
-// 代理地址里含 {url} 就替换；否则把编码后的原链接直接接在末尾（如 https://x.workers.dev/?url=）
+// 代理地址里含 {url} 就替换
 function buildImgProxyUrl(tpl, target) {
     const enc = encodeURIComponent(target);
     if (tpl.indexOf('{url}') !== -1) return tpl.replace('{url}', enc);
@@ -7476,12 +7457,12 @@ async function urlToFile(rawUrl) {
     try { u = new URL(rawUrl); } catch (e) { throw new Error('链接格式不正确'); }
     if (!/^https?:$/.test(u.protocol)) throw new Error('仅支持 http/https 链接');
 
-    // no-referrer：很多图床按 Referer 做防盗链，不带来源就能直接拿到
+    // no-referrer：很多图床按 Referer 做防盗链
     let res = null;
     try {
         res = await fetchWithRetry(u.href, { mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer' }, { tries: 2, retryThrown: false });
     } catch (_) { res = null; }
-    // 直连失败（多为 CORS）或被防盗链拒绝（401/403）：有图片代理就走代理再试一次
+    // 直连失败或被防盗链拒绝：有图片代理就走代理再试一次
     const imgProxy = getSettings().imgProxy;
     if ((!res || res.status === 401 || res.status === 403) && imgProxy) {
         let proxyErr = '';
@@ -7498,7 +7479,7 @@ async function urlToFile(rawUrl) {
     const blob = await res.blob();
     if (!blob.size) throw new Error('获取到的内容为空');
 
-    // 图床转换只接受图片响应；避免把网页、JSON、JS 等普通链接误上传到资源库。
+    // 图床转换只接受图片响应
     const contentType = String(blob.type || res.headers.get('content-type') || '').toLowerCase().split(';')[0].trim();
     if (!contentType.startsWith('image/')) {
         if (!IMAGE_EXT_RE.test(u.pathname)) throw new Error('该链接返回的不是图片，已跳过');
@@ -7507,8 +7488,8 @@ async function urlToFile(rawUrl) {
     let name = '';
     try { name = decodeURIComponent(u.pathname.split('/').filter(Boolean).pop() || ''); } catch (e) {}
     if (!name || !IMAGE_EXT_RE.test(name)) {
-        // 扩展名缺失或不是图片扩展名（如 image.php）：按响应的 MIME 类型补正，
-        // 否则 CDN 会按错误扩展名返回 Content-Type，图片无法显示。
+        // 扩展名缺失或不是图片扩展名：按响应的 MIME 类型补正
+        // 否则 CDN 会按错误扩展名返回 Content-Type，图片无法显示
         let typeExt = MIME_EXT[contentType];
         if (!typeExt) typeExt = contentType.startsWith('image/') ? (contentType.split('/')[1] || 'jpg').split('+')[0].replace('jpeg', 'jpg') : 'jpg';
         const stem = name.replace(/\.[A-Za-z0-9]{1,8}$/, '');
@@ -7518,7 +7499,7 @@ async function urlToFile(rawUrl) {
 }
 
 /* ----- 图床识别 ----- */
-// 只提取「图片上下文」里的 URL，避免把代码里的普通网址当成图床。
+// 只提取「图片上下文」里的 URL，避免把代码里的普通网址当成图床
 function cleanRawUrl(raw) {
     if (!raw) return '';
     let value = String(raw).trim();
@@ -7548,9 +7529,9 @@ function looksLikeImageUrl(url) {
         const u = new URL(url);
         const path = u.pathname.toLowerCase();
         if (IMAGE_EXT_RE.test(path)) return true;
-        // 明显不是图片的资源直接排除（脚本 CDN、样式、网页等）
+        // 明显不是图片的资源直接排除
         if (/\.(?:js|mjs|css|html?|json|php|aspx?|xml|txt|map|woff2?|ttf|otf|eot|mp4|mp3|zip|pdf)$/i.test(path)) return false;
-        // 无扩展名的图床地址：按“域名后缀 / 路径片段”整词匹配，不再做子串匹配（避免 costco、cdn 等误判）
+        // 无扩展名的图床地址：按“域名后缀 / 路径片段”整词匹配，不再做子串匹配
         if (IMG_HOST_RE.test(u.hostname)) return true;
         return (u.hostname + path).split(/[^a-z0-9]+/).some(t => IMG_PATH_TOKENS.has(t));
     } catch (_) { return false; }
@@ -7565,9 +7546,9 @@ function extractUrlsFromText(text, opts) {
         if (!url) return;
         if (FONT_EXT_RE.test(new URL(url).pathname)) return; // 字体不属于图床转换范围
         if (!explicitImageContext && !looksLikeImageUrl(url)) return;
-        // 记录原文里写成 //host/path（协议相对）的链接，替换文件时需要一并处理
+        // 记录原文里写成 //host/path的链接，替换文件时需要一并处理
         if (opts.rawForms && /^\/\//.test(String(value).trim())) opts.rawForms.add(url);
-        // new URL().href 会把中文等字符转成 %XX；记下原文写法，替换文件时才对得上
+        // new URL.href 会把中文等字符转成 %XX
         if (opts.aliases) {
             const cleaned = cleanRawUrl(value);
             if (/^https?:\/\//i.test(cleaned) && cleaned !== url) {
@@ -7578,7 +7559,7 @@ function extractUrlsFromText(text, opts) {
         if (!found.includes(url)) found.push(url);
     };
 
-    // 1. HTML <img>/<source>：这是最可靠的图片上下文。
+    // 1. HTML <img>/<source>：这是最可靠的图片上下文
     const imgTagRe = /<(?:img|source)\b[^>]*>/gi;
     const attrRe = /(?:^|[\s"'])(src|srcset|data-src|data-srcset|data-original|data-lazy-src)\s*=\s*(?:"([^"]*)"|'([^']*)')/gi;
     let m;
@@ -7591,27 +7572,27 @@ function extractUrlsFromText(text, opts) {
         const lazy = attrs['data-src'] || attrs['data-original'] || attrs['data-lazy-src'];
         if (lazy) add(lazy.trim(), true);
         else if (attrs.src) add(attrs.src.trim(), true);
-        // srcset：只有“逗号后跟空白”才是分隔符，避免把带逗号的 URL（如 w_300,h_200）切断
+        // srcset：只有“逗号后跟空白”才是分隔符，避免把带逗号的 URL切断
         [attrs.srcset, attrs['data-srcset']].forEach(set => {
             if (set) set.split(/,\s+/).forEach(part => add(part.trim().split(/\s+/)[0], true));
         });
     }
 
-    // 2. Markdown 图片：![alt](URL)
+    // 2. Markdown 图片：![alt]
     const mdRe = /!\[[^\]]*\]\(\s*<?([^\s>]+)>?(?:\s+["'][^"']*["'])?\s*\)/g;
     while ((m = mdRe.exec(source))) add(m[1], true);
 
-    // 3. CSS background / @font-face 等 url() 中的资源。
+    // 3. CSS background / @font-face 等 url 中的资源
     const cssDeclRe = /(?:background(?:-image)?|content|src|mask(?:-image)?|list-style(?:-image)?|border-image(?:-source)?)\s*:[^;{}]*/gi;
     const cssUrlRe = /url\(\s*["']?([^"')\s]+)["']?\s*\)/gi;
     while ((m = cssDeclRe.exec(source))) {
         let u;
         cssUrlRe.lastIndex = 0;
-        while ((u = cssUrlRe.exec(m[0]))) add(u[1], true); // 同一声明里的多个 url() 都要取
+        while ((u = cssUrlRe.exec(m[0]))) add(u[1], true); // 同一声明里的多个 url 都要取
     }
 
-    // 4. 单独一行的纯 URL：只接受看起来像图片/图床的地址。
-    //    这样粘贴整段 HTML/JS/CSS 时，不会把 GitHub API、脚本 CDN、普通网页链接一起抓进去。
+    // 4. 单独一行的纯 URL：只接受看起来像图片/图床的地址
+    // 这样粘贴整段 HTML/JS/CSS 时，不会把 GitHub API、脚本 CDN、普通网页链接一起抓进去
     const lines = source.split(/\r?\n/);
     const pureUrlRe = /^\s*(https?:\/\/[^\s"'<>]+)\s*$/i;
     for (const line of lines) {
@@ -7619,8 +7600,8 @@ function extractUrlsFromText(text, opts) {
         if (match) add(match[1], false);
     }
 
-    // 5. 导入文件时：全文扫描所有 http(s) 链接（JSON、TXT 等没有 <img> 上下文的文件也能识别），
-    //    仍然只保留“看起来像图片/图床”的地址。
+    // 5. 导入文件时：全文扫描所有 http 链接
+    // 仍然只保留“看起来像图片/图床”的地址
     if (opts.scanAll) {
         const anyUrlRe = /https?:\/\/[^\s"'<>`)\]\\]+/gi;
         while ((m = anyUrlRe.exec(source))) add(m[0], false);
@@ -7629,7 +7610,7 @@ function extractUrlsFromText(text, opts) {
     return found;
 }
 
-// 已经是自己仓库的直链：不需要再转换（避免重复上传）。owner 已知时同时比较 owner 和仓库名
+// 已经是自己仓库的直链：不需要再转换
 function isOwnHostUrl(url) {
     const repo = (getSettings().repo || '').toLowerCase();
     if (!repo) return false;
@@ -7647,7 +7628,7 @@ function isOwnHostUrl(url) {
     return false;
 }
 
-// collector: 可选的 Map(原链接 → 新直链)，afterFn: 全部处理完（含失败重试）后的回调
+// collector: 可选的 Map，afterFn: 全部处理完后的回调
 async function convertUrls(urls, collector, afterFn, namer) {
     urls = Array.from(new Set(urls.map(s => s.trim()).filter(Boolean)));
     const before = urls.length;
@@ -7677,7 +7658,7 @@ async function convertUrls(urls, collector, afterFn, namer) {
     });
 
     if (files.length) {
-        // 下载期间如果用户又发起了别的上传，等它结束再传，避免 handleFiles 拒绝后链接丢失
+        // 下载期间如果用户又发起了别的上传
         while (isBatchUploading) await sleep(500);
         await handleFiles(files);
     }
@@ -7721,8 +7702,8 @@ async function convertUrls(urls, collector, afterFn, namer) {
 async function handleExternalLinks() {
     const box = $('external-link-input');
     const raw = box.value || '';
-    // 不再要求“每行必须是一个纯链接”：直接从整段内容里识别链接，
-    // 不管粘贴的是纯链接，还是 <img> 标签、Markdown 图片语法这类代码。
+    // 不再要求“每行必须是一个纯链接”：直接从整段内容里识别链接
+    // 不管粘贴的是纯链接，还是 <img> 标签、Markdown 图片语法这类代码
     const urls = extractUrlsFromText(raw);
     if (!urls.length) { toast('未识别到链接'); return; }
     // 先做前置校验再清空输入框，失败时不丢用户粘贴的内容
@@ -7761,7 +7742,7 @@ let replaceOutput = null; // { url, name }
 
 function escapeRegExp(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-// 一次性替换：最长的链接优先，且链接后面不能紧跟链接字符，避免把 a.png?x=1 只替换掉一半
+// 一次性替换：最长的链接优先
 function applyLinkMap(text, map, protoRelative, aliases) {
     const keys = Array.from(map.keys()).sort((a, b) => b.length - a.length);
     if (!keys.length) return { text, count: 0 };
@@ -7770,7 +7751,7 @@ function applyLinkMap(text, map, protoRelative, aliases) {
     keys.forEach(k => {
         const addForm = form => {
             forms.set(form, map.get(k));
-            if (form.indexOf('&') !== -1) forms.set(form.replace(/&/g, '&amp;'), map.get(k)); // HTML 里的 &amp; 写法
+            if (form.indexOf('&') !== -1) forms.set(form.replace(/&/g, '&amp;'), map.get(k)); // HTML 里的 &amp
         };
         addForm(k);
         const al = aliases && aliases.get(k);
@@ -7781,7 +7762,7 @@ function applyLinkMap(text, map, protoRelative, aliases) {
     const fullRe = new RegExp('(' + fullKeys.map(escapeRegExp).join('|') + ')' + tail, 'g');
     let out = text.replace(fullRe, (m) => { count++; return forms.get(m); });
 
-    // 协议相对写法 //host/path（仅当原文里确实这样写过）
+    // 协议相对写法 //host/path
     const relKeys = keys.filter(k => protoRelative.has(k) && /^https:/i.test(k));
     if (relKeys.length) {
         const relForms = new Map();
@@ -7813,15 +7794,12 @@ function downloadReplaceOutput() {
     a.remove();
 }
 
-/* ----- 替换历史 -----
-   每次替换 / 表情包转存生成的新文件都记下来（不限条数），之后可以重新下载。
-   索引（名字、时间、数量）和内容分开存：索引一份，内容一条一份，都放在 IndexedDB 的 kv 里。
-   同一次替换里失败重试、重新生成结果时，更新的是同一条记录，不会多出重复项。 */
+/* ----- 替换历史 ----- */
 const RH_INDEX_KEY = 'replace_hist', RH_BODY_PREFIX = 'rh:', RH_LS_KEY = 'kb_replace_hist';
 const RH_BODY_MAX = 30 * 1024 * 1024;
 const RH_ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v10M8 10.5l4 4 4-4M5 19.5h14"/></svg>';
-const rhMemBodies = new Map();   // IndexedDB 写不进去时，内容先留在内存里（刷新页面就没了）
-const rhPending = new Map();     // 会话 id → 待写入的记录（防抖合并）
+const rhMemBodies = new Map();   // IndexedDB 写不进去时，内容先留在内存里
+const rhPending = new Map();     // 会话 id → 待写入的记录
 let rhTimer = null, rhChain = Promise.resolve(), rhShowAll = false, rhAskedPersist = false, rhQuery = '';
 const RH_PAGE = 20;   // 列表一次先画 20 条，其余点「显示更多」
 
@@ -7848,7 +7826,7 @@ async function rhGetBody(it) {
     try { const b = await dlDB.get('kv', RH_BODY_PREFIX + it.id); if (b && typeof b.text === 'string') return b; } catch (_) {}
     return null;
 }
-// sess：rhBegin 返回的会话；info：{ name, mime, bom, text, done, total }
+// sess：rhBegin 返回的会话
 function rhRecord(sess, info) {
     if (!sess || !info || !info.name || typeof info.text !== 'string') return;
     rhPending.set(sess.id, { sess: sess, info: info });
@@ -7861,7 +7839,7 @@ async function rhFlush() {
     if (!batch.length) return;
     const got = await rhReadIndex();
     let list = got.list.filter(x => x && x.id);
-    let unsaved = false;   // 有内容没能存进浏览器（太大 / 空间不足）：提醒一次，免得以为存好了
+    let unsaved = false;   // 有内容没能存进浏览器：提醒一次，免得以为存好了
     for (const { sess, info } of batch) {
         const bytes = new Blob([info.text]).size;
         const old = list.find(x => x.id === sess.id);
@@ -7883,7 +7861,7 @@ async function rhFlush() {
     const pg = $('page-replace');
     if (pg && pg.classList.contains('active')) rhRender();
 }
-// 备份：把替换历史（索引 + 内容）一起导出 / 导入。导入只补缺少的，已有的不动。
+// 备份：把替换历史一起导出 / 导入
 async function rhExport() {
     const items = [];
     const got = await rhReadIndex();
@@ -7940,7 +7918,7 @@ async function rhRender() {
         const nm = document.createElement('span'); nm.className = 'st-name'; nm.textContent = it.name; line.appendChild(nm);
         row.appendChild(line);
         const sub = document.createElement('div'); sub.className = 'rb-sub';
-        // 只写时间；有链接没替换成功时才多一句，免得每行都是同样的字
+        // 只写时间
         sub.textContent = (it.total && it.done < it.total ? '仅 ' + it.done + '/' + it.total + ' 成功 · ' : '') + recycleAgo(it.time);
         row.appendChild(sub);
         row.onclick = () => openMoreMenu(row, [
@@ -8001,12 +7979,12 @@ async function rhClear() {
 }
 
 /* ================= 文件管理 ================= */
-// 按路径浏览仓库文件。列表数据与仓库页共用（repoLiveFiles），移动 / 删除复用仓库页的提交、撤销和「最近删除」；
-// 本页自己只存两份本机数据：每个仓库的手动排序、最近 30 条操作历史。
+// 按路径浏览仓库文件
+// 本页自己只存两份本机数据：每个仓库的手动排序、最近 30 条操作历史
 const FM_TEXT_MAX = 2 * 1024 * 1024, FM_IMG_MAX = 8 * 1024 * 1024, FM_TEXT_SHOW = 200000;
 const FM_UPLOAD_MAX = 50 * 1024 * 1024, FM_HIST_MAX = 30, FM_PAGE = 100;
 const FM_IMG_RE = /\.(png|jpe?g|gif|webp|avif|svg|bmp|ico)$/i;
-const FM_EMPTY_SHA = 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391';   // 空文件的 blob sha（.gitkeep 占位文件）
+const FM_EMPTY_SHA = 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391';   // 空文件的 blob sha
 const FM_SORTS = [['manual', '手动'], ['name', '名称'], ['size', '大小'], ['type', '类型']];
 const FM_SORT_KEY = 'kb_fm_sort';
 let fmPath = '', fmQuery = '', fmShowAll = false, fmLastId = '', fmState = 'loading', fmPrevSeq = 0, fmSearchTimer = 0;
@@ -8028,7 +8006,7 @@ function fmBlockingParent(p) {
     }
     return '';
 }
-// mode：'move' 目标已存在就拒绝；'upload' 目标已存在由调用方确认覆盖
+// mode：'move' 目标已存在就拒绝
 function fmPathProblem(v, from, mode) {
     const p = fmNorm(v);
     if (!p) return '路径不能为空';
@@ -8065,14 +8043,14 @@ function fmCycleSort() {
 function fmOrderKey() { return 'kb_fm_order:' + fmId(); }
 function fmOrderLoad() { try { const a = JSON.parse(lsGet(fmOrderKey()) || '[]'); return Array.isArray(a) ? a : []; } catch (_) { return []; } }
 function fmOrderSave(a) { try { lsSet(fmOrderKey(), JSON.stringify(a)); return true; } catch (_) { return false; } }
-function fmMerged() {   // 排过序的在前（按你排的顺序），没排过的按名字排在后面
+function fmMerged() {   // 排过序的在前，没排过的按名字排在后面
     const have = new Set(repoLiveFiles.map(f => f.path));
     const saved = fmOrderLoad().filter(x => have.has(x));
     const known = new Set(saved);
     const rest = repoLiveFiles.filter(f => !known.has(f.path)).map(f => f.path).sort((a, b) => a.localeCompare(b, 'zh'));
     return saved.concat(rest);
 }
-// 路径变了（移动 / 改名 / 撤销）：手动顺序跟着走。pairs: [[from, to], ...]
+// 路径变了：手动顺序跟着走
 function fmOrderRemap(pairs) {
     const a = fmOrderLoad(), map = new Map(pairs);
     let changed = false;
@@ -8169,7 +8147,7 @@ async function fmEnter(force) {
     fmState = 'ok';
     fmRender();
 }
-// 当前文件夹里的内容；搜索时返回全仓库的匹配文件。folders: [{ name, n, size }]
+// 当前文件夹里的内容
 function fmVisible() {
     const q = fmQuery.trim().toLowerCase();
     const prefix = fmPath ? fmPath + '/' : '';
@@ -8219,7 +8197,7 @@ function fmRender() {
     if (sortBtn) sortBtn.textContent = fmSortMode() === 'manual' ? '排序' : FM_SORTS.find(x => x[0] === fmSortMode())[1];
     const msg = { notoken: '请先在设置里配置 GitHub Token', norepo: '在上传页点「更换」选择一个仓库后显示文件', loading: '读取中…', error: '读取失败，点右上角「刷新」重试' }[fmState];
     if (msg) { if (sb) sb.style.display = 'none'; list.appendChild(fmNote(msg)); return; }
-    while (fmPath && !fmFolderFiles(fmPath).length) fmPath = fmPath.indexOf('/') < 0 ? '' : fmPath.slice(0, fmPath.lastIndexOf('/'));   // 当前文件夹没了（被删 / 改名）：退到还在的上一级
+    while (fmPath && !fmFolderFiles(fmPath).length) fmPath = fmPath.indexOf('/') < 0 ? '' : fmPath.slice(0, fmPath.lastIndexOf('/'));   // 当前文件夹没了：退到还在的上一级
     const mk = (label, path) => {
         if (crumb.childNodes.length) { const sp = document.createElement('span'); sp.className = 'sep'; sp.textContent = '/'; crumb.appendChild(sp); }
         const b = document.createElement('button'); b.type = 'button'; b.textContent = label;
@@ -8285,7 +8263,7 @@ function fmSheet(title, sub, actions) {
 }
 function fmCloseSheet() { fmPrevSeq++; $('fm-sheet-backdrop').classList.remove('show'); }
 function fmOpenFile(f) {
-    const acts = [['复制直链', () => fmCopyLink(f)], ['移动 / 改名', () => fmMove(f)]];
+    const acts = [['重命名', () => fmMove(f, 'rename')], ['移动', () => fmMove(f, 'move')]];
     if (fmSortMode() === 'manual') acts.push(['上移', () => fmShift(f.path, -1)], ['下移', () => fmShift(f.path, 1)]);
     acts.push(['删除', () => fmDelete(f), true]);
     const seq = fmSheet(f.name, (f.path !== f.name ? f.path + ' · ' : '') + fmSizeText(f.size || 0), acts);
@@ -8295,7 +8273,8 @@ function fmOpenFile(f) {
 function fmOpenFolder(path) {
     const files = fmReal(fmFolderFiles(path));
     fmSheet(path.split('/').pop() + '/', path + ' · ' + files.length + ' 个文件 · ' + fmSizeText(files.reduce((n, f) => n + (f.size || 0), 0)), [
-        ['重命名 / 移动', () => fmMoveFolder(path)],
+        ['重命名', () => fmMoveFolder(path, 'rename')],
+        ['移动', () => fmMoveFolder(path, 'move')],
         ['删除文件夹', () => fmDeleteFolder(path), true]
     ]);
     const box = $('fm-preview'); box.innerHTML = ''; box.style.display = 'none';
@@ -8330,14 +8309,9 @@ async function fmLoadPreview(f, seq) {
         if (seq === fmPrevSeq) fmSetPreviewNote('预览失败：' + ((e && e.message) || '未知错误'));
     }
 }
-async function fmCopyLink(f) {
-    const url = (f.size || 0) > 20 * 1024 * 1024 ? f.rawUrl : f.url;   // jsDelivr 单文件上限 20MB，超过改用 raw 直链
-    const ok = await writeClipboard(url);
-    toast(ok ? '直链已复制' : '复制失败，请手动复制', ok ? 'ok' : 'error');
-}
 
 /* ----- 移动 / 改名 / 删除 ----- */
-// 一次提交搬一组文件，本地状态、手动顺序、历史和撤销条一起更新。moves: [{ from, to, sha }]
+// 一次提交搬一组文件，本地状态、手动顺序、历史和撤销条一起更新
 async function fmApplyMoves(moves, commitMsg, doneMsg, histAction, histDetail) {
     const s = getSettings();
     const ctx = await resolveGithubContext();
@@ -8359,36 +8333,44 @@ async function fmApplyMoves(moves, commitMsg, doneMsg, histAction, histDetail) {
         return msg;
     });
 }
-async function fmMove(f) {
-    const from = f.path;   // 先记下原路径：applyLocalMoves 会就地改掉 f.path
-    const raw = await showPrompt({ title: '移动 / 重命名', message: '输入新的完整路径（含文件名）', value: from, validate: v => fmPathProblem(v, from, 'move') });
+async function fmMove(f, mode) {
+    const from = f.path, dir = pathDirname(from), base = pathBasename(from), rename = mode === 'rename';
+    const target = v => rename ? fmNorm((dir ? dir + '/' : '') + v.trim()) : fmNorm(v.trim() + '/' + base);
+    const raw = await showPrompt({
+        title: rename ? '重命名' : '移动到', message: rename ? '输入新的文件名' : '输入目标文件夹，/ 表示根目录', value: rename ? base : (dir || '/'),
+        validate: v => rename && /[\/\\]/.test(v) ? '只改文件名，不要带路径' : fmPathProblem(target(v), from, 'move')
+    });
     if (raw === null) return;
-    const to = fmNorm(raw);
+    const to = target(raw);
     fmCloseSheet();
-    toast('正在移动…', 'loading');
+    toast(rename ? '正在重命名…' : '正在移动…', 'loading');
     try {
-        await fmApplyMoves([{ from: from, to: to, sha: f.sha }], '移动 ' + from + ' → ' + to, '已移动到 ' + to,
-            pathBasename(from) === pathBasename(to) ? '移动' : '移动 / 重命名', from + ' → ' + to);
+        await fmApplyMoves([{ from: from, to: to, sha: f.sha }], (rename ? '重命名 ' : '移动 ') + from + ' → ' + to, (rename ? '已重命名为 ' + pathBasename(to) : '已移动到 ' + to),
+            rename ? '重命名' : '移动', from + ' → ' + to);
     } catch (e) {
-        toast('移动失败：' + ((e && e.message) || '未知错误'), 'error');
+        toast((rename ? '重命名' : '移动') + '失败：' + ((e && e.message) || '未知错误'), 'error');
     }
 }
-async function fmMoveFolder(from) {
+async function fmMoveFolder(from, mode) {
     const files = fmFolderFiles(from);
     if (!files.length) return;
-    const n = fmReal(files).length;
-    const raw = await showPrompt({ title: '重命名 / 移动文件夹', message: '输入新的完整路径，里面的 ' + n + ' 个文件会一起移动', value: from, validate: v => fmFolderProblem(v, from) });
+    const n = fmReal(files).length, dir = pathDirname(from), base = pathBasename(from), rename = mode === 'rename';
+    const target = v => rename ? fmNorm((dir ? dir + '/' : '') + v.trim()) : fmNorm(v.trim() + '/' + base);
+    const raw = await showPrompt({
+        title: rename ? '重命名文件夹' : '移动文件夹到', message: rename ? '输入新的文件夹名' : '输入目标文件夹，/ 表示根目录', value: rename ? base : (dir || '/'),
+        validate: v => rename && /[\/\\]/.test(v) ? '只改名称，不要带路径' : fmFolderProblem(target(v), from)
+    });
     if (raw === null) return;
-    const to = fmNorm(raw);
+    const to = target(raw);
     fmCloseSheet();
-    toast('正在移动…', 'loading');
+    toast(rename ? '正在重命名…' : '正在移动…', 'loading');
     try {
         const moves = files.map(f => ({ from: f.path, to: to + f.path.slice(from.length), sha: f.sha || FM_EMPTY_SHA }));
-        await fmApplyMoves(moves, '移动文件夹 ' + from + ' → ' + to, '已移动到 ' + to, '移动文件夹', from + ' → ' + to + '（' + n + ' 个文件）');
+        await fmApplyMoves(moves, (rename ? '重命名文件夹 ' : '移动文件夹 ') + from + ' → ' + to, rename ? '已重命名为 ' + pathBasename(to) : '已移动到 ' + to, rename ? '重命名文件夹' : '移动文件夹', from + ' → ' + to + '（' + n + ' 个文件）');
         if (fmPath === from || fmPath.indexOf(from + '/') === 0) fmPath = to + fmPath.slice(from.length);
         fmRender();
     } catch (e) {
-        toast('移动失败：' + ((e && e.message) || '未知错误'), 'error');
+        toast((rename ? '重命名' : '移动') + '失败：' + ((e && e.message) || '未知错误'), 'error');
     }
 }
 async function fmDelete(f) {
@@ -8446,7 +8428,7 @@ async function fmNewFolder() {
         toast('创建失败：' + ((e && e.message) || '未知错误'), 'error');
     }
 }
-// 上传成功后把文件记进本地列表（已有同路径的就更新）
+// 上传成功后把文件记进本地列表
 function fmLocalPut(path, file, sha, ctx, s) {
     const rec = { path: path, name: pathBasename(path), sha: sha, size: file.size, type: repoFileType(path), url: repoCdnUrl(ctx.owner, s.repo, ctx.branch, path), rawUrl: repoRawUrl(ctx.owner, s.repo, ctx.branch, path), owner: ctx.owner, repo: s.repo, branch: ctx.branch };
     const i = repoLiveFiles.findIndex(f => f.path === path);
@@ -8600,13 +8582,13 @@ async function handleReplaceFile(file) {
 }
 
 /* ----- 批量处理 ----- */
-// 单文件上传上限（受 GitHub Git Data API 限制，并考虑手机浏览器内存；base64 后体积约 ×1.33）。
+// 单文件上传上限
 const MAX_UPLOAD_SIZE = 99 * 1024 * 1024;
-// jsDelivr 对 GitHub 单文件有 20MB 上限：更大的文件不走 jsDelivr，改用 raw.githubusercontent.com 直链。
+// jsDelivr 对 GitHub 单文件有 20MB 上限：更大的文件不走 jsDelivr
 const CDN_SIZE_LIMIT = 20 * 1024 * 1024;
 function assetResult(file, owner, repo, branch, path, ref) {
     const viaRaw = file.size > CDN_SIZE_LIMIT;
-    const r = ref || branch; // 开启「固定到提交版本」时 ref 是提交 sha，直链里用它；branch 仍保留真实分支名（删除文件要用）
+    const r = ref || branch; // 开启「固定到提交版本」时 ref 是提交 sha，直链里用它
     const url = viaRaw
         ? repoRawUrl(owner, repo, r, path)
         : repoCdnUrl(owner, repo, r, path);
@@ -8620,11 +8602,8 @@ function isAllowedAssetFile(file) {
     return isImageFile(file) || isMediaFile(file) || FONT_EXT_RE.test(file.name || '') || /^font\//i.test(file.type || '');
 }
 
-/* ----- 后台保活（静音音频） -----
-   开关打开期间循环播放一段人耳听不到的静音音频，让 iOS 不把页面挂起。
-   与是否在上传无关：开关开着，整个 App 里的所有功能都受保护；关掉开关才停止。
-   iOS 要求播放由点击触发，若被拒绝，会在下一次触摸时自动补上。 */
-// 应用图标：给锁屏 / 控制中心的「正在播放」用（取页面自带的图标）
+/* ----- 后台保活（静音音频） ----- */
+// 应用图标：给锁屏 / 控制中心的「正在播放」用
 let appIconBlobUrl = '';
 function appIconSrc() {
     const l = document.querySelector('link[rel="icon"][sizes="192x192"]') || document.querySelector('link[rel="apple-touch-icon"]');
@@ -8674,7 +8653,7 @@ const keepAlive = (() => {
         const a = ensure();
         const pr = a.play();
         if (pr && pr.catch) pr.catch(err => {
-            // 上传刚结束时 stop() 会打断尚未完成的 play()，这里不能再弹「点一下屏幕」
+            // 上传刚结束时 stop 会打断尚未完成的 play，这里不能再弹「点一下屏幕」
             if (!active || (err && err.name === 'AbortError')) return;
             if (armed) return;
             armed = true;
@@ -8688,7 +8667,7 @@ const keepAlive = (() => {
         start(quiet, force) {
             if (active || (!force && !prefKeepAlive())) return;
             active = true; warned = !!quiet; setSession(true); tryPlay();
-            // 看门狗：每 4 秒确认一次还在播。来电结束、被其他 App 抢走音频、被系统静默暂停时，不用等切回前台就能自己恢复
+            // 看门狗：每 4 秒确认一次还在播
             clearInterval(watchdog);
             watchdog = setInterval(() => { if (active && (!audio || audio.paused)) tryPlay(); }, 4000);
         },
@@ -8704,7 +8683,7 @@ const keepAlive = (() => {
 })();
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') keepAlive.resume(); });
 window.addEventListener('pageshow', () => keepAlive.resume());
-// iOS 音频会话被打断（来电 / 闹钟 / Siri）后恢复时，立刻把静音音频接上
+// iOS 音频会话被打断后恢复时，立刻把静音音频接上
 try { if (navigator.audioSession && navigator.audioSession.addEventListener) navigator.audioSession.addEventListener('statechange', () => keepAlive.resume()); } catch (_) {}
 try { if ('mediaSession' in navigator) navigator.mediaSession.setActionHandler('play', () => keepAlive.resume()); } catch (_) {}
 
@@ -8712,7 +8691,7 @@ try { if ('mediaSession' in navigator) navigator.mediaSession.setActionHandler('
 let wakeLockPending = false;
 async function requestScreenWakeLock() {
     if (!prefWakeLock() || !('wakeLock' in navigator) || document.visibilityState !== 'visible') return;
-    if (wakeLockPending) return; // 申请还没返回时又来一次（切回前台 + 开关同时触发）：不能重复申请，否则旧的 lock 丢了引用就再也释放不掉
+    if (wakeLockPending) return; // 申请还没返回时又来一次：不能重复申请，否则旧的 lock 丢了引用就再也释放不掉
     wakeLockPending = true;
     try {
         if (uploadWakeLock && !uploadWakeLock.released) return;
@@ -8721,7 +8700,7 @@ async function requestScreenWakeLock() {
         uploadWakeLock = lock;
         lock.addEventListener('release', () => {
             if (uploadWakeLock === lock) uploadWakeLock = null;
-            // 系统自动释放（切后台等）后，回到前台会重新申请；这里处理前台被意外释放的情况
+            // 系统自动释放后，回到前台会重新申请
             if (prefWakeLock() && document.visibilityState === 'visible') setTimeout(requestScreenWakeLock, 150);
         });
     } catch (_) { uploadWakeLock = null; }
@@ -8747,12 +8726,12 @@ function releaseUploadWakeLock() { applyKeepModes(true); }
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') applyKeepModes(true);
 });
-// 启动时按开关状态开启；iOS 不允许无手势播放音频，被拒绝时会在第一次触摸时自动补上（静默，不弹提示）
+// 启动时按开关状态开启
 applyKeepModes(true);
 
-// 上传中关闭 / 刷新页面：桌面浏览器会先提示一下（iOS 主屏幕 App 不支持，但无害）
+// 上传中关闭 / 刷新页面：桌面浏览器会先提示一下
 window.addEventListener('beforeunload', e => { if (isBatchUploading) { e.preventDefault(); e.returnValue = ''; } });
-// 上传中断网 / 恢复的提示统一在 initOffline 里处理（重试会等到网络恢复后再继续，见 waitOnline）
+// 上传中断网 / 恢复的提示统一在 initOffline 里处理
 
 
 /* ----- ZIP 压缩包导入 ----- */
@@ -8763,7 +8742,7 @@ function zipDecodeName(bytes, utf8Flag) {
     let u = null;
     try { u = new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch (_) {}
     if (u !== null) {
-        // 有些 GBK 文件名碰巧也是合法 UTF-8（会变成奇怪的希腊 / 拉丁扩展字符）：出现这类字符才改按 GBK 解
+        // 有些 GBK 文件名碰巧也是合法 UTF-8：出现这类字符才改按 GBK 解
         const odd = [...u].some(c => { const k = c.codePointAt(0); return k > 127 && k < 0x800 && !(k >= 0xC0 && k <= 0x17F); });
         if (!odd) return u;
     }
@@ -8775,7 +8754,7 @@ async function zipInflateRaw(u8) {
     const stream = new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
     return new Uint8Array(await new Response(stream).arrayBuffer());
 }
-// 返回 { files, skipped }：files 为解压出的图片 / 字体，skipped 为被跳过的其他文件数
+// 返回 { files
 async function readZipAssets(zip) {
     if (zip.size > 400 * 1024 * 1024) throw new Error('压缩包超过 400MB，请分包后再导入');
     const buf = await zip.arrayBuffer();
@@ -8845,7 +8824,7 @@ async function expandZipFiles(list, failures) {
 
 async function handleFiles(files) {
     if (!files || !files.length) return;
-    // 先拷贝文件列表再清空选择器：无论后面走哪个提前 return，再次选择同一文件都能触发 change。
+    // 先拷贝文件列表再清空选择器：无论后面走哪个提前 return
     const inputFiles = Array.from(files);
     const fileInputEl = $('file-input');
     if (fileInputEl) fileInputEl.value = '';
@@ -8874,7 +8853,7 @@ async function handleFiles(files) {
         return;
     }
 
-    // 仓库已超过 GitHub 建议的 1GB：上传前让用户确认一次（同一仓库确认过就不再反复问）
+    // 仓库已超过 GitHub 建议的 1GB：上传前让用户确认一次
     {
         const cur = getSettings();
         const usedNow = repoUsedBytesNow();
@@ -8890,8 +8869,8 @@ async function handleFiles(files) {
         }
     }
 
-    // 防止在上一批还没跑完时又触发新一批（比如手快连点两次“转换”），
-    // 否则两批会各自去请求 GitHub，互相抢节奏，又会撞回限流问题。
+    // 防止在上一批还没跑完时又触发新一批
+    // 否则两批会各自去请求 GitHub，互相抢节奏，又会撞回限流问题
     if (isBatchUploading) { toast('上传中，请稍候', 'info'); return; }
     isBatchUploading = true;
     requestUploadWakeLock();
@@ -8915,7 +8894,7 @@ async function handleFiles(files) {
     const total = validFiles.length;
     let done = 0;
     const failures = invalidFailures.slice();
-    let failedCount = 0; // 仅统计上传失败的文件（不含被跳过的非法文件）
+    let failedCount = 0; // 仅统计上传失败的文件
     const batchOk = []; // 本批成功的 { url, name }，用于自动复制
 
     if (progress) progress.classList.add('show');
@@ -8924,7 +8903,6 @@ async function handleFiles(files) {
     if (text) text.textContent = '准备上传 ' + total + ' 个文件';
 
     // 整批只解析一次 owner/branch，避免每个文件都重复请求账号和仓库信息
-    // （这是之前多文件批量上传时容易被 GitHub 限流、需要手动重试的主要原因）。
     let ctx = null;
     try {
         ctx = await resolveGithubContext({ createIfMissing: true });
@@ -8940,8 +8918,8 @@ async function handleFiles(files) {
         return;
     }
 
-    // ---- 并发上传池：最多 3 个文件同时传；在途数据超过 48MB 时先等一等（手机内存有限）----
-    // 先把所有结果行建好（状态“等待中”），缩略图等轮到该文件时再加载，避免一次性解码几十张大图。
+    // 并发上传池：最多 3 个文件同时传
+    // 先把所有结果行建好，缩略图等轮到该文件时再加载，避免一次性解码几十张大图
     const POOL = 3, MAX_INFLIGHT_BYTES = 48 * 1024 * 1024;
     const batchStamp = Date.now();
     const items = validFiles.map((file, i) => {
@@ -8951,7 +8929,7 @@ async function handleFiles(files) {
         list.appendChild(refs.item);
         return { file, refs, i };
     });
-    persistPendingUploads(validFiles, ctx);   // 后台依次存进本机队列；传完一个删一个
+    persistPendingUploads(validFiles, ctx);   // 后台依次存进本机队列
     const results = new Array(items.length);
     const fracs = new Map();
     let active = 0, nextIdx = 0, inflightBytes = 0;
@@ -9007,7 +8985,7 @@ async function handleFiles(files) {
             ? ('完成 · ' + (total - failedCount) + '/' + total + ' 成功，' + failedCount + ' 个失败')
             : ('上传完成 · ' + done + '/' + total + '，' + invalidFailures.length + ' 个文件被跳过');
         if (percent) percent.textContent = '100%';
-        // 批量上传只弹一次总提示，不会连续弹多个窗口（弹窗打开时不再叠加提示条）。
+        // 批量上传只弹一次总提示，不会连续弹多个窗口
         showUploadErrorModal(failures);
     } else {
         if (text) text.textContent = '上传完成 · ' + done + '/' + total;
@@ -9015,7 +8993,7 @@ async function handleFiles(files) {
         if (autoCopy === 'ok') toast('上传完成，已复制 ' + batchOk.length + ' 条链接');
         else if (autoCopy === 'fail') toast('上传完成。系统拦截了自动复制，请点「复制全部」', 'info');
         else toast('上传完成');
-        // 全部成功才跳转；有失败时留在原页，方便看失败原因和重试
+        // 全部成功才跳转
         if (prefAutoJump() && done > 0) {
             setTimeout(() => {
                 const onUpload = $('page-upload') && $('page-upload').classList.contains('active');
@@ -9073,10 +9051,10 @@ function linkNameFromUrl(url) {
 function escapeHtmlAttr(t) {
     return String(t).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-// 图片 → ![名称](链接) / <img>；字体等其他文件 → 普通超链接
+// 图片 → ![名称] / <img>
 function formatLink(url, name, fmt) {
     fmt = fmt || prefCopyFormat();
-    url = applyCdnLine(url);   // 复制时换成选定的 CDN 线路（默认不变）
+    url = applyCdnLine(url);   // 复制时换成选定的 CDN 线路
     if (fmt === 'url') return url;
     const full = String(name || '').trim() || linkNameFromUrl(url);
     const base = full.split('/').pop(); // 文件夹上传时名称带路径，只取文件名
@@ -9135,7 +9113,7 @@ async function autoCopyBatch(items) {
     const fmt = prefCopyFormat();
     const ok = await writeClipboard(items.map(it => formatLink(it.url, it.name, fmt)).join('\n'));
     if (!ok) {
-        // iPhone 常在长时间上传后拒绝「没有用户操作」的复制：让「复制全部」闪一下，提醒手动点一次
+        // iPhone 常在长时间上传后拒绝「没有用户操作」的复制：让「复制全部」闪一下
         const btn = document.querySelector('#result-card .card-head-actions .small-btn');
         if (btn) { btn.classList.remove('pulse'); void btn.offsetWidth; btn.classList.add('pulse'); setTimeout(() => btn.classList.remove('pulse'), 3600); }
     }
@@ -9294,11 +9272,8 @@ function loadImageForCanvas(file) {
 function canvasBlob(c, type, q) {
     return new Promise(r => { try { c.toBlob(r, type, q); } catch (_) { r(null); } });
 }
-/* ----- 图片后台线程（压缩 / 相似图指纹） -----
-   压缩 / 相似图指纹放进 Worker，批量处理时界面不卡。
-   需要 Worker + createImageBitmap + OffscreenCanvas（iOS 16.4+）。任何一环不可用、自检不过或运行出错，
-   都会自动退回主线程的老做法，结果不变。HEIC 转换仍在主线程（只有 Safari 能解码，Worker 里不一定行）。 */
-// 自检图：4×2 的 JPEG，EXIF 方向 = 6（顺时针转 90°）。方向被正确应用时，解码出来应是 2×4。
+/* ----- 图片后台线程（压缩 / 相似图指纹） ----- */
+// 自检图：4×2 的 JPEG，EXIF 方向 = 6
 const IMGW_TEST_B64 = '/9j/4AAQSkZJRgABAQAAAQABAAD/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAYAAAAAAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAACAAQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD5i8Vf8h+6/wCA/wDoAooor+yOFf8AkQZf/wBeaX/pETLiT/kd47/r7U/9LZ//2Q==';
 function imgWorkerMain() {
     let orient = null;   // createImageBitmap 的附加参数，由自检决定
@@ -9313,7 +9288,7 @@ function imgWorkerMain() {
                 if (ok) { orient = o; return true; }
             } catch (_) { /* 换下一种参数再试 */ }
         }
-        return false;   // 这个浏览器的 Worker 不会按 EXIF 转正：不能用，否则竖拍的照片会被压成横的
+        return false;   // 这个浏览器的 Worker 不会按 EXIF 转正：不能用
     }
     self.onmessage = async e => {
         const m = e.data;
@@ -9414,7 +9389,7 @@ function imgWorkerReady() {
     })();
     return imgW.ready;
 }
-// 成功返回 { blob, w0, h0 }；不可用 / 失败返回 null，调用方改走主线程
+// 成功返回 { blob, w0, h0 }
 async function workerEncodeImage(file, type, bg) {
     try {
         if (!(await imgWorkerReady())) return null;
@@ -9422,7 +9397,7 @@ async function workerEncodeImage(file, type, bg) {
         return r && r.blob ? r : null;
     } catch (_) { return null; }
 }
-// 成功返回 34 位指纹；不可用 / 失败返回 null
+// 成功返回 34 位指纹
 async function workerHashUrl(url) {
     try {
         if (!(await imgWorkerReady())) return null;
@@ -9430,9 +9405,9 @@ async function workerHashUrl(url) {
         return r && typeof r.hash === 'string' && r.hash.length === 34 ? r.hash : null;
     } catch (_) { return null; }
 }
-// 返回处理后的 File；不需要 / 不划算 / 出错时原样返回传入的 file
-// 动图检测：APNG（PNG 里有 acTL 块）和动态 WebP（VP8X 的动画标志位）。
-// 压缩会把它们画到画布上重新编码，只剩第一帧，所以要先认出来、原样上传。按文件头判断，不看扩展名和 MIME。
+// 返回处理后的 File
+// 动图检测：APNG和动态 WebP
+// 压缩会把它们画到画布上重新编码，只剩第一帧，所以要先认出来、原样上传
 async function isAnimatedImage(file) {
     try {
         const buf = new Uint8Array(await file.slice(0, 512 * 1024).arrayBuffer());
@@ -9477,7 +9452,7 @@ async function preprocessFile(file) {
         target = isJpeg ? 'image/jpeg' : isPng ? 'image/png' : isWebp ? 'image/webp' : (webpOk ? 'image/webp' : 'image/jpeg');
     }
     if (target === 'image/webp' && !webpOk) return file; // 读得了 WebP 却编不了：不动它
-    // 优先在后台线程解码 + 缩放 + 编码；不可用 / 失败 / 输出格式不对时，退回下面主线程的老做法
+    // 优先在后台线程解码 + 缩放 + 编码
     let blob = null;
     const wr = await workerEncodeImage(file, target, target === 'image/jpeg');
     if (wr && wr.blob && wr.blob.type === target) blob = wr.blob;
@@ -9494,7 +9469,7 @@ async function preprocessFile(file) {
         if (target === 'image/jpeg') { g.fillStyle = '#FFFFFF'; g.fillRect(0, 0, w, h); } // JPEG 没有透明，避免透明处变黑
         g.drawImage(img, 0, 0, w, h);
         blob = await canvasBlob(c, target, 0.82);
-        c.width = c.height = 0; img.src = ''; // 立即释放画布和解码后的位图：iOS Safari 不会主动回收，批量处理容易把页面撑爆
+        c.width = c.height = 0; img.src = ''; // 立即释放画布和解码后的位图：iOS Safari 不会主动回收
     }
     if (!blob || blob.type !== target) return file;
     const sameKind = (target === 'image/jpeg' && isJpeg) || (target === 'image/png' && isPng) || (target === 'image/webp' && isWebp);
@@ -9509,7 +9484,7 @@ async function preprocessFile(file) {
 }
 
 /* ----- 重命名（一次 Git 提交） ----- */
-// 删旧路径，再用同一个 blob 建新路径。
+// 删旧路径，再用同一个 blob 建新路径
 const BAD_FILENAME_RE = /[\/\\:*?"<>|]/;
 function pathDirname(p) { const i = String(p).lastIndexOf('/'); return i < 0 ? '' : p.slice(0, i); }
 function pathBasename(p) { return String(p).split('/').pop(); }
@@ -9560,7 +9535,7 @@ async function doRename(ref, newName) {
         if (!owner) owner = (await resolveGithubContext()).owner;
         const contentsUrl = p => '/repos/' + owner + '/' + repo + '/contents/' + p.split('/').map(encodeURIComponent).join('/') + '?ref=' + encodeURIComponent(branch);
         // 目标名字已被占用就不继续，绝不覆盖
-        // 本地列表里有就肯定重名；没有也不一定安全（列表可能是旧的，别处刚传了同名文件），所以再向 GitHub 确认一次
+        // 本地列表里有就肯定重名
         const listKnown = repoLiveLoaded && String(repo).toLowerCase() === String(s.repo).toLowerCase();
         let exists = listKnown && repoLiveFiles.some(f => f.path === newPath && (!f.branch || f.branch === branch));
         if (!exists) {
@@ -9611,7 +9586,7 @@ async function renameAsset(ref) {
 /* ----- 批量重命名 ----- */
 const RENAME_MODES = [['prefix', '加前缀'], ['suffix', '加后缀'], ['seq', '序号'], ['replace', '替换']];
 function splitExt(name) { const m = String(name).match(/\.[^./]+$/); return m ? [name.slice(0, -m[0].length), m[0]] : [name, '']; }
-// 按规则算出每个文件的新名字；扩展名不动。返回 { error } 或 { moves }
+// 按规则算出每个文件的新名字
 function buildRenamePlan(files, cfg) {
     const n = files.length;
     if (cfg.mode !== 'seq' && !cfg.a) return { error: cfg.mode === 'replace' ? '填好要查找的文字后，这里会显示改名效果' : '填好要添加的文字后，这里会显示改名效果' };
@@ -9757,7 +9732,7 @@ async function renameSelectedGallery() {
 }
 
 /* ----- 最近删除 ----- */
-// 文件删除后，它的内容仍然留在 Git 历史里；恢复就是把原来的文件（按 sha）重新放回原路径，不用重新上传。
+// 文件删除后，它的内容仍然留在 Git 历史里
 const RECYCLE_KEY = 'kb_recycle';
 const RECYCLE_DAYS = 30, RECYCLE_MAX = 500;
 let recycleCache = null;
@@ -9777,7 +9752,7 @@ function recycleLoad() {
     return recycleCache;
 }
 function recycleKey(x) { return [x.owner, x.repo, x.branch || 'main', x.path].join('\u0000'); }
-// files: [{ owner, repo, branch, path, name, sha, size }]；snap / removedHist 是撤销用的快照，恢复时一并还原收藏、标签、资源库记录
+// files: [{ owner
 function recycleAdd(files, snap, removedHist) {
     try {
         const list = recycleLoad();
@@ -9893,7 +9868,7 @@ async function recycleRestore(items) {
             const have = new Map(((tree && tree.tree) || []).filter(x => x.type === 'blob').map(x => [x.path, x.sha]));
             g.forEach(it => { if (!have.has(it.path)) free.push(it); else if (have.get(it.path) === it.sha) already.push(it); else blocked.push(it); });
         }
-        if (already.length) recycleRemoveFiles(already);   // 已经在仓库里了（比如刚点过「撤销」）
+        if (already.length) recycleRemoveFiles(already);   // 已经在仓库里了
         if (!free.length) {
             hideToast();
             return toast(blocked.length ? '原位置已经有同名文件，没法恢复' : '这些文件已经在仓库里了', blocked.length ? 'error' : 'info');
@@ -9939,7 +9914,7 @@ async function exportLinkList(kind) {
         scopes.push(['all', '全部记录', loadHistory()]);
     }
     const FORMATS = [['url', '直链'], ['copy', '复制格式'], ['json', 'JSON'], ['csv', 'CSV']];
-    const st = { scope: (scopes.find(x => x[2].length) || scopes[0])[0], fmt: 'url' };   // 默认选第一个有内容的范围（在根目录时「当前列表」可能是空的）
+    const st = { scope: (scopes.find(x => x[2].length) || scopes[0])[0], fmt: 'url' };   // 默认选第一个有内容的范围
     const toItems = () => {
         const src = (scopes.find(x => x[0] === st.scope) || scopes[0])[2];
         const seen = new Set(), out = [];
@@ -10006,7 +9981,7 @@ async function exportLinkList(kind) {
 }
 
 /* ----- 排序 ----- */
-// 名称排序用同一个 Collator：每次 localeCompare(…, 'zh', {numeric}) 都会重建排序规则，8000 条记录要慢几十倍
+// 名称排序用同一个 Collator：每次 localeCompare 都会重建排序规则
 let NAME_COLLATOR; try { NAME_COLLATOR = new Intl.Collator('zh', { numeric: true }); } catch (_) { NAME_COLLATOR = new Intl.Collator(undefined, { numeric: true }); }
 const GALLERY_SORTS = [['new', '时间 · 新到旧'], ['old', '时间 · 旧到新'], ['size-desc', '大小 · 大到小'], ['size-asc', '大小 · 小到大'], ['name', '名称 A–Z']];
 const REPO_SORTS = [['time-asc', '上传时间 · 早到晚'], ['time-desc', '上传时间 · 晚到早'], ['size-desc', '大小 · 大到小'], ['size-asc', '大小 · 小到大'], ['name', '名称 A–Z']];
@@ -10020,7 +9995,7 @@ function sortGalleryEntries(list) {
     const m = prefGallerySort();
     const a = list.slice();
     const t = e => e.time || 0;
-    if (m === 'new') return a.sort((x, y) => t(y) - t(x)); // 按时间新到旧；时间相同保持原顺序（导入备份、并发上传后也不会乱）
+    if (m === 'new') return a.sort((x, y) => t(y) - t(x)); // 按时间新到旧
     if (m === 'old') a.sort((x, y) => t(x) - t(y));
     else if (m === 'size-desc') a.sort((x, y) => entrySizeForSort(y) - entrySizeForSort(x) || t(y) - t(x));
     else if (m === 'size-asc') a.sort((x, y) => entrySizeForSort(x) - entrySizeForSort(y) || t(y) - t(x));
@@ -10061,7 +10036,7 @@ function setRepoSort(k) {
 }
 
 /* ----- 仓库用量提示 ----- */
-let repoUsage = null; // { kb, at, repo }  —— kb 来自 GitHub 的仓库信息（含历史记录，更新会有延迟）
+let repoUsage = null; // { kb, at, repo } —— kb 来自 GitHub 的仓库信息
 const REPO_SOFT_LIMIT = 1024 * 1024 * 1024; // GitHub 建议单个仓库保持在 1 GB 以内
 function fmtSize(n) {
     if (n >= 1073741824) return (n / 1073741824).toFixed(2) + ' GB';
@@ -10092,7 +10067,7 @@ async function afterBatchUsageCheck(ctx) {
 function loadLinkStatus() {
     try { const o = JSON.parse(lsGet(LINKCHK_KEY) || '{}'); return (o && typeof o === 'object') ? o : {}; } catch (_) { return {}; }
 }
-let linkStatus = loadLinkStatus(); // { 记录id: { s: 'ok'|'dead'|'cdn', t: 时间 } }
+let linkStatus = loadLinkStatus(); // { 记录id: { s: 'ok'|'dead'|'cdn'
 let linkCheckRunning = false, linkCheckStop = false;
 function saveLinkStatus() {
     const ids = new Set(loadHistory().map(e => e.id));
@@ -10100,7 +10075,7 @@ function saveLinkStatus() {
     lsSet(LINKCHK_KEY, JSON.stringify(linkStatus));
 }
 function linkStatusOf(id) { const v = linkStatus[id]; return v ? v.s : ''; }
-// 返回 'ok' | 'missing'（404/410）| 'net'（连不上、超时、被限流等，不能断定是链接坏了）
+// 返回 'ok' | 'missing'| 'net'
 async function probeUrl(url) {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 12000);
@@ -10118,7 +10093,7 @@ async function probeUrl(url) {
     } catch (_) { return 'net'; }
     finally { clearTimeout(timer); }
 }
-// 逐个检测：'ok' 能打开；'dead' CDN 和 raw 都 404；'cdn' 仅 CDN 404（刚上传或改名，jsDelivr 还没同步）；'net' 无法判断
+// 逐个检测：'ok' 能打开
 async function checkEntryLink(entry) {
     const r1 = await probeUrl(entry.url);
     if (r1 === 'ok') return 'ok';
@@ -10134,8 +10109,8 @@ async function checkEntryLink(entry) {
     }
     return 'dead';
 }
-// 按仓库批量预检：每个仓库只读 1 次文件树（大仓库自动按目录分批），树里还在的文件直接判定为「能打开」；
-// 树里找不到的、读不到树的、没有对应 Token 的、固定到提交的记录，仍然逐个请求链接来确认（所以不会误报失效）。
+// 按仓库批量预检：每个仓库只读 1 次文件树，树里还在的文件直接判定为「能打开」
+// 树里找不到的、读不到树的、没有对应 Token 的、固定到提交的记录
 function tokenForOwner(owner) {
     const want = String(owner || '').toLowerCase();
     if (!want) return null;
@@ -10172,7 +10147,7 @@ async function precheckLinksByRepo(entries) {
     await Promise.all(Array.from({ length: Math.min(3, jobs.length) }, worker));
     return okIds;
 }
-// 进度条只在「检测链接」提示还留在屏幕上时才刷新：用户点掉它、或被「上传完成」之类的新提示顶替后，不再反复弹回来
+// 进度条只在「检测链接」提示还留在屏幕上时才刷新：用户点掉它、或被「上传完成」之类的新提示顶替后
 function linkCheckProgressToast(done, total) {
     const el = $('kb-toast'), m = el && el.querySelector('.kb-toast-msg');
     if (!el || !m || !el.classList.contains('show') || m.textContent.indexOf('检测链接') !== 0) return;
@@ -10190,7 +10165,7 @@ async function runLinkCheck(opts) {
     const found = { ok: [], dead: [], cdn: [], net: [] };
     if (!quiet) toast('检测链接 0/' + total, 'loading');
     let todo = entries;
-    // 24 小时内测过且结果正常的链接不再重复检测（菜单里的「重新检测全部」可以忽略缓存）
+    // 24 小时内测过且结果正常的链接不再重复检测
     const cachedOk = new Set();
     if (!opts.force) {
         const nowC = Date.now();
@@ -10209,7 +10184,7 @@ async function runLinkCheck(opts) {
     try {
         let pre = new Set();
         try { pre = await precheckLinksByRepo(entries.filter(e => !cachedOk.has(e.id))); } catch (_) {}
-        // 最近 3 天上传的 jsDelivr 链接：就算仓库里有文件，CDN 也可能还没同步，要实际打开确认
+        // 最近 3 天上传的 jsDelivr 链接：就算仓库里有文件
         const recentMs = 3 * 24 * 3600 * 1000, nowT = Date.now();
         entries.forEach(e => { if (pre.has(e.id) && nowT - (e.time || 0) < recentMs && /cdn\.jsdelivr\.net/.test(e.url || '')) pre.delete(e.id); });
         pre.forEach(id => found.ok.push(id));
@@ -10221,7 +10196,7 @@ async function runLinkCheck(opts) {
     finally { linkCheckRunning = false; }
     const stopped = linkCheckStop;
     linkCheckStop = false;
-    // 大部分都连不上，多半是网络问题（或 jsDelivr 被限制）：别把结果当真
+    // 大部分都连不上，多半是网络问题：别把结果当真
     if (done >= 5 && found.net.length >= done * 0.6) {
         if (!quiet) toast('大部分链接连不上，可能是网络问题，这次结果没有保存', 'error');
         return;
@@ -10265,7 +10240,7 @@ async function runLinkCheck(opts) {
     const first = document.querySelector('#gallery-container .gallery-tile .tile-badge:not(.cdn)');
     if (first) first.parentElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
 }
-// 仓库页检测失效链接。仓库里的文件一定存在，所以这里测的是「直链现在能不能打开」
+// 仓库页检测失效链接
 async function checkRepoFileLink(f) {
     const url = repoShareUrl(f);
     if (!url) return 'net';
@@ -10286,13 +10261,13 @@ async function runRepoLinkCheck(opts) {
     if (repoLinkCheckRunning) { if (!quiet) { repoLinkCheckStop = true; toast('正在停止检测…', 'info'); } return; }
     if (!repoLiveLoaded) { if (!quiet) toast('仓库文件还没读取完，稍后再试', 'info'); return; }
     const onlyDead = !!opts.onlyDead;
-    const subset = Array.isArray(opts.files);   // 只检测指定的文件（当前文件夹 / 选中的文件）
+    const subset = Array.isArray(opts.files);   // 只检测指定的文件
     const files = (subset ? opts.files : repoLiveFiles).filter(f => f.name !== '.gitkeep' && (!onlyDead || repoLinkStatusOf(f) === 'dead'));
     if (!files.length) { if (!quiet) toast(onlyDead ? '没有需要重测的失效项' : (subset ? '没有可检测的文件' : '仓库里还没有文件'), 'info'); return; }
     const atKey = repoLinkCheckAtKey(files[0]);
     repoLinkCheckRunning = true; repoLinkCheckStop = false;
     const total = files.length;
-    // 内容没变（sha 相同）、24 小时内测过且正常的文件不再重复检测
+    // 内容没变、24 小时内测过且正常的文件不再重复检测
     const cachedPaths = new Set();
     if (!opts.force && !onlyDead) {
         const nowC = Date.now();
@@ -10400,7 +10375,7 @@ function syncSpecialChip(id, filter, label, n) {
         document.querySelectorAll('.filter-btn[data-rf]').forEach(b => b.classList.toggle('active', b.dataset.rf === 'all'));
     }
 }
-// 切到某个筛选，并选中其中的一批文件（接着用现有的删除 / 移动）
+// 切到某个筛选，并选中其中的一批文件
 function selectRepoSubset(filter, files) {
     resetRepoView();
     repoFilter = filter;
@@ -10423,7 +10398,7 @@ function openRepoToolsMenu(btn) {
 }
 
 /* ----- 未被引用的文件 ----- */
-// 路径要作为完整的一段出现：前面不能紧挨着字母 / 数字 / . 等，后面不能接着更长的文件名
+// 路径要作为完整的一段出现：前面不能紧挨着字母 / 数字 / . 等
 function repoPathMentioned(text, path) {
     const variants = [path];
     const e1 = path.split('/').map(encodeURIComponent).join('/');
@@ -10482,7 +10457,7 @@ async function handleOrphanScan(fileList) {
 }
 
 /* ----- 表情包导入 / 导出 ----- */
-// JSON（链接或内嵌图片）/ Word / 文本；导出成 url / meaning / category 的 JSON。
+// JSON/ Word / 文本
 function exportStickerJson() {
     if (!repoLiveLoaded) return toast('仓库文件还没读取完，稍后再试', 'info');
     let files, label;
@@ -10514,7 +10489,7 @@ function exportStickerJson() {
     toast('已导出 ' + list.length + ' 条（含义取自文件名，分类取自所在文件夹）');
 }
 
-// JSON 里直接内嵌的 base64 图片（data:image/...;base64,...）：换成短的伪链接排队，转存时再解码成文件
+// JSON 里直接内嵌的 base64 图片：换成短的伪链接排队
 const STICKER_LOCAL = 'local-sticker:';
 const stickerLocal = new Map();      // 伪链接 → { mime, b64, meaning }
 const stickerKeyByData = new Map();  // 同一张内嵌图片只传一次
@@ -10550,7 +10525,7 @@ function stickerLocalToFile(key) {
     return new File([u8], 'sticker-' + key.slice(STICKER_LOCAL.length) + '.' + ext, { type: it.mime });
 }
 
-// 读 ZIP 里指定的几个文件（Word 本质上是个 ZIP）
+// 读 ZIP 里指定的几个文件
 async function readZipEntries(zip, wanted) {
     const buf = await zip.arrayBuffer();
     const dv = new DataView(buf), u8 = new Uint8Array(buf);
@@ -10585,7 +10560,7 @@ function xmlUnescape(s) {
         .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
         .replace(/&amp;/g, '&');
 }
-// 取出 Word 正文：一段一行；超链接的真实地址（显示文字和地址不一样时）补在行尾
+// 取出 Word 正文：一段一行
 async function readDocxText(file) {
     const got = await readZipEntries(file, ['word/document.xml', 'word/_rels/document.xml.rels']);
     const docBytes = got.get('word/document.xml');
@@ -10618,7 +10593,7 @@ async function readDocxText(file) {
     });
     return lines.join('\n');
 }
-// 文本 / Word 里按行识别：「含义：链接」「1. 含义 链接」「![含义](链接)」，单独成行的标题当作分类
+// 文本 / Word 里按行识别：「含义：链接」「1. 含义 链接」「![含义]」
 function parseStickerLines(text, defaultCategory) {
     const out = [];
     const seen = new Set();
@@ -10665,7 +10640,7 @@ function buildStickerOutput(outName, text, mime, bom, done, total, sess) {
     $('replace-result').style.display = 'block';
 }
 
-// 选文件时自动判断是不是表情包：Word、带含义/分类（或内嵌图片）的 JSON、几乎每行都是「含义：链接」的文本
+// 选文件时自动判断是不是表情包：Word、带含义/分类的 JSON、几乎每行都是「含义：链接」的文本
 async function looksLikeStickerFile(file) {
     const name = file.name || '';
     if (/\.docx$/i.test(name) || /wordprocessingml/i.test(file.type || '')) return true;
@@ -10725,7 +10700,7 @@ function stickerFormatOutput(list, fmt, tpl) {
     }
     return { text: JSON.stringify(list, null, 2), ext: 'json', mime: 'application/json', bom: false };
 }
-// 返回 Promise：取消 → null；确认 → { selected: [key…]（保持原顺序）, edits: Map(key → {meaning, category}), format, tpl }
+// 返回 Promise：取消 → null
 function stickerPreview(urls, info, opts) {
     return new Promise(resolve => {
         if (stickerPrev) stickerPreviewClose();
@@ -10774,7 +10749,7 @@ function stickerPreview(urls, info, opts) {
             rows.push({ key, row, cb, mi, ci });
         });
         list.appendChild(frag);
-        // 输出格式：只有「文本 / Word 来源」才有得选；JSON 来源会保持原来的结构
+        // 输出格式：只有「文本 / Word 来源」才有得选
         const fmtWrap = $('stk-fmt-wrap');
         fmtWrap.hidden = jsonMode;
         const sel = $('stk-fmt');
@@ -10874,7 +10849,7 @@ async function handleStickerImport(file) {
     }
     text = text.replace(/^\uFEFF/, '');
 
-    const info = new Map();   // 链接（或伪链接）→ { meaning, category }
+    const info = new Map();   // 链接→ { meaning, category }
     const nodes = [];         // JSON 模式：记下每个条目，转存后直接改它的 url
     let data = null, jsonMode = false;
     if (!isDocx && (/\.json$/i.test(file.name) || /^\s*[\[{]/.test(text))) {
@@ -10887,7 +10862,7 @@ async function handleStickerImport(file) {
         const add = (n, k, ref, meaning, category, mk, ck) => {
             const key = stickerRegisterRef(ref, meaning);
             if (!key) return;
-            nodes.push({ n, k, key, mk: mk || '', ck: ck || '', m0: meaning, c0: category });   // mk / ck：含义、分类在条目里叫什么字段（预览里改了要写回去）
+            nodes.push({ n, k, key, mk: mk || '', ck: ck || '', m0: meaning, c0: category });   // mk / ck：含义、分类在条目里叫什么字段
             if (!info.has(key)) info.set(key, { meaning, category });
         };
         (function walk(n) {
@@ -10914,7 +10889,7 @@ async function handleStickerImport(file) {
     if (!pre) { stickerLocal.clear(); stickerKeyByData.clear(); return toast('已取消导入', 'info'); }
     const chosen = new Set(pre.selected);
     pre.edits.forEach((v, k) => { const it = info.get(k); if (it) { it.meaning = v.meaning; it.category = v.category; } });
-    // JSON 来源：把改过的含义 / 分类写回原条目（含义字段只有原来就有才写；原来没有分类字段、这次填了，就新增一个 category）
+    // JSON 来源：把改过的含义 / 分类写回原条目
     let edited = false;
     nodes.forEach(x => {
         if (!chosen.has(x.key)) return;
@@ -10996,7 +10971,7 @@ async function cdnTimeOne(url, timeoutMs) {
 async function runCdnSpeedTest(btn) {
     if (cdnTesting) return;
     if (!repoLiveLoaded) return toast('仓库文件还没读取完，稍后再试', 'info');
-    // 样本：300KB 以内、最接近 100KB 的文件（太小测不出差别，太大浪费流量）
+    // 样本：300KB 以内、最接近 100KB 的文件
     const cand = repoLiveFiles.filter(f => f.name !== '.gitkeep' && f.size > 0 && f.size <= 300 * 1024 && CDN_GH_RE.test(f.url || ''));
     if (!cand.length) return toast('仓库里没有合适的小文件可以拿来测速', 'info');
     const sample = cand.reduce((a, b) => (Math.abs(a.size - 102400) <= Math.abs(b.size - 102400) ? a : b));
@@ -11040,7 +11015,7 @@ function phashSave() {
         lsSet(PHASH_KEY, JSON.stringify(phashCache));
     } catch (_) {}
 }
-// 纯计算：输入 72×72 的 RGBA 像素，输出 34 位十六进制指纹。不引用任何外部变量，因为 Worker 里会原样复制这个函数。
+// 纯计算：输入 72×72 的 RGBA 像素，输出 34 位十六进制指纹
 function dHashFromPixels(d, W) {
     const g = new Array(81);
     let mn = 255, mx = 0;
@@ -11057,7 +11032,7 @@ function dHashFromPixels(d, W) {
             if (v > mx) mx = v;
         }
     }
-    // 128 位：横向 64 位（左右相邻比大小）+ 纵向 64 位（上下相邻比大小）；末尾 2 位十六进制是画面对比度
+    // 128 位：横向 64 位+ 纵向 64 位
     const w = [0, 0, 0, 0];
     let n = 0;
     for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
@@ -11090,7 +11065,7 @@ function loadImageForHash(url) {
     });
 }
 async function hashRepoImage(f) {
-    // 优先在后台线程下载 + 解码 + 算指纹；Worker 不可用或这张图失败时，退回主线程原来的做法
+    // 优先在后台线程下载 + 解码 + 算指纹
     let h = await workerHashUrl(f.url);
     if (!h && f.rawUrl && f.rawUrl !== f.url) h = await workerHashUrl(f.rawUrl);
     if (h) return h;
@@ -11142,7 +11117,7 @@ async function runSimilarScan(th) {
     finally { repoSimRunning = false; phashSave(); }
     if (repoSimStop) { repoSimStop = false; return toast('已停止，已分析的结果已保存，下次接着来', 'info'); }
     hideToast();
-    // 对比度太低的图（纯色、几乎空白）指纹没有区分度，不参与比较
+    // 对比度太低的图指纹没有区分度，不参与比较
     const items = [];
     imgs.forEach(f => {
         const h = cache[f.sha];
@@ -11346,7 +11321,7 @@ function initV13Prefs() {
 
 <script>
 /* ================= 拉取最新版 / 设置备份 ================= */
-const APP_VERSION = '3.0.39';
+const APP_VERSION = '3.0.42';
 (function () {
     // 拉取最新版时会带一个 ?_= 参数来绕过缓存，进来后把它从地址栏去掉
     try { if (/[?&]_=/.test(location.search)) history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {}
@@ -11751,7 +11726,7 @@ async function offlineStatusRefresh() {
 }
 async function offlineInfo() { toast(await offlineStatusText(), 'info'); }
 /* ----- 申请持久存储 ----- */
-// iOS / 浏览器空间紧张时默认会优先清掉网站数据（上传队列、指纹缓存都在里面）。
+// iOS / 浏览器空间紧张时默认会优先清掉网站数据
 let storagePersisted = null, storageAskedAt = 0;
 async function requestPersistentStorage(force) {
     if (!force && Date.now() - storageAskedAt < 10 * 60 * 1000) return storagePersisted;   // 10 分钟内不重复申请
@@ -11789,14 +11764,14 @@ async function storageStatusRefresh() {
     const go = () => setTimeout(() => { requestPersistentStorage(true); }, 1500);
     if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });
 })();
-/* 清理旧版「外观」功能留下的背景图（IndexedDB），只做一次 */
+/* 清理旧版「外观」功能留下的背景图，只做一次 */
 try { if (!lsGet('kb_ap_cleaned')) { indexedDB.deleteDatabase('kb_appearance'); lsSet('kb_ap_cleaned', '1'); } } catch (_) {}
 
 /* ----- 插件（同目录 plugins.js） ----- */
 const PLUGIN_STATE_KEY = 'kb_pref_plugins';   // 带 kb_pref_ 前缀，会随设置备份一起导出
 const DL = window.DL = {
     apiVersion: 3,
-    list: [],            // 已注册的插件（按注册顺序）
+    list: [],            // 已注册的插件
     loadError: '',
     ready: null,
     register(def) {
@@ -11817,7 +11792,7 @@ function initPlugins() {
         const onErr = e => { if (e.filename && /\/plugins\.js(\?|$)/.test(e.filename)) syntaxMsg = e.message || '脚本报错'; };
         window.addEventListener('error', onErr);
         const el = document.createElement('script');
-        el.src = new URL('plugins.js', location.href).href + '?t=' + Date.now();   // 带时间戳避开浏览器缓存；sw.js 会忽略它
+        el.src = new URL('plugins.js', location.href).href + '?t=' + Date.now();   // 带时间戳避开浏览器缓存
         el.async = true;
         const done = () => { window.removeEventListener('error', onErr); el.remove(); res(); };
         el.onload = () => {
@@ -11829,7 +11804,7 @@ function initPlugins() {
         document.head.appendChild(el);
     });
 }
-// v1.11：插件可选钩子 onToggle(on, DL)——页面加载完插件后、以及在「设置」里开关时调用
+// v1.11：插件可选钩子 onToggle——页面加载完插件后、以及在「设置」里开关时调用
 function pluginToggle(p, on) {
     if (typeof p.onToggle !== 'function') return;
     try { Promise.resolve(p.onToggle(!!on, DL)).catch(e => console.warn('[插件 ' + p.id + ']', e)); }
@@ -12000,7 +11975,7 @@ async function exportBackup() {
             toast(pass ? '已导出加密备份，请记牢口令' : '已导出备份（明文含 Token，请妥善保管）', 'ok');
         };
         if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
-            // 分享被系统拒绝（常见于用户手势已过期）时改走下载；只有用户自己关掉面板才不处理
+            // 分享被系统拒绝时改走下载
             navigator.share({ files: [file], title: 'Direct Link 备份' }).catch(err => { if (err && err.name === 'AbortError') return; download(); });
             return;
         }
@@ -12049,10 +12024,10 @@ async function importBackup(file) {
     setTimeout(() => location.reload(), 700);
 }
 /* ----- 多选时滑动选择 ----- */
-// 两种用法：①已经在多选里，手指横着在图上划一下就开始（竖着划仍然是滚动）；②长按一张图进入多选后不松手，直接拖。
-// 选中范围 = 起点到手指所在位置之间（按页面上的先后顺序）的所有图；往回拖会收缩。起点原本就是选中的，则整片取消选择。
-// 手指拖到屏幕上 / 下边缘会自动滚动。
-let dsState = null;              // 当前这根手指（或鼠标）的状态；没有在操作时为 null
+// 两种用法：①已经在多选里，手指横着在图上划一下就开始
+// 选中范围 = 起点到手指所在位置之间的所有图
+// 手指拖到屏幕上 / 下边缘会自动滚动
+let dsState = null;              // 当前这根手指的状态
 let dsSuppressClickUntil = 0;    // 滑动结束后的一小段时间内吞掉紧跟着的 click，免得最后一张被点回去
 let dsLastTouchAt = 0;
 const DS_KINDS = {
@@ -12127,7 +12102,7 @@ function dsApply(i) {
 function dsHit(x, y) {
     const st = dsState;
     if (!st || !st.engaged) return;
-    // 用 elementsFromPoint 穿透上面的悬浮层（底部操作坞、顶部雾化渐变），否则手指拖到屏幕边缘时会被它们挡住
+    // 用 elementsFromPoint 穿透上面的悬浮层
     let el = null;
     const stack = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [document.elementFromPoint(x, y)];
     for (const n of stack) { const t = n && n.closest ? n.closest(st.cfg.tileSel) : null; if (t) { el = t; break; } }
@@ -12200,7 +12175,7 @@ function dsEnd() {
     const endTouch = () => { dsLastTouchAt = Date.now(); dsEnd(); };
     document.addEventListener('touchend', endTouch, { passive: true, capture: true });
     document.addEventListener('touchcancel', endTouch, { passive: true, capture: true });
-    // 电脑上用鼠标：多选里按住左键拖过去；或者长按进入多选后不松手继续拖
+    // 电脑上用鼠标：多选里按住左键拖过去
     page.addEventListener('mousedown', e => {
         if (e.button !== 0 || Date.now() - dsLastTouchAt < 800) return;   // 触屏点按后浏览器会补发鼠标事件，忽略
         dsStart(e.target, e.clientX, e.clientY);

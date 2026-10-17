@@ -218,10 +218,11 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .fab-item .fp { display:flex; width:13px; height:13px; opacity:.7; }
     .fab-item .fp svg { width:100%; height:100%; display:block; }
     .fab-acct.add .fab-av { background:transparent; border:1.5px dashed rgba(120,120,128,.55); }
-    .fab-search { flex-shrink:0; width:100%; margin:0 0 6px; border:1px solid var(--border); border-radius:10px; padding:8px 10px 8px 32px; font-size:13px; background-color:rgba(0,0,0,.03); color:var(--primary); font-family:inherit; }
+    .fab-search { flex-shrink:0; width:100%; margin:0 0 6px; border:1px solid var(--border); border-radius:999px; padding:8px 14px 8px 36px; font-size:13px; background-color:rgba(0,0,0,.03); color:var(--primary); font-family:inherit; }
     .fab-search:focus { outline:none; border-color:var(--primary); }
     .fab-search, .repo-pick-search { background-image:var(--rh-ico); background-repeat:no-repeat; background-position:11px center; background-size:15px; }
-    .fab-list { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; display:flex; flex-direction:column; gap:2px; }
+    .fab-search { background-position:14px center; }
+    .fab-list { flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; padding:0 2px; overscroll-behavior:contain; display:flex; flex-direction:column; gap:2px; }
     .fab-item { flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 11px; border-radius:12px; border:0; background:transparent; color:var(--primary); font-family:inherit; font-size:13px; font-weight:600; text-align:left; cursor:pointer; transition:background .12s ease, transform .12s ease; }
     .fab-item:active { background:rgba(120,120,128,.16); transform:scale(.985); }
     .fab-item.cur { background:var(--primary); color:var(--bg); }
@@ -3898,8 +3899,8 @@ function savePrefs() {
         localStorage.setItem(PREF_CLIPWATCH_KEY, $('pref-clipwatch').checked ? '1' : '0');
         localStorage.setItem(PREF_LINKCHECK_KEY, $('pref-linkcheck').checked ? '1' : '0');
         localStorage.setItem(PREF_METASYNC_KEY, $('pref-metasync').checked ? '1' : '0');
-        localStorage.setItem('kb_pref_fab', $('pref-fab').checked ? '1' : '0');
-        localStorage.setItem('kb_pref_fabtuck', $('pref-fabtuck').checked ? '1' : '0');
+        localStorage.setItem(PREF_FAB_KEY, $('pref-fab').checked ? '1' : '0');
+        localStorage.setItem(PREF_FABTUCK_KEY, $('pref-fabtuck').checked ? '1' : '0');
     } catch (_) {}
     fabRefresh();
     applyKeepModes(false); // 开关一改立即生效，不分页面、不分是否在上传
@@ -4377,7 +4378,6 @@ function removeHistoryItem(id) {
 // 实时仓库按此顺序排序
 // GitHub 的文件树只按路径字母序返回、不带上传时间
 // 单独存一份
-const REPO_SORT_NEWEST_FIRST = false; // false = 先上传的在前
 function uploadKey(owner, repo, path) {
     return [String(owner || '').toLowerCase(), String(repo || '').toLowerCase(), path].join('\u0000');
 }
@@ -10322,7 +10322,7 @@ const REPO_SORTS = [['time-asc', '上传时间 · 早到晚'], ['time-desc', '�
 function prefGallerySort() { const v = lsGet(GALLERY_SORT_KEY); return GALLERY_SORTS.some(x => x[0] === v) ? v : 'new'; }
 function prefRepoSort() {
     const v = lsGet(REPO_SORT_KEY);
-    return REPO_SORTS.some(x => x[0] === v) ? v : (REPO_SORT_NEWEST_FIRST ? 'time-desc' : 'time-asc');
+    return REPO_SORTS.some(x => x[0] === v) ? v : 'time-asc';
 }
 function entrySizeForSort(e) { return Number(e.size) || galleryRepoSize(e) || 0; }
 function sortGalleryEntries(list) {
@@ -11842,7 +11842,7 @@ function renderFabPanel() {
     panel.appendChild(strip);
     if (myRepos.length > 7 || q) {
         const inp = document.createElement('input');
-        inp.type = 'text'; inp.className = 'fab-search'; inp.placeholder = '搜索仓库'; inp.value = keepQ ? keepQ.value : '';
+        inp.type = 'text'; inp.className = 'fab-search'; inp.placeholder = 'Search'; inp.value = keepQ ? keepQ.value : '';
         inp.setAttribute('autocomplete', 'off'); inp.setAttribute('autocapitalize', 'off'); inp.spellcheck = false;
         inp.oninput = renderFabPanel;
         panel.appendChild(inp);
@@ -12739,6 +12739,24 @@ async function importBackup(file) {
     });
     if (!ok) return;
     try {
+        // 先做最容易失败的（账号、记录：可能空间不足），都成功了再写偏好；中途失败不留下写了一半的状态
+        let accRollback = null;
+        if (Array.isArray(data.accounts) && data.accounts.length) {
+            const curAcc = accLoad();
+            const accIds = new Set(curAcc.map(a => a && a.id));
+            const addAcc = data.accounts.filter(a => a && a.id && !accIds.has(a.id));
+            if (addAcc.length) { if (!accSave(curAcc.concat(addAcc))) return toast('导入失败：账号没能保存，存储空间可能不足', 'error'); accRollback = curAcc; }
+            if (data.activeAccount && !accActiveId()) { try { localStorage.setItem(ACC_ACTIVE, data.activeAccount); } catch (_) {} }
+        }
+        if (Array.isArray(data.history) && data.history.length) {
+            const cur = loadHistory();
+            const ids = new Set(cur.map(e => e && e.id));
+            const add = data.history.filter(e => e && e.id && !ids.has(e.id));
+            if (add.length && !saveHistory(cur.concat(add))) {
+                if (accRollback) accSave(accRollback);   // 账号已经加进去了：撤回，保持「要么全导入，要么都不动」
+                return toast('导入失败：存储空间不足', 'error');
+            }
+        }
         Object.keys(data.prefs).forEach(k => {
             if ((/^kb_pref_/.test(k) || BACKUP_KEYS_EXTRA.indexOf(k) >= 0) && typeof data.prefs[k] === 'string') localStorage.setItem(k, data.prefs[k]);
         });
@@ -12747,19 +12765,6 @@ async function importBackup(file) {
         const fill = (liveKey, val) => { if (val && !localStorage.getItem(liveKey)) localStorage.setItem(liveKey, val); };
         fill(ACC_LIVE.token, st.token); fill(ACC_LIVE.repo, st.repo); fill(ACC_LIVE.proxy, st.proxy); fill(ACC_LIVE.imgProxy, st.imgProxy); fill(ACC_LIVE.owner, st.owner);
         if (st.pin && localStorage.getItem(ACC_LIVE.pin) === null) localStorage.setItem(ACC_LIVE.pin, '1');
-        if (Array.isArray(data.accounts) && data.accounts.length) {
-            const curAcc = accLoad();
-            const accIds = new Set(curAcc.map(a => a && a.id));
-            const addAcc = data.accounts.filter(a => a && a.id && !accIds.has(a.id));
-            if (addAcc.length && !accSave(curAcc.concat(addAcc))) return toast('导入失败：账号没能保存，存储空间可能不足', 'error');
-            if (data.activeAccount && !accActiveId()) { try { localStorage.setItem(ACC_ACTIVE, data.activeAccount); } catch (_) {} }
-        }
-        if (Array.isArray(data.history) && data.history.length) {
-            const cur = loadHistory();
-            const ids = new Set(cur.map(e => e && e.id));
-            const add = data.history.filter(e => e && e.id && !ids.has(e.id));
-            if (add.length && !saveHistory(cur.concat(add))) return toast('导入失败：存储空间不足', 'error');
-        }
         try { await rhImport(data.replaceHist); } catch (e) { console.warn('替换历史没能导入：', e); }
     } catch (e) { return toast('导入失败：' + (e && e.message || '未知错误'), 'error'); }
     try { await flushStoreNow(); } catch (_) {}   // 记录是延迟写入的，等写完再刷新，否则记录多时会被刷新打断

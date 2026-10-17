@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<script>const APP_VERSION = '3.0.62';   // 放在文件最前面：检查更新时读到这一行就不再往下下载</script>
+<script>const APP_VERSION = '3.0.64';   // 放在文件最前面：检查更新时读到这一行就不再往下下载</script>
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F7F7F9">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111113">
@@ -33,9 +33,12 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; scrollbar-width: none; }
     *::-webkit-scrollbar { display: none; }   /* 原生滚动条一律不显示（iOS 的长条），改用下面固定短短一截的指示条 */
-    #scroll-ind { position: fixed; right: 2px; top: 0; width: 3px; height: 34px; border-radius: 2px; background: rgba(60,60,67,.42); opacity: 0; transition: opacity .3s ease; pointer-events: none; z-index: 5000; }
-    #scroll-ind.on { opacity: 1; transition-duration: .1s; }
-    html[data-theme="dark"] #scroll-ind { background: rgba(235,235,245,.45); }
+    #scroll-ind { position: fixed; right: 0; top: 0; width: 28px; height: 34px; opacity: 0; transition: opacity .3s ease; pointer-events: none; touch-action: none; z-index: 5000; }   /* 外框是好按的触控区，看得见的只有里面那一小条 */
+    #scroll-ind::before { content: ''; position: absolute; right: 2px; top: 0; bottom: 0; width: 3px; border-radius: 3px; background: rgba(60,60,67,.42); transition: width .15s ease, right .15s ease, background .15s ease; }
+    #scroll-ind.on { opacity: 1; transition-duration: .1s; pointer-events: auto; }
+    #scroll-ind.drag::before { width: 7px; right: 1px; background: rgba(60,60,67,.62); }
+    html[data-theme="dark"] #scroll-ind::before { background: rgba(235,235,245,.45); }
+    html[data-theme="dark"] #scroll-ind.drag::before { background: rgba(235,235,245,.7); }
     html, body { touch-action: manipulation; }
     body {
         font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Roboto, sans-serif;
@@ -215,7 +218,7 @@ var d=!!(m&&m.matches);r.setAttribute('data-theme',d?'dark':'light');r.style.col
     .fab-item .fp { display:flex; width:13px; height:13px; opacity:.7; }
     .fab-item .fp svg { width:100%; height:100%; display:block; }
     .fab-acct.add .fab-av { background:transparent; border:1.5px dashed rgba(120,120,128,.55); }
-    .fab-search { flex-shrink:0; width:calc(100% - 8px); margin:0 4px 6px; border:1px solid var(--border); border-radius:10px; padding:8px 10px 8px 32px; font-size:13px; background-color:rgba(0,0,0,.03); color:var(--primary); font-family:inherit; }
+    .fab-search { flex-shrink:0; width:100%; margin:0 0 6px; border:1px solid var(--border); border-radius:10px; padding:8px 10px 8px 32px; font-size:13px; background-color:rgba(0,0,0,.03); color:var(--primary); font-family:inherit; }
     .fab-search:focus { outline:none; border-color:var(--primary); }
     .fab-search, .repo-pick-search { background-image:var(--rh-ico); background-repeat:no-repeat; background-position:11px center; background-size:15px; }
     .fab-list { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; display:flex; flex-direction:column; gap:2px; }
@@ -3368,7 +3371,7 @@ function openPage(name) {
         if (name === 'files') fmEnter(false);
         if (name === 'prefs') renderPlugins();
         if (name === 'about') { renderAboutPlugins(); try { offlineStatusRefresh(); } catch (_) {} try { storageStatusRefresh(); } catch (_) {} }
-        if (name === 'update' && typeof aboutOnOpen === 'function') aboutOnOpen();
+        if (name === 'update') aboutOnOpen();
     });
 }
 function openGallery(seg) {
@@ -5910,10 +5913,10 @@ const authThumbCache = new Map();    // 'owner/repo@branch/path' -> Promise<blob
 const authThumbRepos = new Set();    // 已确认需要走 Token 取图的仓库
 let authThumbActive = 0;
 const authThumbWait = [];
-function authThumbSlot() {
+function authThumbSlot(ctl) {
     return new Promise(res => {
-        if (authThumbActive < 4) { authThumbActive++; res(); }
-        else authThumbWait.push(() => { authThumbActive++; res(); });
+        if (authThumbActive < 6) { authThumbActive++; res(); }
+        else authThumbWait.push({ ctl, go: () => { authThumbActive++; res(); } });
     });
 }
 const AUTH_THUMB_MAX = 400;   // 缓存的缩略图上限：每张 blob 地址都占着内存，大仓库来回翻会越积越多
@@ -5925,9 +5928,90 @@ function authThumbTrim() {
         if (old && old.then) old.then(u => { try { URL.revokeObjectURL(u); } catch (_) {} }, () => {});
     }
 }
-function authThumbFree() { authThumbActive--; const n = authThumbWait.shift(); if (n) n(); }
+// 空出一个名额：先放行已作废的（不联网，马上结束），其次是离屏幕最近的格子，而不是谁先排队谁先取
+function authThumbFree() {
+    authThumbActive--;
+    if (!authThumbWait.length) return;
+    let best = 0, bestD = Infinity;
+    for (let i = 0; i < authThumbWait.length; i++) {
+        const c = authThumbWait[i].ctl;
+        const d = c && c.cancelled ? -1 : (c && c.dist ? c.dist() : 0);
+        if (d < bestD) { bestD = d; best = i; if (d < 0) break; }
+    }
+    authThumbWait.splice(best, 1)[0].go();
+}
 function canAuthThumb(owner, repo, path) { return !!(getSettings().token && owner && repo && path); }
-function preferAuthThumb(owner, repo) { return authThumbRepos.has(owner + '/' + repo) && !!getSettings().token; }
+function preferAuthThumb(owner, repo) {   // 已取成功过，或仓库列表里标着「私有」：直接走 Token，不再先试一遍 CDN
+    return !!getSettings().token && (authThumbRepos.has(owner + '/' + repo) || myRepos.some(r => r && r.private && r.name === repo));
+}
+/* 私有仓库缩略图存到本机缓存（按 sha 命名，文件改了 sha 就变，不会过期），下次打开直接用，不再联网 */
+const THUMB_CACHE = 'dl-thumbs-v1';
+const thumbCacheKey = (owner, repo, sha) => 'https://thumb.local/' + owner + '/' + repo + '/' + sha;
+let thumbCachePuts = 0;
+async function thumbCacheGet(owner, repo, sha) {
+    try {
+        if (!sha || !window.caches) return null;
+        const r = await (await caches.open(THUMB_CACHE)).match(thumbCacheKey(owner, repo, sha));
+        return r ? await r.blob() : null;
+    } catch (_) { return null; }
+}
+async function thumbCachePut(owner, repo, sha, blob) {
+    try {
+        if (!window.caches) return;
+        const c = await caches.open(THUMB_CACHE);
+        await c.put(thumbCacheKey(owner, repo, sha), new Response(blob));
+        if (++thumbCachePuts % 100 === 0) {   // 偶尔修剪一次，只留最近 2500 张
+            const ks = await c.keys();
+            if (ks.length > 2500) await Promise.all(ks.slice(0, ks.length - 2500).map(k => c.delete(k)));
+        }
+    } catch (_) {}
+}
+// 格子进入屏幕附近才开始取图，滑走了还没轮到就作废：滑到哪里就先加载哪里，不用排在一大串远处的格子后面
+function makeAuthThumbWatcher(root) {   // root 必须是真正滚动的那一层（.page），否则「提前 1200px」不生效，要滑进屏幕才开始取
+    if (!('IntersectionObserver' in window)) return null;
+    const io = new IntersectionObserver(es => es.forEach(e => {
+        const h = e.target._authThumb;
+        if (h) (e.isIntersecting ? h.start : h.cancel)();
+    }), { root, rootMargin: '1200px 0px' });
+    return { watch(img, start, cancel) { img._authThumb = { start, cancel }; io.observe(img); }, stop() { io.disconnect(); } };
+}
+let repoAuthWatcher = null, galleryAuthWatcher = null;
+// 格子里的缩略图：CDN → raw → 私有仓库走 Token。仓库页和图库页共用
+function attachThumb(img, o) {
+    let triedRaw = false, triedAuth = false, curSrc = o.url, authTries = 0, apiCtl = null;
+    const canApi = canAuthThumb(o.owner, o.repo, o.path);
+    const viaApi = () => {
+        if (apiCtl) { apiCtl.cancelled = false; return; }   // 已经排上队：滑回来了就继续排，不重复请求
+        triedAuth = true; authTries++;
+        const ctl = apiCtl = { cancelled: false, dist: () => {   // 离屏幕多远：0 = 就在屏幕里
+            const r = img.getBoundingClientRect();
+            return r.bottom < 0 ? -r.bottom : (r.top > innerHeight ? r.top - innerHeight : 0);
+        } };
+        loadAuthThumb(o.owner, o.repo, o.branch, o.path, o.sha || repoFileSha(o.owner, o.repo, o.path), ctl).then(u => {
+            apiCtl = null; curSrc = u; img.removeAttribute('crossorigin'); img.src = u;
+        }, err => {
+            apiCtl = null;
+            if (ctl.cancelled) { triedAuth = false; authTries--; return; }   // 还没轮到就滑走了：下次滑回来再取
+            o.fail(err);
+        });
+    };
+    if (canApi && preferAuthThumb(o.owner, o.repo)) {
+        if (o.watcher) o.watcher.watch(img, viaApi, () => { if (apiCtl) apiCtl.cancelled = true; }); else viaApi();
+    } else {
+        if (/^https:\/\/(cdn\.jsdelivr\.net|raw\.githubusercontent\.com)\//.test(o.url || '')) img.crossOrigin = 'anonymous';   // 让离线缓存能存下缩略图
+        img.src = o.url;
+    }
+    img.loading = 'lazy';
+    img.onerror = () => {
+        // 缓存里的 blob 地址被淘汰回收后再恢复显示会报错：重新取一次
+        if (canApi && authTries < 3 && /^blob:/.test(curSrc || '')) { viaApi(); return; }
+        // jsDelivr 打不开时再回退到 raw 地址，再不行用 Token 取图
+        if (!triedRaw && !triedAuth && o.rawUrl && o.rawUrl !== o.url && !/^blob:/.test(img.currentSrc || '')) { triedRaw = true; curSrc = o.rawUrl; img.src = o.rawUrl; return; }
+        if (!triedAuth && canApi) { viaApi(); return; }
+        o.fail();
+    };
+    if (o.keeper) o.keeper.watch(img, () => curSrc);
+}
 let authThumbWarned = false;
 function authThumbNote(err) {   // 失败原因只提示一次，别刷屏
     if (authThumbWarned) return;
@@ -5958,7 +6042,7 @@ function repoFileSha(owner, repo, path) {   // 仓库列表读过的话，直接
     const f = repoLiveFiles.find(x => x.path === path && x.owner === owner && x.repo === repo);
     return f ? f.sha : '';
 }
-function loadAuthThumb(owner, repo, branch, path, sha) {
+function loadAuthThumb(owner, repo, branch, path, sha, ctl) {
     const key = owner + '/' + repo + '@' + (branch || 'main') + '/' + path;
     if (authThumbCache.has(key)) {
         const hit = authThumbCache.get(key);
@@ -5967,12 +6051,20 @@ function loadAuthThumb(owner, repo, branch, path, sha) {
     }
     const job = (async () => {
         const s = getSettings();
-        await authThumbSlot();
+        const hit = await thumbCacheGet(owner, repo, sha);   // 本机存过的，直接用
+        if (hit) { authThumbRepos.add(owner + '/' + repo); return URL.createObjectURL(hit); }
+        await authThumbSlot(ctl);
         try {
+            if (ctl && ctl.cancelled) throw new Error('已取消');   // 排队期间格子已经滑走了
             const ext = (path.split('.').pop() || '').toLowerCase();
             const type = DL_MIME[ext] || 'image/jpeg';
             const blob = b64ToBlob(await authThumbRead(owner, repo, branch, path, sha, s), type);
-            const keepOriginal = () => { authThumbRepos.add(owner + '/' + repo); return URL.createObjectURL(blob); };
+            const toUrl = b => {
+                authThumbRepos.add(owner + '/' + repo);
+                if (sha && b.size <= 400 * 1024) thumbCachePut(owner, repo, sha, b);
+                return URL.createObjectURL(b);
+            };
+            const keepOriginal = () => toUrl(blob);
             // 小文件、SVG、动图直接用原文件，别白白重绘
             if (blob.size < 150 * 1024 || ext === 'svg' || ext === 'gif') return keepOriginal();
             try {
@@ -5984,8 +6076,7 @@ function loadAuthThumb(owner, repo, branch, path, sha) {
                     c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
                     const out = await new Promise(r => c.toBlob(r, ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : 'image/webp', 0.82));
                     if (!out) throw new Error('缩略图生成失败');
-                    authThumbRepos.add(owner + '/' + repo);
-                    return URL.createObjectURL(out);
+                    return toUrl(out);
                 } finally { if (bmp.close) bmp.close(); }
             } catch (e) {
                 if (blob.size <= 8 * 1024 * 1024) return keepOriginal();   // 缩小失败（内存或格式）：直接用原图，让浏览器自己解码
@@ -6001,7 +6092,7 @@ function loadAuthThumb(owner, repo, branch, path, sha) {
 
 /* ----- 大列表缩略图内存管理 ----- */
 const THUMB_KEEP_MIN = 120;
-function makeThumbKeeper() {
+function makeThumbKeeper(root) {
     if (!('IntersectionObserver' in window)) return null;
     const io = new IntersectionObserver(es => {
         es.forEach(e => {
@@ -6014,7 +6105,7 @@ function makeThumbKeeper() {
                 img.removeAttribute('src');   // 释放解码后的位图
             }
         });
-    }, { rootMargin: '2400px 0px' });
+    }, { root, rootMargin: '2400px 0px' });
     return { watch(img, get) { img._thumb = { get, released: false }; io.observe(img); }, stop() { io.disconnect(); } };
 }
 let repoThumbKeeper = null, galleryThumbKeeper = null;
@@ -6025,6 +6116,7 @@ function renderRepoLiveFiles() {
     if (!container) return;
     repoViewEpoch++;   // 重画前先让缓存作废，下面只会算一遍
     if (repoThumbKeeper) { repoThumbKeeper.stop(); repoThumbKeeper = null; }   // 旧的格子马上要被清掉，别让观察器一直引用它们
+    if (repoAuthWatcher) { repoAuthWatcher.stop(); repoAuthWatcher = null; }
     if (repoMoreIO) { repoMoreIO.disconnect(); repoMoreIO = null; }
     repoRenderMore = null;
     if (repoLiveLoaded) {
@@ -6045,8 +6137,9 @@ function renderRepoLiveFiles() {
     }
     const list = document.createElement('div');
     list.className = 'repo-live-list';
-    if (visible.length >= THUMB_KEEP_MIN) repoThumbKeeper = makeThumbKeeper();
+    if (visible.length >= THUMB_KEEP_MIN) repoThumbKeeper = makeThumbKeeper(container.closest('.page'));
     const keeper = repoThumbKeeper;
+    const authWatcher = repoAuthWatcher = makeAuthThumbWatcher(container.closest('.page'));
     const uploadRank = buildUploadRank();
 
     folders.forEach(name => {
@@ -6165,37 +6258,17 @@ function renderRepoLiveFiles() {
         preview.className = 'repo-live-preview icon-tile';
         if (file.type === 'image') {
             const img = document.createElement('img');
-            let triedRaw = false, triedAuth = false, curSrc = file.url, authTries = 0;
             img.draggable = false;
             img.decoding = 'async';
-            const showPlaceholder = err => {
-                preview.innerHTML = '<div class="repo-live-icon">IMG</div>';
-                if (err && err.message) { preview.title = '缩略图读取失败：' + err.message; authThumbNote(err); }
-            };
-            // 私有仓库：CDN 和 Raw 都读不到，改用带 Token 的 API 取图
-            const viaApi = () => {
-                triedAuth = true; authTries++;
-                loadAuthThumb(file.owner, file.repo, file.branch, file.path, file.sha).then(u => {
-                    curSrc = u; img.removeAttribute('crossorigin'); img.src = u;
-                }, showPlaceholder);
-            };
-            const canApi = canAuthThumb(file.owner, file.repo, file.path);
-            if (canApi && preferAuthThumb(file.owner, file.repo)) viaApi();
-            else {
-                if (/^https:\/\/(cdn\.jsdelivr\.net|raw\.githubusercontent\.com)\//.test(file.url || '')) img.crossOrigin = 'anonymous';   // 让离线缓存能存下缩略图
-                img.src = file.url;
-            }
-            img.loading = 'lazy';
-            img.onerror = () => {
-                // 缓存里的 blob 地址被淘汰回收后再恢复显示会报错：重新取一次
-                if (canApi && authTries < 3 && /^blob:/.test(curSrc || '')) { viaApi(); return; }
-                // jsDelivr 打不开时再回退到 raw 地址，再不行用 Token 取图
-                if (!triedRaw && !triedAuth && file.rawUrl && file.rawUrl !== file.url && !/^blob:/.test(img.currentSrc || '')) { triedRaw = true; curSrc = file.rawUrl; img.src = file.rawUrl; return; }
-                if (!triedAuth && canApi) { viaApi(); return; }
-                showPlaceholder();
-            };
+            attachThumb(img, {
+                url: file.url, rawUrl: file.rawUrl, owner: file.owner, repo: file.repo, branch: file.branch, path: file.path, sha: file.sha,
+                keeper, watcher: authWatcher,
+                fail: err => {
+                    preview.innerHTML = '<div class="repo-live-icon">IMG</div>';
+                    if (err && err.message) { preview.title = '缩略图读取失败：' + err.message; authThumbNote(err); }
+                }
+            });
             preview.appendChild(img);
-            if (keeper) keeper.watch(img, () => curSrc);
         } else {
             const icon = document.createElement('div');
             icon.className = 'repo-live-icon';
@@ -6229,7 +6302,7 @@ function renderRepoLiveFiles() {
         container.appendChild(more);
         repoRenderMore = drawMore;
         if ('IntersectionObserver' in window) {
-            repoMoreIO = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) drawMore(); }, { rootMargin: '1500px 0px' });
+            repoMoreIO = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) drawMore(); }, { root: container.closest('.page'), rootMargin: '1500px 0px' });
             repoMoreIO.observe(more);
         } else { while (shown < visible.length) drawMore(); }
     }
@@ -6280,6 +6353,7 @@ function refreshDeadChip() {
 function renderGallery(opts) {
     if (galleryIO) { galleryIO.disconnect(); galleryIO = null; }
     if (galleryThumbKeeper) { galleryThumbKeeper.stop(); galleryThumbKeeper = null; }
+    if (galleryAuthWatcher) { galleryAuthWatcher.stop(); galleryAuthWatcher = null; }
     try { refreshDeadChip(); } catch (_) {}
     const container = $('gallery-container');
     const list = getGalleryVisibleList();
@@ -6314,8 +6388,9 @@ function renderGallery(opts) {
     dates.forEach(dateStr => groups[dateStr].forEach(entry => queue.push({ dateStr, entry })));
     const gridOf = {};
     let rendered = 0;
-    if (queue.length >= THUMB_KEEP_MIN) galleryThumbKeeper = makeThumbKeeper();
+    if (queue.length >= THUMB_KEEP_MIN) galleryThumbKeeper = makeThumbKeeper(container.closest('.page'));
     const keeper = galleryThumbKeeper;
+    const authWatcher = galleryAuthWatcher = makeAuthThumbWatcher(container.closest('.page'));
     const buildTile = (entry) => {
             const tile = document.createElement('div');
             tile.className = 'gallery-tile' + (gallerySelected.has(entry.id) ? ' selected' : '');
@@ -6359,38 +6434,22 @@ function renderGallery(opts) {
                 const img = document.createElement('img');
                 img.draggable = false;
                 img.decoding = 'async';
-                if (/^https:\/\/(cdn\.jsdelivr\.net|raw\.githubusercontent\.com)\//.test(entry.url || '')) img.crossOrigin = 'anonymous';   // 让离线缓存能存下缩略图
-                img.src = entry.url;
-                img.loading = 'lazy';
                 const ref = historyAssetRef(entry);
-                const rawFallback = (ref && ref.owner && ref.repo && ref.path)
-                    ? repoRawUrl(ref.owner, ref.repo, entry.githubBranch || ref.branch || 'main', ref.path) : '';
-                let triedRaw = false, triedAuth = false, curSrc = entry.url, authTries = 0;
-                const canApi = !!(ref && canAuthThumb(ref.owner, ref.repo, ref.path));
-                const showPlaceholder = err => {
-                    const ph = document.createElement('div');
-                    ph.className = 'icon-tile';
-                    ph.textContent = 'IMG';
-                    if (err && err.message) { ph.title = '缩略图读取失败：' + err.message; authThumbNote(err); }
-                    img.replaceWith(ph);
-                };
-                const viaApi = () => {
-                    triedAuth = true; authTries++;
-                    loadAuthThumb(ref.owner, ref.repo, entry.githubBranch || ref.branch || 'main', ref.path, repoFileSha(ref.owner, ref.repo, ref.path)).then(u => {
-                        curSrc = u; img.removeAttribute('crossorigin'); img.src = u;
-                    }, showPlaceholder);
-                };
-                if (canApi && preferAuthThumb(ref.owner, ref.repo)) { img.removeAttribute('src'); viaApi(); }
-                img.onerror = () => {
-                    // 缓存里的 blob 地址被淘汰回收后再恢复显示会报错：重新取一次
-                    if (canApi && authTries < 3 && /^blob:/.test(curSrc || '')) { viaApi(); return; }
-                    // jsDelivr 打不开时回退到 raw，再不行用 Token 取图
-                    if (!triedRaw && !triedAuth && rawFallback && rawFallback !== entry.url) { triedRaw = true; curSrc = rawFallback; img.src = rawFallback; return; }
-                    if (!triedAuth && canApi) { viaApi(); return; }
-                    showPlaceholder();
-                };
+                const branch = entry.githubBranch || (ref && ref.branch) || 'main';
+                attachThumb(img, {
+                    url: entry.url,
+                    rawUrl: (ref && ref.owner && ref.repo && ref.path) ? repoRawUrl(ref.owner, ref.repo, branch, ref.path) : '',
+                    owner: ref && ref.owner, repo: ref && ref.repo, branch, path: ref && ref.path,
+                    keeper, watcher: authWatcher,
+                    fail: err => {
+                        const ph = document.createElement('div');
+                        ph.className = 'icon-tile';
+                        ph.textContent = 'IMG';
+                        if (err && err.message) { ph.title = '缩略图读取失败：' + err.message; authThumbNote(err); }
+                        img.replaceWith(ph);
+                    }
+                });
                 tile.appendChild(img);
-                if (keeper) keeper.watch(img, () => curSrc);
             } else {
                 const icon = document.createElement('div');
                 icon.className = 'icon-tile';
@@ -6463,7 +6522,7 @@ function renderGallery(opts) {
             if (rendered >= queue.length) { if (galleryIO) { galleryIO.disconnect(); galleryIO = null; } sentinel.remove(); }
         };
         if ('IntersectionObserver' in window) {
-            galleryIO = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) fill(); }, { rootMargin: '1200px 0px' });
+            galleryIO = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) fill(); }, { root: container.closest('.page'), rootMargin: '1200px 0px' });
             galleryIO.observe(sentinel);
         } else renderMore(queue.length);
     }
@@ -11943,20 +12002,37 @@ function initV13Prefs() {
     const probe = document.createElement('div'); probe.style.cssText = 'position:fixed;top:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';
     document.body.appendChild(probe);
     const LEN = 34, GAP = 10, BOTTOM = 24;
-    let raf = 0, timer = 0, target = document;
+    let raf = 0, timer = 0, target = document, drag = null;
+    const hideLater = () => { clearTimeout(timer); timer = setTimeout(() => bar.classList.remove('on'), 1000); };
+    const metrics = () => {
+        const doc = target === document;
+        const ch = doc ? window.innerHeight : target.clientHeight;
+        const top = probe.offsetHeight + GAP;
+        return { st: doc ? window.scrollY : target.scrollTop, ch, top, max: (doc ? document.documentElement.scrollHeight : target.scrollHeight) - ch, room: ch - top - BOTTOM - LEN };
+    };
     function draw() {
         raf = 0;
-        const doc = target === document;
-        const st = doc ? window.scrollY : target.scrollTop;
-        const ch = doc ? window.innerHeight : target.clientHeight;
-        const max = (doc ? document.documentElement.scrollHeight : target.scrollHeight) - ch;
-        if (max <= 4) { bar.classList.remove('on'); return; }   // 没超出一屏就不显示
-        const top = probe.offsetHeight + GAP;
-        const y = top + (ch - top - BOTTOM - LEN) * Math.max(0, Math.min(1, st / max));
-        bar.style.transform = 'translate3d(0,' + Math.round(y) + 'px,0)';
+        const m = metrics();
+        if (m.max <= 4) { bar.classList.remove('on'); return; }   // 没超出一屏就不显示
+        bar.style.transform = 'translate3d(0,' + Math.round(m.top + m.room * Math.max(0, Math.min(1, m.st / m.max))) + 'px,0)';
         bar.classList.add('on');
-        clearTimeout(timer); timer = setTimeout(() => bar.classList.remove('on'), 1000);
+        if (!drag) hideLater();
     }
+    // 按住这一条上下拖，页面跟着滚
+    bar.addEventListener('pointerdown', e => {
+        const m = metrics();
+        if (m.max <= 4 || m.room <= 0) return;
+        drag = { y: e.clientY, st: m.st, k: m.max / m.room };
+        bar.setPointerCapture(e.pointerId); bar.classList.add('drag'); clearTimeout(timer); e.preventDefault();
+    });
+    bar.addEventListener('pointermove', e => {
+        if (!drag) return;
+        const v = drag.st + (e.clientY - drag.y) * drag.k;
+        if (target === document) window.scrollTo(0, v); else target.scrollTop = v;
+    });
+    const endDrag = () => { if (!drag) return; drag = null; bar.classList.remove('drag'); hideLater(); };
+    bar.addEventListener('pointerup', endDrag);
+    bar.addEventListener('pointercancel', endDrag);
     // scroll 不冒泡，用捕获监听；只跟随整页滚动：首页（整个文档）和当前打开的子页面
     document.addEventListener('scroll', e => {
         const t = e.target;
